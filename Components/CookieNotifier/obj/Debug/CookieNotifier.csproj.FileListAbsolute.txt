@@ -1,0 +1,4 @@
+D:\Active Projects\Projects\Components\CookieNotifier\bin\Debug\CookieNotifier.dll
+D:\Active Projects\Projects\Components\CookieNotifier\bin\Debug\CookieNotifier.pdb
+D:\Active Projects\Projects\Components\CookieNotifier\obj\Debug\CookieNotifier.dll
+D:\Active Projects\Projects\Components\CookieNotifier\obj\Debug\CookieNotifier.pdb

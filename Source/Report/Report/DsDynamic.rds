@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RptDataSource xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="DsDynamic">
+  <ConnectionProperties>
+    <Extension>SQL</Extension>
+    <ConnectString>Parameters!DatabaseConnectionString.value</ConnectString>
+  </ConnectionProperties>
+  <DataSourceID>9a33d099-a44e-4ad0-b9fc-ffa9a8904758</DataSourceID>
+</RptDataSource>

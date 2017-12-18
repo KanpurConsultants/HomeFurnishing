@@ -1,0 +1,16 @@
+D:\Active Projects\Projects\Modules\Basic Setup\Models.BasicSetup\bin\Release\Models.BasicSetup.dll.config
+D:\Active Projects\Projects\Modules\Basic Setup\Models.BasicSetup\bin\Release\Models.BasicSetup.dll
+D:\Active Projects\Projects\Modules\Basic Setup\Models.BasicSetup\bin\Release\Models.BasicSetup.pdb
+D:\Active Projects\Projects\Modules\Basic Setup\Models.BasicSetup\bin\Release\EntityFramework.dll
+D:\Active Projects\Projects\Modules\Basic Setup\Models.BasicSetup\bin\Release\EntityFramework.SqlServer.dll
+D:\Active Projects\Projects\Modules\Basic Setup\Models.BasicSetup\bin\Release\Infrastructure.dll
+D:\Active Projects\Projects\Modules\Basic Setup\Models.BasicSetup\bin\Release\Microsoft.AspNet.Identity.Core.dll
+D:\Active Projects\Projects\Modules\Basic Setup\Models.BasicSetup\bin\Release\Microsoft.AspNet.Identity.EntityFramework.dll
+D:\Active Projects\Projects\Modules\Basic Setup\Models.BasicSetup\bin\Release\Infrastructure.pdb
+D:\Active Projects\Projects\Modules\Basic Setup\Models.BasicSetup\bin\Release\EntityFramework.xml
+D:\Active Projects\Projects\Modules\Basic Setup\Models.BasicSetup\bin\Release\EntityFramework.SqlServer.xml
+D:\Active Projects\Projects\Modules\Basic Setup\Models.BasicSetup\bin\Release\Microsoft.AspNet.Identity.Core.xml
+D:\Active Projects\Projects\Modules\Basic Setup\Models.BasicSetup\bin\Release\Microsoft.AspNet.Identity.EntityFramework.xml
+D:\Active Projects\Projects\Modules\Basic Setup\Models.BasicSetup\obj\Release\Models.BasicSetup.csprojResolveAssemblyReference.cache
+D:\Active Projects\Projects\Modules\Basic Setup\Models.BasicSetup\obj\Release\Models.BasicSetup.dll
+D:\Active Projects\Projects\Modules\Basic Setup\Models.BasicSetup\obj\Release\Models.BasicSetup.pdb

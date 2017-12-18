@@ -1,0 +1,13 @@
+D:\Active Projects\Projects\Components\Mailer\Source\bin\Debug\Mailer.dll.config
+D:\Active Projects\Projects\Components\Mailer\Source\bin\Debug\Mailer.dll
+D:\Active Projects\Projects\Components\Mailer\Source\bin\Debug\Mailer.pdb
+D:\Active Projects\Projects\Components\Mailer\Source\bin\Debug\Newtonsoft.Json.dll
+D:\Active Projects\Projects\Components\Mailer\Source\bin\Debug\SendGrid.CSharp.HTTP.Client.dll
+D:\Active Projects\Projects\Components\Mailer\Source\bin\Debug\SendGrid.SmtpApi.dll
+D:\Active Projects\Projects\Components\Mailer\Source\bin\Debug\SendGridMail.dll
+D:\Active Projects\Projects\Components\Mailer\Source\bin\Debug\System.Net.Http.Formatting.dll
+D:\Active Projects\Projects\Components\Mailer\Source\bin\Debug\Newtonsoft.Json.xml
+D:\Active Projects\Projects\Components\Mailer\Source\bin\Debug\System.Net.Http.Formatting.xml
+D:\Active Projects\Projects\Components\Mailer\Source\obj\Debug\Mailer.csprojResolveAssemblyReference.cache
+D:\Active Projects\Projects\Components\Mailer\Source\obj\Debug\Mailer.dll
+D:\Active Projects\Projects\Components\Mailer\Source\obj\Debug\Mailer.pdb

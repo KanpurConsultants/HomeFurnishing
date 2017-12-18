@@ -1,0 +1,8 @@
+D:\Active Projects\Projects\Components\PermissionValidator\bin\Release\PermissionValidator.dll.config
+D:\Active Projects\Projects\Components\PermissionValidator\bin\Release\PermissionValidator.dll
+D:\Active Projects\Projects\Components\PermissionValidator\bin\Release\PermissionValidator.pdb
+D:\Active Projects\Projects\Components\PermissionValidator\bin\Release\ProjLib.dll
+D:\Active Projects\Projects\Components\PermissionValidator\bin\Release\ProjLib.pdb
+D:\Active Projects\Projects\Components\PermissionValidator\obj\Release\PermissionValidator.dll
+D:\Active Projects\Projects\Components\PermissionValidator\obj\Release\PermissionValidator.pdb
+D:\Active Projects\Projects\Components\PermissionValidator\obj\Release\PermissionValidator.csprojResolveAssemblyReference.cache

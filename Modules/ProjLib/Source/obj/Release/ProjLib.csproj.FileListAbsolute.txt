@@ -1,0 +1,14 @@
+D:\Active Projects\Projects\Modules\ProjLib\Source\bin\Release\ProjLib.dll.config
+D:\Active Projects\Projects\Modules\ProjLib\Source\bin\Release\ProjLib.dll
+D:\Active Projects\Projects\Modules\ProjLib\Source\bin\Release\ProjLib.pdb
+D:\Active Projects\Projects\Modules\ProjLib\Source\bin\Release\Infrastructure.dll
+D:\Active Projects\Projects\Modules\ProjLib\Source\bin\Release\Microsoft.AspNet.Identity.EntityFramework.dll
+D:\Active Projects\Projects\Modules\ProjLib\Source\bin\Release\EntityFramework.dll
+D:\Active Projects\Projects\Modules\ProjLib\Source\bin\Release\Microsoft.AspNet.Identity.Core.dll
+D:\Active Projects\Projects\Modules\ProjLib\Source\bin\Release\Infrastructure.pdb
+D:\Active Projects\Projects\Modules\ProjLib\Source\bin\Release\Microsoft.AspNet.Identity.EntityFramework.xml
+D:\Active Projects\Projects\Modules\ProjLib\Source\bin\Release\EntityFramework.xml
+D:\Active Projects\Projects\Modules\ProjLib\Source\bin\Release\Microsoft.AspNet.Identity.Core.xml
+D:\Active Projects\Projects\Modules\ProjLib\Source\obj\Release\ProjLib.dll
+D:\Active Projects\Projects\Modules\ProjLib\Source\obj\Release\ProjLib.pdb
+D:\Active Projects\Projects\Modules\ProjLib\Source\obj\Release\ProjLib.csprojResolveAssemblyReference.cache

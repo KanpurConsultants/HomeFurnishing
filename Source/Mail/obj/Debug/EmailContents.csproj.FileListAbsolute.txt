@@ -1,0 +1,226 @@
+D:\Active Projects\Projects\Source\Mail\bin\Debug\EMailContents.dll.config
+D:\Active Projects\Projects\Source\Mail\bin\Debug\EMailContents.dll
+D:\Active Projects\Projects\Source\Mail\bin\Debug\EMailContents.pdb
+D:\Active Projects\Projects\Source\Mail\bin\Debug\Core.dll
+D:\Active Projects\Projects\Source\Mail\bin\Debug\Data.dll
+D:\Active Projects\Projects\Source\Mail\bin\Debug\EntityFramework.dll
+D:\Active Projects\Projects\Source\Mail\bin\Debug\EntityFramework.SqlServer.dll
+D:\Active Projects\Projects\Source\Mail\bin\Debug\Mailer.dll
+D:\Active Projects\Projects\Source\Mail\bin\Debug\Microsoft.AspNet.Identity.Core.dll
+D:\Active Projects\Projects\Source\Mail\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.dll
+D:\Active Projects\Projects\Source\Mail\bin\Debug\Microsoft.ReportViewer.WebForms.DLL
+D:\Active Projects\Projects\Source\Mail\bin\Debug\Model.dll
+D:\Active Projects\Projects\Source\Mail\bin\Debug\Models.Login.dll
+D:\Active Projects\Projects\Source\Mail\bin\Debug\Service.dll
+D:\Active Projects\Projects\Source\Mail\bin\Debug\SendGridMail.dll
+D:\Active Projects\Projects\Source\Mail\bin\Debug\Models.Tasks.dll
+D:\Active Projects\Projects\Source\Mail\bin\Debug\Remotion.Data.Linq.dll
+D:\Active Projects\Projects\Source\Mail\bin\Debug\log4net.dll
+D:\Active Projects\Projects\Source\Mail\bin\Debug\System.Web.Mvc.dll
+D:\Active Projects\Projects\Source\Mail\bin\Debug\ProjLib.dll
+D:\Active Projects\Projects\Source\Mail\bin\Debug\AutoMapper.dll
+D:\Active Projects\Projects\Source\Mail\bin\Debug\SendGrid.SmtpApi.dll
+D:\Active Projects\Projects\Source\Mail\bin\Debug\Mailer.pdb
+D:\Active Projects\Projects\Source\Mail\bin\Debug\Models.Login.pdb
+D:\Active Projects\Projects\Source\Mail\bin\Debug\Core.pdb
+D:\Active Projects\Projects\Source\Mail\bin\Debug\Data.pdb
+D:\Active Projects\Projects\Source\Mail\bin\Debug\Model.pdb
+D:\Active Projects\Projects\Source\Mail\bin\Debug\Service.pdb
+D:\Active Projects\Projects\Source\Mail\bin\Debug\EntityFramework.xml
+D:\Active Projects\Projects\Source\Mail\bin\Debug\EntityFramework.SqlServer.xml
+D:\Active Projects\Projects\Source\Mail\bin\Debug\Microsoft.AspNet.Identity.Core.xml
+D:\Active Projects\Projects\Source\Mail\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.xml
+D:\Active Projects\Projects\Source\Mail\bin\Debug\Models.Tasks.pdb
+D:\Active Projects\Projects\Source\Mail\bin\Debug\log4net.xml
+D:\Active Projects\Projects\Source\Mail\bin\Debug\System.Web.Mvc.xml
+D:\Active Projects\Projects\Source\Mail\bin\Debug\ProjLib.pdb
+D:\Active Projects\Projects\Source\Mail\bin\Debug\AutoMapper.pdb
+D:\Active Projects\Projects\Source\Mail\bin\Debug\AutoMapper.xml
+D:\Active Projects\Projects\Source\Mail\obj\Debug\EmailContents.csprojResolveAssemblyReference.cache
+D:\Active Projects\Projects\Source\Mail\obj\Debug\EMailContents.dll
+D:\Active Projects\Projects\Source\Mail\obj\Debug\EMailContents.pdb
+D:\Active Projects\ERP\Source\Mail\bin\Debug\EMailContents.dll.config
+D:\Active Projects\ERP\Source\Mail\bin\Debug\EMailContents.dll
+D:\Active Projects\ERP\Source\Mail\bin\Debug\EMailContents.pdb
+D:\Active Projects\ERP\Source\Mail\bin\Debug\Core.dll
+D:\Active Projects\ERP\Source\Mail\bin\Debug\Data.dll
+D:\Active Projects\ERP\Source\Mail\bin\Debug\EntityFramework.dll
+D:\Active Projects\ERP\Source\Mail\bin\Debug\EntityFramework.SqlServer.dll
+D:\Active Projects\ERP\Source\Mail\bin\Debug\Mailer.dll
+D:\Active Projects\ERP\Source\Mail\bin\Debug\Microsoft.AspNet.Identity.Core.dll
+D:\Active Projects\ERP\Source\Mail\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.dll
+D:\Active Projects\ERP\Source\Mail\bin\Debug\Microsoft.ReportViewer.WebForms.DLL
+D:\Active Projects\ERP\Source\Mail\bin\Debug\Model.dll
+D:\Active Projects\ERP\Source\Mail\bin\Debug\Service.dll
+D:\Active Projects\ERP\Source\Mail\bin\Debug\SendGridMail.dll
+D:\Active Projects\ERP\Source\Mail\bin\Debug\Remotion.Data.Linq.dll
+D:\Active Projects\ERP\Source\Mail\bin\Debug\log4net.dll
+D:\Active Projects\ERP\Source\Mail\bin\Debug\Components.dll
+D:\Active Projects\ERP\Source\Mail\bin\Debug\System.Web.Mvc.dll
+D:\Active Projects\ERP\Source\Mail\bin\Debug\AutoMapper.dll
+D:\Active Projects\ERP\Source\Mail\bin\Debug\SendGrid.SmtpApi.dll
+D:\Active Projects\ERP\Source\Mail\bin\Debug\Mailer.pdb
+D:\Active Projects\ERP\Source\Mail\bin\Debug\Core.pdb
+D:\Active Projects\ERP\Source\Mail\bin\Debug\Data.pdb
+D:\Active Projects\ERP\Source\Mail\bin\Debug\Model.pdb
+D:\Active Projects\ERP\Source\Mail\bin\Debug\Service.pdb
+D:\Active Projects\ERP\Source\Mail\bin\Debug\EntityFramework.xml
+D:\Active Projects\ERP\Source\Mail\bin\Debug\EntityFramework.SqlServer.xml
+D:\Active Projects\ERP\Source\Mail\bin\Debug\Microsoft.AspNet.Identity.Core.xml
+D:\Active Projects\ERP\Source\Mail\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.xml
+D:\Active Projects\ERP\Source\Mail\bin\Debug\log4net.xml
+D:\Active Projects\ERP\Source\Mail\bin\Debug\Components.pdb
+D:\Active Projects\ERP\Source\Mail\bin\Debug\System.Web.Mvc.xml
+D:\Active Projects\ERP\Source\Mail\bin\Debug\AutoMapper.pdb
+D:\Active Projects\ERP\Source\Mail\bin\Debug\AutoMapper.xml
+D:\Active Projects\ERP\Source\Mail\obj\Debug\EmailContents.csprojResolveAssemblyReference.cache
+D:\Active Projects\ERP\Source\Mail\obj\Debug\EMailContents.dll
+D:\Active Projects\ERP\Source\Mail\obj\Debug\EMailContents.pdb
+D:\HomeFurnishing\Source\Mail\bin\Debug\EMailContents.dll.config
+D:\HomeFurnishing\Source\Mail\bin\Debug\EMailContents.dll
+D:\HomeFurnishing\Source\Mail\bin\Debug\EMailContents.pdb
+D:\HomeFurnishing\Source\Mail\bin\Debug\Core.dll
+D:\HomeFurnishing\Source\Mail\bin\Debug\Data.dll
+D:\HomeFurnishing\Source\Mail\bin\Debug\EntityFramework.dll
+D:\HomeFurnishing\Source\Mail\bin\Debug\EntityFramework.SqlServer.dll
+D:\HomeFurnishing\Source\Mail\bin\Debug\Mailer.dll
+D:\HomeFurnishing\Source\Mail\bin\Debug\Microsoft.AspNet.Identity.Core.dll
+D:\HomeFurnishing\Source\Mail\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.dll
+D:\HomeFurnishing\Source\Mail\bin\Debug\Microsoft.ReportViewer.WebForms.DLL
+D:\HomeFurnishing\Source\Mail\bin\Debug\Model.dll
+D:\HomeFurnishing\Source\Mail\bin\Debug\Service.dll
+D:\HomeFurnishing\Source\Mail\bin\Debug\SendGridMail.dll
+D:\HomeFurnishing\Source\Mail\bin\Debug\log4net.dll
+D:\HomeFurnishing\Source\Mail\bin\Debug\Remotion.Data.Linq.dll
+D:\HomeFurnishing\Source\Mail\bin\Debug\Components.dll
+D:\HomeFurnishing\Source\Mail\bin\Debug\System.Web.Mvc.dll
+D:\HomeFurnishing\Source\Mail\bin\Debug\AutoMapper.dll
+D:\HomeFurnishing\Source\Mail\bin\Debug\SendGrid.SmtpApi.dll
+D:\HomeFurnishing\Source\Mail\bin\Debug\Microsoft.SqlServer.Types.dll
+D:\HomeFurnishing\Source\Mail\bin\Debug\Mailer.pdb
+D:\HomeFurnishing\Source\Mail\bin\Debug\Core.pdb
+D:\HomeFurnishing\Source\Mail\bin\Debug\Data.pdb
+D:\HomeFurnishing\Source\Mail\bin\Debug\Model.pdb
+D:\HomeFurnishing\Source\Mail\bin\Debug\Service.pdb
+D:\HomeFurnishing\Source\Mail\bin\Debug\EntityFramework.xml
+D:\HomeFurnishing\Source\Mail\bin\Debug\EntityFramework.SqlServer.xml
+D:\HomeFurnishing\Source\Mail\bin\Debug\Microsoft.AspNet.Identity.Core.xml
+D:\HomeFurnishing\Source\Mail\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.xml
+D:\HomeFurnishing\Source\Mail\bin\Debug\log4net.xml
+D:\HomeFurnishing\Source\Mail\bin\Debug\Components.pdb
+D:\HomeFurnishing\Source\Mail\bin\Debug\System.Web.Mvc.xml
+D:\HomeFurnishing\Source\Mail\bin\Debug\AutoMapper.pdb
+D:\HomeFurnishing\Source\Mail\bin\Debug\AutoMapper.xml
+D:\HomeFurnishing\Source\Mail\obj\Debug\EmailContents.csprojResolveAssemblyReference.cache
+D:\HomeFurnishing\Source\Mail\obj\Debug\EMailContents.dll
+D:\HomeFurnishing\Source\Mail\obj\Debug\EMailContents.pdb
+D:\Active Projects\HomeFurnishing\Source\Mail\bin\Debug\EMailContents.dll.config
+D:\Active Projects\HomeFurnishing\Source\Mail\bin\Debug\EMailContents.dll
+D:\Active Projects\HomeFurnishing\Source\Mail\bin\Debug\EMailContents.pdb
+D:\Active Projects\HomeFurnishing\Source\Mail\bin\Debug\Core.dll
+D:\Active Projects\HomeFurnishing\Source\Mail\bin\Debug\Data.dll
+D:\Active Projects\HomeFurnishing\Source\Mail\bin\Debug\EntityFramework.dll
+D:\Active Projects\HomeFurnishing\Source\Mail\bin\Debug\EntityFramework.SqlServer.dll
+D:\Active Projects\HomeFurnishing\Source\Mail\bin\Debug\Mailer.dll
+D:\Active Projects\HomeFurnishing\Source\Mail\bin\Debug\Microsoft.AspNet.Identity.Core.dll
+D:\Active Projects\HomeFurnishing\Source\Mail\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.dll
+D:\Active Projects\HomeFurnishing\Source\Mail\bin\Debug\Microsoft.ReportViewer.WebForms.DLL
+D:\Active Projects\HomeFurnishing\Source\Mail\bin\Debug\Model.dll
+D:\Active Projects\HomeFurnishing\Source\Mail\bin\Debug\Service.dll
+D:\Active Projects\HomeFurnishing\Source\Mail\bin\Debug\SendGridMail.dll
+D:\Active Projects\HomeFurnishing\Source\Mail\bin\Debug\log4net.dll
+D:\Active Projects\HomeFurnishing\Source\Mail\bin\Debug\Remotion.Data.Linq.dll
+D:\Active Projects\HomeFurnishing\Source\Mail\bin\Debug\Components.dll
+D:\Active Projects\HomeFurnishing\Source\Mail\bin\Debug\System.Web.Mvc.dll
+D:\Active Projects\HomeFurnishing\Source\Mail\bin\Debug\AutoMapper.dll
+D:\Active Projects\HomeFurnishing\Source\Mail\bin\Debug\SendGrid.SmtpApi.dll
+D:\Active Projects\HomeFurnishing\Source\Mail\bin\Debug\Mailer.pdb
+D:\Active Projects\HomeFurnishing\Source\Mail\bin\Debug\Core.pdb
+D:\Active Projects\HomeFurnishing\Source\Mail\bin\Debug\Data.pdb
+D:\Active Projects\HomeFurnishing\Source\Mail\bin\Debug\Model.pdb
+D:\Active Projects\HomeFurnishing\Source\Mail\bin\Debug\Service.pdb
+D:\Active Projects\HomeFurnishing\Source\Mail\bin\Debug\EntityFramework.xml
+D:\Active Projects\HomeFurnishing\Source\Mail\bin\Debug\EntityFramework.SqlServer.xml
+D:\Active Projects\HomeFurnishing\Source\Mail\bin\Debug\Microsoft.AspNet.Identity.Core.xml
+D:\Active Projects\HomeFurnishing\Source\Mail\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.xml
+D:\Active Projects\HomeFurnishing\Source\Mail\bin\Debug\log4net.xml
+D:\Active Projects\HomeFurnishing\Source\Mail\bin\Debug\System.Web.Mvc.xml
+D:\Active Projects\HomeFurnishing\Source\Mail\bin\Debug\AutoMapper.pdb
+D:\Active Projects\HomeFurnishing\Source\Mail\bin\Debug\AutoMapper.xml
+D:\Active Projects\HomeFurnishing\Source\Mail\obj\Debug\EmailContents.csprojResolveAssemblyReference.cache
+D:\Active Projects\HomeFurnishing\Source\Mail\obj\Debug\EMailContents.dll
+D:\Active Projects\HomeFurnishing\Source\Mail\obj\Debug\EMailContents.pdb
+D:\Active Projects\HomeFurnishing\Source\Mail\bin\Debug\Components.pdb
+D:\Active Projects\Web\HomeFurnishing\Source\Mail\bin\Debug\EMailContents.dll.config
+D:\Active Projects\Web\HomeFurnishing\Source\Mail\bin\Debug\EMailContents.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Mail\bin\Debug\EMailContents.pdb
+D:\Active Projects\Web\HomeFurnishing\Source\Mail\bin\Debug\Core.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Mail\bin\Debug\Data.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Mail\bin\Debug\EntityFramework.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Mail\bin\Debug\EntityFramework.SqlServer.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Mail\bin\Debug\Mailer.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Mail\bin\Debug\Microsoft.AspNet.Identity.Core.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Mail\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Mail\bin\Debug\Microsoft.ReportViewer.WebForms.DLL
+D:\Active Projects\Web\HomeFurnishing\Source\Mail\bin\Debug\Model.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Mail\bin\Debug\Service.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Mail\bin\Debug\SendGridMail.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Mail\bin\Debug\log4net.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Mail\bin\Debug\Remotion.Data.Linq.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Mail\bin\Debug\Components.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Mail\bin\Debug\System.Web.Mvc.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Mail\bin\Debug\AutoMapper.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Mail\bin\Debug\SendGrid.SmtpApi.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Mail\bin\Debug\Mailer.pdb
+D:\Active Projects\Web\HomeFurnishing\Source\Mail\bin\Debug\Core.pdb
+D:\Active Projects\Web\HomeFurnishing\Source\Mail\bin\Debug\Data.pdb
+D:\Active Projects\Web\HomeFurnishing\Source\Mail\bin\Debug\Model.pdb
+D:\Active Projects\Web\HomeFurnishing\Source\Mail\bin\Debug\Service.pdb
+D:\Active Projects\Web\HomeFurnishing\Source\Mail\bin\Debug\EntityFramework.xml
+D:\Active Projects\Web\HomeFurnishing\Source\Mail\bin\Debug\EntityFramework.SqlServer.xml
+D:\Active Projects\Web\HomeFurnishing\Source\Mail\bin\Debug\Microsoft.AspNet.Identity.Core.xml
+D:\Active Projects\Web\HomeFurnishing\Source\Mail\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.xml
+D:\Active Projects\Web\HomeFurnishing\Source\Mail\bin\Debug\log4net.xml
+D:\Active Projects\Web\HomeFurnishing\Source\Mail\bin\Debug\System.Web.Mvc.xml
+D:\Active Projects\Web\HomeFurnishing\Source\Mail\bin\Debug\AutoMapper.pdb
+D:\Active Projects\Web\HomeFurnishing\Source\Mail\bin\Debug\AutoMapper.xml
+D:\Active Projects\Web\HomeFurnishing\Source\Mail\obj\Debug\EmailContents.csprojResolveAssemblyReference.cache
+D:\Active Projects\Web\HomeFurnishing\Source\Mail\obj\Debug\EMailContents.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Mail\obj\Debug\EMailContents.pdb
+D:\Sample\HomeFurnishing\Source\Mail\bin\Debug\EMailContents.dll.config
+D:\Sample\HomeFurnishing\Source\Mail\bin\Debug\EMailContents.dll
+D:\Sample\HomeFurnishing\Source\Mail\bin\Debug\EMailContents.pdb
+D:\Sample\HomeFurnishing\Source\Mail\bin\Debug\Core.dll
+D:\Sample\HomeFurnishing\Source\Mail\bin\Debug\Data.dll
+D:\Sample\HomeFurnishing\Source\Mail\bin\Debug\EntityFramework.dll
+D:\Sample\HomeFurnishing\Source\Mail\bin\Debug\EntityFramework.SqlServer.dll
+D:\Sample\HomeFurnishing\Source\Mail\bin\Debug\Mailer.dll
+D:\Sample\HomeFurnishing\Source\Mail\bin\Debug\Microsoft.AspNet.Identity.Core.dll
+D:\Sample\HomeFurnishing\Source\Mail\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.dll
+D:\Sample\HomeFurnishing\Source\Mail\bin\Debug\Microsoft.ReportViewer.WebForms.DLL
+D:\Sample\HomeFurnishing\Source\Mail\bin\Debug\Model.dll
+D:\Sample\HomeFurnishing\Source\Mail\bin\Debug\Service.dll
+D:\Sample\HomeFurnishing\Source\Mail\bin\Debug\SendGridMail.dll
+D:\Sample\HomeFurnishing\Source\Mail\bin\Debug\Remotion.Data.Linq.dll
+D:\Sample\HomeFurnishing\Source\Mail\bin\Debug\log4net.dll
+D:\Sample\HomeFurnishing\Source\Mail\bin\Debug\Components.dll
+D:\Sample\HomeFurnishing\Source\Mail\bin\Debug\System.Web.Mvc.dll
+D:\Sample\HomeFurnishing\Source\Mail\bin\Debug\AutoMapper.dll
+D:\Sample\HomeFurnishing\Source\Mail\bin\Debug\SendGrid.SmtpApi.dll
+D:\Sample\HomeFurnishing\Source\Mail\bin\Debug\Mailer.pdb
+D:\Sample\HomeFurnishing\Source\Mail\bin\Debug\Core.pdb
+D:\Sample\HomeFurnishing\Source\Mail\bin\Debug\Data.pdb
+D:\Sample\HomeFurnishing\Source\Mail\bin\Debug\Model.pdb
+D:\Sample\HomeFurnishing\Source\Mail\bin\Debug\Service.pdb
+D:\Sample\HomeFurnishing\Source\Mail\bin\Debug\EntityFramework.xml
+D:\Sample\HomeFurnishing\Source\Mail\bin\Debug\EntityFramework.SqlServer.xml
+D:\Sample\HomeFurnishing\Source\Mail\bin\Debug\Microsoft.AspNet.Identity.Core.xml
+D:\Sample\HomeFurnishing\Source\Mail\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.xml
+D:\Sample\HomeFurnishing\Source\Mail\bin\Debug\log4net.xml
+D:\Sample\HomeFurnishing\Source\Mail\bin\Debug\Components.pdb
+D:\Sample\HomeFurnishing\Source\Mail\bin\Debug\System.Web.Mvc.xml
+D:\Sample\HomeFurnishing\Source\Mail\bin\Debug\AutoMapper.pdb
+D:\Sample\HomeFurnishing\Source\Mail\bin\Debug\AutoMapper.xml
+D:\Sample\HomeFurnishing\Source\Mail\obj\Debug\EmailContents.csprojResolveAssemblyReference.cache
+D:\Sample\HomeFurnishing\Source\Mail\obj\Debug\EMailContents.dll
+D:\Sample\HomeFurnishing\Source\Mail\obj\Debug\EMailContents.pdb

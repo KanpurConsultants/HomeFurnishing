@@ -1,0 +1,2 @@
+D:\Active Projects\Projects\Modules\Reports\Source\Reports\obj\Debug\Web.Reports.csprojResolveAssemblyReference.cache
+D:\Active Projects\ERP\Modules\Reports\Source\Reports\obj\Debug\Web.Reports.csprojResolveAssemblyReference.cache

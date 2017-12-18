@@ -1,0 +1,16 @@
+D:\Active Projects\Projects\Components\Logger\Source\bin\Release\Logger.dll.config
+D:\Active Projects\Projects\Components\Logger\Source\bin\Release\Logger.dll
+D:\Active Projects\Projects\Components\Logger\Source\bin\Release\Logger.pdb
+D:\Active Projects\Projects\Components\Logger\Source\bin\Release\EntityFramework.dll
+D:\Active Projects\Projects\Components\Logger\Source\bin\Release\EntityFramework.SqlServer.dll
+D:\Active Projects\Projects\Components\Logger\Source\bin\Release\Infrastructure.dll
+D:\Active Projects\Projects\Components\Logger\Source\bin\Release\Microsoft.AspNet.Identity.Core.dll
+D:\Active Projects\Projects\Components\Logger\Source\bin\Release\Microsoft.AspNet.Identity.EntityFramework.dll
+D:\Active Projects\Projects\Components\Logger\Source\bin\Release\Infrastructure.pdb
+D:\Active Projects\Projects\Components\Logger\Source\bin\Release\EntityFramework.xml
+D:\Active Projects\Projects\Components\Logger\Source\bin\Release\EntityFramework.SqlServer.xml
+D:\Active Projects\Projects\Components\Logger\Source\bin\Release\Microsoft.AspNet.Identity.Core.xml
+D:\Active Projects\Projects\Components\Logger\Source\bin\Release\Microsoft.AspNet.Identity.EntityFramework.xml
+D:\Active Projects\Projects\Components\Logger\Source\obj\Release\Logger.csprojResolveAssemblyReference.cache
+D:\Active Projects\Projects\Components\Logger\Source\obj\Release\Logger.dll
+D:\Active Projects\Projects\Components\Logger\Source\obj\Release\Logger.pdb

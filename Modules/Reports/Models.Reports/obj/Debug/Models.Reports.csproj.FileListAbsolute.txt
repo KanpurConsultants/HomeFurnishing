@@ -1,0 +1,16 @@
+D:\Active Projects\Projects\Modules\Reports\Models.Reports\bin\Debug\Models.Reports.dll.config
+D:\Active Projects\Projects\Modules\Reports\Models.Reports\bin\Debug\Models.Reports.dll
+D:\Active Projects\Projects\Modules\Reports\Models.Reports\bin\Debug\Models.Reports.pdb
+D:\Active Projects\Projects\Modules\Reports\Models.Reports\bin\Debug\EntityFramework.dll
+D:\Active Projects\Projects\Modules\Reports\Models.Reports\bin\Debug\EntityFramework.SqlServer.dll
+D:\Active Projects\Projects\Modules\Reports\Models.Reports\bin\Debug\Infrastructure.dll
+D:\Active Projects\Projects\Modules\Reports\Models.Reports\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.dll
+D:\Active Projects\Projects\Modules\Reports\Models.Reports\bin\Debug\Microsoft.AspNet.Identity.Core.dll
+D:\Active Projects\Projects\Modules\Reports\Models.Reports\bin\Debug\Infrastructure.pdb
+D:\Active Projects\Projects\Modules\Reports\Models.Reports\bin\Debug\EntityFramework.xml
+D:\Active Projects\Projects\Modules\Reports\Models.Reports\bin\Debug\EntityFramework.SqlServer.xml
+D:\Active Projects\Projects\Modules\Reports\Models.Reports\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.xml
+D:\Active Projects\Projects\Modules\Reports\Models.Reports\bin\Debug\Microsoft.AspNet.Identity.Core.xml
+D:\Active Projects\Projects\Modules\Reports\Models.Reports\obj\Debug\Models.Reports.csprojResolveAssemblyReference.cache
+D:\Active Projects\Projects\Modules\Reports\Models.Reports\obj\Debug\Models.Reports.dll
+D:\Active Projects\Projects\Modules\Reports\Models.Reports\obj\Debug\Models.Reports.pdb

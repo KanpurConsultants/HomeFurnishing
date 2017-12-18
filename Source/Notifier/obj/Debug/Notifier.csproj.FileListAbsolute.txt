@@ -1,0 +1,174 @@
+D:\Active Projects\Projects\Source\Notifier\bin\Debug\Notifier.dll.config
+D:\Active Projects\Projects\Source\Notifier\bin\Debug\Notifier.dll
+D:\Active Projects\Projects\Source\Notifier\bin\Debug\Notifier.pdb
+D:\Active Projects\Projects\Source\Notifier\bin\Debug\Core.dll
+D:\Active Projects\Projects\Source\Notifier\bin\Debug\Data.dll
+D:\Active Projects\Projects\Source\Notifier\bin\Debug\Microsoft.AspNet.SignalR.Core.dll
+D:\Active Projects\Projects\Source\Notifier\bin\Debug\Microsoft.AspNet.SignalR.SystemWeb.dll
+D:\Active Projects\Projects\Source\Notifier\bin\Debug\Microsoft.Owin.dll
+D:\Active Projects\Projects\Source\Notifier\bin\Debug\Microsoft.Owin.Host.SystemWeb.dll
+D:\Active Projects\Projects\Source\Notifier\bin\Debug\Microsoft.Owin.Security.dll
+D:\Active Projects\Projects\Source\Notifier\bin\Debug\Models.Login.dll
+D:\Active Projects\Projects\Source\Notifier\bin\Debug\Newtonsoft.Json.dll
+D:\Active Projects\Projects\Source\Notifier\bin\Debug\Owin.dll
+D:\Active Projects\Projects\Source\Notifier\bin\Debug\EntityFramework.dll
+D:\Active Projects\Projects\Source\Notifier\bin\Debug\Models.Tasks.dll
+D:\Active Projects\Projects\Source\Notifier\bin\Debug\Remotion.Data.Linq.dll
+D:\Active Projects\Projects\Source\Notifier\bin\Debug\log4net.dll
+D:\Active Projects\Projects\Source\Notifier\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.dll
+D:\Active Projects\Projects\Source\Notifier\bin\Debug\Model.dll
+D:\Active Projects\Projects\Source\Notifier\bin\Debug\Microsoft.AspNet.Identity.Core.dll
+D:\Active Projects\Projects\Source\Notifier\bin\Debug\Models.Login.pdb
+D:\Active Projects\Projects\Source\Notifier\bin\Debug\Core.pdb
+D:\Active Projects\Projects\Source\Notifier\bin\Debug\Data.pdb
+D:\Active Projects\Projects\Source\Notifier\bin\Debug\Microsoft.AspNet.SignalR.Core.xml
+D:\Active Projects\Projects\Source\Notifier\bin\Debug\Microsoft.AspNet.SignalR.SystemWeb.xml
+D:\Active Projects\Projects\Source\Notifier\bin\Debug\Microsoft.Owin.xml
+D:\Active Projects\Projects\Source\Notifier\bin\Debug\Microsoft.Owin.Host.SystemWeb.xml
+D:\Active Projects\Projects\Source\Notifier\bin\Debug\Microsoft.Owin.Security.xml
+D:\Active Projects\Projects\Source\Notifier\bin\Debug\Newtonsoft.Json.xml
+D:\Active Projects\Projects\Source\Notifier\bin\Debug\EntityFramework.xml
+D:\Active Projects\Projects\Source\Notifier\bin\Debug\Models.Tasks.pdb
+D:\Active Projects\Projects\Source\Notifier\bin\Debug\log4net.xml
+D:\Active Projects\Projects\Source\Notifier\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.xml
+D:\Active Projects\Projects\Source\Notifier\bin\Debug\Model.pdb
+D:\Active Projects\Projects\Source\Notifier\bin\Debug\Microsoft.AspNet.Identity.Core.xml
+D:\Active Projects\Projects\Source\Notifier\obj\Debug\Notifier.csprojResolveAssemblyReference.cache
+D:\Active Projects\Projects\Source\Notifier\obj\Debug\Notifier.dll
+D:\Active Projects\Projects\Source\Notifier\obj\Debug\Notifier.pdb
+D:\Active Projects\ERP\Source\Notifier\bin\Debug\Notifier.dll.config
+D:\Active Projects\ERP\Source\Notifier\bin\Debug\Notifier.dll
+D:\Active Projects\ERP\Source\Notifier\bin\Debug\Notifier.pdb
+D:\Active Projects\ERP\Source\Notifier\bin\Debug\Core.dll
+D:\Active Projects\ERP\Source\Notifier\bin\Debug\Data.dll
+D:\Active Projects\ERP\Source\Notifier\bin\Debug\Microsoft.AspNet.SignalR.Core.dll
+D:\Active Projects\ERP\Source\Notifier\bin\Debug\Microsoft.AspNet.SignalR.SystemWeb.dll
+D:\Active Projects\ERP\Source\Notifier\bin\Debug\Microsoft.Owin.dll
+D:\Active Projects\ERP\Source\Notifier\bin\Debug\Microsoft.Owin.Host.SystemWeb.dll
+D:\Active Projects\ERP\Source\Notifier\bin\Debug\Microsoft.Owin.Security.dll
+D:\Active Projects\ERP\Source\Notifier\bin\Debug\Model.dll
+D:\Active Projects\ERP\Source\Notifier\bin\Debug\Newtonsoft.Json.dll
+D:\Active Projects\ERP\Source\Notifier\bin\Debug\Owin.dll
+D:\Active Projects\ERP\Source\Notifier\bin\Debug\Remotion.Data.Linq.dll
+D:\Active Projects\ERP\Source\Notifier\bin\Debug\log4net.dll
+D:\Active Projects\ERP\Source\Notifier\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.dll
+D:\Active Projects\ERP\Source\Notifier\bin\Debug\EntityFramework.dll
+D:\Active Projects\ERP\Source\Notifier\bin\Debug\Microsoft.AspNet.Identity.Core.dll
+D:\Active Projects\ERP\Source\Notifier\bin\Debug\Core.pdb
+D:\Active Projects\ERP\Source\Notifier\bin\Debug\Data.pdb
+D:\Active Projects\ERP\Source\Notifier\bin\Debug\Microsoft.AspNet.SignalR.Core.xml
+D:\Active Projects\ERP\Source\Notifier\bin\Debug\Microsoft.AspNet.SignalR.SystemWeb.xml
+D:\Active Projects\ERP\Source\Notifier\bin\Debug\Microsoft.Owin.xml
+D:\Active Projects\ERP\Source\Notifier\bin\Debug\Microsoft.Owin.Host.SystemWeb.xml
+D:\Active Projects\ERP\Source\Notifier\bin\Debug\Microsoft.Owin.Security.xml
+D:\Active Projects\ERP\Source\Notifier\bin\Debug\Model.pdb
+D:\Active Projects\ERP\Source\Notifier\bin\Debug\Newtonsoft.Json.xml
+D:\Active Projects\ERP\Source\Notifier\bin\Debug\log4net.xml
+D:\Active Projects\ERP\Source\Notifier\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.xml
+D:\Active Projects\ERP\Source\Notifier\bin\Debug\EntityFramework.xml
+D:\Active Projects\ERP\Source\Notifier\bin\Debug\Microsoft.AspNet.Identity.Core.xml
+D:\Active Projects\ERP\Source\Notifier\obj\Debug\Notifier.csprojResolveAssemblyReference.cache
+D:\Active Projects\ERP\Source\Notifier\obj\Debug\Notifier.dll
+D:\Active Projects\ERP\Source\Notifier\obj\Debug\Notifier.pdb
+D:\HomeFurnishing\Source\Notifier\bin\Debug\Notifier.dll.config
+D:\HomeFurnishing\Source\Notifier\bin\Debug\Notifier.dll
+D:\HomeFurnishing\Source\Notifier\bin\Debug\Notifier.pdb
+D:\HomeFurnishing\Source\Notifier\bin\Debug\Core.dll
+D:\HomeFurnishing\Source\Notifier\bin\Debug\Data.dll
+D:\HomeFurnishing\Source\Notifier\bin\Debug\Microsoft.AspNet.SignalR.Core.dll
+D:\HomeFurnishing\Source\Notifier\bin\Debug\Microsoft.AspNet.SignalR.SystemWeb.dll
+D:\HomeFurnishing\Source\Notifier\bin\Debug\Microsoft.Owin.dll
+D:\HomeFurnishing\Source\Notifier\bin\Debug\Microsoft.Owin.Host.SystemWeb.dll
+D:\HomeFurnishing\Source\Notifier\bin\Debug\Microsoft.Owin.Security.dll
+D:\HomeFurnishing\Source\Notifier\bin\Debug\Model.dll
+D:\HomeFurnishing\Source\Notifier\bin\Debug\Newtonsoft.Json.dll
+D:\HomeFurnishing\Source\Notifier\bin\Debug\Owin.dll
+D:\HomeFurnishing\Source\Notifier\bin\Debug\log4net.dll
+D:\HomeFurnishing\Source\Notifier\bin\Debug\Remotion.Data.Linq.dll
+D:\HomeFurnishing\Source\Notifier\bin\Debug\EntityFramework.dll
+D:\HomeFurnishing\Source\Notifier\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.dll
+D:\HomeFurnishing\Source\Notifier\bin\Debug\Microsoft.AspNet.Identity.Core.dll
+D:\HomeFurnishing\Source\Notifier\bin\Debug\Core.pdb
+D:\HomeFurnishing\Source\Notifier\bin\Debug\Data.pdb
+D:\HomeFurnishing\Source\Notifier\bin\Debug\Microsoft.AspNet.SignalR.Core.xml
+D:\HomeFurnishing\Source\Notifier\bin\Debug\Microsoft.AspNet.SignalR.SystemWeb.xml
+D:\HomeFurnishing\Source\Notifier\bin\Debug\Microsoft.Owin.xml
+D:\HomeFurnishing\Source\Notifier\bin\Debug\Microsoft.Owin.Host.SystemWeb.xml
+D:\HomeFurnishing\Source\Notifier\bin\Debug\Microsoft.Owin.Security.xml
+D:\HomeFurnishing\Source\Notifier\bin\Debug\Model.pdb
+D:\HomeFurnishing\Source\Notifier\bin\Debug\Newtonsoft.Json.xml
+D:\HomeFurnishing\Source\Notifier\bin\Debug\log4net.xml
+D:\HomeFurnishing\Source\Notifier\bin\Debug\EntityFramework.xml
+D:\HomeFurnishing\Source\Notifier\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.xml
+D:\HomeFurnishing\Source\Notifier\bin\Debug\Microsoft.AspNet.Identity.Core.xml
+D:\HomeFurnishing\Source\Notifier\obj\Debug\Notifier.csprojResolveAssemblyReference.cache
+D:\HomeFurnishing\Source\Notifier\obj\Debug\Notifier.dll
+D:\HomeFurnishing\Source\Notifier\obj\Debug\Notifier.pdb
+D:\Active Projects\HomeFurnishing\Source\Notifier\bin\Debug\Notifier.dll.config
+D:\Active Projects\HomeFurnishing\Source\Notifier\bin\Debug\Notifier.dll
+D:\Active Projects\HomeFurnishing\Source\Notifier\bin\Debug\Notifier.pdb
+D:\Active Projects\HomeFurnishing\Source\Notifier\bin\Debug\Core.dll
+D:\Active Projects\HomeFurnishing\Source\Notifier\bin\Debug\Data.dll
+D:\Active Projects\HomeFurnishing\Source\Notifier\bin\Debug\Microsoft.AspNet.SignalR.Core.dll
+D:\Active Projects\HomeFurnishing\Source\Notifier\bin\Debug\Microsoft.AspNet.SignalR.SystemWeb.dll
+D:\Active Projects\HomeFurnishing\Source\Notifier\bin\Debug\Microsoft.Owin.dll
+D:\Active Projects\HomeFurnishing\Source\Notifier\bin\Debug\Microsoft.Owin.Host.SystemWeb.dll
+D:\Active Projects\HomeFurnishing\Source\Notifier\bin\Debug\Microsoft.Owin.Security.dll
+D:\Active Projects\HomeFurnishing\Source\Notifier\bin\Debug\Model.dll
+D:\Active Projects\HomeFurnishing\Source\Notifier\bin\Debug\Newtonsoft.Json.dll
+D:\Active Projects\HomeFurnishing\Source\Notifier\bin\Debug\Owin.dll
+D:\Active Projects\HomeFurnishing\Source\Notifier\bin\Debug\log4net.dll
+D:\Active Projects\HomeFurnishing\Source\Notifier\bin\Debug\Remotion.Data.Linq.dll
+D:\Active Projects\HomeFurnishing\Source\Notifier\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.dll
+D:\Active Projects\HomeFurnishing\Source\Notifier\bin\Debug\EntityFramework.dll
+D:\Active Projects\HomeFurnishing\Source\Notifier\bin\Debug\Microsoft.AspNet.Identity.Core.dll
+D:\Active Projects\HomeFurnishing\Source\Notifier\bin\Debug\Core.pdb
+D:\Active Projects\HomeFurnishing\Source\Notifier\bin\Debug\Data.pdb
+D:\Active Projects\HomeFurnishing\Source\Notifier\bin\Debug\Microsoft.AspNet.SignalR.Core.xml
+D:\Active Projects\HomeFurnishing\Source\Notifier\bin\Debug\Microsoft.AspNet.SignalR.SystemWeb.xml
+D:\Active Projects\HomeFurnishing\Source\Notifier\bin\Debug\Microsoft.Owin.xml
+D:\Active Projects\HomeFurnishing\Source\Notifier\bin\Debug\Microsoft.Owin.Host.SystemWeb.xml
+D:\Active Projects\HomeFurnishing\Source\Notifier\bin\Debug\Microsoft.Owin.Security.xml
+D:\Active Projects\HomeFurnishing\Source\Notifier\bin\Debug\Model.pdb
+D:\Active Projects\HomeFurnishing\Source\Notifier\bin\Debug\Newtonsoft.Json.xml
+D:\Active Projects\HomeFurnishing\Source\Notifier\bin\Debug\log4net.xml
+D:\Active Projects\HomeFurnishing\Source\Notifier\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.xml
+D:\Active Projects\HomeFurnishing\Source\Notifier\bin\Debug\EntityFramework.xml
+D:\Active Projects\HomeFurnishing\Source\Notifier\bin\Debug\Microsoft.AspNet.Identity.Core.xml
+D:\Active Projects\HomeFurnishing\Source\Notifier\obj\Debug\Notifier.csprojResolveAssemblyReference.cache
+D:\Active Projects\HomeFurnishing\Source\Notifier\obj\Debug\Notifier.dll
+D:\Active Projects\HomeFurnishing\Source\Notifier\obj\Debug\Notifier.pdb
+D:\Sample\HomeFurnishing\Source\Notifier\bin\Debug\Notifier.dll.config
+D:\Sample\HomeFurnishing\Source\Notifier\bin\Debug\Notifier.dll
+D:\Sample\HomeFurnishing\Source\Notifier\bin\Debug\Notifier.pdb
+D:\Sample\HomeFurnishing\Source\Notifier\bin\Debug\Core.dll
+D:\Sample\HomeFurnishing\Source\Notifier\bin\Debug\Data.dll
+D:\Sample\HomeFurnishing\Source\Notifier\bin\Debug\Microsoft.AspNet.SignalR.Core.dll
+D:\Sample\HomeFurnishing\Source\Notifier\bin\Debug\Microsoft.AspNet.SignalR.SystemWeb.dll
+D:\Sample\HomeFurnishing\Source\Notifier\bin\Debug\Microsoft.Owin.dll
+D:\Sample\HomeFurnishing\Source\Notifier\bin\Debug\Microsoft.Owin.Host.SystemWeb.dll
+D:\Sample\HomeFurnishing\Source\Notifier\bin\Debug\Microsoft.Owin.Security.dll
+D:\Sample\HomeFurnishing\Source\Notifier\bin\Debug\Model.dll
+D:\Sample\HomeFurnishing\Source\Notifier\bin\Debug\Newtonsoft.Json.dll
+D:\Sample\HomeFurnishing\Source\Notifier\bin\Debug\Owin.dll
+D:\Sample\HomeFurnishing\Source\Notifier\bin\Debug\Remotion.Data.Linq.dll
+D:\Sample\HomeFurnishing\Source\Notifier\bin\Debug\log4net.dll
+D:\Sample\HomeFurnishing\Source\Notifier\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.dll
+D:\Sample\HomeFurnishing\Source\Notifier\bin\Debug\EntityFramework.dll
+D:\Sample\HomeFurnishing\Source\Notifier\bin\Debug\Microsoft.AspNet.Identity.Core.dll
+D:\Sample\HomeFurnishing\Source\Notifier\bin\Debug\Core.pdb
+D:\Sample\HomeFurnishing\Source\Notifier\bin\Debug\Data.pdb
+D:\Sample\HomeFurnishing\Source\Notifier\bin\Debug\Microsoft.AspNet.SignalR.Core.xml
+D:\Sample\HomeFurnishing\Source\Notifier\bin\Debug\Microsoft.AspNet.SignalR.SystemWeb.xml
+D:\Sample\HomeFurnishing\Source\Notifier\bin\Debug\Microsoft.Owin.xml
+D:\Sample\HomeFurnishing\Source\Notifier\bin\Debug\Microsoft.Owin.Host.SystemWeb.xml
+D:\Sample\HomeFurnishing\Source\Notifier\bin\Debug\Microsoft.Owin.Security.xml
+D:\Sample\HomeFurnishing\Source\Notifier\bin\Debug\Model.pdb
+D:\Sample\HomeFurnishing\Source\Notifier\bin\Debug\Newtonsoft.Json.xml
+D:\Sample\HomeFurnishing\Source\Notifier\bin\Debug\log4net.xml
+D:\Sample\HomeFurnishing\Source\Notifier\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.xml
+D:\Sample\HomeFurnishing\Source\Notifier\bin\Debug\EntityFramework.xml
+D:\Sample\HomeFurnishing\Source\Notifier\bin\Debug\Microsoft.AspNet.Identity.Core.xml
+D:\Sample\HomeFurnishing\Source\Notifier\obj\Debug\Notifier.csprojResolveAssemblyReference.cache
+D:\Sample\HomeFurnishing\Source\Notifier\obj\Debug\Notifier.dll
+D:\Sample\HomeFurnishing\Source\Notifier\obj\Debug\Notifier.pdb

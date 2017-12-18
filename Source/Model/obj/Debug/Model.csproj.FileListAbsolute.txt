@@ -1,0 +1,192 @@
+D:\Active Projects\Projects\Source\Model\bin\Debug\Model.dll.config
+D:\Active Projects\Projects\Source\Model\bin\Debug\Model.dll
+D:\Active Projects\Projects\Source\Model\bin\Debug\Model.pdb
+D:\Active Projects\Projects\Source\Model\bin\Debug\Core.dll
+D:\Active Projects\Projects\Source\Model\bin\Debug\EntityFramework.dll
+D:\Active Projects\Projects\Source\Model\bin\Debug\EntityFramework.SqlServer.dll
+D:\Active Projects\Projects\Source\Model\bin\Debug\Microsoft.AspNet.Identity.Core.dll
+D:\Active Projects\Projects\Source\Model\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.dll
+D:\Active Projects\Projects\Source\Model\bin\Debug\Microsoft.AspNet.Identity.Owin.dll
+D:\Active Projects\Projects\Source\Model\bin\Debug\Microsoft.Owin.dll
+D:\Active Projects\Projects\Source\Model\bin\Debug\Microsoft.Owin.Security.Cookies.dll
+D:\Active Projects\Projects\Source\Model\bin\Debug\Microsoft.Owin.Security.dll
+D:\Active Projects\Projects\Source\Model\bin\Debug\Microsoft.Owin.Security.OAuth.dll
+D:\Active Projects\Projects\Source\Model\bin\Debug\Newtonsoft.Json.dll
+D:\Active Projects\Projects\Source\Model\bin\Debug\Owin.dll
+D:\Active Projects\Projects\Source\Model\bin\Debug\Remotion.Data.Linq.dll
+D:\Active Projects\Projects\Source\Model\bin\Debug\log4net.dll
+D:\Active Projects\Projects\Source\Model\bin\Debug\Core.pdb
+D:\Active Projects\Projects\Source\Model\bin\Debug\EntityFramework.xml
+D:\Active Projects\Projects\Source\Model\bin\Debug\EntityFramework.SqlServer.xml
+D:\Active Projects\Projects\Source\Model\bin\Debug\Microsoft.AspNet.Identity.Core.xml
+D:\Active Projects\Projects\Source\Model\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.xml
+D:\Active Projects\Projects\Source\Model\bin\Debug\Microsoft.AspNet.Identity.Owin.xml
+D:\Active Projects\Projects\Source\Model\bin\Debug\Microsoft.Owin.xml
+D:\Active Projects\Projects\Source\Model\bin\Debug\Microsoft.Owin.Security.xml
+D:\Active Projects\Projects\Source\Model\bin\Debug\Microsoft.Owin.Security.Cookies.xml
+D:\Active Projects\Projects\Source\Model\bin\Debug\Microsoft.Owin.Security.OAuth.xml
+D:\Active Projects\Projects\Source\Model\bin\Debug\Newtonsoft.Json.xml
+D:\Active Projects\Projects\Source\Model\bin\Debug\log4net.xml
+D:\Active Projects\Projects\Source\Model\obj\Debug\Model.csprojResolveAssemblyReference.cache
+D:\Active Projects\Projects\Source\Model\obj\Debug\Model.dll
+D:\Active Projects\Projects\Source\Model\obj\Debug\Model.pdb
+D:\Active Projects\ERP\Source\Model\bin\Debug\Model.dll.config
+D:\Active Projects\ERP\Source\Model\bin\Debug\Model.dll
+D:\Active Projects\ERP\Source\Model\bin\Debug\Model.pdb
+D:\Active Projects\ERP\Source\Model\bin\Debug\Core.dll
+D:\Active Projects\ERP\Source\Model\bin\Debug\EntityFramework.dll
+D:\Active Projects\ERP\Source\Model\bin\Debug\EntityFramework.SqlServer.dll
+D:\Active Projects\ERP\Source\Model\bin\Debug\Microsoft.AspNet.Identity.Core.dll
+D:\Active Projects\ERP\Source\Model\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.dll
+D:\Active Projects\ERP\Source\Model\bin\Debug\Microsoft.AspNet.Identity.Owin.dll
+D:\Active Projects\ERP\Source\Model\bin\Debug\Microsoft.Owin.dll
+D:\Active Projects\ERP\Source\Model\bin\Debug\Microsoft.Owin.Security.Cookies.dll
+D:\Active Projects\ERP\Source\Model\bin\Debug\Microsoft.Owin.Security.dll
+D:\Active Projects\ERP\Source\Model\bin\Debug\Microsoft.Owin.Security.OAuth.dll
+D:\Active Projects\ERP\Source\Model\bin\Debug\Newtonsoft.Json.dll
+D:\Active Projects\ERP\Source\Model\bin\Debug\Owin.dll
+D:\Active Projects\ERP\Source\Model\bin\Debug\Remotion.Data.Linq.dll
+D:\Active Projects\ERP\Source\Model\bin\Debug\log4net.dll
+D:\Active Projects\ERP\Source\Model\bin\Debug\Core.pdb
+D:\Active Projects\ERP\Source\Model\bin\Debug\EntityFramework.xml
+D:\Active Projects\ERP\Source\Model\bin\Debug\EntityFramework.SqlServer.xml
+D:\Active Projects\ERP\Source\Model\bin\Debug\Microsoft.AspNet.Identity.Core.xml
+D:\Active Projects\ERP\Source\Model\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.xml
+D:\Active Projects\ERP\Source\Model\bin\Debug\Microsoft.AspNet.Identity.Owin.xml
+D:\Active Projects\ERP\Source\Model\bin\Debug\Microsoft.Owin.xml
+D:\Active Projects\ERP\Source\Model\bin\Debug\Microsoft.Owin.Security.xml
+D:\Active Projects\ERP\Source\Model\bin\Debug\Microsoft.Owin.Security.Cookies.xml
+D:\Active Projects\ERP\Source\Model\bin\Debug\Microsoft.Owin.Security.OAuth.xml
+D:\Active Projects\ERP\Source\Model\bin\Debug\Newtonsoft.Json.xml
+D:\Active Projects\ERP\Source\Model\bin\Debug\log4net.xml
+D:\Active Projects\ERP\Source\Model\obj\Debug\Model.csprojResolveAssemblyReference.cache
+D:\Active Projects\ERP\Source\Model\obj\Debug\Model.dll
+D:\Active Projects\ERP\Source\Model\obj\Debug\Model.pdb
+D:\HomeFurnishing\Source\Model\bin\Debug\Model.dll.config
+D:\HomeFurnishing\Source\Model\bin\Debug\Model.dll
+D:\HomeFurnishing\Source\Model\bin\Debug\Model.pdb
+D:\HomeFurnishing\Source\Model\bin\Debug\Core.dll
+D:\HomeFurnishing\Source\Model\bin\Debug\EntityFramework.dll
+D:\HomeFurnishing\Source\Model\bin\Debug\EntityFramework.SqlServer.dll
+D:\HomeFurnishing\Source\Model\bin\Debug\Microsoft.AspNet.Identity.Core.dll
+D:\HomeFurnishing\Source\Model\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.dll
+D:\HomeFurnishing\Source\Model\bin\Debug\Microsoft.AspNet.Identity.Owin.dll
+D:\HomeFurnishing\Source\Model\bin\Debug\Microsoft.Owin.dll
+D:\HomeFurnishing\Source\Model\bin\Debug\Microsoft.Owin.Security.Cookies.dll
+D:\HomeFurnishing\Source\Model\bin\Debug\Microsoft.Owin.Security.dll
+D:\HomeFurnishing\Source\Model\bin\Debug\Microsoft.Owin.Security.OAuth.dll
+D:\HomeFurnishing\Source\Model\bin\Debug\Newtonsoft.Json.dll
+D:\HomeFurnishing\Source\Model\bin\Debug\Owin.dll
+D:\HomeFurnishing\Source\Model\bin\Debug\log4net.dll
+D:\HomeFurnishing\Source\Model\bin\Debug\Remotion.Data.Linq.dll
+D:\HomeFurnishing\Source\Model\bin\Debug\Core.pdb
+D:\HomeFurnishing\Source\Model\bin\Debug\EntityFramework.xml
+D:\HomeFurnishing\Source\Model\bin\Debug\EntityFramework.SqlServer.xml
+D:\HomeFurnishing\Source\Model\bin\Debug\Microsoft.AspNet.Identity.Core.xml
+D:\HomeFurnishing\Source\Model\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.xml
+D:\HomeFurnishing\Source\Model\bin\Debug\Microsoft.AspNet.Identity.Owin.xml
+D:\HomeFurnishing\Source\Model\bin\Debug\Microsoft.Owin.xml
+D:\HomeFurnishing\Source\Model\bin\Debug\Microsoft.Owin.Security.xml
+D:\HomeFurnishing\Source\Model\bin\Debug\Microsoft.Owin.Security.Cookies.xml
+D:\HomeFurnishing\Source\Model\bin\Debug\Microsoft.Owin.Security.OAuth.xml
+D:\HomeFurnishing\Source\Model\bin\Debug\Newtonsoft.Json.xml
+D:\HomeFurnishing\Source\Model\bin\Debug\log4net.xml
+D:\HomeFurnishing\Source\Model\obj\Debug\Model.csprojResolveAssemblyReference.cache
+D:\HomeFurnishing\Source\Model\obj\Debug\Model.dll
+D:\HomeFurnishing\Source\Model\obj\Debug\Model.pdb
+D:\Active Projects\HomeFurnishing\Source\Model\bin\Debug\Model.dll.config
+D:\Active Projects\HomeFurnishing\Source\Model\bin\Debug\Model.dll
+D:\Active Projects\HomeFurnishing\Source\Model\bin\Debug\Model.pdb
+D:\Active Projects\HomeFurnishing\Source\Model\bin\Debug\Core.dll
+D:\Active Projects\HomeFurnishing\Source\Model\bin\Debug\EntityFramework.dll
+D:\Active Projects\HomeFurnishing\Source\Model\bin\Debug\EntityFramework.SqlServer.dll
+D:\Active Projects\HomeFurnishing\Source\Model\bin\Debug\Microsoft.AspNet.Identity.Core.dll
+D:\Active Projects\HomeFurnishing\Source\Model\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.dll
+D:\Active Projects\HomeFurnishing\Source\Model\bin\Debug\Microsoft.AspNet.Identity.Owin.dll
+D:\Active Projects\HomeFurnishing\Source\Model\bin\Debug\Microsoft.Owin.dll
+D:\Active Projects\HomeFurnishing\Source\Model\bin\Debug\Microsoft.Owin.Security.Cookies.dll
+D:\Active Projects\HomeFurnishing\Source\Model\bin\Debug\Microsoft.Owin.Security.dll
+D:\Active Projects\HomeFurnishing\Source\Model\bin\Debug\Microsoft.Owin.Security.OAuth.dll
+D:\Active Projects\HomeFurnishing\Source\Model\bin\Debug\Newtonsoft.Json.dll
+D:\Active Projects\HomeFurnishing\Source\Model\bin\Debug\Owin.dll
+D:\Active Projects\HomeFurnishing\Source\Model\bin\Debug\log4net.dll
+D:\Active Projects\HomeFurnishing\Source\Model\bin\Debug\Remotion.Data.Linq.dll
+D:\Active Projects\HomeFurnishing\Source\Model\bin\Debug\Core.pdb
+D:\Active Projects\HomeFurnishing\Source\Model\bin\Debug\EntityFramework.xml
+D:\Active Projects\HomeFurnishing\Source\Model\bin\Debug\EntityFramework.SqlServer.xml
+D:\Active Projects\HomeFurnishing\Source\Model\bin\Debug\Microsoft.AspNet.Identity.Core.xml
+D:\Active Projects\HomeFurnishing\Source\Model\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.xml
+D:\Active Projects\HomeFurnishing\Source\Model\bin\Debug\Microsoft.AspNet.Identity.Owin.xml
+D:\Active Projects\HomeFurnishing\Source\Model\bin\Debug\Microsoft.Owin.xml
+D:\Active Projects\HomeFurnishing\Source\Model\bin\Debug\Microsoft.Owin.Security.xml
+D:\Active Projects\HomeFurnishing\Source\Model\bin\Debug\Microsoft.Owin.Security.Cookies.xml
+D:\Active Projects\HomeFurnishing\Source\Model\bin\Debug\Microsoft.Owin.Security.OAuth.xml
+D:\Active Projects\HomeFurnishing\Source\Model\bin\Debug\Newtonsoft.Json.xml
+D:\Active Projects\HomeFurnishing\Source\Model\bin\Debug\log4net.xml
+D:\Active Projects\HomeFurnishing\Source\Model\obj\Debug\Model.csprojResolveAssemblyReference.cache
+D:\Active Projects\HomeFurnishing\Source\Model\obj\Debug\Model.dll
+D:\Active Projects\HomeFurnishing\Source\Model\obj\Debug\Model.pdb
+D:\Active Projects\Web\HomeFurnishing\Source\Model\bin\Debug\Model.dll.config
+D:\Active Projects\Web\HomeFurnishing\Source\Model\bin\Debug\Model.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Model\bin\Debug\Model.pdb
+D:\Active Projects\Web\HomeFurnishing\Source\Model\bin\Debug\Core.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Model\bin\Debug\EntityFramework.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Model\bin\Debug\EntityFramework.SqlServer.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Model\bin\Debug\Microsoft.AspNet.Identity.Core.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Model\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Model\bin\Debug\Microsoft.AspNet.Identity.Owin.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Model\bin\Debug\Microsoft.Owin.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Model\bin\Debug\Microsoft.Owin.Security.Cookies.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Model\bin\Debug\Microsoft.Owin.Security.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Model\bin\Debug\Microsoft.Owin.Security.OAuth.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Model\bin\Debug\Newtonsoft.Json.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Model\bin\Debug\Owin.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Model\bin\Debug\log4net.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Model\bin\Debug\Remotion.Data.Linq.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Model\bin\Debug\Core.pdb
+D:\Active Projects\Web\HomeFurnishing\Source\Model\bin\Debug\EntityFramework.xml
+D:\Active Projects\Web\HomeFurnishing\Source\Model\bin\Debug\EntityFramework.SqlServer.xml
+D:\Active Projects\Web\HomeFurnishing\Source\Model\bin\Debug\Microsoft.AspNet.Identity.Core.xml
+D:\Active Projects\Web\HomeFurnishing\Source\Model\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.xml
+D:\Active Projects\Web\HomeFurnishing\Source\Model\bin\Debug\Microsoft.AspNet.Identity.Owin.xml
+D:\Active Projects\Web\HomeFurnishing\Source\Model\bin\Debug\Microsoft.Owin.xml
+D:\Active Projects\Web\HomeFurnishing\Source\Model\bin\Debug\Microsoft.Owin.Security.xml
+D:\Active Projects\Web\HomeFurnishing\Source\Model\bin\Debug\Microsoft.Owin.Security.Cookies.xml
+D:\Active Projects\Web\HomeFurnishing\Source\Model\bin\Debug\Microsoft.Owin.Security.OAuth.xml
+D:\Active Projects\Web\HomeFurnishing\Source\Model\bin\Debug\Newtonsoft.Json.xml
+D:\Active Projects\Web\HomeFurnishing\Source\Model\bin\Debug\log4net.xml
+D:\Active Projects\Web\HomeFurnishing\Source\Model\obj\Debug\Model.csprojResolveAssemblyReference.cache
+D:\Active Projects\Web\HomeFurnishing\Source\Model\obj\Debug\Model.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Model\obj\Debug\Model.pdb
+D:\Sample\HomeFurnishing\Source\Model\bin\Debug\Model.dll.config
+D:\Sample\HomeFurnishing\Source\Model\bin\Debug\Model.dll
+D:\Sample\HomeFurnishing\Source\Model\bin\Debug\Model.pdb
+D:\Sample\HomeFurnishing\Source\Model\bin\Debug\Core.dll
+D:\Sample\HomeFurnishing\Source\Model\bin\Debug\EntityFramework.dll
+D:\Sample\HomeFurnishing\Source\Model\bin\Debug\EntityFramework.SqlServer.dll
+D:\Sample\HomeFurnishing\Source\Model\bin\Debug\Microsoft.AspNet.Identity.Core.dll
+D:\Sample\HomeFurnishing\Source\Model\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.dll
+D:\Sample\HomeFurnishing\Source\Model\bin\Debug\Microsoft.AspNet.Identity.Owin.dll
+D:\Sample\HomeFurnishing\Source\Model\bin\Debug\Microsoft.Owin.dll
+D:\Sample\HomeFurnishing\Source\Model\bin\Debug\Microsoft.Owin.Security.Cookies.dll
+D:\Sample\HomeFurnishing\Source\Model\bin\Debug\Microsoft.Owin.Security.dll
+D:\Sample\HomeFurnishing\Source\Model\bin\Debug\Microsoft.Owin.Security.OAuth.dll
+D:\Sample\HomeFurnishing\Source\Model\bin\Debug\Newtonsoft.Json.dll
+D:\Sample\HomeFurnishing\Source\Model\bin\Debug\Owin.dll
+D:\Sample\HomeFurnishing\Source\Model\bin\Debug\Remotion.Data.Linq.dll
+D:\Sample\HomeFurnishing\Source\Model\bin\Debug\log4net.dll
+D:\Sample\HomeFurnishing\Source\Model\bin\Debug\Core.pdb
+D:\Sample\HomeFurnishing\Source\Model\bin\Debug\EntityFramework.xml
+D:\Sample\HomeFurnishing\Source\Model\bin\Debug\EntityFramework.SqlServer.xml
+D:\Sample\HomeFurnishing\Source\Model\bin\Debug\Microsoft.AspNet.Identity.Core.xml
+D:\Sample\HomeFurnishing\Source\Model\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.xml
+D:\Sample\HomeFurnishing\Source\Model\bin\Debug\Microsoft.AspNet.Identity.Owin.xml
+D:\Sample\HomeFurnishing\Source\Model\bin\Debug\Microsoft.Owin.xml
+D:\Sample\HomeFurnishing\Source\Model\bin\Debug\Microsoft.Owin.Security.xml
+D:\Sample\HomeFurnishing\Source\Model\bin\Debug\Microsoft.Owin.Security.Cookies.xml
+D:\Sample\HomeFurnishing\Source\Model\bin\Debug\Microsoft.Owin.Security.OAuth.xml
+D:\Sample\HomeFurnishing\Source\Model\bin\Debug\Newtonsoft.Json.xml
+D:\Sample\HomeFurnishing\Source\Model\bin\Debug\log4net.xml
+D:\Sample\HomeFurnishing\Source\Model\obj\Debug\Model.csprojResolveAssemblyReference.cache
+D:\Sample\HomeFurnishing\Source\Model\obj\Debug\Model.dll
+D:\Sample\HomeFurnishing\Source\Model\obj\Debug\Model.pdb

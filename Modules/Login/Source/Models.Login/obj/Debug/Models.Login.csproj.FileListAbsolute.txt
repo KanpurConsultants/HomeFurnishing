@@ -1,0 +1,13 @@
+D:\Active Projects\Projects\Modules\Login\Source\Models.Login\bin\Debug\Models.Login.dll.config
+D:\Active Projects\Projects\Modules\Login\Source\Models.Login\bin\Debug\Models.Login.dll
+D:\Active Projects\Projects\Modules\Login\Source\Models.Login\bin\Debug\Models.Login.pdb
+D:\Active Projects\Projects\Modules\Login\Source\Models.Login\bin\Debug\Infrastructure.dll
+D:\Active Projects\Projects\Modules\Login\Source\Models.Login\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.dll
+D:\Active Projects\Projects\Modules\Login\Source\Models.Login\bin\Debug\Microsoft.AspNet.Identity.Core.dll
+D:\Active Projects\Projects\Modules\Login\Source\Models.Login\bin\Debug\Infrastructure.pdb
+D:\Active Projects\Projects\Modules\Login\Source\Models.Login\bin\Debug\EntityFramework.xml
+D:\Active Projects\Projects\Modules\Login\Source\Models.Login\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.xml
+D:\Active Projects\Projects\Modules\Login\Source\Models.Login\bin\Debug\Microsoft.AspNet.Identity.Core.xml
+D:\Active Projects\Projects\Modules\Login\Source\Models.Login\obj\Debug\Models.Login.dll
+D:\Active Projects\Projects\Modules\Login\Source\Models.Login\obj\Debug\Models.Login.pdb
+D:\Active Projects\Projects\Modules\Login\Source\Models.Login\obj\Debug\Models.Login.csprojResolveAssemblyReference.cache

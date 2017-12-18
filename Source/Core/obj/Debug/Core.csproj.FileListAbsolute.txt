@@ -1,0 +1,34 @@
+D:\Active Projects\Projects\Source\Core\obj\Debug\Core.pdb
+D:\Active Projects\Projects\Source\Core\bin\Debug\Core.dll
+D:\Active Projects\Projects\Source\Core\bin\Debug\Core.pdb
+D:\Active Projects\Projects\Source\Core\bin\Debug\log4net.dll
+D:\Active Projects\Projects\Source\Core\bin\Debug\log4net.xml
+D:\Active Projects\Projects\Source\Core\obj\Debug\Core.dll
+D:\Active Projects\Projects\Source\Core\obj\Debug\Core.csprojResolveAssemblyReference.cache
+D:\Active Projects\ERP\Source\Core\bin\Debug\Core.dll
+D:\Active Projects\ERP\Source\Core\bin\Debug\Core.pdb
+D:\Active Projects\ERP\Source\Core\bin\Debug\log4net.dll
+D:\Active Projects\ERP\Source\Core\bin\Debug\log4net.xml
+D:\Active Projects\ERP\Source\Core\obj\Debug\Core.dll
+D:\Active Projects\ERP\Source\Core\obj\Debug\Core.pdb
+D:\Active Projects\ERP\Source\Core\obj\Debug\Core.csprojResolveAssemblyReference.cache
+D:\HomeFurnishing\Source\Core\bin\Debug\Core.dll
+D:\HomeFurnishing\Source\Core\bin\Debug\Core.pdb
+D:\HomeFurnishing\Source\Core\bin\Debug\log4net.dll
+D:\HomeFurnishing\Source\Core\bin\Debug\log4net.xml
+D:\HomeFurnishing\Source\Core\obj\Debug\Core.csprojResolveAssemblyReference.cache
+D:\HomeFurnishing\Source\Core\obj\Debug\Core.dll
+D:\HomeFurnishing\Source\Core\obj\Debug\Core.pdb
+D:\Active Projects\HomeFurnishing\Source\Core\bin\Debug\Core.dll
+D:\Active Projects\HomeFurnishing\Source\Core\bin\Debug\Core.pdb
+D:\Active Projects\HomeFurnishing\Source\Core\bin\Debug\log4net.dll
+D:\Active Projects\HomeFurnishing\Source\Core\bin\Debug\log4net.xml
+D:\Active Projects\HomeFurnishing\Source\Core\obj\Debug\Core.dll
+D:\Active Projects\HomeFurnishing\Source\Core\obj\Debug\Core.pdb
+D:\Active Projects\HomeFurnishing\Source\Core\obj\Debug\Core.csprojResolveAssemblyReference.cache
+D:\Active Projects\Web\HomeFurnishing\Source\Core\bin\Debug\Core.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Core\bin\Debug\Core.pdb
+D:\Active Projects\Web\HomeFurnishing\Source\Core\bin\Debug\log4net.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Core\bin\Debug\log4net.xml
+D:\Active Projects\Web\HomeFurnishing\Source\Core\obj\Debug\Core.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Core\obj\Debug\Core.pdb

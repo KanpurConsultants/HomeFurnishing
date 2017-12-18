@@ -1,0 +1,14 @@
+D:\Active Projects\Projects\Components\PermissionValidator\bin\Debug\PermissionValidator.dll.config
+D:\Active Projects\Projects\Components\PermissionValidator\bin\Debug\PermissionValidator.dll
+D:\Active Projects\Projects\Components\PermissionValidator\bin\Debug\PermissionValidator.pdb
+D:\Active Projects\Projects\Components\PermissionValidator\bin\Debug\ProjLib.dll
+D:\Active Projects\Projects\Components\PermissionValidator\bin\Debug\ProjLib.pdb
+D:\Active Projects\Projects\Components\PermissionValidator\obj\Debug\PermissionValidator.dll
+D:\Active Projects\Projects\Components\PermissionValidator\obj\Debug\PermissionValidator.pdb
+D:\Active Projects\ERP\Components\PermissionValidator\bin\Debug\PermissionValidator.dll.config
+D:\Active Projects\ERP\Components\PermissionValidator\bin\Debug\PermissionValidator.dll
+D:\Active Projects\ERP\Components\PermissionValidator\bin\Debug\PermissionValidator.pdb
+D:\Active Projects\ERP\Components\PermissionValidator\bin\Debug\ProjLib.dll
+D:\Active Projects\ERP\Components\PermissionValidator\bin\Debug\ProjLib.pdb
+D:\Active Projects\ERP\Components\PermissionValidator\obj\Debug\PermissionValidator.dll
+D:\Active Projects\ERP\Components\PermissionValidator\obj\Debug\PermissionValidator.pdb

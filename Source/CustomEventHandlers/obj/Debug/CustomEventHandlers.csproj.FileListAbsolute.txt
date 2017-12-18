@@ -1,0 +1,129 @@
+D:\Active Projects\Projects\Source\CustomEventHandlers\bin\Debug\CustomEventHandlers.dll.config
+D:\Active Projects\Projects\Source\CustomEventHandlers\bin\Debug\CustomEventHandlers.dll
+D:\Active Projects\Projects\Source\CustomEventHandlers\bin\Debug\CustomEventHandlers.pdb
+D:\Active Projects\Projects\Source\CustomEventHandlers\bin\Debug\Core.dll
+D:\Active Projects\Projects\Source\CustomEventHandlers\bin\Debug\Data.dll
+D:\Active Projects\Projects\Source\CustomEventHandlers\bin\Debug\DocumentEvents.dll
+D:\Active Projects\Projects\Source\CustomEventHandlers\bin\Debug\EntityFramework.dll
+D:\Active Projects\Projects\Source\CustomEventHandlers\bin\Debug\EntityFramework.SqlServer.dll
+D:\Active Projects\Projects\Source\CustomEventHandlers\bin\Debug\Microsoft.AspNet.Identity.Core.dll
+D:\Active Projects\Projects\Source\CustomEventHandlers\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.dll
+D:\Active Projects\Projects\Source\CustomEventHandlers\bin\Debug\Model.dll
+D:\Active Projects\Projects\Source\CustomEventHandlers\bin\Debug\Remotion.Data.Linq.dll
+D:\Active Projects\Projects\Source\CustomEventHandlers\bin\Debug\log4net.dll
+D:\Active Projects\Projects\Source\CustomEventHandlers\bin\Debug\Models.Login.dll
+D:\Active Projects\Projects\Source\CustomEventHandlers\bin\Debug\Models.Tasks.dll
+D:\Active Projects\Projects\Source\CustomEventHandlers\bin\Debug\DocumentEvents.pdb
+D:\Active Projects\Projects\Source\CustomEventHandlers\bin\Debug\Core.pdb
+D:\Active Projects\Projects\Source\CustomEventHandlers\bin\Debug\Data.pdb
+D:\Active Projects\Projects\Source\CustomEventHandlers\bin\Debug\Model.pdb
+D:\Active Projects\Projects\Source\CustomEventHandlers\bin\Debug\EntityFramework.xml
+D:\Active Projects\Projects\Source\CustomEventHandlers\bin\Debug\EntityFramework.SqlServer.xml
+D:\Active Projects\Projects\Source\CustomEventHandlers\bin\Debug\Microsoft.AspNet.Identity.Core.xml
+D:\Active Projects\Projects\Source\CustomEventHandlers\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.xml
+D:\Active Projects\Projects\Source\CustomEventHandlers\bin\Debug\log4net.xml
+D:\Active Projects\Projects\Source\CustomEventHandlers\bin\Debug\Models.Login.pdb
+D:\Active Projects\Projects\Source\CustomEventHandlers\bin\Debug\Models.Tasks.pdb
+D:\Active Projects\Projects\Source\CustomEventHandlers\obj\Debug\CustomEventHandlers.csprojResolveAssemblyReference.cache
+D:\Active Projects\Projects\Source\CustomEventHandlers\obj\Debug\CustomEventHandlers.dll
+D:\Active Projects\Projects\Source\CustomEventHandlers\obj\Debug\CustomEventHandlers.pdb
+D:\Active Projects\ERP\Source\CustomEventHandlers\bin\Debug\CustomEventHandlers.dll.config
+D:\Active Projects\ERP\Source\CustomEventHandlers\bin\Debug\CustomEventHandlers.dll
+D:\Active Projects\ERP\Source\CustomEventHandlers\bin\Debug\CustomEventHandlers.pdb
+D:\Active Projects\ERP\Source\CustomEventHandlers\bin\Debug\Core.dll
+D:\Active Projects\ERP\Source\CustomEventHandlers\bin\Debug\Data.dll
+D:\Active Projects\ERP\Source\CustomEventHandlers\bin\Debug\DocumentEvents.dll
+D:\Active Projects\ERP\Source\CustomEventHandlers\bin\Debug\EntityFramework.dll
+D:\Active Projects\ERP\Source\CustomEventHandlers\bin\Debug\EntityFramework.SqlServer.dll
+D:\Active Projects\ERP\Source\CustomEventHandlers\bin\Debug\Microsoft.AspNet.Identity.Core.dll
+D:\Active Projects\ERP\Source\CustomEventHandlers\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.dll
+D:\Active Projects\ERP\Source\CustomEventHandlers\bin\Debug\Model.dll
+D:\Active Projects\ERP\Source\CustomEventHandlers\bin\Debug\Remotion.Data.Linq.dll
+D:\Active Projects\ERP\Source\CustomEventHandlers\bin\Debug\log4net.dll
+D:\Active Projects\ERP\Source\CustomEventHandlers\bin\Debug\DocumentEvents.pdb
+D:\Active Projects\ERP\Source\CustomEventHandlers\bin\Debug\Core.pdb
+D:\Active Projects\ERP\Source\CustomEventHandlers\bin\Debug\Data.pdb
+D:\Active Projects\ERP\Source\CustomEventHandlers\bin\Debug\Model.pdb
+D:\Active Projects\ERP\Source\CustomEventHandlers\bin\Debug\EntityFramework.xml
+D:\Active Projects\ERP\Source\CustomEventHandlers\bin\Debug\EntityFramework.SqlServer.xml
+D:\Active Projects\ERP\Source\CustomEventHandlers\bin\Debug\Microsoft.AspNet.Identity.Core.xml
+D:\Active Projects\ERP\Source\CustomEventHandlers\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.xml
+D:\Active Projects\ERP\Source\CustomEventHandlers\bin\Debug\log4net.xml
+D:\Active Projects\ERP\Source\CustomEventHandlers\obj\Debug\CustomEventHandlers.csprojResolveAssemblyReference.cache
+D:\Active Projects\ERP\Source\CustomEventHandlers\obj\Debug\CustomEventHandlers.dll
+D:\Active Projects\ERP\Source\CustomEventHandlers\obj\Debug\CustomEventHandlers.pdb
+D:\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\CustomEventHandlers.dll.config
+D:\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\CustomEventHandlers.dll
+D:\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\CustomEventHandlers.pdb
+D:\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\Core.dll
+D:\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\Data.dll
+D:\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\DocumentEvents.dll
+D:\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\EntityFramework.dll
+D:\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\EntityFramework.SqlServer.dll
+D:\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\Microsoft.AspNet.Identity.Core.dll
+D:\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.dll
+D:\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\Model.dll
+D:\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\log4net.dll
+D:\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\Remotion.Data.Linq.dll
+D:\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\DocumentEvents.pdb
+D:\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\Core.pdb
+D:\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\Data.pdb
+D:\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\Model.pdb
+D:\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\EntityFramework.xml
+D:\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\EntityFramework.SqlServer.xml
+D:\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\Microsoft.AspNet.Identity.Core.xml
+D:\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.xml
+D:\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\log4net.xml
+D:\HomeFurnishing\Source\CustomEventHandlers\obj\Debug\CustomEventHandlers.csprojResolveAssemblyReference.cache
+D:\HomeFurnishing\Source\CustomEventHandlers\obj\Debug\CustomEventHandlers.dll
+D:\HomeFurnishing\Source\CustomEventHandlers\obj\Debug\CustomEventHandlers.pdb
+D:\Active Projects\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\CustomEventHandlers.dll.config
+D:\Active Projects\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\CustomEventHandlers.dll
+D:\Active Projects\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\CustomEventHandlers.pdb
+D:\Active Projects\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\Core.dll
+D:\Active Projects\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\Data.dll
+D:\Active Projects\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\DocumentEvents.dll
+D:\Active Projects\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\EntityFramework.dll
+D:\Active Projects\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\EntityFramework.SqlServer.dll
+D:\Active Projects\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\Microsoft.AspNet.Identity.Core.dll
+D:\Active Projects\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.dll
+D:\Active Projects\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\Model.dll
+D:\Active Projects\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\log4net.dll
+D:\Active Projects\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\Remotion.Data.Linq.dll
+D:\Active Projects\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\DocumentEvents.pdb
+D:\Active Projects\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\Core.pdb
+D:\Active Projects\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\Data.pdb
+D:\Active Projects\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\Model.pdb
+D:\Active Projects\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\EntityFramework.xml
+D:\Active Projects\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\EntityFramework.SqlServer.xml
+D:\Active Projects\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\Microsoft.AspNet.Identity.Core.xml
+D:\Active Projects\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.xml
+D:\Active Projects\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\log4net.xml
+D:\Active Projects\HomeFurnishing\Source\CustomEventHandlers\obj\Debug\CustomEventHandlers.csprojResolveAssemblyReference.cache
+D:\Active Projects\HomeFurnishing\Source\CustomEventHandlers\obj\Debug\CustomEventHandlers.dll
+D:\Active Projects\HomeFurnishing\Source\CustomEventHandlers\obj\Debug\CustomEventHandlers.pdb
+D:\Sample\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\CustomEventHandlers.dll.config
+D:\Sample\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\CustomEventHandlers.dll
+D:\Sample\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\CustomEventHandlers.pdb
+D:\Sample\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\Core.dll
+D:\Sample\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\Data.dll
+D:\Sample\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\DocumentEvents.dll
+D:\Sample\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\EntityFramework.dll
+D:\Sample\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\EntityFramework.SqlServer.dll
+D:\Sample\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\Microsoft.AspNet.Identity.Core.dll
+D:\Sample\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.dll
+D:\Sample\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\Model.dll
+D:\Sample\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\Remotion.Data.Linq.dll
+D:\Sample\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\log4net.dll
+D:\Sample\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\DocumentEvents.pdb
+D:\Sample\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\Core.pdb
+D:\Sample\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\Data.pdb
+D:\Sample\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\Model.pdb
+D:\Sample\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\EntityFramework.xml
+D:\Sample\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\EntityFramework.SqlServer.xml
+D:\Sample\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\Microsoft.AspNet.Identity.Core.xml
+D:\Sample\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.xml
+D:\Sample\HomeFurnishing\Source\CustomEventHandlers\bin\Debug\log4net.xml
+D:\Sample\HomeFurnishing\Source\CustomEventHandlers\obj\Debug\CustomEventHandlers.csprojResolveAssemblyReference.cache
+D:\Sample\HomeFurnishing\Source\CustomEventHandlers\obj\Debug\CustomEventHandlers.dll
+D:\Sample\HomeFurnishing\Source\CustomEventHandlers\obj\Debug\CustomEventHandlers.pdb

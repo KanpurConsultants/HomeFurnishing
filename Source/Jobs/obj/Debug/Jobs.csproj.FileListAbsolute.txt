@@ -1,0 +1,506 @@
+D:\Active Projects\HomeFurnishing\Source\Jobs\obj\Debug\Jobs.csprojResolveAssemblyReference.cache
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\AutoMapper.Net4.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports\Packing_AWLabelPrintNew_11082015.rdlc
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports\Packing_AWLabelPrintNew.rdlc
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports\Packing_LabelPrint_OnlyQRCode.rdlc
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports\Packing_LabelPrint.rdlc
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports\Packing_LabelPrintNew.rdlc
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseGoodsReceipt_Print_WithDealUnit.rdlc
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports\DispatchWaybill_Print.rdlc
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseWaybill_Print.rdlc
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports\LocalReportExample.rdlc
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseInvoicePrint_Charges.rdlc
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseGoodsReceipt_Print.rdlc
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseGoodsReceipt_Print_Carpet_WithShortQty.rdlc
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseGoodsReceipt_Print_Carpet.rdlc
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseGoodsReceipt_Print_WithLotNo_WithShortQty.rdlc
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseGoodsReceipt_Print_WithDealUnitandSpecification.rdlc
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseGoodsReceipt_Print_WithLotNo.rdlc
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseGoodsReceipt_Print_WithSpecification_WithShortQty.rdlc
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseInvoiceReport.rdlc
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseInvoice_Print.rdlc
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseOrderHeaderAmendmentDetail.rdlc
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseOrdePrintAmendment.rdlc
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseOrderReport.rdlc
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseInvoiceReportProductWise.rdlc
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseOrderStatusSummary.rdlc
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseOrderReportProductWise.rdlc
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseOrderSummary.rdlc
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseIndent_Print.rdlc
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseCharges.rdlc
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports\CompanyDetail.rdlc
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseOrder_Print_Carpet.rdlc
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseOrder_Print_Carpet_WithDeliveryUnit.rdlc
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseGoodsReceipt_Print_WithSpecification.rdlc
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseInvoice_Print_WithDeliveryUnit.rdlc
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseOrder_Print_WithDeliveryUnit.rdlc
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports\SaleInvoice_MasterKey.rdlc
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports\SaleInvoice_ExportValueDeclaration.rdlc
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports\SaleInvoice_DocumentOfExchange.rdlc
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports\SaleInvoice_PostShipmentCoveringLetter.rdlc
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports\SaleInvoice_SingleCountryDeclaration.rdlc
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports\SaleInvoice_ShippingAgentLetter.rdlc
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports\SaleOrderAmendment_Print.rdlc
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports\ProductionOrder_Print.rdlc
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports\YarnDyeingPlan_Print.rdlc
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports\SaleInvoice_ExporterDeclaration.rdlc
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseOrder_Print.rdlc
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports\SaleOrderPlan_Print.rdlc
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports\WeavingOrder_Print1.rdlc
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports\WeavingOrder_Print.rdlc
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports\SaleOrder_Print.rdlc
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports\SaleOrderCancel_Print.rdlc
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports\Packing_Print.rdlc
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports\Packing_AWLabelPrint.rdlc
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports\Packing_HDCLabelPrint.rdlc
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports\Packing_Print_ToExcel.rdlc
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Jobs.dll.config
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Jobs.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Jobs.pdb
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Antlr3.Runtime.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\AutoMapper.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Core.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\CustomEventHandlers.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Data.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\DocumentEvents.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\EMailContents.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\EntityFramework.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\EntityFramework.SqlServer.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\GridMvc.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\ImageResizer.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Mailer.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Microsoft.AspNet.Identity.Core.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Microsoft.AspNet.Identity.EntityFramework.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Microsoft.AspNet.Identity.Owin.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Microsoft.AspNet.SignalR.Core.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Microsoft.AspNet.SignalR.SystemWeb.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Microsoft.Owin.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Microsoft.Owin.Host.SystemWeb.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Microsoft.Owin.Security.Cookies.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Microsoft.Owin.Security.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Microsoft.Owin.Security.Facebook.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Microsoft.Owin.Security.Google.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Microsoft.Owin.Security.MicrosoftAccount.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Microsoft.Owin.Security.OAuth.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Microsoft.Owin.Security.Twitter.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Microsoft.Practices.ServiceLocation.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Microsoft.Practices.Unity.Configuration.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Microsoft.Practices.Unity.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Microsoft.Practices.Unity.Mvc.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Microsoft.Practices.Unity.RegistrationByConvention.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Microsoft.QualityTools.Testing.Fakes.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Microsoft.ReportViewer.Common.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Microsoft.ReportViewer.ProcessingObjectModel.DLL
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Microsoft.ReportViewer.WebForms.DLL
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Microsoft.Web.Infrastructure.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Model.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Newtonsoft.Json.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\NotificationContents.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Notifier.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Owin.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Service.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\System.Web.Helpers.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\System.Web.Mvc.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\System.Web.Optimization.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\System.Web.Razor.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\System.Web.WebPages.Deployment.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\System.Web.WebPages.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\System.Web.WebPages.Razor.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\WebActivatorEx.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\WebGrease.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\log4net.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\EPPlus.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\itextsharp.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Elmah.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\SendGridMail.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\SendGrid.SmtpApi.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\CustomEventHandlers.pdb
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\DocumentEvents.pdb
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Notifier.pdb
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Core.pdb
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Data.pdb
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Model.pdb
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Reports.pdb
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Service.pdb
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Antlr3.Runtime.pdb
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\AutoMapper.pdb
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\AutoMapper.xml
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\AutoMapper.Net4.pdb
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\EMailContents.pdb
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\EntityFramework.xml
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\EntityFramework.SqlServer.xml
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\ImageResizer.xml
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Mailer.pdb
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Microsoft.AspNet.Identity.Core.xml
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Microsoft.AspNet.Identity.EntityFramework.xml
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Microsoft.AspNet.Identity.Owin.xml
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Microsoft.AspNet.SignalR.Core.xml
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Microsoft.AspNet.SignalR.SystemWeb.xml
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Microsoft.Owin.xml
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Microsoft.Owin.Host.SystemWeb.xml
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Microsoft.Owin.Security.xml
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Microsoft.Owin.Security.Cookies.xml
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Microsoft.Owin.Security.Facebook.xml
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Microsoft.Owin.Security.Google.xml
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Microsoft.Owin.Security.MicrosoftAccount.xml
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Microsoft.Owin.Security.OAuth.xml
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Microsoft.Owin.Security.Twitter.xml
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Microsoft.Practices.ServiceLocation.pdb
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Microsoft.Practices.ServiceLocation.xml
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Microsoft.Practices.Unity.xml
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Microsoft.Practices.Unity.Configuration.xml
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Microsoft.Practices.Unity.Mvc.xml
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Microsoft.Practices.Unity.RegistrationByConvention.xml
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Newtonsoft.Json.xml
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\System.Web.Helpers.xml
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\System.Web.Mvc.xml
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\System.Web.Optimization.xml
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\System.Web.Razor.xml
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\System.Web.WebPages.xml
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\System.Web.WebPages.Deployment.xml
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\System.Web.WebPages.Razor.xml
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\log4net.xml
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\EPPlus.xml
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\itextsharp.xml
+D:\Active Projects\HomeFurnishing\Source\Jobs\obj\Debug\Jobs.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\obj\Debug\Jobs.pdb
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Components.dll
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\Components.pdb
+D:\Active Projects\HomeFurnishing\Source\Jobs\bin\NotificationContents.pdb
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\AutoMapper.Net4.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports\Packing_AWLabelPrintNew_11082015.rdlc
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports\Packing_AWLabelPrintNew.rdlc
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports\Packing_LabelPrint_OnlyQRCode.rdlc
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports\Packing_LabelPrint.rdlc
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports\Packing_LabelPrintNew.rdlc
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseGoodsReceipt_Print_WithDealUnit.rdlc
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports\DispatchWaybill_Print.rdlc
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseWaybill_Print.rdlc
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports\LocalReportExample.rdlc
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseInvoicePrint_Charges.rdlc
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseGoodsReceipt_Print.rdlc
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseGoodsReceipt_Print_Carpet_WithShortQty.rdlc
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseGoodsReceipt_Print_Carpet.rdlc
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseGoodsReceipt_Print_WithLotNo_WithShortQty.rdlc
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseGoodsReceipt_Print_WithDealUnitandSpecification.rdlc
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseGoodsReceipt_Print_WithLotNo.rdlc
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseGoodsReceipt_Print_WithSpecification_WithShortQty.rdlc
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseInvoiceReport.rdlc
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseInvoice_Print.rdlc
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseOrderHeaderAmendmentDetail.rdlc
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseOrdePrintAmendment.rdlc
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseOrderReport.rdlc
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseInvoiceReportProductWise.rdlc
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseOrderStatusSummary.rdlc
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseOrderReportProductWise.rdlc
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseOrderSummary.rdlc
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseIndent_Print.rdlc
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseCharges.rdlc
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports\CompanyDetail.rdlc
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseOrder_Print_Carpet.rdlc
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseOrder_Print_Carpet_WithDeliveryUnit.rdlc
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseGoodsReceipt_Print_WithSpecification.rdlc
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseInvoice_Print_WithDeliveryUnit.rdlc
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseOrder_Print_WithDeliveryUnit.rdlc
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports\SaleInvoice_MasterKey.rdlc
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports\SaleInvoice_ExportValueDeclaration.rdlc
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports\SaleInvoice_DocumentOfExchange.rdlc
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports\SaleInvoice_PostShipmentCoveringLetter.rdlc
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports\SaleInvoice_SingleCountryDeclaration.rdlc
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports\SaleInvoice_ShippingAgentLetter.rdlc
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports\SaleOrderAmendment_Print.rdlc
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports\ProductionOrder_Print.rdlc
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports\YarnDyeingPlan_Print.rdlc
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports\SaleInvoice_ExporterDeclaration.rdlc
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseOrder_Print.rdlc
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports\SaleOrderPlan_Print.rdlc
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports\WeavingOrder_Print1.rdlc
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports\WeavingOrder_Print.rdlc
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports\SaleOrder_Print.rdlc
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports\SaleOrderCancel_Print.rdlc
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports\Packing_Print.rdlc
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports\Packing_AWLabelPrint.rdlc
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports\Packing_HDCLabelPrint.rdlc
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports\Packing_Print_ToExcel.rdlc
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Jobs.dll.config
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Jobs.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Jobs.pdb
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Antlr3.Runtime.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\AutoMapper.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Core.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\CustomEventHandlers.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Data.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\DocumentEvents.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\EMailContents.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\EntityFramework.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\EntityFramework.SqlServer.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\GridMvc.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\ImageResizer.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Mailer.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Microsoft.AspNet.Identity.Core.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Microsoft.AspNet.Identity.EntityFramework.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Microsoft.AspNet.Identity.Owin.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Microsoft.AspNet.SignalR.Core.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Microsoft.AspNet.SignalR.SystemWeb.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Microsoft.Owin.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Microsoft.Owin.Host.SystemWeb.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Microsoft.Owin.Security.Cookies.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Microsoft.Owin.Security.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Microsoft.Owin.Security.Facebook.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Microsoft.Owin.Security.Google.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Microsoft.Owin.Security.MicrosoftAccount.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Microsoft.Owin.Security.OAuth.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Microsoft.Owin.Security.Twitter.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Microsoft.Practices.ServiceLocation.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Microsoft.Practices.Unity.Configuration.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Microsoft.Practices.Unity.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Microsoft.Practices.Unity.Mvc.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Microsoft.Practices.Unity.RegistrationByConvention.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Microsoft.ReportViewer.Common.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Microsoft.ReportViewer.ProcessingObjectModel.DLL
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Microsoft.ReportViewer.WebForms.DLL
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Microsoft.Web.Infrastructure.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Model.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Newtonsoft.Json.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Notifier.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Owin.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Service.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\System.Web.Helpers.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\System.Web.Mvc.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\System.Web.Optimization.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\System.Web.Razor.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\System.Web.WebPages.Deployment.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\System.Web.WebPages.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\System.Web.WebPages.Razor.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\WebActivatorEx.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\WebGrease.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\log4net.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\EPPlus.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\itextsharp.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Elmah.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\SendGridMail.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\SendGrid.SmtpApi.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\CustomEventHandlers.pdb
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\DocumentEvents.pdb
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Notifier.pdb
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Core.pdb
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Data.pdb
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Model.pdb
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Reports.pdb
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Service.pdb
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Antlr3.Runtime.pdb
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\AutoMapper.pdb
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\AutoMapper.xml
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\AutoMapper.Net4.pdb
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\EMailContents.pdb
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\EntityFramework.xml
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\EntityFramework.SqlServer.xml
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\ImageResizer.xml
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Mailer.pdb
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Microsoft.AspNet.Identity.Core.xml
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Microsoft.AspNet.Identity.EntityFramework.xml
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Microsoft.AspNet.Identity.Owin.xml
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Microsoft.AspNet.SignalR.Core.xml
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Microsoft.AspNet.SignalR.SystemWeb.xml
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Microsoft.Owin.xml
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Microsoft.Owin.Host.SystemWeb.xml
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Microsoft.Owin.Security.xml
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Microsoft.Owin.Security.Cookies.xml
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Microsoft.Owin.Security.Facebook.xml
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Microsoft.Owin.Security.Google.xml
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Microsoft.Owin.Security.MicrosoftAccount.xml
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Microsoft.Owin.Security.OAuth.xml
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Microsoft.Owin.Security.Twitter.xml
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Microsoft.Practices.ServiceLocation.pdb
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Microsoft.Practices.ServiceLocation.xml
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Microsoft.Practices.Unity.xml
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Microsoft.Practices.Unity.Configuration.xml
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Microsoft.Practices.Unity.Mvc.xml
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Microsoft.Practices.Unity.RegistrationByConvention.xml
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Newtonsoft.Json.xml
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\NotificationContents.pdb
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\System.Web.Helpers.xml
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\System.Web.Mvc.xml
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\System.Web.Optimization.xml
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\System.Web.Razor.xml
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\System.Web.WebPages.xml
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\System.Web.WebPages.Deployment.xml
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\System.Web.WebPages.Razor.xml
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\log4net.xml
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\EPPlus.xml
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\itextsharp.xml
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\obj\Debug\Jobs.csprojResolveAssemblyReference.cache
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\obj\Debug\Jobs.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Jobs\obj\Debug\Jobs.pdb
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports\Packing_AWLabelPrintNew_11082015.rdlc
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports\Packing_AWLabelPrintNew.rdlc
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports\Packing_LabelPrint_OnlyQRCode.rdlc
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports\Packing_LabelPrint.rdlc
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports\Packing_LabelPrintNew.rdlc
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseGoodsReceipt_Print_WithDealUnit.rdlc
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports\DispatchWaybill_Print.rdlc
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseWaybill_Print.rdlc
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports\LocalReportExample.rdlc
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseInvoicePrint_Charges.rdlc
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseGoodsReceipt_Print.rdlc
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseGoodsReceipt_Print_Carpet_WithShortQty.rdlc
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseGoodsReceipt_Print_Carpet.rdlc
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseGoodsReceipt_Print_WithLotNo_WithShortQty.rdlc
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseGoodsReceipt_Print_WithDealUnitandSpecification.rdlc
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseGoodsReceipt_Print_WithLotNo.rdlc
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseGoodsReceipt_Print_WithSpecification_WithShortQty.rdlc
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseInvoiceReport.rdlc
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseInvoice_Print.rdlc
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseOrderHeaderAmendmentDetail.rdlc
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseOrdePrintAmendment.rdlc
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseOrderReport.rdlc
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseInvoiceReportProductWise.rdlc
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseOrderStatusSummary.rdlc
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseOrderReportProductWise.rdlc
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseOrderSummary.rdlc
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseIndent_Print.rdlc
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseCharges.rdlc
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports\CompanyDetail.rdlc
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseOrder_Print_Carpet.rdlc
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseOrder_Print_Carpet_WithDeliveryUnit.rdlc
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseGoodsReceipt_Print_WithSpecification.rdlc
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseInvoice_Print_WithDeliveryUnit.rdlc
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseOrder_Print_WithDeliveryUnit.rdlc
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports\SaleInvoice_MasterKey.rdlc
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports\SaleInvoice_ExportValueDeclaration.rdlc
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports\SaleInvoice_DocumentOfExchange.rdlc
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports\SaleInvoice_PostShipmentCoveringLetter.rdlc
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports\SaleInvoice_SingleCountryDeclaration.rdlc
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports\SaleInvoice_ShippingAgentLetter.rdlc
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports\SaleOrderAmendment_Print.rdlc
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports\ProductionOrder_Print.rdlc
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports\YarnDyeingPlan_Print.rdlc
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports\SaleInvoice_ExporterDeclaration.rdlc
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports\PurchaseOrder_Print.rdlc
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports\SaleOrderPlan_Print.rdlc
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports\WeavingOrder_Print1.rdlc
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports\WeavingOrder_Print.rdlc
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports\SaleOrder_Print.rdlc
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports\SaleOrderCancel_Print.rdlc
+D:\Sample\HomeFurnishing\Source\Jobs\bin\AutoMapper.Net4.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports\Packing_Print.rdlc
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports\Packing_AWLabelPrint.rdlc
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports\Packing_HDCLabelPrint.rdlc
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports\Packing_Print_ToExcel.rdlc
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Jobs.dll.config
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Jobs.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Jobs.pdb
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Antlr3.Runtime.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\AutoMapper.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Components.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Core.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\CustomEventHandlers.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Data.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\DocumentEvents.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\EMailContents.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\EntityFramework.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\EntityFramework.SqlServer.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\GridMvc.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\ImageResizer.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Mailer.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Microsoft.AspNet.Identity.Core.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Microsoft.AspNet.Identity.EntityFramework.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Microsoft.AspNet.Identity.Owin.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Microsoft.AspNet.SignalR.Core.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Microsoft.AspNet.SignalR.SystemWeb.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Microsoft.Owin.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Microsoft.Owin.Host.SystemWeb.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Microsoft.Owin.Security.Cookies.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Microsoft.Owin.Security.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Microsoft.Owin.Security.Facebook.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Microsoft.Owin.Security.Google.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Microsoft.Owin.Security.MicrosoftAccount.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Microsoft.Owin.Security.OAuth.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Microsoft.Owin.Security.Twitter.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Microsoft.Practices.ServiceLocation.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Microsoft.Practices.Unity.Configuration.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Microsoft.Practices.Unity.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Microsoft.Practices.Unity.Mvc.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Microsoft.Practices.Unity.RegistrationByConvention.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Microsoft.QualityTools.Testing.Fakes.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Microsoft.ReportViewer.Common.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Microsoft.ReportViewer.ProcessingObjectModel.DLL
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Microsoft.ReportViewer.WebForms.DLL
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Microsoft.Web.Infrastructure.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Model.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Newtonsoft.Json.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\NotificationContents.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Notifier.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Owin.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Service.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\System.Web.Helpers.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\System.Web.Mvc.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\System.Web.Optimization.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\System.Web.Razor.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\System.Web.WebPages.Deployment.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\System.Web.WebPages.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\System.Web.WebPages.Razor.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\WebActivatorEx.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\WebGrease.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\log4net.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\EPPlus.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\itextsharp.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Elmah.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\SendGridMail.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\SendGrid.SmtpApi.dll
+D:\Sample\HomeFurnishing\Source\Jobs\bin\CustomEventHandlers.pdb
+D:\Sample\HomeFurnishing\Source\Jobs\bin\DocumentEvents.pdb
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Notifier.pdb
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Core.pdb
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Data.pdb
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Model.pdb
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Reports.pdb
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Service.pdb
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Antlr3.Runtime.pdb
+D:\Sample\HomeFurnishing\Source\Jobs\bin\AutoMapper.pdb
+D:\Sample\HomeFurnishing\Source\Jobs\bin\AutoMapper.xml
+D:\Sample\HomeFurnishing\Source\Jobs\bin\AutoMapper.Net4.pdb
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Components.pdb
+D:\Sample\HomeFurnishing\Source\Jobs\bin\EMailContents.pdb
+D:\Sample\HomeFurnishing\Source\Jobs\bin\EntityFramework.xml
+D:\Sample\HomeFurnishing\Source\Jobs\bin\EntityFramework.SqlServer.xml
+D:\Sample\HomeFurnishing\Source\Jobs\bin\ImageResizer.xml
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Mailer.pdb
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Microsoft.AspNet.Identity.Core.xml
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Microsoft.AspNet.Identity.EntityFramework.xml
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Microsoft.AspNet.Identity.Owin.xml
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Microsoft.AspNet.SignalR.Core.xml
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Microsoft.AspNet.SignalR.SystemWeb.xml
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Microsoft.Owin.xml
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Microsoft.Owin.Host.SystemWeb.xml
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Microsoft.Owin.Security.xml
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Microsoft.Owin.Security.Cookies.xml
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Microsoft.Owin.Security.Facebook.xml
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Microsoft.Owin.Security.Google.xml
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Microsoft.Owin.Security.MicrosoftAccount.xml
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Microsoft.Owin.Security.OAuth.xml
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Microsoft.Owin.Security.Twitter.xml
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Microsoft.Practices.ServiceLocation.pdb
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Microsoft.Practices.ServiceLocation.xml
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Microsoft.Practices.Unity.xml
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Microsoft.Practices.Unity.Configuration.xml
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Microsoft.Practices.Unity.Mvc.xml
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Microsoft.Practices.Unity.RegistrationByConvention.xml
+D:\Sample\HomeFurnishing\Source\Jobs\bin\Newtonsoft.Json.xml
+D:\Sample\HomeFurnishing\Source\Jobs\bin\NotificationContents.pdb
+D:\Sample\HomeFurnishing\Source\Jobs\bin\System.Web.Helpers.xml
+D:\Sample\HomeFurnishing\Source\Jobs\bin\System.Web.Mvc.xml
+D:\Sample\HomeFurnishing\Source\Jobs\bin\System.Web.Optimization.xml
+D:\Sample\HomeFurnishing\Source\Jobs\bin\System.Web.Razor.xml
+D:\Sample\HomeFurnishing\Source\Jobs\bin\System.Web.WebPages.xml
+D:\Sample\HomeFurnishing\Source\Jobs\bin\System.Web.WebPages.Deployment.xml
+D:\Sample\HomeFurnishing\Source\Jobs\bin\System.Web.WebPages.Razor.xml
+D:\Sample\HomeFurnishing\Source\Jobs\bin\log4net.xml
+D:\Sample\HomeFurnishing\Source\Jobs\bin\EPPlus.xml
+D:\Sample\HomeFurnishing\Source\Jobs\bin\itextsharp.xml
+D:\Sample\HomeFurnishing\Source\Jobs\obj\Debug\Jobs.csprojResolveAssemblyReference.cache
+D:\Sample\HomeFurnishing\Source\Jobs\obj\Debug\Jobs.dll
+D:\Sample\HomeFurnishing\Source\Jobs\obj\Debug\Jobs.pdb

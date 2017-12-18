@@ -1,0 +1,14 @@
+D:\Active Projects\Projects\Modules\Infrastructure\bin\Release\Infrastructure.dll.config
+D:\Active Projects\Projects\Modules\Infrastructure\bin\Release\Infrastructure.dll
+D:\Active Projects\Projects\Modules\Infrastructure\bin\Release\Infrastructure.pdb
+D:\Active Projects\Projects\Modules\Infrastructure\bin\Release\EntityFramework.dll
+D:\Active Projects\Projects\Modules\Infrastructure\bin\Release\EntityFramework.SqlServer.dll
+D:\Active Projects\Projects\Modules\Infrastructure\bin\Release\Microsoft.AspNet.Identity.Core.dll
+D:\Active Projects\Projects\Modules\Infrastructure\bin\Release\Microsoft.AspNet.Identity.EntityFramework.dll
+D:\Active Projects\Projects\Modules\Infrastructure\bin\Release\EntityFramework.xml
+D:\Active Projects\Projects\Modules\Infrastructure\bin\Release\EntityFramework.SqlServer.xml
+D:\Active Projects\Projects\Modules\Infrastructure\bin\Release\Microsoft.AspNet.Identity.Core.xml
+D:\Active Projects\Projects\Modules\Infrastructure\bin\Release\Microsoft.AspNet.Identity.EntityFramework.xml
+D:\Active Projects\Projects\Modules\Infrastructure\obj\Release\Infrastructure.csprojResolveAssemblyReference.cache
+D:\Active Projects\Projects\Modules\Infrastructure\obj\Release\Infrastructure.dll
+D:\Active Projects\Projects\Modules\Infrastructure\obj\Release\Infrastructure.pdb
