@@ -69,3 +69,26 @@ D:\Active Projects\HomeFurnishing\Source\NotificationContents\bin\Debug\log4net.
 D:\Active Projects\HomeFurnishing\Source\NotificationContents\obj\Debug\NotificationContents.dll
 D:\Active Projects\HomeFurnishing\Source\NotificationContents\obj\Debug\NotificationContents.pdb
 D:\Active Projects\HomeFurnishing\Source\NotificationContents\obj\Debug\NotificationContents.csprojResolveAssemblyReference.cache
+D:\Sample_New\HomeFurnishing\Source\NotificationContents\bin\Debug\NotificationContents.dll.config
+D:\Sample_New\HomeFurnishing\Source\NotificationContents\bin\Debug\NotificationContents.dll
+D:\Sample_New\HomeFurnishing\Source\NotificationContents\bin\Debug\NotificationContents.pdb
+D:\Sample_New\HomeFurnishing\Source\NotificationContents\bin\Debug\Core.dll
+D:\Sample_New\HomeFurnishing\Source\NotificationContents\bin\Debug\Data.dll
+D:\Sample_New\HomeFurnishing\Source\NotificationContents\bin\Debug\EntityFramework.dll
+D:\Sample_New\HomeFurnishing\Source\NotificationContents\bin\Debug\EntityFramework.SqlServer.dll
+D:\Sample_New\HomeFurnishing\Source\NotificationContents\bin\Debug\Microsoft.AspNet.Identity.Core.dll
+D:\Sample_New\HomeFurnishing\Source\NotificationContents\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.dll
+D:\Sample_New\HomeFurnishing\Source\NotificationContents\bin\Debug\Model.dll
+D:\Sample_New\HomeFurnishing\Source\NotificationContents\bin\Debug\Remotion.Data.Linq.dll
+D:\Sample_New\HomeFurnishing\Source\NotificationContents\bin\Debug\log4net.dll
+D:\Sample_New\HomeFurnishing\Source\NotificationContents\bin\Debug\Core.pdb
+D:\Sample_New\HomeFurnishing\Source\NotificationContents\bin\Debug\Data.pdb
+D:\Sample_New\HomeFurnishing\Source\NotificationContents\bin\Debug\Model.pdb
+D:\Sample_New\HomeFurnishing\Source\NotificationContents\bin\Debug\EntityFramework.xml
+D:\Sample_New\HomeFurnishing\Source\NotificationContents\bin\Debug\EntityFramework.SqlServer.xml
+D:\Sample_New\HomeFurnishing\Source\NotificationContents\bin\Debug\Microsoft.AspNet.Identity.Core.xml
+D:\Sample_New\HomeFurnishing\Source\NotificationContents\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.xml
+D:\Sample_New\HomeFurnishing\Source\NotificationContents\bin\Debug\log4net.xml
+D:\Sample_New\HomeFurnishing\Source\NotificationContents\obj\Debug\NotificationContents.csprojResolveAssemblyReference.cache
+D:\Sample_New\HomeFurnishing\Source\NotificationContents\obj\Debug\NotificationContents.dll
+D:\Sample_New\HomeFurnishing\Source\NotificationContents\obj\Debug\NotificationContents.pdb

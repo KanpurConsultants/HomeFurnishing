@@ -32,3 +32,9 @@ D:\Active Projects\Web\HomeFurnishing\Source\Core\bin\Debug\log4net.dll
 D:\Active Projects\Web\HomeFurnishing\Source\Core\bin\Debug\log4net.xml
 D:\Active Projects\Web\HomeFurnishing\Source\Core\obj\Debug\Core.dll
 D:\Active Projects\Web\HomeFurnishing\Source\Core\obj\Debug\Core.pdb
+D:\Sample_New\HomeFurnishing\Source\Core\bin\Debug\Core.dll
+D:\Sample_New\HomeFurnishing\Source\Core\bin\Debug\Core.pdb
+D:\Sample_New\HomeFurnishing\Source\Core\bin\Debug\log4net.dll
+D:\Sample_New\HomeFurnishing\Source\Core\bin\Debug\log4net.xml
+D:\Sample_New\HomeFurnishing\Source\Core\obj\Debug\Core.dll
+D:\Sample_New\HomeFurnishing\Source\Core\obj\Debug\Core.pdb
