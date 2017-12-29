@@ -22,6 +22,7 @@ namespace Jobs.Areas.Rug.Controllers
     {
         private ApplicationDbContext db = new ApplicationDbContext();
 
+        List<string> UserRoles = new List<string>();
         ActiivtyLogViewModel LogVm = new ActiivtyLogViewModel();
 
         IProductQualityService _ProductQualityService;
@@ -32,6 +33,8 @@ namespace Jobs.Areas.Rug.Controllers
             _ProductQualityService = ProductQualityService;
             _unitOfWork = unitOfWork;
             _exception = exec;
+
+            UserRoles = (List<string>)System.Web.HttpContext.Current.Session["Roles"];
 
             //Log Initialization
             LogVm.SessionId = 0;
@@ -60,6 +63,19 @@ namespace Jobs.Areas.Rug.Controllers
 
         public ActionResult Create(int id)//ProductType Id
         {
+            var DocType = new DocumentTypeService(_unitOfWork).FindByName(MasterDocTypeConstants.ProductQuality);
+            int DocTypeId = 0;
+
+            if (DocType != null)
+                DocTypeId = DocType.DocumentTypeId;
+            else
+                return View("~/Views/Shared/InValidSettings.cshtml").Warning("Document Type named " + MasterDocTypeConstants.ProductQuality + " is not defined in database.");
+
+            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, DocTypeId, null, this.ControllerContext.RouteData.Values["controller"].ToString(), "Create") == false)
+            {
+                return View("~/Views/Shared/PermissionDenied.cshtml").Warning("You don't have permission to do this task.");
+            }
+
             ProductQuality vm = new ProductQuality();
             vm.IsActive = true;
             vm.ProductTypeId = id;
@@ -169,6 +185,19 @@ namespace Jobs.Areas.Rug.Controllers
 
         public ActionResult Edit(int id)
         {
+            var DocType = new DocumentTypeService(_unitOfWork).FindByName(MasterDocTypeConstants.ProductQuality);
+            int DocTypeId = 0;
+
+            if (DocType != null)
+                DocTypeId = DocType.DocumentTypeId;
+            else
+                return View("~/Views/Shared/InValidSettings.cshtml").Warning("Document Type named " + MasterDocTypeConstants.ProductQuality + " is not defined in database.");
+
+            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, DocTypeId, null, this.ControllerContext.RouteData.Values["controller"].ToString(), "Edit") == false)
+            {
+                return View("~/Views/Shared/PermissionDenied.cshtml").Warning("You don't have permission to do this task.");
+            }
+
             ProductQuality pt = _ProductQualityService.Find(id);
             if (pt == null)
             {
@@ -187,6 +216,20 @@ namespace Jobs.Areas.Rug.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
+
+            var DocType = new DocumentTypeService(_unitOfWork).FindByName(MasterDocTypeConstants.ProductQuality);
+            int DocTypeId = 0;
+
+            if (DocType != null)
+                DocTypeId = DocType.DocumentTypeId;
+            else
+                return View("~/Views/Shared/InValidSettings.cshtml").Warning("Document Type named " + MasterDocTypeConstants.ProductQuality + " is not defined in database.");
+
+            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, DocTypeId, null, this.ControllerContext.RouteData.Values["controller"].ToString(), "Delete") == false)
+            {
+                return PartialView("~/Views/Shared/PermissionDenied_Modal.cshtml").Warning("You don't have permission to do this task.");
+            }
+
             ProductQuality ProductQuality = _ProductQualityService.Find(id);
 
             if (ProductQuality == null)

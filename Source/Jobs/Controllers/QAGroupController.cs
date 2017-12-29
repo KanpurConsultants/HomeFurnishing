@@ -137,6 +137,19 @@ namespace Jobs.Controllers
 
         public ActionResult Create(int id)//DocumentTypeId
         {
+            var DocType = new DocumentTypeService(_unitOfWork).FindByName(MasterDocTypeConstants.QAGroup);
+            int DocTypeId = 0;
+
+            if (DocType != null)
+                DocTypeId = DocType.DocumentTypeId;
+            else
+                return View("~/Views/Shared/InValidSettings.cshtml").Warning("Document Type named " + MasterDocTypeConstants.QAGroup + " is not defined in database.");
+
+            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, DocTypeId, null, this.ControllerContext.RouteData.Values["controller"].ToString(), "Create") == false)
+            {
+                return View("~/Views/Shared/PermissionDenied.cshtml").Warning("You don't have permission to do this task.");
+            }
+
             QAGroupViewModel p = new QAGroupViewModel();                
             p.CreatedDate = DateTime.Now;                      
             p.DocTypeId = id;
@@ -438,6 +451,19 @@ namespace Jobs.Controllers
         // GET: /JobOrderHeader/Edit/5
         private ActionResult Edit(int id, string IndexType)
         {
+            var DocType = new DocumentTypeService(_unitOfWork).FindByName(MasterDocTypeConstants.QAGroup);
+            int DocTypeId = 0;
+
+            if (DocType != null)
+                DocTypeId = DocType.DocumentTypeId;
+            else
+                return View("~/Views/Shared/InValidSettings.cshtml").Warning("Document Type named " + MasterDocTypeConstants.QAGroup + " is not defined in database.");
+
+            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, DocTypeId, null, this.ControllerContext.RouteData.Values["controller"].ToString(), "Edit") == false)
+            {
+                return View("~/Views/Shared/PermissionDenied.cshtml").Warning("You don't have permission to do this task.");
+
+            }
             ViewBag.IndexStatus = IndexType;
             QAGroupViewModel s = _QAGroupService.GetQAGroup(id);
             #region DocTypeTimeLineValidation
@@ -535,6 +561,20 @@ namespace Jobs.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
+
+            var DocType = new DocumentTypeService(_unitOfWork).FindByName(MasterDocTypeConstants.QAGroup);
+            int DocTypeId = 0;
+
+            if (DocType != null)
+                DocTypeId = DocType.DocumentTypeId;
+            else
+                return View("~/Views/Shared/InValidSettings.cshtml").Warning("Document Type named " + MasterDocTypeConstants.QAGroup + " is not defined in database.");
+
+            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, DocTypeId, null, this.ControllerContext.RouteData.Values["controller"].ToString(), "Delete") == false)
+            {
+                return PartialView("~/Views/Shared/PermissionDenied_Modal.cshtml").Warning("You don't have permission to do this task.");
+            }
+
             QAGroup QAGroup = _QAGroupService.Find(id);
 
             if (QAGroup == null)

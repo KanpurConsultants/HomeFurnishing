@@ -166,7 +166,13 @@ namespace Jobs.Controllers
 
             vm.JobInvoiceSettings = Mapper.Map<JobInvoiceSettings, JobInvoiceSettingsViewModel>(settings);
 
-            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, id, settings.ProcessId, this.ControllerContext.RouteData.Values["controller"].ToString(), "Create") == false)
+
+            if ((settings.isVisibleProcessHeader ?? false) == false)
+            {
+                vm.ProcessId = settings.ProcessId;
+            }
+
+            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, id, vm.ProcessId, this.ControllerContext.RouteData.Values["controller"].ToString(), "Create") == false)
             {
                 return View("~/Views/Shared/PermissionDenied.cshtml").Warning("You don't have permission to do this task.");
             }
@@ -245,10 +251,7 @@ namespace Jobs.Controllers
 
             //vm.ProcessId = settings.ProcessId;
 
-            if ((settings.isVisibleProcessHeader ?? false) == false)
-            {
-                vm.ProcessId = settings.ProcessId;
-            }
+
 
             vm.DocDate = DateTime.Now;
             vm.DocTypeId = id;
@@ -1840,6 +1843,13 @@ namespace Jobs.Controllers
         public JsonResult GetJobWorkerDetailJson(int JobWorkerId)
         {
             return Json(new JobInvoiceHeaderService(_unitOfWork).GetJobWorkerDetail(JobWorkerId));
+        }
+
+        public JsonResult GetProcessPermissionJson(int DocTypeId, int ProcessId)
+        {
+            var temp = new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, DocTypeId, ProcessId, this.ControllerContext.RouteData.Values["controller"].ToString(), "Create");
+
+            return Json(temp);
         }
 
         #region submitValidation

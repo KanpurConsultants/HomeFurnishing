@@ -129,6 +129,19 @@ namespace Jobs.Areas.Rug.Controllers
 
         public ActionResult Create()
         {
+            var DocType = new DocumentTypeService(_unitOfWork).FindByName(MasterDocTypeConstants.DesignConsumption);
+            int DocTypeId = 0;
+
+            if (DocType != null)
+                DocTypeId = DocType.DocumentTypeId;
+            else
+                return View("~/Views/Shared/InValidSettings.cshtml").Warning("Document Type named " + MasterDocTypeConstants.DesignConsumption + " is not defined in database.");
+
+            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, DocTypeId, null, this.ControllerContext.RouteData.Values["controller"].ToString(), "Create") == false)
+            {
+                return View("~/Views/Shared/PermissionDenied.cshtml").Warning("You don't have permission to do this task.");
+            }
+
             DesignConsumptionHeaderViewModel p = new DesignConsumptionHeaderViewModel();
             PrepareViewBag();
             return View("Create", p);
@@ -290,6 +303,19 @@ namespace Jobs.Areas.Rug.Controllers
 
         public ActionResult Edit(int id)
         {
+            var DocType = new DocumentTypeService(_unitOfWork).FindByName(MasterDocTypeConstants.DesignConsumption);
+            int DocTypeId = 0;
+
+            if (DocType != null)
+                DocTypeId = DocType.DocumentTypeId;
+            else
+                return View("~/Views/Shared/InValidSettings.cshtml").Warning("Document Type named " + MasterDocTypeConstants.DesignConsumption + " is not defined in database.");
+
+            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, DocTypeId, null, this.ControllerContext.RouteData.Values["controller"].ToString(), "Edit") == false)
+            {
+                return View("~/Views/Shared/PermissionDenied.cshtml").Warning("You don't have permission to do this task.");
+            }
+
             DesignConsumptionHeaderViewModel bvm = _BomDetailService.GetDesignConsumptionHeaderViewModel(id);
             PrepareViewBag();
             if (bvm == null)
@@ -308,6 +334,20 @@ namespace Jobs.Areas.Rug.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
+
+            var DocType = new DocumentTypeService(_unitOfWork).FindByName(MasterDocTypeConstants.DesignConsumption);
+            int DocTypeId = 0;
+
+            if (DocType != null)
+                DocTypeId = DocType.DocumentTypeId;
+            else
+                return View("~/Views/Shared/InValidSettings.cshtml").Warning("Document Type named " + MasterDocTypeConstants.DesignConsumption + " is not defined in database.");
+
+            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, DocTypeId, null, this.ControllerContext.RouteData.Values["controller"].ToString(), "Delete") == false)
+            {
+                return PartialView("~/Views/Shared/PermissionDenied_Modal.cshtml").Warning("You don't have permission to do this task.");
+            }
+
             Product product = _ProductService.Find(id);
             if (product == null)
             {

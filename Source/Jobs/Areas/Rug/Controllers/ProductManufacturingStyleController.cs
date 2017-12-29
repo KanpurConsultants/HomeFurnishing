@@ -1,16 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.Entity;
 using System.Linq;
 using System.Net;
-using System.Web;
 using System.Web.Mvc;
 using Model.Models;
 using Data.Models;
 using Service;
 using Data.Infrastructure;
+using Presentation.ViewModels;
+using Presentation;
+using Core.Common;
 using Model.ViewModel;
+using AutoMapper;
+using System.Xml.Linq;
+using Jobs.Helpers;
 
 namespace Jobs.Areas.Rug.Controllers
 {
@@ -19,10 +22,13 @@ namespace Jobs.Areas.Rug.Controllers
     {
           private ApplicationDbContext db = new ApplicationDbContext();
 
+          List<string> UserRoles = new List<string>();
           IProductManufacturingStyleService _ProductManufacturingStyleService;
           IUnitOfWork _unitOfWork;
           public ProductManufacturingStyleController(IProductManufacturingStyleService ProductManufacturingStyleService, IUnitOfWork unitOfWork)
           {
+              UserRoles = (List<string>)System.Web.HttpContext.Current.Session["Roles"];
+
               _ProductManufacturingStyleService = ProductManufacturingStyleService;
               _unitOfWork = unitOfWork;
           }
@@ -35,7 +41,20 @@ namespace Jobs.Areas.Rug.Controllers
 
         // GET: /ProductMaster/Create
           public ActionResult Create()
-          {       
+          {
+              var DocType = new DocumentTypeService(_unitOfWork).FindByName(MasterDocTypeConstants.ProductManufacturingStyle);
+              int DocTypeId = 0;
+
+              if (DocType != null)
+                  DocTypeId = DocType.DocumentTypeId;
+              else
+                  return View("~/Views/Shared/InValidSettings.cshtml").Warning("Document Type named " + MasterDocTypeConstants.ProductManufacturingStyle + " is not defined in database.");
+
+              if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, DocTypeId, null, this.ControllerContext.RouteData.Values["controller"].ToString(), "Create") == false)
+              {
+                  return View("~/Views/Shared/PermissionDenied.cshtml").Warning("You don't have permission to do this task.");
+              }
+
               return View();
           }
 
@@ -65,6 +84,19 @@ namespace Jobs.Areas.Rug.Controllers
         // GET: /ProductMaster/Edit/5
         public ActionResult Edit(int id)
         {
+            var DocType = new DocumentTypeService(_unitOfWork).FindByName(MasterDocTypeConstants.ProductManufacturingStyle);
+            int DocTypeId = 0;
+
+            if (DocType != null)
+                DocTypeId = DocType.DocumentTypeId;
+            else
+                return View("~/Views/Shared/InValidSettings.cshtml").Warning("Document Type named " + MasterDocTypeConstants.ProductManufacturingStyle + " is not defined in database.");
+
+            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, DocTypeId, null, this.ControllerContext.RouteData.Values["controller"].ToString(), "Edit") == false)
+            {
+                return View("~/Views/Shared/PermissionDenied.cshtml").Warning("You don't have permission to do this task.");
+            }
+
             ProductStyle pt = _ProductManufacturingStyleService.GetProductManufacturingStyle(id);
             if (pt == null)
             {
@@ -100,6 +132,20 @@ namespace Jobs.Areas.Rug.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
+
+            var DocType = new DocumentTypeService(_unitOfWork).FindByName(MasterDocTypeConstants.ProductManufacturingStyle);
+            int DocTypeId = 0;
+
+            if (DocType != null)
+                DocTypeId = DocType.DocumentTypeId;
+            else
+                return View("~/Views/Shared/InValidSettings.cshtml").Warning("Document Type named " + MasterDocTypeConstants.ProductManufacturingStyle + " is not defined in database.");
+
+            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, DocTypeId, null, this.ControllerContext.RouteData.Values["controller"].ToString(), "Delete") == false)
+            {
+                return PartialView("~/Views/Shared/PermissionDenied_Modal.cshtml").Warning("You don't have permission to do this task.");
+            }
+
             ProductStyle ProductManufacturingStyle = db.ProductStyle.Find(id);
             if (ProductManufacturingStyle == null)
             {

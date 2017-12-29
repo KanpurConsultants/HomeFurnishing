@@ -114,6 +114,7 @@
     <Compile Include="Models\DocumentLineAttributes.cs" />
     <Compile Include="Models\DocumentHeaderAttributes.cs" />
     <Compile Include="Models\ChargeGroupSettings.cs" />
+    <Compile Include="Models\DocumentTypeProcess.cs" />
     <Compile Include="Models\JobInvoiceHeaderAttributes.cs" />
     <Compile Include="Models\JobOrderBomMaterialIssue.cs" />
     <Compile Include="Models\Notification.cs" />

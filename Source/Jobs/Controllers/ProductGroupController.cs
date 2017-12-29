@@ -91,6 +91,19 @@ namespace Jobs.Controllers
 
         public ActionResult Create(int id)
         {
+            var DocType = new DocumentTypeService(_unitOfWork).FindByName(MasterDocTypeConstants.ProductGroup);
+            int DocTypeId = 0;
+
+            if (DocType != null)
+                DocTypeId = DocType.DocumentTypeId;
+            else
+                return View("~/Views/Shared/InValidSettings.cshtml").Warning("Document Type named " + MasterDocTypeConstants.ProductGroup + " is not defined in database.");
+
+            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, DocTypeId, null, this.ControllerContext.RouteData.Values["controller"].ToString(), "Create") == false)
+            {
+                return View("~/Views/Shared/PermissionDenied.cshtml").Warning("You don't have permission to do this task.");
+            }
+
             ProductGroup vm = new ProductGroup();
             vm.IsActive = true;
             vm.ProductTypeId = id;
@@ -230,6 +243,19 @@ namespace Jobs.Controllers
 
         public ActionResult Edit(int id)
         {
+            var DocType = new DocumentTypeService(_unitOfWork).FindByName(MasterDocTypeConstants.ProductGroup);
+            int DocTypeId = 0;
+
+            if (DocType != null)
+                DocTypeId = DocType.DocumentTypeId;
+            else
+                return View("~/Views/Shared/InValidSettings.cshtml").Warning("Document Type named " + MasterDocTypeConstants.ProductGroup + " is not defined in database.");
+
+            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, DocTypeId, null, this.ControllerContext.RouteData.Values["controller"].ToString(), "Edit") == false)
+            {
+                return View("~/Views/Shared/PermissionDenied.cshtml").Warning("You don't have permission to do this task.");
+            }
+
             ProductGroup pt = _ProductGroupService.GetProductGroup(id);
             if (pt == null)
             {
@@ -258,6 +284,20 @@ namespace Jobs.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
+
+            var DocType = new DocumentTypeService(_unitOfWork).FindByName(MasterDocTypeConstants.ProductGroup);
+            int DocTypeId = 0;
+
+            if (DocType != null)
+                DocTypeId = DocType.DocumentTypeId;
+            else
+                return View("~/Views/Shared/InValidSettings.cshtml").Warning("Document Type named " + MasterDocTypeConstants.ProductGroup + " is not defined in database.");
+
+            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, DocTypeId, null, this.ControllerContext.RouteData.Values["controller"].ToString(), "Delete") == false)
+            {
+                return PartialView("~/Views/Shared/PermissionDenied_Modal.cshtml").Warning("You don't have permission to do this task.");
+            }
+
             ProductGroup ProductGroup = _ProductGroupService.GetProductGroup(id);
             if (ProductGroup == null)
             {

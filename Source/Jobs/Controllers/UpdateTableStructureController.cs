@@ -2527,6 +2527,39 @@ namespace Module
             }
 
 
+            try
+            {
+                if ((int)ExecuteScaler("SELECT Count(*) AS Cnt FROM INFORMATION_SCHEMA.Tables WHERE TABLE_NAME = 'DocumentTypeProcesses'") == 0)
+                {
+                    mQry = @"CREATE TABLE Web.DocumentTypeProcesses
+	                            (
+	                                DocumentTypeProcessId INT IDENTITY NOT NULL,
+	                                DocumentTypeId        INT NOT NULL,
+	                                ProcessId             INT NOT NULL,
+	                                CreatedBy             NVARCHAR (max),
+	                                ModifiedBy            NVARCHAR (max),
+	                                CreatedDate           DATETIME NOT NULL,
+	                                ModifiedDate          DATETIME NOT NULL,
+	                                OMSId                 NVARCHAR (50),
+	                                CONSTRAINT [PK_Web.DocumentTypeProcesses] PRIMARY KEY (DocumentTypeProcessId),
+	                                CONSTRAINT [FK_Web.DocumentTypeProcesses_Web.DocumentTypes_DocumentTypeId] FOREIGN KEY (DocumentTypeId) REFERENCES Web.DocumentTypes (DocumentTypeId),
+	                                CONSTRAINT [FK_Web.DocumentTypeProcesses_Web.Processes_ProcessId] FOREIGN KEY (ProcessId) REFERENCES Web.Processes (ProcessId)
+	                            )
+
+                            CREATE INDEX IX_DocumentTypeId
+	                            ON Web.DocumentTypeProcesses (DocumentTypeId)
+
+                            CREATE INDEX IX_ProcessId
+	                            ON Web.DocumentTypeProcesses (ProcessId) ";
+                    ExecuteQuery(mQry);
+                }
+            }
+            catch (Exception ex)
+            {
+                RecordError(ex);
+            }
+
+
             AddFields("ControllerActions", "DisplayName", "nvarchar(50)");
             ReCreateProcedures();
             DataCorrection();

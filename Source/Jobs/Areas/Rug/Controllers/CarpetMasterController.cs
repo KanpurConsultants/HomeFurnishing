@@ -406,6 +406,19 @@ namespace Jobs.Areas.Rug.Controllers
         [HttpGet]
         public ActionResult Create(bool sample)
         {
+            var DocType = new DocumentTypeService(_unitOfWork).FindByName(MasterDocTypeConstants.CarpetDesign);
+            int DocTypeId = 0;
+
+            if (DocType != null)
+                DocTypeId = DocType.DocumentTypeId;
+            else
+                return View("~/Views/Shared/InValidSettings.cshtml").Warning("Document Type named " + MasterDocTypeConstants.CarpetDesign + " is not defined in database.");
+
+            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, DocTypeId, null, this.ControllerContext.RouteData.Values["controller"].ToString(), "Create") == false)
+            {
+                return View("~/Views/Shared/PermissionDenied.cshtml").Warning("You don't have permission to do this task.");
+            }
+
             PrepareDivisionViewBag();
             CarpetMasterViewModel vm = new CarpetMasterViewModel();
             vm.IsSample = sample;
@@ -445,6 +458,19 @@ namespace Jobs.Areas.Rug.Controllers
         [HttpGet]
         public ActionResult Edit(int id, bool sample)//ProductGroupId
         {
+            var DocType = new DocumentTypeService(_unitOfWork).FindByName(MasterDocTypeConstants.CarpetDesign);
+            int DocTypeId = 0;
+
+            if (DocType != null)
+                DocTypeId = DocType.DocumentTypeId;
+            else
+                return View("~/Views/Shared/InValidSettings.cshtml").Warning("Document Type named " + MasterDocTypeConstants.CarpetDesign + " is not defined in database.");
+
+            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, DocTypeId, null, this.ControllerContext.RouteData.Values["controller"].ToString(), "Edit") == false)
+            {
+                return View("~/Views/Shared/PermissionDenied.cshtml").Warning("You don't have permission to do this task.");
+            }
+
             var temp = _ProductService.GetProductListForGroup(id);
             var productGroup = _ProductGroupService.Find(id);
             var product = temp.FirstOrDefault();
@@ -3072,6 +3098,18 @@ namespace Jobs.Areas.Rug.Controllers
         [HttpGet]
         public ActionResult Delete(int id)//ProductGroupId
         {
+            var DocType = new DocumentTypeService(_unitOfWork).FindByName(MasterDocTypeConstants.CarpetDesign);
+            int DocTypeId = 0;
+
+            if (DocType != null)
+                DocTypeId = DocType.DocumentTypeId;
+            else
+                return View("~/Views/Shared/InValidSettings.cshtml").Warning("Document Type named " + MasterDocTypeConstants.CarpetDesign + " is not defined in database.");
+
+            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, DocTypeId, null, this.ControllerContext.RouteData.Values["controller"].ToString(), "Delete") == false)
+            {
+                return PartialView("~/Views/Shared/PermissionDenied_Modal.cshtml").Warning("You don't have permission to do this task.");
+            }
 
             var group = _ProductGroupService.GetProductGroup(id);
 

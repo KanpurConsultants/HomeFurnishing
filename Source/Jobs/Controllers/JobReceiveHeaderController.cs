@@ -155,7 +155,12 @@ namespace Jobs.Controllers
             }
             vm.JobReceiveSettings = Mapper.Map<JobReceiveSettings, JobReceiveSettingsViewModel>(settings);
 
-            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, id, settings.ProcessId, this.ControllerContext.RouteData.Values["controller"].ToString(), "Create") == false)
+            if ((settings.isVisibleProcessHeader ?? false) == false)
+            {
+                vm.ProcessId = settings.ProcessId;
+            }
+
+            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, id, vm.ProcessId, this.ControllerContext.RouteData.Values["controller"].ToString(), "Create") == false)
             {
                 return View("~/Views/Shared/PermissionDenied.cshtml").Warning("You don't have permission to do this task.");
             }
@@ -163,7 +168,8 @@ namespace Jobs.Controllers
             if (System.Web.HttpContext.Current.Session["DefaultGodownId"] != null)
                 vm.GodownId = (int)System.Web.HttpContext.Current.Session["DefaultGodownId"];
 
-            vm.ProcessId = settings.ProcessId;
+
+
             vm.DocDate = DateTime.Now;
             vm.DocTypeId = id;
             vm.DocNo = new DocumentTypeService(_unitOfWork).FGetNewDocNo("DocNo", ConfigurationManager.AppSettings["DataBaseSchema"] + ".JobReceiveHeaders", vm.DocTypeId, vm.DocDate, vm.DivisionId, vm.SiteId);
@@ -1621,6 +1627,13 @@ namespace Jobs.Controllers
             else{
                 return Json(true);
             }
+        }
+
+        public JsonResult GetProcessPermissionJson(int DocTypeId, int ProcessId)
+        {
+            var temp = new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, DocTypeId, ProcessId, this.ControllerContext.RouteData.Values["controller"].ToString(), "Create");
+
+            return Json(temp);
         }
 
 

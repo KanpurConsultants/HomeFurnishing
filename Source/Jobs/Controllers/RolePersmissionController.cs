@@ -12,6 +12,7 @@ using Jobs.Helpers;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity;
 using System.Threading.Tasks;
+using Core.Common;
 
 namespace Jobs.Controllers
 {
@@ -20,6 +21,7 @@ namespace Jobs.Controllers
     {
 
         private ApplicationDbContext db = new ApplicationDbContext();
+        List<string> UserRoles = new List<string>();
         protected string connectionString = (string)System.Web.HttpContext.Current.Session["DefaultConnectionString"];
         IRolePermissionService _RolePermissionService;
         IUnitOfWork _unitOfWork;
@@ -32,6 +34,8 @@ namespace Jobs.Controllers
             _unitOfWork = unitOfWork;
 
             RoleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(db));
+
+            UserRoles = (List<string>)System.Web.HttpContext.Current.Session["Roles"];
         }
 
         public ActionResult Index()
@@ -41,6 +45,19 @@ namespace Jobs.Controllers
 
         public ActionResult Create()
         {
+            var DocType = new DocumentTypeService(_unitOfWork).FindByName(MasterDocTypeConstants.UserRoles);
+            int DocTypeId = 0;
+
+            if (DocType != null)
+                DocTypeId = DocType.DocumentTypeId;
+            else
+                return View("~/Views/Shared/InValidSettings.cshtml").Warning("Document Type named " + MasterDocTypeConstants.UserRoles + " is not defined in database.");
+
+            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, DocTypeId, null, this.ControllerContext.RouteData.Values["controller"].ToString(), "Delete") == false)
+            {
+                return PartialView("~/Views/Shared/PermissionDenied_Modal.cshtml").Warning("You don't have permission to do this task.");
+            }
+
             return View();
         }
 
@@ -68,6 +85,19 @@ namespace Jobs.Controllers
 
         public ActionResult Edit(string id)
         {
+            var DocType = new DocumentTypeService(_unitOfWork).FindByName(MasterDocTypeConstants.UserRoles);
+            int DocTypeId = 0;
+
+            if (DocType != null)
+                DocTypeId = DocType.DocumentTypeId;
+            else
+                return View("~/Views/Shared/InValidSettings.cshtml").Warning("Document Type named " + MasterDocTypeConstants.UserRoles + " is not defined in database.");
+
+            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, DocTypeId, null, this.ControllerContext.RouteData.Values["controller"].ToString(), "Edit") == false)
+            {
+                return View("~/Views/Shared/PermissionDenied.cshtml").Warning("You don't have permission to do this task.");
+            }
+
             var role = RoleManager.FindById(id);
             if (role == null)
             {

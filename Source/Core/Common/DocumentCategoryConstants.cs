@@ -455,7 +455,7 @@ namespace Core.Common
 
     public class MasterDocTypeConstants
     {
-
+        public const string Machine = "Machine";
         public const string ProductUid = "Product Uid";
         public const string ProcessSequence = "Process Sequence";
         public const string City = "City";
@@ -562,6 +562,7 @@ namespace Core.Common
         public const string Charge = "Charge";
         public const string ChargeGroupProduct = "Charge Group Product";
         public const string ChargeGroupSettings = "Charge Group Settings";
+        public const string QAGroup = "QA Group";
         public const string ChargeType = "Charge Type";
         public const string ProductConsumption = "Product Consumption";
         public const string ProductBuyer = "Product Buyer";

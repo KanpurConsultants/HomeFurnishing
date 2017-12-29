@@ -545,6 +545,36 @@
         $('#ProcessId').attr('readonly','true');
     }
 
+
+    $("#ProcessId").change(GetProcessPermission);
+
+    function GetProcessPermission() {
+        var ProcessProgress = $("#Product detail loading progress");
+        ProcessProgress.show();
+        if ($("#ProcessId").val() != 0 && $("#ProcessId").val() != null) {
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url: "@(Url.Action("GetProcessPermissionJson"))",
+                data: { DocTypeId : $("#DocTypeId").val(), ProcessId: $("#ProcessId").val() },
+            success: function (data) {
+                if (data == false)
+                {
+                    var ProcessName = $("#ProcessId").select2('data').text;
+                    $('.panel-info').filter(':eq(1)').before('<div class="alert alert-danger" role="alert" id="validationerrormsg">'+'You do not have permission for '+ ProcessName +'.'+'</div>');
+                    $("#ProcessId").select2('data', { id: '', text: ''});
+                }
+                else{
+                    $('#validationerrormsg').remove();
+                }
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert('Failed to retrieve product details.' + thrownError);
+            }
+        });
+    }}
+
+
     //Loading the Table data or Line Information
     @*function LoadProducts() {
         var DomainName='@System.Configuration.ConfigurationManager.AppSettings["AdminSetupDomain"]';

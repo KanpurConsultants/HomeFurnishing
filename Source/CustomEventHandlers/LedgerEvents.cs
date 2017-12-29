@@ -458,21 +458,6 @@ namespace Jobs.Controllers
 
             ApplicationDbContext DbContext = new ApplicationDbContext();
 
-            var LedgerHeader = (from p in DbContext.LedgerHeader.AsNoTracking()
-                                where p.LedgerHeaderId == EventArgs.DocId
-                                select p
-                            ).FirstOrDefault();
-
-            var CostCenterIds = Temp.Select(m => m.CostCenterId).ToArray();
-
-
-            var LedgersForCostCenters = (from p in DbContext.Ledger.AsNoTracking()
-                                         join t in DbContext.LedgerHeader on p.LedgerHeaderId equals t.LedgerHeaderId
-                                         where CostCenterIds.Contains(p.CostCenterId) && p.LedgerLineId != EventArgs.DocLineId
-                                         && t.DocTypeId == LedgerHeader.DocTypeId && p.CostCenterId != null
-                                         group p by p.CostCenterId into g
-                                         select g).ToList();
-
             var DocType = (from p in DbContext.DocumentType.AsNoTracking()
                            where p.DocumentTypeName == TransactionDoctypeConstants.SchemeIncentive
                            || p.DocumentTypeName == TransactionDoctypeConstants.WeavingDebitNote
@@ -488,17 +473,34 @@ namespace Jobs.Controllers
                            || p.DocumentTypeName == TransactionDoctypeConstants.WeavingReceipt
                            select p).ToList();
 
-
-            DbContext.Dispose();
-
-            var GroupedTemp = (from p in Temp
-                               where p.CostCenterId != null
-                               group p by p.CostCenterId into g
-                               select g).ToList();           
+            var LedgerHeader = (from p in DbContext.LedgerHeader.AsNoTracking()
+                                where p.LedgerHeaderId == EventArgs.DocId
+                                select p
+                ).FirstOrDefault();
 
 
             if (DocType.Select(m => m.DocumentTypeId).ToArray().Contains(LedgerHeader.DocTypeId))
             {
+
+                var CostCenterIds = Temp.Select(m => m.CostCenterId).ToArray();
+
+
+                var LedgersForCostCenters = (from p in DbContext.Ledger.AsNoTracking()
+                                             join t in DbContext.LedgerHeader on p.LedgerHeaderId equals t.LedgerHeaderId
+                                             where CostCenterIds.Contains(p.CostCenterId) && p.LedgerLineId != EventArgs.DocLineId
+                                             && t.DocTypeId == LedgerHeader.DocTypeId && p.CostCenterId != null
+                                             group p by p.CostCenterId into g
+                                             select g).ToList();
+
+                DbContext.Dispose();
+
+                var GroupedTemp = (from p in Temp
+                                   where p.CostCenterId != null
+                                   group p by p.CostCenterId into g
+                                   select g).ToList();           
+
+
+
                 var CostCenterREcords = (from p in db.CostCenterStatusExtended
                                          where CostCenterIds.Contains(p.CostCenterId)
                                          select p).ToList();

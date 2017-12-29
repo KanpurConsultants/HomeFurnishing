@@ -24,6 +24,7 @@ namespace Jobs.Controllers
 
         private ApplicationDbContext context = new ApplicationDbContext();
 
+        List<string> UserRoles = new List<string>();
         ActiivtyLogViewModel LogVm = new ActiivtyLogViewModel();
 
         IProcessSequenceHeaderService _ProcessSequenceHeaderService;
@@ -37,6 +38,8 @@ namespace Jobs.Controllers
             _ActivityLogService = ActivityLogService;
             _unitOfWork = unitOfWork;
             _exception = exec;
+
+            UserRoles = (List<string>)System.Web.HttpContext.Current.Session["Roles"];
 
             //Log Initialization
             LogVm.SessionId = 0;
@@ -112,6 +115,19 @@ namespace Jobs.Controllers
 
         public ActionResult Create()
         {
+            var DocType = new DocumentTypeService(_unitOfWork).FindByName(MasterDocTypeConstants.ProcessSequence);
+            int DocTypeId = 0;
+
+            if (DocType != null)
+                DocTypeId = DocType.DocumentTypeId;
+            else
+                return View("~/Views/Shared/InValidSettings.cshtml").Warning("Document Type named " + MasterDocTypeConstants.ProcessSequence + " is not defined in database.");
+
+            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, DocTypeId, null, this.ControllerContext.RouteData.Values["controller"].ToString(), "Create") == false)
+            {
+                return View("~/Views/Shared/PermissionDenied.cshtml").Warning("You don't have permission to do this task.");
+            }
+
             ProcessSequenceHeaderIndexViewModel p = new ProcessSequenceHeaderIndexViewModel();
 
             return View("Create", p);
@@ -214,6 +230,19 @@ namespace Jobs.Controllers
                 ViewBag.Redirect = PrevAction;
             }
 
+            var DocType = new DocumentTypeService(_unitOfWork).FindByName(MasterDocTypeConstants.ProcessSequence);
+            int DocTypeId = 0;
+
+            if (DocType != null)
+                DocTypeId = DocType.DocumentTypeId;
+            else
+                return View("~/Views/Shared/InValidSettings.cshtml").Warning("Document Type named " + MasterDocTypeConstants.ProcessSequence + " is not defined in database.");
+
+            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, DocTypeId, null, this.ControllerContext.RouteData.Values["controller"].ToString(), "Edit") == false)
+            {
+                return View("~/Views/Shared/PermissionDenied.cshtml").Warning("You don't have permission to do this task.");
+            }
+
             ProcessSequenceHeader s = _ProcessSequenceHeaderService.GetProcessSequenceHeader(id);
             ProcessSequenceHeaderIndexViewModel svm = Mapper.Map<ProcessSequenceHeader, ProcessSequenceHeaderIndexViewModel>(s);
             PrepareViewBag(svm);
@@ -273,6 +302,20 @@ namespace Jobs.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
+
+            var DocType = new DocumentTypeService(_unitOfWork).FindByName(MasterDocTypeConstants.ProcessSequence);
+            int DocTypeId = 0;
+
+            if (DocType != null)
+                DocTypeId = DocType.DocumentTypeId;
+            else
+                return View("~/Views/Shared/InValidSettings.cshtml").Warning("Document Type named " + MasterDocTypeConstants.ProcessSequence + " is not defined in database.");
+
+            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, DocTypeId, null, this.ControllerContext.RouteData.Values["controller"].ToString(), "Delete") == false)
+            {
+                return PartialView("~/Views/Shared/PermissionDenied_Modal.cshtml").Warning("You don't have permission to do this task.");
+            }
+
             ProcessSequenceHeaderIndexViewModel ProcessSequenceHeader = _ProcessSequenceHeaderService.GetProcessSequenceHeaderVM(id);
             if (ProcessSequenceHeader == null)
             {

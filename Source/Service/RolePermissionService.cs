@@ -40,17 +40,23 @@ namespace Service
             mQry = @"SELECT D.DocumentTypeId, D.DocumentTypeName, 
                     Max(Ca.ControllerName) AS ControllerName, 
                     Max(CASE WHEN Ca.DisplayName = 'Add' THEN Ca.ActionName END) AS AddActionName, 
-                    Convert(BIT,Sum(CASE WHEN Ca.DisplayName = 'Add' THEN IsNull(VRolesDocTypes.IsPermissionGranted,0) END)) AS [Add],
+                    Convert(BIT,Sum(CASE WHEN Ca.DisplayName = 'Add' THEN IsNull(VRolesDocTypes.IsPermissionGranted,0) ELSE 0 END)) AS [Add],
                     Max(CASE WHEN Ca.DisplayName = 'Edit' THEN Ca.ActionName END) AS EditActionName, 
-                    Convert(BIT,Sum(CASE WHEN Ca.DisplayName = 'Edit' THEN IsNull(VRolesDocTypes.IsPermissionGranted,0) END)) AS [Edit],
+                    Convert(BIT,Sum(CASE WHEN Ca.DisplayName = 'Edit' THEN IsNull(VRolesDocTypes.IsPermissionGranted,0) ELSE 0 END)) AS [Edit],
                     Max(CASE WHEN Ca.DisplayName = 'Delete' THEN Ca.ActionName END) AS DeleteActionName, 
-                    Convert(BIT,Sum(CASE WHEN Ca.DisplayName = 'Delete' THEN IsNull(VRolesDocTypes.IsPermissionGranted,0) END)) AS [Delete],
+                    Convert(BIT,Sum(CASE WHEN Ca.DisplayName = 'Delete' THEN IsNull(VRolesDocTypes.IsPermissionGranted,0) ELSE 0 END)) AS [Delete],
                     Max(CASE WHEN Ca.DisplayName = 'Print' THEN Ca.ActionName END) AS PrintActionName, 
-                    Convert(BIT,Sum(CASE WHEN Ca.DisplayName = 'Print' THEN IsNull(VRolesDocTypes.IsPermissionGranted,0) END)) AS [Print],
+                    Convert(BIT,Sum(CASE WHEN Ca.DisplayName = 'Print' THEN IsNull(VRolesDocTypes.IsPermissionGranted,0) ELSE 0 END)) AS [Print],
                     Max(CASE WHEN Ca.DisplayName = 'Submit' THEN Ca.ActionName END) AS SubmitActionName, 
-                    Convert(BIT,Sum(CASE WHEN Ca.DisplayName = 'Submit' THEN IsNull(VRolesDocTypes.IsPermissionGranted,0) END)) AS [Submit]
+                    Convert(BIT,Sum(CASE WHEN Ca.DisplayName = 'Submit' THEN IsNull(VRolesDocTypes.IsPermissionGranted,0) ELSE 0 END)) AS [Submit],
+                    Case When Max(IsNull(VDocumentTypeProcesses.Cnt,0)) > 1 Then 'True' Else 'False' End IsVisibleProcess 
                     FROM Web.ControllerActions Ca
                     LEFT JOIN Web.DocumentTypes D ON Ca.ControllerName = D.ControllerName
+                    LEFT JOIN (
+                            Select Dp.DocumentTypeId, Count(*) As Cnt
+                            From Web.DocumentTypeProcesses Dp
+                            Group By Dp.DocumentTypeId
+                    ) As VDocumentTypeProcesses On D.DocumentTypeId = VDocumentTypeProcesses.DocumentTypeId
                     LEFT JOIN (SELECT 1 AS IsPermissionGranted, Rd.DocTypeId, Rd.ControllerName, Rd.ActionName
 			                    FROM Web.RolesDocTypes Rd
 			                    WHERE Rd.RoleId = @RoleId
@@ -80,14 +86,15 @@ namespace Service
                         Convert(BIT,IsNull(VRolesDocTypeProcess.IsPermissionGranted,0)) AS IsActive
                         FROM Web.DocumentTypes D
                         LEFT JOIN Web.AspNetRoles R ON 1=1
-                        LEFT JOIN Web.Processes P ON 1=1
+                        LEFT JOIN Web.DocumentTypeProcesses Dp On D.DocumentTypeId = Dp.DocumentTypeId
+                        LEFT JOIN Web.Processes P ON Dp.ProcessId = P.ProcessId
                         LEFT JOIN (SELECT 1 AS IsPermissionGranted, Rdp.RoleId, Rdp.DocTypeId, Rdp.ProcessId
                                     FROM Web.RolesDocTypeProcesses Rdp
                                     WHERE Rdp.RoleId = @RoleId AND Rdp.DocTypeId = @DocTypeId
                         ) AS VRolesDocTypeProcess ON R.Id = VRolesDocTypeProcess.RoleId
                                 AND D.DocumentTypeId = VRolesDocTypeProcess.DocTypeId
                                 AND P.ProcessId = VRolesDocTypeProcess.ProcessId
-                        WHERE R.Id = @RoleId AND D.DocumentTypeId = @DocTypeId ";
+                        WHERE R.Id = @RoleId AND D.DocumentTypeId = @DocTypeId And P.ProcessId Is Not Null ";
 
             IEnumerable<RoleProcessPermissionViewModel> RoleProcessPermissionViewModel = db.Database.SqlQuery<RoleProcessPermissionViewModel>(mQry, SqlParameterRoleId, SqlParameterDocTypeId).ToList();
 
@@ -129,6 +136,7 @@ namespace Service
         public bool IsActionAllowed(List<string> UserRoles, int DocTypeId, int? ProcessId, string ControllerName, string ActionName)
         {
             bool IsAllowed = true;
+            bool IsAllowedForPreviousRole = false;
 
             var ExistingData = (from L in db.RolesDocType select L).FirstOrDefault();
             if (ExistingData == null)
@@ -136,39 +144,51 @@ namespace Service
 
             foreach(string RoleName in UserRoles)
             {
-                var RolesDocType = (from L in db.RolesDocType
-                                    join R in db.Roles on L.RoleId equals R.Id
-                                    where R.Name == RoleName && L.DocTypeId == DocTypeId
-                                        && L.ControllerName == ControllerName && L.ActionName == ActionName
-                                    select L).FirstOrDefault();
+                if (IsAllowedForPreviousRole == false)
+                {
+                    var RolesDocType = (from L in db.RolesDocType
+                                        join R in db.Roles on L.RoleId equals R.Id
+                                        where R.Name == RoleName && L.DocTypeId == DocTypeId
+                                            && L.ControllerName == ControllerName && L.ActionName == ActionName
+                                        select L).FirstOrDefault();
 
-                if (RolesDocType == null)
-                {
-                    IsAllowed = false;
-                }
-                else
-                {
-                    if (ProcessId != null)
+                    if (RolesDocType == null)
                     {
-                        var RolesDocTypeProcess_Any = (from L in db.RolesDocTypeProcess
-                                                       join R in db.Roles on L.RoleId equals R.Id
-                                                   where R.Name == RoleName && L.DocTypeId == DocTypeId
-                                                   select L).FirstOrDefault();
-                        if (RolesDocTypeProcess_Any != null)
+                        IsAllowed = false;
+                    }
+                    else
+                    {
+                        if (ProcessId != null && ProcessId != 0)
                         {
-                            var RolesDocTypeProcess = (from L in db.RolesDocTypeProcess
-                                                       join R in db.Roles on L.RoleId equals R.Id
+                            var RolesDocTypeProcess_Any = (from L in db.RolesDocTypeProcess
+                                                           join R in db.Roles on L.RoleId equals R.Id
                                                        where R.Name == RoleName && L.DocTypeId == DocTypeId
-                                                            && L.ProcessId == ProcessId
                                                        select L).FirstOrDefault();
-                            if (RolesDocTypeProcess == null)
-                                IsAllowed = false;
+                            if (RolesDocTypeProcess_Any != null)
+                            {
+                                var RolesDocTypeProcess = (from L in db.RolesDocTypeProcess
+                                                           join R in db.Roles on L.RoleId equals R.Id
+                                                           where R.Name == RoleName && L.DocTypeId == DocTypeId
+                                                                && L.ProcessId == ProcessId
+                                                           select L).FirstOrDefault();
+                                if (RolesDocTypeProcess == null)
+                                    IsAllowed = false;
+                                else
+                                {
+                                    IsAllowed = true;
+                                    IsAllowedForPreviousRole = true;
+                                }
+                            }
                             else
+                            {
                                 IsAllowed = true;
+                                IsAllowedForPreviousRole = true;
+                            }
                         }
                         else
                         {
                             IsAllowed = true;
+                            IsAllowedForPreviousRole = true;
                         }
                     }
                 }
@@ -187,6 +207,7 @@ namespace Service
     {
         public int DocumentTypeId { get; set; }
         public string DocumentTypeName { get; set; }
+        public string IsVisibleProcess { get; set; }
         public string ControllerName { get; set; }
         public string AddActionName { get; set; }
         public bool Add { get; set; }

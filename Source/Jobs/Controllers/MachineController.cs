@@ -21,6 +21,7 @@ namespace Jobs.Controllers
     public class MachineController : System.Web.Mvc.Controller
     {
           private ApplicationDbContext db = new ApplicationDbContext();
+          List<string> UserRoles = new List<string>();
         ActiivtyLogViewModel LogVm = new ActiivtyLogViewModel();
         IProductUidService _ProductUidService;
           IUnitOfWork _unitOfWork;
@@ -30,6 +31,8 @@ namespace Jobs.Controllers
               _ProductUidService = ProductUidService;
               _unitOfWork = unitOfWork;
               _exception = exec;
+
+              UserRoles = (List<string>)System.Web.HttpContext.Current.Session["Roles"];
           }
         // GET: /ProductUidMaster/
         
@@ -47,6 +50,19 @@ namespace Jobs.Controllers
 
         public ActionResult Create(int id)
           {
+              var DocType = new DocumentTypeService(_unitOfWork).FindByName(MasterDocTypeConstants.Machine);
+              int DocTypeId = 0;
+
+              if (DocType != null)
+                  DocTypeId = DocType.DocumentTypeId;
+              else
+                  return View("~/Views/Shared/InValidSettings.cshtml").Warning("Document Type named " + MasterDocTypeConstants.Machine + " is not defined in database.");
+
+              if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, DocTypeId, null, this.ControllerContext.RouteData.Values["controller"].ToString(), "Create") == false)
+              {
+                  return View("~/Views/Shared/PermissionDenied.cshtml").Warning("You don't have permission to do this task.");
+              }
+
             int GoDownId = (int)System.Web.HttpContext.Current.Session["DefaultGodownId"];
             ProductUid vm = new ProductUid();
             vm.IsActive = true;
@@ -166,6 +182,19 @@ namespace Jobs.Controllers
         
         public ActionResult Edit(int id)
         {
+            var DocType = new DocumentTypeService(_unitOfWork).FindByName(MasterDocTypeConstants.Machine);
+            int DocTypeId = 0;
+
+            if (DocType != null)
+                DocTypeId = DocType.DocumentTypeId;
+            else
+                return View("~/Views/Shared/InValidSettings.cshtml").Warning("Document Type named " + MasterDocTypeConstants.Machine + " is not defined in database.");
+
+            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, DocTypeId, null, this.ControllerContext.RouteData.Values["controller"].ToString(), "Edit") == false)
+            {
+                return View("~/Views/Shared/PermissionDenied.cshtml").Warning("You don't have permission to do this task.");
+            }
+
             ProductUid pt = _ProductUidService.Find(id);
             ViewBag.id = pt.GenDocTypeId;
             if (pt == null)
@@ -183,6 +212,20 @@ namespace Jobs.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
+
+            var DocType = new DocumentTypeService(_unitOfWork).FindByName(MasterDocTypeConstants.Machine);
+            int DocTypeId = 0;
+
+            if (DocType != null)
+                DocTypeId = DocType.DocumentTypeId;
+            else
+                return View("~/Views/Shared/InValidSettings.cshtml").Warning("Document Type named " + MasterDocTypeConstants.Machine + " is not defined in database.");
+
+            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, DocTypeId, null, this.ControllerContext.RouteData.Values["controller"].ToString(), "Delete") == false)
+            {
+                return PartialView("~/Views/Shared/PermissionDenied_Modal.cshtml").Warning("You don't have permission to do this task.");
+            }
+
             ProductUid ProductUid = db.ProductUid.Find(id);
             if (ProductUid == null)
             {
@@ -227,7 +270,7 @@ namespace Jobs.Controllers
 
                 LogActivity.LogActivityDetail(LogVm.Map(new ActiivtyLogViewModel
                 {
-                    DocTypeId = new DocumentTypeService(_unitOfWork).FindByName(MasterDocTypeConstants.ProductUid).DocumentTypeId,
+                    DocTypeId = new DocumentTypeService(_unitOfWork).FindByName(MasterDocTypeConstants.Machine).DocumentTypeId,
                     DocId = vm.id,
 
                     ActivityType = (int)ActivityTypeContants.Deleted,

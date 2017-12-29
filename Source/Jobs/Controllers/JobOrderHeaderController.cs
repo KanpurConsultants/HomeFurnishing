@@ -216,7 +216,13 @@ namespace Jobs.Controllers
             }
             p.JobOrderSettings = Mapper.Map<JobOrderSettings, JobOrderSettingsViewModel>(settings);
 
-            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, id, settings.ProcessId, this.ControllerContext.RouteData.Values["controller"].ToString(),"Create") == false)
+
+            if ((settings.isVisibleProcessHeader ?? false) == false)
+            {
+                p.ProcessId = settings.ProcessId;
+            }
+
+            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, id, p.ProcessId, this.ControllerContext.RouteData.Values["controller"].ToString(), "Create") == false)
             {
                 return View("~/Views/Shared/PermissionDenied.cshtml").Warning("You don't have permission to do this task.");
             }
@@ -262,10 +268,7 @@ namespace Jobs.Controllers
             p.PerkViewModel = Perks;
             p.UnitConversionForId = settings.UnitConversionForId;
 
-            if ((settings.isVisibleProcessHeader ?? false) == false)
-            {
-                p.ProcessId = settings.ProcessId;
-            }
+
 
 
             p.TermsAndConditions = settings.TermsAndConditions;
@@ -2801,6 +2804,13 @@ namespace Jobs.Controllers
                 Data = Data,
                 JsonRequestBehavior = JsonRequestBehavior.AllowGet
             };
+        }
+
+        public JsonResult GetProcessPermissionJson(int DocTypeId, int ProcessId)
+        {
+            var temp = new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, DocTypeId, ProcessId, this.ControllerContext.RouteData.Values["controller"].ToString(), "Create");
+
+            return Json(temp);
         }
 
     }

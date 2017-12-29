@@ -202,6 +202,7 @@ namespace Jobs.Areas.Rug.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
+
             DocumentTypeTimeExtension DocumentTypeTimeExtension = _DocumentTypeTimeExtensionService.Find(id);
             if (DocumentTypeTimeExtension == null)
             {

@@ -367,3 +367,4 @@ D:\Sample_New\HomeFurnishing\Source\Data\obj\Debug\Data.Migrations.RoleDocTypePr
 D:\Sample_New\HomeFurnishing\Source\Data\obj\Debug\Data.csproj.GenerateResource.Cache
 D:\Sample_New\HomeFurnishing\Source\Data\obj\Debug\Data.dll
 D:\Sample_New\HomeFurnishing\Source\Data\obj\Debug\Data.pdb
+D:\Sample\HomeFurnishing\Source\Data\obj\Debug\Data.Migrations.SampleTesting.resources

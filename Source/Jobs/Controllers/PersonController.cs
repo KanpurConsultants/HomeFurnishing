@@ -148,6 +148,11 @@ namespace Jobs.Controllers
 
        public ActionResult Create(int id)
        {
+           if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, id, null, this.ControllerContext.RouteData.Values["controller"].ToString(), "ChooseContactType") == false)
+           {
+               return View("~/Views/Shared/PermissionDenied.cshtml").Warning("You don't have permission to do this task.");
+           }
+
             PersonViewModel p = new PersonViewModel();
             p.IsActive = true;
             //p.Code = new PersonService(_unitOfWork).GetMaxCode();
@@ -1087,6 +1092,11 @@ namespace Jobs.Controllers
 
         public ActionResult Edit(int id, int DocTypeId)
         {
+            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, DocTypeId, null, this.ControllerContext.RouteData.Values["controller"].ToString(), "Edit") == false)
+            {
+                return View("~/Views/Shared/PermissionDenied.cshtml").Warning("You don't have permission to do this task.");
+            }
+
             PersonViewModel bvm = _PersonService.GetPersonViewModelForEdit(id);
             bvm.DocTypeId = DocTypeId;
             PrepareViewBag(DocTypeId);
@@ -1120,10 +1130,19 @@ namespace Jobs.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
+
+
+
             Person Person = _PersonService.GetPerson(id);
             if (Person == null)
             {
                 return HttpNotFound();
+            }
+
+
+            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, Person.DocTypeId, null, this.ControllerContext.RouteData.Values["controller"].ToString(), "Delete") == false)
+            {
+                return PartialView("~/Views/Shared/PermissionDenied_Modal.cshtml").Warning("You don't have permission to do this task.");
             }
 
             ReasonViewModel vm = new ReasonViewModel()
@@ -1329,6 +1348,11 @@ namespace Jobs.Controllers
        [HttpGet]
         public ActionResult ChooseContactType(int id)//DocTypeId
         {
+            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, id, null, this.ControllerContext.RouteData.Values["controller"].ToString(), "ChooseContactType") == false)
+            {
+                return PartialView("~/Views/Shared/PermissionDenied_Modal.cshtml").Warning("You don't have permission to do this task.");
+            }
+
             PrepareViewBag(id);
             return PartialView("ChooseContactType");
         }

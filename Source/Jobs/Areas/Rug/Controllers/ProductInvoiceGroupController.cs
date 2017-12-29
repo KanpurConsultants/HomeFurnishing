@@ -22,6 +22,7 @@ namespace Jobs.Areas.Rug.Controllers
         private ApplicationDbContext db = new ApplicationDbContext();
 
         ActiivtyLogViewModel LogVm = new ActiivtyLogViewModel();
+        List<string> UserRoles = new List<string>();
 
         IProductInvoiceGroupService _ProductInvoiceGroupService;
         IUnitOfWork _unitOfWork;
@@ -31,6 +32,8 @@ namespace Jobs.Areas.Rug.Controllers
             _ProductInvoiceGroupService = ProductInvoiceGroupService;
             _unitOfWork = unitOfWork;
             _exception = exec;
+
+            UserRoles = (List<string>)System.Web.HttpContext.Current.Session["Roles"];
 
             //Log Initialization
             LogVm.SessionId = 0;
@@ -51,6 +54,19 @@ namespace Jobs.Areas.Rug.Controllers
 
         public ActionResult Create()
         {
+            var DocType = new DocumentTypeService(_unitOfWork).FindByName(MasterDocTypeConstants.ProductInvoiceGroup);
+            int DocTypeId = 0;
+
+            if (DocType != null)
+                DocTypeId = DocType.DocumentTypeId;
+            else
+                return View("~/Views/Shared/InValidSettings.cshtml").Warning("Document Type named " + MasterDocTypeConstants.ProductInvoiceGroup + " is not defined in database.");
+
+            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, DocTypeId, null, this.ControllerContext.RouteData.Values["controller"].ToString(), "Create") == false)
+            {
+                return View("~/Views/Shared/PermissionDenied.cshtml").Warning("You don't have permission to do this task.");
+            }
+
             int DivisionId= (int)System.Web.HttpContext.Current.Session["DivisionId"];
             ProductInvoiceGroup vm = new ProductInvoiceGroup();
             vm.DivisionId = DivisionId;
@@ -165,6 +181,19 @@ namespace Jobs.Areas.Rug.Controllers
 
         public ActionResult Edit(int id)
         {
+            var DocType = new DocumentTypeService(_unitOfWork).FindByName(MasterDocTypeConstants.ProductInvoiceGroup);
+            int DocTypeId = 0;
+
+            if (DocType != null)
+                DocTypeId = DocType.DocumentTypeId;
+            else
+                return View("~/Views/Shared/InValidSettings.cshtml").Warning("Document Type named " + MasterDocTypeConstants.ProductInvoiceGroup + " is not defined in database.");
+
+            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, DocTypeId, null, this.ControllerContext.RouteData.Values["controller"].ToString(), "Edit") == false)
+            {
+                return View("~/Views/Shared/PermissionDenied.cshtml").Warning("You don't have permission to do this task.");
+            }
+
             ProductInvoiceGroup pt = _ProductInvoiceGroupService.Find(id);
             if (pt == null)
             {
@@ -181,6 +210,20 @@ namespace Jobs.Areas.Rug.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
+
+            var DocType = new DocumentTypeService(_unitOfWork).FindByName(MasterDocTypeConstants.ProductInvoiceGroup);
+            int DocTypeId = 0;
+
+            if (DocType != null)
+                DocTypeId = DocType.DocumentTypeId;
+            else
+                return View("~/Views/Shared/InValidSettings.cshtml").Warning("Document Type named " + MasterDocTypeConstants.ProductInvoiceGroup + " is not defined in database.");
+
+            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, DocTypeId, null, this.ControllerContext.RouteData.Values["controller"].ToString(), "Delete") == false)
+            {
+                return PartialView("~/Views/Shared/PermissionDenied_Modal.cshtml").Warning("You don't have permission to do this task.");
+            }
+
             ProductInvoiceGroup ProductInvoiceGroup = _ProductInvoiceGroupService.Find(id);
             if (ProductInvoiceGroup == null)
             {

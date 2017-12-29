@@ -110,6 +110,7 @@ namespace Data.Models
         public DbSet<CalculationLineLedgerAccount> CalculationLineLedgerAccount { get; set; }
         public DbSet<DocumentTypeDivision> DocumentTypeDivision { get; set; }
         public DbSet<DocumentTypeSite> DocumentTypeSite { get; set; }
+        public DbSet<DocumentTypeProcess> DocumentTypeProcess { get; set; }
         public DbSet<AspNetRole> AspNetRole { get; set; }
         public DbSet<AspNetUserRole> AspNetUserRole { get; set; }
         public DbSet<UserRole> UserRole { get; set; }

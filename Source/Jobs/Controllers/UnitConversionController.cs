@@ -23,6 +23,7 @@ namespace Jobs.Controllers
         private ApplicationDbContext db = new ApplicationDbContext();
 
         ActiivtyLogViewModel LogVm = new ActiivtyLogViewModel();
+        List<string> UserRoles = new List<string>();
 
         IUnitConversionService _UnitConversionService;
         IUnitOfWork _unitOfWork;
@@ -32,6 +33,8 @@ namespace Jobs.Controllers
             _UnitConversionService = UnitConversionService;
             _unitOfWork = unitOfWork;
             _exception = exec;
+
+            UserRoles = (List<string>)System.Web.HttpContext.Current.Session["Roles"];
 
             //Log Initialization
             LogVm.SessionId = 0;
@@ -72,6 +75,19 @@ namespace Jobs.Controllers
         
         public ActionResult Create(int ProductId)
         {
+            var DocType = new DocumentTypeService(_unitOfWork).FindByName(MasterDocTypeConstants.UnitConversion);
+            int DocTypeId = 0;
+
+            if (DocType != null)
+                DocTypeId = DocType.DocumentTypeId;
+            else
+                return View("~/Views/Shared/InValidSettings.cshtml").Warning("Document Type named " + MasterDocTypeConstants.UnitConversion + " is not defined in database.");
+
+            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, DocTypeId, null, this.ControllerContext.RouteData.Values["controller"].ToString(), "Create") == false)
+            {
+                return View("~/Views/Shared/PermissionDenied.cshtml").Warning("You don't have permission to do this task.");
+            }
+
             UnitConversionViewModel vm = new UnitConversionViewModel();
             vm.ProductId = ProductId;
             Product Temp = new ProductService(_unitOfWork).Find(ProductId);
@@ -186,6 +202,19 @@ namespace Jobs.Controllers
         
         public ActionResult Edit(int id)//UnitConversionId
         {
+            var DocType = new DocumentTypeService(_unitOfWork).FindByName(MasterDocTypeConstants.UnitConversion);
+            int DocTypeId = 0;
+
+            if (DocType != null)
+                DocTypeId = DocType.DocumentTypeId;
+            else
+                return View("~/Views/Shared/InValidSettings.cshtml").Warning("Document Type named " + MasterDocTypeConstants.UnitConversion + " is not defined in database.");
+
+            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, DocTypeId, null, this.ControllerContext.RouteData.Values["controller"].ToString(), "Edit") == false)
+            {
+                return View("~/Views/Shared/PermissionDenied.cshtml").Warning("You don't have permission to do this task.");
+            }
+
             UnitConversion pt = _UnitConversionService.Find(id);
             UnitConversionViewModel vm = AutoMapper.Mapper.Map<UnitConversion, UnitConversionViewModel>(pt);
             if (pt == null)
@@ -205,6 +234,20 @@ namespace Jobs.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
+
+            var DocType = new DocumentTypeService(_unitOfWork).FindByName(MasterDocTypeConstants.UnitConversion);
+            int DocTypeId = 0;
+
+            if (DocType != null)
+                DocTypeId = DocType.DocumentTypeId;
+            else
+                return View("~/Views/Shared/InValidSettings.cshtml").Warning("Document Type named " + MasterDocTypeConstants.UnitConversion + " is not defined in database.");
+
+            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, DocTypeId, null, this.ControllerContext.RouteData.Values["controller"].ToString(), "Delete") == false)
+            {
+                return PartialView("~/Views/Shared/PermissionDenied_Modal.cshtml").Warning("You don't have permission to do this task.");
+            }
+
             UnitConversion UnitConversion = db.UnitConversion.Find(id);
             if (UnitConversion == null)
             {
