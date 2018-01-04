@@ -50,6 +50,13 @@ namespace Jobs.Controllers
         public ActionResult ReportPrint(int MenuId)
         {
             //TempData["DefaultValues"] = TempData["DefaultValues"] as Dictionary<int, string>;
+
+            if (IsActionAllowed(UserRoles, MenuId) == false)
+            {
+                return View("~/Views/Shared/PermissionDenied.cshtml").Warning("You don't have permission to do this task.");
+            }
+
+
             Menu menu = new MenuService(_unitOfWork).Find(MenuId);
             return RedirectToAction("ReportLayout", "ReportLayout", new { name = menu.MenuName });
         }
@@ -871,6 +878,50 @@ namespace Jobs.Controllers
             return Json(new { success = true });
 
         }
+
+
+        public bool IsActionAllowed(List<string> UserRoles, int MenuId)
+        {
+            bool IsAllowed = true;
+            bool IsAllowedForPreviousRole = false;
+
+            var Menu = (from M in db.Menu
+                        where M.MenuId == MenuId
+                        select new
+                        {
+                            ControllerName = M.ControllerAction.ControllerName,
+                            ActionName = M.ControllerAction.ActionName
+                        }).FirstOrDefault();
+
+            var ExistingData = (from L in db.RolesDocType select L).FirstOrDefault();
+            if (ExistingData == null)
+                return true;
+
+            foreach (string RoleName in UserRoles)
+            {
+                if (IsAllowedForPreviousRole == false)
+                {
+                    var RolesDocType = (from L in db.RolesDocType
+                                        join R in db.Roles on L.RoleId equals R.Id
+                                        where R.Name == RoleName && L.MenuId == MenuId
+                                            && L.ControllerName == Menu.ControllerName && L.ActionName == Menu.ActionName
+                                        select L).FirstOrDefault();
+
+                    if (RolesDocType == null)
+                    {
+                        IsAllowed = false;
+                    }
+                    else
+                    {
+                        IsAllowed = true;
+                        IsAllowedForPreviousRole = true;
+                    }
+                }
+            }
+
+            return IsAllowed;
+        }
+
 
     }
 

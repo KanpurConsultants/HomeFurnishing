@@ -60,6 +60,7 @@ namespace Jobs.App_Start
             // TODO: Register your types here
             // container.RegisterType<IProductRepository, ProductRepository>();
 
+            container.RegisterType<IRolesDocTypeService, RolesDocTypeService>(new PerRequestLifetimeManager());
             container.RegisterType<IRolePermissionService, RolePermissionService>(new PerRequestLifetimeManager());
             container.RegisterType<IUserRolesNewService, UserRolesNewService>(new PerRequestLifetimeManager());
 
@@ -1328,6 +1329,7 @@ namespace Jobs.App_Start
             container.RegisterType<IRepository<RolesDivision>, Repository<RolesDivision>>();
             container.RegisterType<IRepository<RolesMenu>, Repository<RolesMenu>>();
             container.RegisterType<IRepository<RolesSite>, Repository<RolesSite>>();
+            container.RegisterType<IRepository<RolesDocType>, Repository<RolesDocType>>();
 
             container.RegisterType<IAdminSetupService, AdminSetupService>(new PerRequestLifetimeManager());
 

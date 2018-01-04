@@ -32,8 +32,9 @@ namespace Module
         private readonly ICompanySettingsService _CompanySettingsService;
         private readonly ICompanyService _CompanyService;
         private readonly IRolesControllerActionService _rolesControllerAcitonService;
+        private readonly IRolesDocTypeService _RolesDocTypeService;
         public SiteSelectionController(ISiteSelectionService SiteSelectionServ, ICompanyService CompanyServ, IUserRolesService userRolesService, IModuleService moduleServ, ICompanySettingsService CompanySettingsServ,
-            IUserBookMarkService userBookmarkServ, IRolesControllerActionService rolesControllerActServ)
+            IUserBookMarkService userBookmarkServ, IRolesControllerActionService rolesControllerActServ, IRolesDocTypeService RolesDocTypeServ)
         {
             _siteSelectionService = SiteSelectionServ;
             _userRolesService = userRolesService;
@@ -42,6 +43,7 @@ namespace Module
             _CompanyService = CompanyServ;
             _userBookMarkService = userBookmarkServ;
             _rolesControllerAcitonService = rolesControllerActServ;
+            _RolesDocTypeService = RolesDocTypeServ;
         }
 
 
@@ -123,21 +125,44 @@ namespace Module
             }
             else
             {
-                var SiteList = _siteSelectionService.GetSiteList(RoleIds).ToList();
-                ViewBag.SiteList = SiteList;
-                var DivList = _siteSelectionService.GetDivisionList(RoleIds).ToList();
-                ViewBag.DivisionList = DivList;
-                if (SiteList.Count == 0 || DivList.Count == 0)
+                var ExistingData = _RolesDocTypeService.GetRolesDocTypeList().FirstOrDefault();
+                if (ExistingData == null)
                 {
-                    return RedirectToAction("AccessDenied", "Account");
-                }
-                else if (SiteList.Count == 1 && DivList.Count == 1)
-                {
-                    AssignSiteDivModuleSession(SiteList.FirstOrDefault().SiteId, DivList.FirstOrDefault().DivisionId);
+                    var SiteList = _siteSelectionService.GetSiteList(RoleIds).ToList();
+                    ViewBag.SiteList = SiteList;
+                    var DivList = _siteSelectionService.GetDivisionList(RoleIds).ToList();
+                    ViewBag.DivisionList = DivList;
+                    if (SiteList.Count == 0 || DivList.Count == 0)
+                    {
+                        return RedirectToAction("AccessDenied", "Account");
+                    }
+                    else if (SiteList.Count == 1 && DivList.Count == 1)
+                    {
+                        AssignSiteDivModuleSession(SiteList.FirstOrDefault().SiteId, DivList.FirstOrDefault().DivisionId);
 
-                    return RedirectToAction("DefaultGodownSelection");
+                        return RedirectToAction("DefaultGodownSelection");
+                    }
+                }
+                else
+                {
+                    var SiteList = _siteSelectionService.GetSiteListForUser(UserId).ToList();
+                    ViewBag.SiteList = SiteList;
+                    var DivList = _siteSelectionService.GetDivisionListForUser(UserId).ToList();
+                    ViewBag.DivisionList = DivList;
+                    if (SiteList.Count == 0 || DivList.Count == 0)
+                    {
+                        return RedirectToAction("AccessDenied", "Account");
+                    }
+                    else if (SiteList.Count == 1 && DivList.Count == 1)
+                    {
+                        AssignSiteDivModuleSession(SiteList.FirstOrDefault().SiteId, DivList.FirstOrDefault().DivisionId);
+
+                        return RedirectToAction("DefaultGodownSelection");
+                    }
                 }
             }
+
+
             if (System.Web.HttpContext.Current.Session["DivisionId"] != null && System.Web.HttpContext.Current.Session["SiteId"] != null)
             {
                 vm.DivisionId = (int)System.Web.HttpContext.Current.Session["DivisionId"];
@@ -279,6 +304,13 @@ namespace Module
         {
             System.Web.HttpContext.Current.Session["DivisionId"] = DivisionId;
             System.Web.HttpContext.Current.Session["SiteId"] = SiteId;
+
+            var ExistingData = _RolesDocTypeService.GetRolesDocTypeList().FirstOrDefault();
+            if (ExistingData == null)
+            {
+                var UserId = User.Identity.GetUserId();
+                System.Web.HttpContext.Current.Session["Roles"] = _userRolesService.GetUserRolesForSession(UserId);
+            }
 
             Site S = _siteSelectionService.GetSite(SiteId);
             Division D = _siteSelectionService.GetDivision(DivisionId);

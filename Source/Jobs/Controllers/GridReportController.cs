@@ -32,10 +32,13 @@ namespace Jobs.Controllers
         //IGridReportService _GridReportService;
         IUnitOfWork _unitOfWork;
         IExceptionHandlingService _exception;
+        List<string> UserRoles = new List<string>();
 
 
         public GridReportController(IUnitOfWork unitOfWork, IExceptionHandlingService exec)
         {
+            UserRoles = (List<string>)System.Web.HttpContext.Current.Session["Roles"];
+
             _exception = exec;
             _unitOfWork = unitOfWork;
         }
@@ -48,6 +51,11 @@ namespace Jobs.Controllers
             List<ReportLine> lines = new List<ReportLine>();
             if (MenuId != null)
             {
+                if (IsActionAllowed(UserRoles, (int)MenuId) == false)
+                {
+                    return View("~/Views/Shared/PermissionDenied.cshtml").Warning("You don't have permission to do this task.");
+                }
+
                 menu = new MenuService(_unitOfWork).Find((int)MenuId);
                 header = new ReportHeaderService(_unitOfWork).GetReportHeaderByName(menu.MenuName);
                 if (header != null)
@@ -295,7 +303,47 @@ namespace Jobs.Controllers
     }
 
 
+        public bool IsActionAllowed(List<string> UserRoles, int MenuId)
+        {
+            bool IsAllowed = true;
+            bool IsAllowedForPreviousRole = false;
 
+            var Menu = (from M in db.Menu
+                        where M.MenuId == MenuId
+                        select new
+                        {
+                            ControllerName = M.ControllerAction.ControllerName,
+                            ActionName = M.ControllerAction.ActionName
+                        }).FirstOrDefault();
+
+            var ExistingData = (from L in db.RolesDocType select L).FirstOrDefault();
+            if (ExistingData == null)
+                return true;
+
+            foreach (string RoleName in UserRoles)
+            {
+                if (IsAllowedForPreviousRole == false)
+                {
+                    var RolesDocType = (from L in db.RolesDocType
+                                        join R in db.Roles on L.RoleId equals R.Id
+                                        where R.Name == RoleName && L.MenuId == MenuId
+                                            && L.ControllerName == Menu.ControllerName && L.ActionName == Menu.ActionName
+                                        select L).FirstOrDefault();
+
+                    if (RolesDocType == null)
+                    {
+                        IsAllowed = false;
+                    }
+                    else
+                    {
+                        IsAllowed = true;
+                        IsAllowedForPreviousRole = true;
+                    }
+                }
+            }
+
+            return IsAllowed;
+        }
 
         
         protected override void Dispose(bool disposing)

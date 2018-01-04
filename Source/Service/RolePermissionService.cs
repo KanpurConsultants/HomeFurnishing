@@ -37,7 +37,7 @@ namespace Service
 
             string mQry = "";
 
-            mQry = @"SELECT D.DocumentTypeId, D.DocumentTypeName, 
+            mQry = @"SELECT D.DocumentTypeId, D.DocumentTypeName, IsNull(Max(VModule.ModuleName),'Others') AS ModuleName, 
                     Max(Ca.ControllerName) AS ControllerName, 
                     Max(CASE WHEN Ca.DisplayName = 'Add' THEN Ca.ActionName END) AS AddActionName, 
                     Convert(BIT,Sum(CASE WHEN Ca.DisplayName = 'Add' THEN IsNull(VRolesDocTypes.IsPermissionGranted,0) ELSE 0 END)) AS [Add],
@@ -49,7 +49,7 @@ namespace Service
                     Convert(BIT,Sum(CASE WHEN Ca.DisplayName = 'Print' THEN IsNull(VRolesDocTypes.IsPermissionGranted,0) ELSE 0 END)) AS [Print],
                     Max(CASE WHEN Ca.DisplayName = 'Submit' THEN Ca.ActionName END) AS SubmitActionName, 
                     Convert(BIT,Sum(CASE WHEN Ca.DisplayName = 'Submit' THEN IsNull(VRolesDocTypes.IsPermissionGranted,0) ELSE 0 END)) AS [Submit],
-                    Case When Max(IsNull(VDocumentTypeProcesses.Cnt,0)) > 1 Then 'True' Else 'False' End IsVisibleProcess 
+                    Case When Max(IsNull(VDocumentTypeProcesses.Cnt,0)) > 1 Then 'True' Else 'False' End IsVisibleProcess, 'Document' As EntryType
                     FROM Web.ControllerActions Ca
                     LEFT JOIN Web.DocumentTypes D ON Ca.ControllerName = D.ControllerName
                     LEFT JOIN (
@@ -63,10 +63,43 @@ namespace Service
                     ) AS VRolesDocTypes ON D.DocumentTypeId = VRolesDocTypes.DocTypeId
 		                    AND Ca.ControllerName = VRolesDocTypes.ControllerName
 		                    AND Ca.ActionName = VRolesDocTypes.ActionName
+                    LEFT JOIN (
+		                    SELECT Dt.DocumentTypeId, Max(Mm.ModuleName) AS ModuleName
+		                    FROM Web.Menus M 
+		                    LEFT JOIN Web.MenuModules Mm ON M.ModuleId = Mm.ModuleId
+		                    LEFT JOIN Web.DocumentCategories Dc ON M.DocumentCategoryId = Dc.DocumentCategoryId
+		                    LEFT JOIN Web.DocumentTypes Dt ON Dc.DocumentCategoryId = Dt.DocumentCategoryId
+		                    WHERE Dt.DocumentTypeId IS NOT NULL
+		                    GROUP BY Dt.DocumentTypeId
+                    ) AS VModule ON D.DocumentTypeId = VModule.DocumentTypeId
                     WHERE D.DocumentTypeId IS NOT NULL
                     AND Ca.DisplayName IN ('Add', 'Edit', 'Delete', 'Print', 'Submit')
-                    GROUP BY D.DocumentTypeId, D.DocumentTypeName 
-                    Order By D.DocumentTypeName ";
+                    GROUP BY D.DocumentTypeId, D.DocumentTypeName ";
+
+            mQry = mQry + " UNION ALL ";
+
+            mQry = mQry + @"SELECT M.MenuId As DocumentTypeId, M.MenuName As DocumentTypeName, IsNull(Mm.ModuleName,'Others') As ModuleName, Ca.ControllerName AS ControllerName, 
+                    NULL AS AddActionName, Convert(BIT,0) AS [Add],
+                    NULL AS EditActionName, Convert(BIT,0) AS [Edit],
+                    NULL AS DeleteActionName, Convert(BIT,0) AS [Delete],
+                    Ca.ActionName AS PrintActionName, Convert(BIT,IsNull(VRolesDocTypes.IsPermissionGranted,0)) AS [Print],
+                    NULL AS SubmitActionName, Convert(BIT,0) AS [Submit],
+                    'False' AS IsVisibleProcess, 'Report' As EntryType 
+                    FROM Web.Menus M
+                    LEFT JOIN Web.MenuModules Mm ON M.ModuleId = Mm.ModuleId
+                    LEFT JOIN Web.ControllerActions Ca ON M.ControllerActionId = Ca.ControllerActionId 
+                    LEFT JOIN (SELECT 1 AS IsPermissionGranted, Rd.DocTypeId, Rd.ControllerName, Rd.ActionName
+                                FROM Web.RolesDocTypes Rd
+                                WHERE Rd.RoleId = @RoleId
+                    ) AS VRolesDocTypes ON M.MenuId = VRolesDocTypes.DocTypeId
+                            AND M.ControllerName = VRolesDocTypes.ControllerName
+                            AND M.ActionName = VRolesDocTypes.ActionName
+                    WHERE 1=1 
+                    And IsNull(M.IsVisible,0) <> 0
+                    AND M.Description = 'Reports' 
+                    AND isNull(M.IsVisible,0) <> 0
+                    Order By DocumentTypeName ";
+
 
             IEnumerable<RolePermissionViewModel> RolePermissionViewModel = db.Database.SqlQuery<RolePermissionViewModel>(mQry, SqlParameterRoleId).ToList();
 
@@ -208,6 +241,8 @@ namespace Service
         public int DocumentTypeId { get; set; }
         public string DocumentTypeName { get; set; }
         public string IsVisibleProcess { get; set; }
+        public string EntryType { get; set; }
+        public string ModuleName { get; set; }
         public string ControllerName { get; set; }
         public string AddActionName { get; set; }
         public bool Add { get; set; }

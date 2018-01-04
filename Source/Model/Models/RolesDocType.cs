@@ -17,10 +17,15 @@ namespace Model.Models
         [ForeignKey("Role")]
         public string RoleId { get; set; }        
         public virtual IdentityRole Role { get; set; }
-        [Display(Name = "DocType")]
+        
         [ForeignKey("DocType")]
-        public int DocTypeId { get; set; }
-        public virtual DocumentType DocType{ get; set; }
+        public int? DocTypeId { get; set; }
+        public virtual DocumentType DocType { get; set; }
+
+        [ForeignKey("Menu")]
+        public int? MenuId { get; set; }
+        public virtual Menu Menu { get; set; }
+
         [Required]
         public string ControllerName { get; set; }
         [Required]

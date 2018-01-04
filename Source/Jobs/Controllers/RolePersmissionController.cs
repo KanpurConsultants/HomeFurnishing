@@ -139,16 +139,32 @@ namespace Jobs.Controllers
                   string EditActionName, bool Edit,
                   string DeleteActionName, bool Delete,
                   string PrintActionName, bool Print,
-                  string SubmitActionName, bool Submit)
+                  string SubmitActionName, bool Submit, string EntryType)
         {
-            RolesDocType RolesDocTypeForAdd = (from L in db.RolesDocType where L.RoleId == RoleId && L.DocTypeId == DocumentTypeId && L.ControllerName == ControllerName && L.ActionName == AddActionName select L).FirstOrDefault();
+            int? DocTypeId = null;
+            int? MenuId = null;
+
+            if (EntryType == "Document")
+                DocTypeId = DocumentTypeId;
+            else
+                MenuId = DocumentTypeId;
+
+
+            RolesDocType RolesDocTypeForAdd = new RolesDocType();
+
+            if (EntryType == "Document")
+                RolesDocTypeForAdd = (from L in db.RolesDocType where L.RoleId == RoleId && L.DocTypeId == DocumentTypeId && L.ControllerName == ControllerName && L.ActionName == AddActionName select L).FirstOrDefault();
+            else
+                RolesDocTypeForAdd = (from L in db.RolesDocType where L.RoleId == RoleId && L.MenuId == DocumentTypeId && L.ControllerName == ControllerName && L.ActionName == AddActionName select L).FirstOrDefault();
+
             if (Add == true)
             {
                 if (RolesDocTypeForAdd == null)
                 {
                     RolesDocType RolesDocType = new RolesDocType();
                     RolesDocType.RoleId = RoleId;
-                    RolesDocType.DocTypeId = DocumentTypeId;
+                    RolesDocType.DocTypeId = DocTypeId;
+                    RolesDocType.MenuId = MenuId;
                     RolesDocType.ControllerName = ControllerName;
                     RolesDocType.ActionName = AddActionName;
                     RolesDocType.CreatedBy = User.Identity.Name;
@@ -169,15 +185,21 @@ namespace Jobs.Controllers
             }
 
 
+            RolesDocType RolesDocTypeForEdit = new RolesDocType();
 
-            RolesDocType RolesDocTypeForEdit = (from L in db.RolesDocType where L.RoleId == RoleId && L.DocTypeId == DocumentTypeId && L.ControllerName == ControllerName && L.ActionName == EditActionName select L).FirstOrDefault();
+            if (EntryType == "Document")
+                RolesDocTypeForEdit = (from L in db.RolesDocType where L.RoleId == RoleId && L.DocTypeId == DocumentTypeId && L.ControllerName == ControllerName && L.ActionName == EditActionName select L).FirstOrDefault();
+            else
+                RolesDocTypeForEdit = (from L in db.RolesDocType where L.RoleId == RoleId && L.MenuId == DocumentTypeId && L.ControllerName == ControllerName && L.ActionName == AddActionName select L).FirstOrDefault();
+
             if (Edit == true)
             {
                 if (RolesDocTypeForEdit == null)
                 {
                     RolesDocType RolesDocType = new RolesDocType();
                     RolesDocType.RoleId = RoleId;
-                    RolesDocType.DocTypeId = DocumentTypeId;
+                    RolesDocType.DocTypeId = DocTypeId;
+                    RolesDocType.MenuId = MenuId;
                     RolesDocType.ControllerName = ControllerName;
                     RolesDocType.ActionName = EditActionName;
                     RolesDocType.CreatedBy = User.Identity.Name;
@@ -198,14 +220,20 @@ namespace Jobs.Controllers
             }
 
 
-            RolesDocType RolesDocTypeForDelete = (from L in db.RolesDocType where L.RoleId == RoleId && L.DocTypeId == DocumentTypeId && L.ControllerName == ControllerName && L.ActionName == DeleteActionName select L).FirstOrDefault();
+            RolesDocType RolesDocTypeForDelete = new RolesDocType();
+            if (EntryType == "Document")
+                RolesDocTypeForDelete = (from L in db.RolesDocType where L.RoleId == RoleId && L.DocTypeId == DocumentTypeId && L.ControllerName == ControllerName && L.ActionName == DeleteActionName select L).FirstOrDefault();
+            else
+                RolesDocTypeForDelete = (from L in db.RolesDocType where L.RoleId == RoleId && L.MenuId == DocumentTypeId && L.ControllerName == ControllerName && L.ActionName == DeleteActionName select L).FirstOrDefault();
+
             if (Delete == true)
             {
                 if (RolesDocTypeForDelete == null)
                 {
                     RolesDocType RolesDocType = new RolesDocType();
                     RolesDocType.RoleId = RoleId;
-                    RolesDocType.DocTypeId = DocumentTypeId;
+                    RolesDocType.DocTypeId = DocTypeId;
+                    RolesDocType.MenuId = MenuId;
                     RolesDocType.ControllerName = ControllerName;
                     RolesDocType.ActionName = DeleteActionName;
                     RolesDocType.CreatedBy = User.Identity.Name;
@@ -226,15 +254,21 @@ namespace Jobs.Controllers
             }
 
 
+            RolesDocType RolesDocTypeForPrint = new RolesDocType();
 
-            RolesDocType RolesDocTypeForPrint = (from L in db.RolesDocType where L.RoleId == RoleId && L.DocTypeId == DocumentTypeId && L.ControllerName == ControllerName && L.ActionName == PrintActionName select L).FirstOrDefault();
+            if (EntryType == "Document")
+                RolesDocTypeForPrint = (from L in db.RolesDocType where L.RoleId == RoleId && L.DocTypeId == DocumentTypeId && L.ControllerName == ControllerName && L.ActionName == PrintActionName select L).FirstOrDefault();
+            else
+                RolesDocTypeForPrint = (from L in db.RolesDocType where L.RoleId == RoleId && L.MenuId == DocumentTypeId && L.ControllerName == ControllerName && L.ActionName == PrintActionName select L).FirstOrDefault();
+
             if (Print == true)
             {
                 if (RolesDocTypeForPrint == null)
                 {
                     RolesDocType RolesDocType = new RolesDocType();
                     RolesDocType.RoleId = RoleId;
-                    RolesDocType.DocTypeId = DocumentTypeId;
+                    RolesDocType.DocTypeId = DocTypeId;
+                    RolesDocType.MenuId = MenuId;
                     RolesDocType.ControllerName = ControllerName;
                     RolesDocType.ActionName = PrintActionName;
                     RolesDocType.CreatedBy = User.Identity.Name;
@@ -254,15 +288,22 @@ namespace Jobs.Controllers
                 }
             }
 
+            RolesDocType RolesDocTypeForSubmit = new RolesDocType();
 
-            RolesDocType RolesDocTypeForSubmit = (from L in db.RolesDocType where L.RoleId == RoleId && L.DocTypeId == DocumentTypeId && L.ControllerName == ControllerName && L.ActionName == SubmitActionName select L).FirstOrDefault();
+            if (EntryType == "Document")
+                RolesDocTypeForSubmit = (from L in db.RolesDocType where L.RoleId == RoleId && L.DocTypeId == DocumentTypeId && L.ControllerName == ControllerName && L.ActionName == SubmitActionName select L).FirstOrDefault();
+            else
+                RolesDocTypeForSubmit = (from L in db.RolesDocType where L.RoleId == RoleId && L.MenuId == DocumentTypeId && L.ControllerName == ControllerName && L.ActionName == SubmitActionName select L).FirstOrDefault();
+
+
             if (Submit == true)
             {
                 if (RolesDocTypeForSubmit == null)
                 {
                     RolesDocType RolesDocType = new RolesDocType();
                     RolesDocType.RoleId = RoleId;
-                    RolesDocType.DocTypeId = DocumentTypeId;
+                    RolesDocType.DocTypeId = DocTypeId;
+                    RolesDocType.MenuId = MenuId;
                     RolesDocType.ControllerName = ControllerName;
                     RolesDocType.ActionName = SubmitActionName;
                     RolesDocType.CreatedBy = User.Identity.Name;

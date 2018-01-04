@@ -34,6 +34,11 @@ namespace Model.Models
         [MaxLength(100, ErrorMessage = "{0} cannot exceed {1} characters")]
         public string URL { get; set; }
 
+        [ForeignKey("DocumentCategory")]
+        [Display(Name = "Document Category")]
+        public int? DocumentCategoryId { get; set; }
+        public virtual DocumentCategory DocumentCategory { get; set; }
+
 
         [ForeignKey("Module")]
         [Display(Name = "Module")]

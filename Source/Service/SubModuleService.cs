@@ -104,6 +104,69 @@ namespace Service
 
         }
 
+        //public IEnumerable<SubModuleViewModel> GetSubModuleFromModuleForUsers(int id, string appuserid, List<string> RoleIds, int SiteId, int DivisionId)
+        //{
+
+        //    //Testing Block
+
+        //    var Roles = _userRolesService.GetRolesList().ToList();
+
+        //    var RoleId = string.Join(",", from p in Roles
+        //                                  where RoleIds.Contains(p.Name)
+        //                                  select p.Id.ToString());
+        //    //End
+
+
+        //    var temp2 = (from p in _MenuRepository.Instance
+        //                 join t in _RolesMenuRepository.Instance on p.MenuId equals t.MenuId
+        //                 where (p.IsVisible.HasValue ? p.IsVisible == true : 1 == 1) && p.ModuleId == id && t.SiteId == SiteId && t.DivisionId == DivisionId && RoleId.Contains(t.RoleId)
+        //                 group p by new { p.SubModuleId, p.SubModule.SubModuleName } into res
+        //                 join t in _SubModuleRepository.Instance on res.Key.SubModuleId equals t.SubModuleId into table
+        //                 from tab in table.DefaultIfEmpty()
+        //                 select new SubModuleViewModel
+        //                 {
+        //                     ModuleId = id,
+        //                     SubModuleIconName = tab.IconName,
+        //                     SubModuleId = res.Key.SubModuleId,
+        //                     SubModuleName = res.Key.SubModuleName,
+        //                     Srl = res.Max(m => m.Srl),
+        //                     MenuViewModel = (from temp in res
+        //                                      group temp by temp.MenuId into g
+        //                                      orderby g.Max(m => m.Srl)
+        //                                      select new MenuViewModel
+        //                                      {
+        //                                          MenuId = g.Key,
+        //                                          MenuName = g.FirstOrDefault().MenuName,
+        //                                          ModuleId = g.FirstOrDefault().ModuleId,
+        //                                          SubModuleId = g.FirstOrDefault().SubModuleId,
+        //                                          ControllerActionId = g.FirstOrDefault().ControllerActionId,
+        //                                          Description = g.FirstOrDefault().Description,
+        //                                          IconName = g.FirstOrDefault().IconName,
+        //                                          Srl = g.FirstOrDefault().Srl,
+        //                                          URL = g.FirstOrDefault().URL,
+        //                                          BookMarked = ((from tek in _UserBookMarkRepository.Instance
+        //                                                         where tek.ApplicationUserName == appuserid && tek.MenuId == g.FirstOrDefault().MenuId
+        //                                                         select tek).Any()
+        //                                                                       ),
+
+        //                                      }
+        //                                 ).ToList()
+
+        //                 }).ToList();
+
+
+
+        //    double x = 0;
+        //    var SubModuleList = temp2.OrderBy(m => m.SubModuleId).ThenBy(sx => double.TryParse(sx.Srl, out x) ? x : 0);
+
+        //    var tempSubModList = from p in SubModuleList
+        //                         group p by p.SubModuleId into g
+        //                         select g.FirstOrDefault();
+
+        //    return tempSubModList;
+
+        //}
+
         public IEnumerable<SubModuleViewModel> GetSubModuleFromModuleForUsers(int id, string appuserid, List<string> RoleIds, int SiteId, int DivisionId)
         {
 
@@ -117,57 +180,137 @@ namespace Service
             //End
 
 
-            var temp2 = (from p in _MenuRepository.Instance
-                         join t in _RolesMenuRepository.Instance on p.MenuId equals t.MenuId
-                         where (p.IsVisible.HasValue ? p.IsVisible == true : 1 == 1) && p.ModuleId == id && t.SiteId == SiteId && t.DivisionId == DivisionId && RoleId.Contains(t.RoleId)
-                         group p by new { p.SubModuleId, p.SubModule.SubModuleName } into res
-                         join t in _SubModuleRepository.Instance on res.Key.SubModuleId equals t.SubModuleId into table
-                         from tab in table.DefaultIfEmpty()
-                         select new SubModuleViewModel
-                         {
-                             ModuleId = id,
-                             SubModuleIconName = tab.IconName,
-                             SubModuleId = res.Key.SubModuleId,
-                             SubModuleName = res.Key.SubModuleName,
-                             Srl = res.Max(m => m.Srl),
-                             MenuViewModel = (from temp in res
-                                              group temp by temp.MenuId into g
-                                              orderby g.Max(m => m.Srl)
-                                              select new MenuViewModel
-                                              {
-                                                  MenuId = g.Key,
-                                                  MenuName = g.FirstOrDefault().MenuName,
-                                                  ModuleId = g.FirstOrDefault().ModuleId,
-                                                  SubModuleId = g.FirstOrDefault().SubModuleId,
-                                                  ControllerActionId = g.FirstOrDefault().ControllerActionId,
-                                                  Description = g.FirstOrDefault().Description,
-                                                  IconName = g.FirstOrDefault().IconName,
-                                                  Srl = g.FirstOrDefault().Srl,
-                                                  URL = g.FirstOrDefault().URL,
-                                                  BookMarked = ((from tek in _UserBookMarkRepository.Instance
-                                                                 where tek.ApplicationUserName == appuserid && tek.MenuId == g.FirstOrDefault().MenuId
-                                                                 select tek).Any()
-                                                                               ),
+            var ExistingData = (from L in _unitOfWork.Repository<RolesDocType>().Instance select L).FirstOrDefault();
+            if (ExistingData == null)
+            {
 
-                                              }
-                                         ).ToList()
+                var temp2 = (from p in _MenuRepository.Instance
+                                join t in _RolesMenuRepository.Instance on p.MenuId equals t.MenuId
+                                where (p.IsVisible.HasValue ? p.IsVisible == true : 1 == 1) && p.ModuleId == id && t.SiteId == SiteId && t.DivisionId == DivisionId && RoleId.Contains(t.RoleId)
+                                group p by new { p.SubModuleId, p.SubModule.SubModuleName } into res
+                                join t in _SubModuleRepository.Instance on res.Key.SubModuleId equals t.SubModuleId into table
+                                from tab in table.DefaultIfEmpty()
+                                select new SubModuleViewModel
+                                {
+                                    ModuleId = id,
+                                    SubModuleIconName = tab.IconName,
+                                    SubModuleId = res.Key.SubModuleId,
+                                    SubModuleName = res.Key.SubModuleName,
+                                    Srl = res.Max(m => m.Srl),
+                                    MenuViewModel = (from temp in res
+                                                    group temp by temp.MenuId into g
+                                                    orderby g.Max(m => m.Srl)
+                                                    select new MenuViewModel
+                                                    {
+                                                        MenuId = g.Key,
+                                                        MenuName = g.FirstOrDefault().MenuName,
+                                                        ModuleId = g.FirstOrDefault().ModuleId,
+                                                        SubModuleId = g.FirstOrDefault().SubModuleId,
+                                                        ControllerActionId = g.FirstOrDefault().ControllerActionId,
+                                                        Description = g.FirstOrDefault().Description,
+                                                        IconName = g.FirstOrDefault().IconName,
+                                                        Srl = g.FirstOrDefault().Srl,
+                                                        URL = g.FirstOrDefault().URL,
+                                                        BookMarked = ((from tek in _UserBookMarkRepository.Instance
+                                                                        where tek.ApplicationUserName == appuserid && tek.MenuId == g.FirstOrDefault().MenuId
+                                                                        select tek).Any()
+                                                                                    ),
 
-                         }).ToList();
+                                                    }
+                                                ).ToList()
+
+                                }).ToList();
 
 
 
-            double x = 0;
-            var SubModuleList = temp2.OrderBy(m => m.SubModuleId).ThenBy(sx => double.TryParse(sx.Srl, out x) ? x : 0);
+                double x = 0;
+                var SubModuleList = temp2.OrderBy(m => m.SubModuleId).ThenBy(sx => double.TryParse(sx.Srl, out x) ? x : 0);
 
-            var tempSubModList = from p in SubModuleList
-                                 group p by p.SubModuleId into g
-                                 select g.FirstOrDefault();
+                var tempSubModList = from p in SubModuleList
+                                        group p by p.SubModuleId into g
+                                        select g.FirstOrDefault();
 
-            return tempSubModList;
+                return tempSubModList;
+            }
+            else
+            {
+                var pt1 = (from R in _unitOfWork.Repository<RolesDocType>().Instance.Where(m => m.DocTypeId != null)
+                           join D in _unitOfWork.Repository<DocumentType>().Instance on R.DocTypeId equals D.DocumentTypeId into DocumentTypeTable
+                           from DocumentTypeTab in DocumentTypeTable.DefaultIfEmpty()
+                           join C in _unitOfWork.Repository<ControllerAction>().Instance on R.ControllerName equals C.ControllerName into ControllerActionTable
+                           from ControllerActionTab in ControllerActionTable.DefaultIfEmpty()
+                           join M in _unitOfWork.Repository<Menu>().Instance on new { B1 = ControllerActionTab.ControllerActionId, B2 = DocumentTypeTab.DocumentCategoryId } equals new { B1 = M.ControllerActionId ?? 0, B2 = M.DocumentCategoryId ?? 0 } into MenuTable
+                           from MenuTab in MenuTable.DefaultIfEmpty()
+                           join Md in _unitOfWork.Repository<MenuModule>().Instance on MenuTab.ModuleId equals Md.ModuleId into ModuleTable
+                           from ModuleTab in ModuleTable.DefaultIfEmpty()
+                           where RoleId.Contains(R.RoleId) && ModuleTab.ModuleId != null
+                           group MenuTab.MenuId by MenuTab.MenuId into Result
+                           select Result.FirstOrDefault());
 
+
+                var pt2 = (from R in _unitOfWork.Repository<RolesDocType>().Instance.Where(m => m.MenuId != null)
+                           join M in _unitOfWork.Repository<Menu>().Instance on R.MenuId equals M.MenuId into MenuTable
+                           from MenuTab in MenuTable.DefaultIfEmpty()
+                           join Md in _unitOfWork.Repository<MenuModule>().Instance on MenuTab.ModuleId equals Md.ModuleId into ModuleTable
+                           from ModuleTab in ModuleTable.DefaultIfEmpty()
+                           where RoleId.Contains(R.RoleId) && ModuleTab.ModuleId != null
+                           group MenuTab.MenuId by MenuTab.MenuId into Result
+                           select Result.FirstOrDefault());
+
+                var pt = pt1.Union(pt2).ToList();
+
+                var MenuList = from M in _unitOfWork.Repository<Menu>().Instance where pt.Contains(M.MenuId) select M;
+
+
+                var temp2 = (from p in MenuList
+                             where (p.IsVisible.HasValue ? p.IsVisible == true : 1 == 1) && p.ModuleId == id
+                             group p by new { p.SubModuleId, p.SubModule.SubModuleName } into res
+                             join t in _SubModuleRepository.Instance on res.Key.SubModuleId equals t.SubModuleId into table
+                             from tab in table.DefaultIfEmpty()
+                             select new SubModuleViewModel
+                             {
+                                 ModuleId = id,
+                                 SubModuleIconName = tab.IconName,
+                                 SubModuleId = res.Key.SubModuleId,
+                                 SubModuleName = res.Key.SubModuleName,
+                                 Srl = res.Max(m => m.Srl),
+                                 MenuViewModel = (from temp in res
+                                                  group temp by temp.MenuId into g
+                                                  orderby g.Max(m => m.Srl)
+                                                  select new MenuViewModel
+                                                  {
+                                                      MenuId = g.Key,
+                                                      MenuName = g.FirstOrDefault().MenuName,
+                                                      ModuleId = g.FirstOrDefault().ModuleId,
+                                                      SubModuleId = g.FirstOrDefault().SubModuleId,
+                                                      ControllerActionId = g.FirstOrDefault().ControllerActionId,
+                                                      Description = g.FirstOrDefault().Description,
+                                                      IconName = g.FirstOrDefault().IconName,
+                                                      Srl = g.FirstOrDefault().Srl,
+                                                      URL = g.FirstOrDefault().URL,
+                                                      BookMarked = ((from tek in _UserBookMarkRepository.Instance
+                                                                     where tek.ApplicationUserName == appuserid && tek.MenuId == g.FirstOrDefault().MenuId
+                                                                     select tek).Any()
+                                                                                  ),
+
+                                                  }
+                                             ).ToList()
+
+                             }).ToList();
+
+
+
+                double x = 0;
+                var SubModuleList = temp2.OrderBy(m => m.SubModuleId).ThenBy(sx => double.TryParse(sx.Srl, out x) ? x : 0);
+
+                var tempSubModList = from p in SubModuleList
+                                     group p by p.SubModuleId into g
+                                     select g.FirstOrDefault();
+
+                return tempSubModList;
+
+            }
         }
-
-
 
         public IEnumerable<SubModuleViewModel> GetSubModuleFromModuleForPermissions(int id, string RoleId, int SiteId, int DivisionId)
         {

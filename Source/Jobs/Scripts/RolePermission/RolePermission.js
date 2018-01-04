@@ -1,19 +1,23 @@
 RolePermission = angular.module('RolePermission', ['ngTouch', 'ui.grid',
-    'ui.grid.exporter', 'ui.grid.cellNav', 'ui.grid.pinning'])
+    'ui.grid.exporter', 'ui.grid.cellNav', 'ui.grid.pinning', 'ui.grid.grouping'])
 
 
 
-RolePermission.controller('MainCtrl', ['$rootScope', '$scope', '$log', '$http', 'modal', 'uiGridConstants', 'uiGridExporterConstants', 'uiGridExporterService',
+RolePermission.controller('MainCtrl', ['$rootScope', '$scope', '$log', '$http', 'modal', 'uiGridConstants', 'uiGridExporterConstants', 'uiGridExporterService', 'uiGridGroupingConstants',
 
 
 
   function ($rootScope, $scope, $log, $http, modal, uiGridConstants, uiGridExporterConstants, uiGridExporterService, uiGridTreeViewConstants) {
       $scope.gridOptions = {
           enableFiltering: true,
+          treeRowHeaderAlwaysVisible: false,
           enableGridMenu: false,
           enableColumnMenus: false,
           onRegisterApi: function (gridApi) {
               $scope.gridApi = gridApi;
+              $scope.gridApi.grid.registerDataChangeCallback(function () {
+                  $scope.gridApi.treeBase.expandAllRows();
+              });
           }
       };
 
@@ -29,6 +33,7 @@ RolePermission.controller('MainCtrl', ['$rootScope', '$scope', '$log', '$http', 
                   DeleteActionName: row.entity.DeleteActionName, Delete: row.entity.Delete,
                   PrintActionName: row.entity.PrintActionName, Print: row.entity.Print,
                   SubmitActionName: row.entity.SubmitActionName, Submit: row.entity.Submit,
+                  EntryType: row.entity.EntryType
               },
               success: function (data) {
               },
@@ -121,11 +126,13 @@ RolePermission.controller('MainCtrl', ['$rootScope', '$scope', '$log', '$http', 
                   if (result.Success == true) {
                       $scope.gridOptions.columnDefs = new Array();
                       $scope.gridOptions.columnDefs.push({ field: 'DocumentTypeId', width: 50, visible: false });
-                      $scope.gridOptions.columnDefs.push({ field: 'DocumentTypeName', width: 580, cellClass: 'cell-text ', headerCellClass: 'header-text' });
+                      $scope.gridOptions.columnDefs.push({ field: 'DocumentTypeName', width: 430, cellClass: 'cell-text ', headerCellClass: 'header-text' });
+                      $scope.gridOptions.columnDefs.push({ field: 'ModuleName', displayName: 'Module', width: 120, grouping: { groupPriority: 1 }, sort: { priority: 1, direction: 'asc' }, cellClass: 'cell-text ', headerCellClass: 'header-text' });
+                      $scope.gridOptions.columnDefs.push({ field: 'EntryType', width: 120, cellClass: 'cell-text ', headerCellClass: 'header-text', visible: false });
                       $scope.gridOptions.columnDefs.push({ field: 'IsVisibleProcess', width: 40, cellClass: 'cell-text ', headerCellClass: 'header-text', visible: false });
                       $scope.gridOptions.columnDefs.push({
                           field: 'Process', name: '', enableFiltering: false, enableSorting: false, width: 40,
-                          cellTemplate: '<div ng-if="row.entity.IsVisibleProcess != \'False\'"><button class="btn primary" ng-click="grid.appScope.ProcessWisePermission(row)">...</button></div>'
+                          cellTemplate: '<div ng-if="row.entity.IsVisibleProcess != \'False\' && row.entity.IsVisibleProcess != null"><button class="btn primary" ng-click="grid.appScope.ProcessWisePermission(row)">...</button></div>'
                       });
                       $scope.gridOptions.columnDefs.push({ field: 'ControllerName', width: 50, visible: false });
                       $scope.gridOptions.columnDefs.push({ field: 'AddActionName', width: 50, visible: false });

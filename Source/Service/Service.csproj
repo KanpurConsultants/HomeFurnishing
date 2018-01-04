@@ -131,6 +131,7 @@
     <Compile Include="Display_PaymentAdivcewithInvoiceService.cs" />
     <Compile Include="GridReportService.cs" />
     <Compile Include="PersonProductUidService.cs" />
+    <Compile Include="RolesDocTypeService.cs" />
     <Compile Include="UserRolesNewService.cs" />
     <Compile Include="ProjectService.cs" />
     <Compile Include="RedirectService.cs" />

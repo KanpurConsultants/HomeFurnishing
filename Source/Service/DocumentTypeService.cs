@@ -122,16 +122,45 @@ namespace Service
             int DivisionId = (int)System.Web.HttpContext.Current.Session["DivisionId"];
             int SiteId = (int)System.Web.HttpContext.Current.Session["SiteId"];
 
-            var DocTypes = from p in db.DocumentType
-                           join t in db.DocumentTypeDivision.Where(m => m.DivisionId == DivisionId) on p.DocumentTypeId equals t.DocumentTypeId into table
-                           from tabdiv in table.DefaultIfEmpty()
-                           join t2 in db.DocumentTypeSite.Where(m => m.SiteId == SiteId) on p.DocumentTypeId equals t2.DocumentTypeId into table2
-                           from tabsit in table2.DefaultIfEmpty()
-                           where p.DocumentCategoryId == DocumentCategoryId && tabdiv == null && tabsit == null
-                           orderby p.DocumentTypeName
-                           select p;
+            var ExistingData = (from L in db.RolesDocType select L).FirstOrDefault();
+            if (ExistingData == null)
+            {
+                var DocTypes = from p in db.DocumentType
+                               join t in db.DocumentTypeDivision.Where(m => m.DivisionId == DivisionId) on p.DocumentTypeId equals t.DocumentTypeId into table
+                               from tabdiv in table.DefaultIfEmpty()
+                               join t2 in db.DocumentTypeSite.Where(m => m.SiteId == SiteId) on p.DocumentTypeId equals t2.DocumentTypeId into table2
+                               from tabsit in table2.DefaultIfEmpty()
+                               where p.DocumentCategoryId == DocumentCategoryId && tabdiv == null && tabsit == null
+                               orderby p.DocumentTypeName
+                               select p;
 
-            return (DocTypes).Include("DocumentCategory");
+                return (DocTypes).Include("DocumentCategory");
+            }
+            else
+            {
+                List<string> UserRoles = (List<string>)System.Web.HttpContext.Current.Session["Roles"];
+
+                var TempDocumentType = (from Rd in db.RolesDocType
+                                        join R in db.Roles on Rd.RoleId equals R.Id into RoleTable
+                                        from RoleTab in RoleTable.DefaultIfEmpty()
+                                        join p in db.DocumentType on Rd.DocTypeId equals p.DocumentTypeId
+                                        where p.DocumentCategoryId == DocumentCategoryId
+                                        && UserRoles.Contains(RoleTab.Name)
+                                        select p.DocumentTypeId).ToList();
+
+                var DocTypes = from p in db.DocumentType.Where(m => TempDocumentType.Contains(m.DocumentTypeId))
+                               join t in db.DocumentTypeDivision.Where(m => m.DivisionId == DivisionId) on p.DocumentTypeId equals t.DocumentTypeId into table
+                               from tabdiv in table.DefaultIfEmpty()
+                               join t2 in db.DocumentTypeSite.Where(m => m.SiteId == SiteId) on p.DocumentTypeId equals t2.DocumentTypeId into table2
+                               from tabsit in table2.DefaultIfEmpty()
+                               where p.DocumentCategoryId == DocumentCategoryId && tabdiv == null && tabsit == null 
+                               orderby p.DocumentTypeName
+                               select p;
+
+                return (DocTypes).Include("DocumentCategory");
+            }
+
+
         }
 
 

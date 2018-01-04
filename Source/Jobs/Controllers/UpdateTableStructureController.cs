@@ -2463,7 +2463,8 @@ namespace Module
 	                        (
 	                        RolesDocTypeId  INT IDENTITY NOT NULL,
 	                        RoleId          NVARCHAR (128),
-	                        DocTypeId       INT NOT NULL,
+	                        DocTypeId       INT,
+                            MenuId          INT,
 	                        ControllerName  NVARCHAR (max) NOT NULL,
 	                        ActionName      NVARCHAR (max) NOT NULL,
 	                        CreatedBy       NVARCHAR (max),
@@ -2479,7 +2480,10 @@ namespace Module
 	                        ON Web.RolesDocTypes (RoleId)
 
                         CREATE INDEX IX_DocTypeId
-	                        ON Web.RolesDocTypes (DocTypeId)";
+	                        ON Web.RolesDocTypes (DocTypeId)
+
+                        CREATE INDEX IX_MenuId
+	                        ON Web.RolesDocTypes (MenuId) ";
                     ExecuteQuery(mQry);
                 }
             }
@@ -2561,6 +2565,7 @@ namespace Module
 
 
             AddFields("ControllerActions", "DisplayName", "nvarchar(50)");
+            AddFields("Menus", "DocumentCategoryId", "Int", "DocumentCategories");
             ReCreateProcedures();
             DataCorrection();
 

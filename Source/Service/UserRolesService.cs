@@ -290,12 +290,39 @@ namespace Service
         {
             var Today = DateTime.Now.Date;
 
-            return (from p in ((ApplicationDbContext)_context).UserRole
-                    join t in ((ApplicationDbContext)_context).Roles on p.RoleId equals t.Id
-                    where p.UserId == UserId && (p.ExpiryDate == null || p.ExpiryDate >= Today)
-                    group t by t.Id into g
-                    select g.Max(m => m.Name)).ToList();
 
+
+            var ExistingData = (from L in ((ApplicationDbContext)_context).RolesDocType select L).FirstOrDefault();
+            if (ExistingData == null)
+            {
+                return (from p in ((ApplicationDbContext)_context).UserRole
+                        join t in ((ApplicationDbContext)_context).Roles on p.RoleId equals t.Id
+                        where p.UserId == UserId && (p.ExpiryDate == null || p.ExpiryDate >= Today)
+                        group t by t.Id into g
+                        select g.Max(m => m.Name)).ToList();
+            }
+            else
+            {
+                if (System.Web.HttpContext.Current.Session["SiteId"] != null && System.Web.HttpContext.Current.Session["DivisionId"] != null)
+                {
+                    int SiteId = (int)System.Web.HttpContext.Current.Session["SiteId"];
+                    int DivisionId = (int)System.Web.HttpContext.Current.Session["DivisionId"];
+
+                    return (from p in ((ApplicationDbContext)_context).UserRole
+                            join t in ((ApplicationDbContext)_context).Roles on p.RoleId equals t.Id
+                            where p.UserId == UserId && p.SiteId == SiteId && p.DivisionId == DivisionId && (p.ExpiryDate == null || p.ExpiryDate >= Today)
+                            group t by t.Id into g
+                            select g.Max(m => m.Name)).ToList();
+                }
+                else
+                {
+                    return (from p in ((ApplicationDbContext)_context).UserRole
+                            join t in ((ApplicationDbContext)_context).Roles on p.RoleId equals t.Id
+                            where p.UserId == UserId && (p.ExpiryDate == null || p.ExpiryDate >= Today)
+                            group t by t.Id into g
+                            select g.Max(m => m.Name)).ToList();
+                }
+            }
         }
 
         public void Dispose()

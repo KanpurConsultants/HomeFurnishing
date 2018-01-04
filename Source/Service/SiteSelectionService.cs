@@ -9,6 +9,7 @@ using Data;
 using Data.Infrastructure;
 using Model.Models;
 using Data.Models;
+using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace Service
 {
@@ -18,8 +19,10 @@ namespace Service
         Division GetDivision(int Id);
         IEnumerable<Site> GetSiteList();
         IEnumerable<Site> GetSiteList(string RoleId);
+        IEnumerable<Site> GetSiteListForUser(string UserId);
         IEnumerable<Division> GetDivisionList();
         IEnumerable<Division> GetDivisionList(string RoleIds);
+        IEnumerable<Division> GetDivisionListForUser(string UserId);
         int GetNotificationCount(string UserName);
         IEnumerable<Godown> GetGodownList(int SiteId);
     }
@@ -67,6 +70,18 @@ namespace Service
             return temp;
         }
 
+        public IEnumerable<Site> GetSiteListForUser(string UserId)
+        {
+            var temp = (from p in _unitOfWork.Repository<UserRole>().Instance
+                        join S in _unitOfWork.Repository<Site>().Instance on p.SiteId equals S.SiteId
+                        where p.UserId == UserId
+                        group S by S.SiteId into g
+                        select g.FirstOrDefault()
+                          );
+
+            return temp;
+        }
+
         public IEnumerable<Division> GetDivisionList()
         {
             var pt = _unitOfWork.Repository<Division>().Query().Get().OrderBy(m => m.DivisionId);
@@ -80,6 +95,18 @@ namespace Service
                        where RoleIds.Contains(t.RoleId)
                        group p by p.DivisionId into g
                        select g.FirstOrDefault();
+
+            return temp;
+        }
+
+        public IEnumerable<Division> GetDivisionListForUser(string UserId)
+        {
+            var temp = (from p in _unitOfWork.Repository<UserRole>().Instance
+                        join S in _unitOfWork.Repository<Division>().Instance on p.DivisionId equals S.DivisionId
+                        where p.UserId == UserId
+                        group S by S.DivisionId into g
+                        select g.FirstOrDefault()
+                          );
 
             return temp;
         }
