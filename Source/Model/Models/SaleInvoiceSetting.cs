@@ -34,6 +34,7 @@ namespace Model.Models
         public bool? isVisibleTermsAndConditions { get; set; }
         public bool? isVisiblePacking { get; set; }
 
+        public bool? isVisibleGodown { get; set; }
         public bool CalculateDiscountOnRate { get; set; }
         public string filterLedgerAccountGroups { get; set; }
         public string filterLedgerAccounts { get; set; }

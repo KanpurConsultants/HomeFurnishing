@@ -672,6 +672,7 @@ namespace Jobs.Controllers
 
 
                     LedgerHeaderViewModel.LedgerHeaderId = pd.LedgerHeaderId ?? 0;
+                    LedgerHeaderViewModel.DocHeaderId = pd.SaleInvoiceReturnHeaderId;
                     LedgerHeaderViewModel.ProcessId  = Settings1.ProcessId ;
                     LedgerHeaderViewModel.DocTypeId = pd.DocTypeId;
                     LedgerHeaderViewModel.DocDate = pd.DocDate;

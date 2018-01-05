@@ -77,7 +77,11 @@ namespace Jobs.Controllers
 
             ViewBag.DrCrList = new SelectList(DRCR, "Value", "Text");
 
-            vm.FromDate = "01/Apr/" + DateTime.Now.Date.Year.ToString();
+            if (DateTime.Now.Date.Month <= 3)
+                vm.FromDate = "01/Apr/" + (DateTime.Now.Date.Year - 1).ToString();
+            else
+                vm.FromDate = "01/Apr/" + DateTime.Now.Date.Year.ToString();
+
             vm.ToDate = DateTime.Now.Date.ToString("dd/MMM/yyyy");
 
             //FinancialDisplaySettings SettingParameter = GetParameterSettings(vm);

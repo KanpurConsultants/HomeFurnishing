@@ -197,6 +197,8 @@ namespace Service
         public IEnumerable<SaleInvoiceLineViewModel> GetDirectSaleInvoiceLineListForIndex(int SaleInvoiceHeaderId)
         {
             IEnumerable<SaleInvoiceLineViewModel> SaleInvoiceLineViewModel = (from l in db.ViewSaleInvoiceLine
+                                                                              join La in db.LedgerAccount on l.ProductID  equals La.ProductId into LedgerAccountTable
+                                                                              from LedgerAccountTab in LedgerAccountTable.DefaultIfEmpty()
                                                                               join t in db.Product on l.ProductID equals t.ProductId into table
                                                                               from tab in table.DefaultIfEmpty()
                                                                               join D1 in db.Dimension1 on l.Dimension1Id equals D1.Dimension1Id into Dimension1Table
@@ -220,6 +222,7 @@ namespace Service
                                                                               {
                                                                                   SaleInvoiceLineId = l.SaleInvoiceLineId,
                                                                                   ProductName = tab.ProductName,
+                                                                                  ProductGroupName = LedgerAccountTab.LedgerAccountGroup.LedgerAccountGroupName ?? tab.ProductGroup.ProductGroupName,
                                                                                   Dimension1Name = Dimension1Tab.Dimension1Name,
                                                                                   Dimension2Name = Dimension2Tab.Dimension2Name,
                                                                                   Specification = l.Specification,                                                                                  
@@ -829,6 +832,8 @@ namespace Service
             else { ProductGroups = new string[] { "NA" }; }
 
             return (from p in db.Product
+                    join La in db.LedgerAccount on p.ProductId equals La.ProductId into LedgerAccountTable
+                    from LedgerAccountTab in LedgerAccountTable.DefaultIfEmpty()
                     where (string.IsNullOrEmpty(settings.filterProductTypes) ? 1 == 1 : ProductTypes.Contains(p.ProductGroup.ProductTypeId.ToString()))
                     && (string.IsNullOrEmpty(settings.filterProducts) ? 1 == 1 : Products.Contains(p.ProductId.ToString()))
                     && (string.IsNullOrEmpty(settings.filterProductGroups) ? 1 == 1 : ProductGroups.Contains(p.ProductGroupId.ToString()))
@@ -839,6 +844,7 @@ namespace Service
                     {
                         id = p.ProductId.ToString(),
                         text = p.ProductName,
+                        AProp1 = LedgerAccountTab.LedgerAccountGroup.LedgerAccountGroupName ?? p.ProductGroup.ProductGroupName,
                     });
         }
 

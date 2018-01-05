@@ -60,6 +60,7 @@ namespace Model.ViewModel
         public bool isVisibleSpecification { get; set; }
         public bool isVisibleSalesTaxGroupPerson { get; set; }
         public bool isVisibleSalesTaxGroupProduct { get; set; }
+        public bool isVisibleGodown { get; set; }
 
         public bool isVisibleProductUid { get; set; }
         public bool isVisibleProductCode { get; set; }

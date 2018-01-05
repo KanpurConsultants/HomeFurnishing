@@ -2566,6 +2566,9 @@ namespace Module
 
             AddFields("ControllerActions", "DisplayName", "nvarchar(50)");
             AddFields("Menus", "DocumentCategoryId", "Int", "DocumentCategories");
+
+            AddFields("SaleInvoiceSettings", "isVisibleGodown", "Bit");
+
             ReCreateProcedures();
             DataCorrection();
 

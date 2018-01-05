@@ -476,7 +476,6 @@ namespace Jobs.Controllers
             DirectSaleInvoiceLineViewModel s = new DirectSaleInvoiceLineViewModel();
 
 
-
             //Getting Settings
             var settings = new SaleInvoiceSettingService(_unitOfWork).GetSaleInvoiceSettingForDocument(H.DocTypeId, H.DivisionId, H.SiteId);
             s.SaleInvoiceSettings = Mapper.Map<SaleInvoiceSetting, SaleInvoiceSettingsViewModel>(settings);
@@ -524,6 +523,32 @@ namespace Jobs.Controllers
                 {
                     s.GodownId = PackingHeader.GodownId;
                 }
+                else
+                {
+                    //04/Jan/2017 for picking default Godown
+                    Site Site = new SiteService(_unitOfWork).Find(s.SiteId);
+                    if (Site != null)
+                    {
+                        if (Site.DefaultGodownId != null)
+                            s.GodownId = (int)Site.DefaultGodownId;
+                    }
+
+                    if (s.GodownId == null || s.GodownId == 0)
+                    {
+                        var SiteGodownList = (from G in db.Godown where G.SiteId == s.SiteId select G).FirstOrDefault();
+                        if (SiteGodownList != null)
+                            s.GodownId = (int)SiteGodownList.GodownId;
+                    }
+
+                    if (s.GodownId == null || s.GodownId == 0)
+                    {
+                        var GodownList = db.Godown.FirstOrDefault();
+                        if (GodownList != null)
+                            s.GodownId = (int)GodownList.GodownId;
+                    }
+                    //End 04/Jan/2017 for picking default Godown
+
+                }
             }
             
 
@@ -567,7 +592,7 @@ namespace Jobs.Controllers
                 ModelState.AddModelError("", "Sale Order field is required");
             }
 
-            if (svm.Qty <= 0)
+            if (svm.Qty <= 0 && svm.Amount == 0)
                 ModelState.AddModelError("", "The Qty field is required");
 
             if (svm.GodownId <= 0)

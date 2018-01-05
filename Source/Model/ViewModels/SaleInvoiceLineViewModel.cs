@@ -51,6 +51,8 @@ namespace Model.ViewModels
         public int ProductId { get; set; }
         public string ProductName { get; set; }
 
+        public string ProductGroupName { get; set; }
+
 
         public int? Dimension1Id { get; set; }
         public string Dimension1Name { get; set; }

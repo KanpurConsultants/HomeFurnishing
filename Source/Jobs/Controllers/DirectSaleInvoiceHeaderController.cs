@@ -427,6 +427,7 @@ namespace Jobs.Controllers
                     _SaleInvoiceHeaderService.Update(saleinvoiceheaderdetail);
 
 
+                    saledispatchheader.DocNo = vm.DocNo;
                     saledispatchheader.DocDate = vm.DocDate;
                     saledispatchheader.SaleToBuyerId = vm.SaleToBuyerId;
                     saledispatchheader.ShipToPartyAddress = vm.ShipToPartyAddress;
@@ -438,6 +439,7 @@ namespace Jobs.Controllers
 
                     if (StockHeader != null)
                     {
+                        StockHeader.DocNo = vm.DocNo;
                         StockHeader.DocDate = vm.DocDate;
                         StockHeader.PersonId = vm.SaleToBuyerId;
                         StockHeader.GodownId = vm.GodownId;
