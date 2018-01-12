@@ -50,6 +50,7 @@ namespace Service
 
         ProductDimensions GetProductDimensions(int ProductId, string DealUnitId, int DocTypeId);
         string FGetNewCode(int ProductTypeId, string ProcName);
+        bool IsActionAllowed(List<string> UserRoles, int ProductTypeId, string ControllerName, string ActionName);
     }
 
 
@@ -745,6 +746,43 @@ namespace Service
                 }
             }
         }
+
+        public bool IsActionAllowed(List<string> UserRoles, int ProductTypeId, string ControllerName, string ActionName)
+        {
+            bool IsAllowed = true;
+            bool IsAllowedForPreviousRole = false;
+
+            var ExistingData = (from L in db.RolesDocType select L).FirstOrDefault();
+            if (ExistingData == null)
+                return true;
+
+            if (UserRoles.Contains("Admin"))
+                return true;
+
+            foreach (string RoleName in UserRoles)
+            {
+                if (IsAllowedForPreviousRole == false)
+                {
+                    var RolesDocType = (from L in db.RolesDocType
+                                        join R in db.Roles on L.RoleId equals R.Id
+                                        where R.Name == RoleName && L.ProductTypeId == ProductTypeId
+                                            && L.ControllerName == ControllerName && L.ActionName == ActionName
+                                        select L).FirstOrDefault();
+
+                    if (RolesDocType == null)
+                    {
+                        IsAllowed = false;
+                    }
+                    else
+                    {
+                        IsAllowed = true;
+                        IsAllowedForPreviousRole = true;
+                    }
+                }
+            }
+
+            return IsAllowed;
+        }
     }
 
     public class UnitConversionMultiplier
@@ -814,6 +852,8 @@ public class dbProductService : IdbProductService
         return Data;
 
     }
+
+
 
 
 

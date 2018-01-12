@@ -234,30 +234,53 @@ namespace Service
             }
             else
             {
+                //var pt1 = (from R in _unitOfWork.Repository<RolesDocType>().Instance.Where(m => m.DocTypeId != null)
+                //           join D in _unitOfWork.Repository<DocumentType>().Instance on R.DocTypeId equals D.DocumentTypeId into DocumentTypeTable
+                //           from DocumentTypeTab in DocumentTypeTable.DefaultIfEmpty()
+                //           join C in _unitOfWork.Repository<ControllerAction>().Instance on R.ControllerName equals C.ControllerName into ControllerActionTable
+                //           from ControllerActionTab in ControllerActionTable.DefaultIfEmpty()
+                //           join M in _unitOfWork.Repository<Menu>().Instance on new { B1 = ControllerActionTab.ControllerActionId, B2 = DocumentTypeTab.DocumentCategoryId } equals new { B1 = M.ControllerActionId ?? 0, B2 = M.DocumentCategoryId ?? 0 } into MenuTable
+                //           from MenuTab in MenuTable.DefaultIfEmpty()
+                //           join Md in _unitOfWork.Repository<MenuModule>().Instance on MenuTab.ModuleId equals Md.ModuleId into ModuleTable
+                //           from ModuleTab in ModuleTable.DefaultIfEmpty()
+                //           where RoleId.Contains(R.RoleId) && ModuleTab.ModuleId != null
+                //           group MenuTab.MenuId by MenuTab.MenuId into Result
+                //           select Result.FirstOrDefault());
+
                 var pt1 = (from R in _unitOfWork.Repository<RolesDocType>().Instance.Where(m => m.DocTypeId != null)
                            join D in _unitOfWork.Repository<DocumentType>().Instance on R.DocTypeId equals D.DocumentTypeId into DocumentTypeTable
                            from DocumentTypeTab in DocumentTypeTable.DefaultIfEmpty()
-                           join C in _unitOfWork.Repository<ControllerAction>().Instance on R.ControllerName equals C.ControllerName into ControllerActionTable
-                           from ControllerActionTab in ControllerActionTable.DefaultIfEmpty()
-                           join M in _unitOfWork.Repository<Menu>().Instance on new { B1 = ControllerActionTab.ControllerActionId, B2 = DocumentTypeTab.DocumentCategoryId } equals new { B1 = M.ControllerActionId ?? 0, B2 = M.DocumentCategoryId ?? 0 } into MenuTable
+                           join M in _unitOfWork.Repository<Menu>().Instance on DocumentTypeTab.DocumentCategoryId equals M.DocumentCategoryId into MenuTable
                            from MenuTab in MenuTable.DefaultIfEmpty()
                            join Md in _unitOfWork.Repository<MenuModule>().Instance on MenuTab.ModuleId equals Md.ModuleId into ModuleTable
                            from ModuleTab in ModuleTable.DefaultIfEmpty()
-                           where RoleId.Contains(R.RoleId) && ModuleTab.ModuleId != null
+                           where RoleId.Contains(R.RoleId) && ModuleTab.ModuleId != null && ModuleTab.IsActive == true
                            group MenuTab.MenuId by MenuTab.MenuId into Result
                            select Result.FirstOrDefault());
 
 
-                var pt2 = (from R in _unitOfWork.Repository<RolesDocType>().Instance.Where(m => m.MenuId != null)
+                var pt2 = (from R in _unitOfWork.Repository<RolesDocType>().Instance.Where(m => m.ProductTypeId != null)
+                           join D in _unitOfWork.Repository<ProductType>().Instance on R.ProductTypeId equals D.ProductTypeId into ProductTypeTable
+                           from ProductTypeTab in ProductTypeTable.DefaultIfEmpty()
+                           join M in _unitOfWork.Repository<Menu>().Instance on ProductTypeTab.ProductNatureId equals M.ProductNatureId into MenuTable
+                           from MenuTab in MenuTable.DefaultIfEmpty()
+                           join Md in _unitOfWork.Repository<MenuModule>().Instance on MenuTab.ModuleId equals Md.ModuleId into ModuleTable
+                           from ModuleTab in ModuleTable.DefaultIfEmpty()
+                           where RoleId.Contains(R.RoleId) && ModuleTab.ModuleId != null && ModuleTab.IsActive == true
+                           group MenuTab.MenuId by MenuTab.MenuId into Result
+                           select Result.FirstOrDefault());
+
+
+                var pt3 = (from R in _unitOfWork.Repository<RolesDocType>().Instance.Where(m => m.MenuId != null)
                            join M in _unitOfWork.Repository<Menu>().Instance on R.MenuId equals M.MenuId into MenuTable
                            from MenuTab in MenuTable.DefaultIfEmpty()
                            join Md in _unitOfWork.Repository<MenuModule>().Instance on MenuTab.ModuleId equals Md.ModuleId into ModuleTable
                            from ModuleTab in ModuleTable.DefaultIfEmpty()
-                           where RoleId.Contains(R.RoleId) && ModuleTab.ModuleId != null
+                           where RoleId.Contains(R.RoleId) && ModuleTab.ModuleId != null && ModuleTab.IsActive == true
                            group MenuTab.MenuId by MenuTab.MenuId into Result
                            select Result.FirstOrDefault());
 
-                var pt = pt1.Union(pt2).ToList();
+                var pt = pt1.Union(pt2).Union(pt3).ToList();
 
                 var MenuList = from M in _unitOfWork.Repository<Menu>().Instance where pt.Contains(M.MenuId) select M;
 

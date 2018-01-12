@@ -125,6 +125,7 @@ namespace Model.Models
         public string filterContraSites { get; set; }
         public string filterContraDivisions { get; set; }
         public string filterPersonRoles { get; set; }
+        public string filterDocTypeCostCenter { get; set; }
 
         [ForeignKey("SalesTaxGroupPerson")]
         [Display(Name = "SalesTaxGroupPerson")]

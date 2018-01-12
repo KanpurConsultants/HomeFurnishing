@@ -152,6 +152,7 @@ namespace Jobs.Controllers
                     temp.SqlProcProductUidHelpList = pt.SqlProcProductUidHelpList;
                     temp.isVisibleHeaderJobWorker = pt.isVisibleHeaderJobWorker;
                     temp.isPostedInStock = pt.isPostedInStock;
+                    temp.filterDocTypeCostCenter = pt.filterDocTypeCostCenter;
                     
                     temp.SqlProcConsumption = pt.SqlProcConsumption;
                     temp.isPostedInStockProcess = pt.isPostedInStockProcess;
@@ -404,6 +405,7 @@ namespace Jobs.Controllers
                     temp.filterContraSites = pt.filterContraSites;
                     temp.filterContraDivisions = pt.filterContraDivisions;
                     temp.filterPersonRoles = pt.filterPersonRoles;
+                    temp.filterDocTypeCostCenter = pt.filterDocTypeCostCenter;
                     temp.SalesTaxGroupPersonId = pt.SalesTaxGroupPersonId;
                     temp.ImportMenuId = pt.ImportMenuId;
                     temp.WizardMenuId = pt.WizardMenuId;
@@ -588,6 +590,7 @@ namespace Jobs.Controllers
                     temp.isGenerateProductUid = pt.isGenerateProductUid;
                     temp.filterContraSites = pt.filterContraSites;
                     temp.filterContraDivisions = pt.filterContraDivisions;
+                    temp.filterDocTypeCostCenter = pt.filterDocTypeCostCenter;
                     temp.SalesTaxGroupPersonId = pt.SalesTaxGroupPersonId;
                     temp.DocumentPrintReportHeaderId = pt.DocumentPrintReportHeaderId;
                     temp.ImportMenuId = pt.ImportMenuId;
@@ -785,6 +788,7 @@ namespace Jobs.Controllers
                     temp.SalesTaxGroupPersonId = pt.SalesTaxGroupPersonId;
                     temp.filterContraSites = pt.filterContraSites;
                     temp.filterContraDivisions = pt.filterContraDivisions;
+                    temp.filterDocTypeCostCenter = pt.filterDocTypeCostCenter;
                     temp.ImportMenuId = pt.ImportMenuId;
                     temp.DocumentPrintReportHeaderId = pt.DocumentPrintReportHeaderId;
                     temp.WizardMenuId = pt.WizardMenuId;

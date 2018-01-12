@@ -40,6 +40,12 @@ namespace Model.Models
         public virtual DocumentCategory DocumentCategory { get; set; }
 
 
+        [ForeignKey("ProductNature")]
+        [Display(Name = "Product Nature")]
+        public int? ProductNatureId { get; set; }
+        public virtual ProductNature ProductNature { get; set; }
+
+
         [ForeignKey("Module")]
         [Display(Name = "Module")]
         [Index("IX_Menu_MenuName", IsUnique = true, Order = 2)]

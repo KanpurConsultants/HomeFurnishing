@@ -50,7 +50,7 @@ namespace Model.ViewModel
         public int CalculationId { get; set; }
         public string CalculationName { get; set; }
 
-
+        public bool IsAutoDocNo { get; set; }
 
         public bool isVisibleAgent { get; set; }
         public bool isVisibleCurrency { get; set; }

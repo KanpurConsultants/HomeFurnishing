@@ -236,7 +236,7 @@
                         <div class="form-group">
                             @Html.LabelFor(model => model.CostCenterId, (Model.DocumentTypeSettings.CostCenterCaption ?? "Cost Center"), new { @class = "control-label col-md-4 col-sm-2 " })
                             <div class="col-md-7 col-sm-10">
-                                @Html.TextBoxFor(model => model.CostCenterId, new { @class = "form-control required", @readonly = true })
+                                @Html.TextBoxFor(model => model.CostCenterId, new { @class = "form-control required" })
                                 @Html.ValidationMessageFor(model => model.CostCenterId, "", new { @class = "text-danger" })
                             </div>
                         </div>
@@ -523,7 +523,7 @@ else
 
         
         
-        CustomSelectFunction($("#CostCenterId"), '/ComboHelpList/GetCostCenter', '/ComboHelpList/SetSingleCostCenter', ' ', false, 0);
+        CustomSelectFunction($("#CostCenterId"), '/JobInvoiceReceiveLine/GetCostCenters', '/ComboHelpList/SetSingleCostCenter', ' ', false, 0,$('#JobInvoiceHeaderId','.modal-body').val());
         CustomSelectFunction($("#SalesTaxGroupProductId"), '/ComboHelpList/GetSalesTaxGroupProduct', '/ComboHelpList/SetSingleSalesTaxGroupProduct', ' ', false, 0);
         CustomSelectFunction($("#Dimension1Id"), '/ComboHelpList/GetDimension1', '/ComboHelpList/SetSingleDimension1', ' ', false, 0);
         CustomSelectFunction($("#Dimension2Id"), '/ComboHelpList/GetDimension2', '/ComboHelpList/SetSingleDimension2', ' ', false, 0);

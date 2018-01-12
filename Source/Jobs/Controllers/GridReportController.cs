@@ -320,6 +320,9 @@ namespace Jobs.Controllers
             if (ExistingData == null)
                 return true;
 
+            if (UserRoles.Contains("Admin"))
+                return true;
+
             foreach (string RoleName in UserRoles)
             {
                 if (IsAllowedForPreviousRole == false)

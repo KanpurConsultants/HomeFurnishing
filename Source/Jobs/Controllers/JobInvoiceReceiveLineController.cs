@@ -2254,8 +2254,289 @@ namespace Jobs.Controllers
             return PartialView("_Create", temp);
         }
 
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]        
+        //public ActionResult DeletePost(JobInvoiceLineViewModel vm)
+        //{
+        //    #region BeforeSave
+        //    bool BeforeSave = true;
+        //    try
+        //    {
+        //        BeforeSave = JobInvoiceReceiveDocEvents.beforeLineDeleteEvent(this, new JobEventArgs(vm.JobInvoiceHeaderId, vm.JobInvoiceLineId), ref db);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        string message = _exception.HandleException(ex);
+        //        TempData["CSEXC"] += message;
+        //        EventException = true;
+        //    }
+
+        //    if (!BeforeSave)
+        //        TempData["CSEXC"] += "Validation failed before delete.";
+        //    #endregion
+
+        //    if (BeforeSave && !EventException)
+        //    {
+        //        int? StockId = 0;
+        //        int? StockProcessId = 0;
+        //        List<LogTypeViewModel> LogList = new List<LogTypeViewModel>();
+
+        //        if (vm.linecharges != null && vm.footercharges == null)
+        //        {
+        //            ModelState.AddModelError("", "Something went wrong while deletion.Please try again.");
+        //            PrepareViewBag(vm);
+        //            ViewBag.LineMode = "Delete";
+        //            return PartialView("_Create", vm);
+        //        }
+
+
+        //        JobInvoiceLine InvoiceLine = db.JobInvoiceLine.Find(vm.JobInvoiceLineId);
+        //        JobInvoiceHeader InvoiceHeader = db.JobInvoiceHeader.Find(InvoiceLine.JobInvoiceHeaderId);
+        //        JobReceiveLine ReceiveLine = db.JobReceiveLine.Find(InvoiceLine.JobReceiveLineId);
+        //        JobReceiveHeader ReceiveHeader = db.JobReceiveHeader.Find(InvoiceHeader.JobReceiveHeaderId ?? 0);
+
+        //        LogList.Add(new LogTypeViewModel
+        //        {
+        //            ExObj = Mapper.Map<JobInvoiceLine>(InvoiceLine),
+        //        });
+
+        //        bool IsDeleteFooterCharges = false;
+
+        //        var JobInvoiceLineForHeader = (from L in db.JobInvoiceLine where L.JobInvoiceHeaderId == InvoiceLine.JobInvoiceHeaderId && L.JobInvoiceLineId != vm.JobInvoiceLineId select L).FirstOrDefault();
+        //        if (JobInvoiceLineForHeader == null)
+        //            IsDeleteFooterCharges = true;
+
+
+        //        JobInvoiceLineStatus Status = new JobInvoiceLineStatus();
+        //        Status.JobInvoiceLineId = InvoiceLine.JobInvoiceLineId;
+        //        db.JobInvoiceLineStatus.Attach(Status);
+
+        //        Status.ObjectState = Model.ObjectState.Deleted;
+        //        db.JobInvoiceLineStatus.Remove(Status);
+
+        //        //_JobInvoiceLineService.Delete(JobInvoiceLine);
+        //        InvoiceLine.ObjectState = Model.ObjectState.Deleted;
+        //        db.JobInvoiceLine.Remove(InvoiceLine);
+
+        //        var chargeslist = (from p in db.JobInvoiceLineCharge
+        //                           where p.LineTableId == vm.JobInvoiceLineId
+        //                           select p).ToList();
+
+        //        if (chargeslist != null)
+        //            foreach (var item in chargeslist)
+        //            {
+        //                item.ObjectState = Model.ObjectState.Deleted;
+        //                db.JobInvoiceLineCharge.Remove(item);
+        //                //new JobInvoiceLineChargeService(_unitOfWork).Delete(item.Id);
+        //            }
+
+
+        //        if (IsDeleteFooterCharges == true)
+        //        {
+        //            var HeaderChargesList = (from Hc in db.JobInvoiceHeaderCharges where Hc.HeaderTableId == InvoiceHeader.JobInvoiceHeaderId select Hc).ToList();
+        //            foreach (var HeaderCharges in HeaderChargesList)
+        //            {
+        //                HeaderCharges.ObjectState = Model.ObjectState.Deleted;
+        //                db.JobInvoiceHeaderCharges.Remove(HeaderCharges);
+        //            }
+        //        }
+        //        else
+        //        {
+        //            if (vm.footercharges != null)
+        //                foreach (var item in vm.footercharges)
+        //                {
+        //                    var footer = new JobInvoiceHeaderChargeService(_unitOfWork).Find(item.Id);
+        //                    footer.Rate = item.Rate;
+        //                    footer.Amount = item.Amount;
+
+        //                    footer.ObjectState = Model.ObjectState.Modified;
+        //                    db.JobInvoiceHeaderCharges.Add(footer);
+        //                    //new JobInvoiceHeaderChargeService(_unitOfWork).Update(footer);
+        //                }
+        //        }
+
+        //        if (InvoiceHeader.Status != (int)StatusConstants.Drafted && InvoiceHeader.Status != (int)StatusConstants.Import)
+        //        {
+        //            InvoiceHeader.Status = (int)StatusConstants.Modified;
+        //            InvoiceHeader.ModifiedBy = User.Identity.Name;
+        //            InvoiceHeader.ModifiedDate = DateTime.Now;
+        //            InvoiceHeader.ObjectState = Model.ObjectState.Modified;
+        //            db.JobInvoiceHeader.Add(InvoiceHeader);
+
+
+        //        }
+
+
+        //        if (ReceiveLine.JobReceiveHeaderId == InvoiceHeader.JobReceiveHeaderId)
+        //        {
+        //            JobReceiveLineStatus LineStatus = (from p in db.JobReceiveLineStatus
+        //                                                where p.JobReceiveLineId == ReceiveLine.JobReceiveLineId
+        //                                                select p).FirstOrDefault();
+
+        //            LineStatus.ObjectState = Model.ObjectState.Deleted;
+        //            db.JobReceiveLineStatus.Remove(LineStatus);
+
+        //            JobReceiveHeader Receiveheader = new JobReceiveHeaderService(_unitOfWork).Find(ReceiveLine.JobReceiveHeaderId);
+
+
+
+        //            LogList.Add(new LogTypeViewModel
+        //            {
+        //                ExObj = Mapper.Map<JobReceiveLine>(ReceiveLine),
+        //            });
+
+        //            if (ReceiveLine.JobOrderLineId != null)
+        //            {
+        //                new JobOrderLineStatusService(_unitOfWork).UpdateJobQtyOnInvoiceReceive((int)ReceiveLine.JobOrderLineId, InvoiceLine.JobInvoiceLineId, InvoiceHeader.DocDate, 0, InvoiceLine.UnitConversionMultiplier, ref db, true);
+        //            }
+
+        //            StockId = ReceiveLine.StockId;
+        //            StockProcessId = ReceiveLine.StockProcessId;
+
+        //            if (vm.ProductUidId != null && vm.ProductUidId != 0)
+        //            {
+        //                ProductUid ProductUid = (from p in db.ProductUid
+        //                                            where p.ProductUIDId == vm.ProductUidId
+        //                                            select p).FirstOrDefault();
+
+        //                if (!(ReceiveLine.ProductUidLastTransactionDocNo == ProductUid.LastTransactionDocNo && ReceiveLine.ProductUidLastTransactionDocTypeId == ProductUid.LastTransactionDocTypeId) || InvoiceHeader.SiteId == 17)
+        //                {
+
+
+        //                    if ((Receiveheader.DocNo != ProductUid.LastTransactionDocNo || Receiveheader.DocTypeId != ProductUid.LastTransactionDocTypeId))
+        //                    {
+        //                        ModelState.AddModelError("", "Bar Code Can't be deleted because this is already Proceed to another process.");
+        //                        PrepareViewBag(vm);
+        //                        return PartialView("_Create", vm);
+        //                    }
+
+
+        //                    ProductUid.LastTransactionDocDate = ReceiveLine.ProductUidLastTransactionDocDate;
+        //                    ProductUid.LastTransactionDocId = ReceiveLine.ProductUidLastTransactionDocId;
+        //                    ProductUid.LastTransactionDocNo = ReceiveLine.ProductUidLastTransactionDocNo;
+        //                    ProductUid.LastTransactionDocTypeId = ReceiveLine.ProductUidLastTransactionDocTypeId;
+        //                    ProductUid.LastTransactionPersonId = ReceiveLine.ProductUidLastTransactionPersonId;
+        //                    ProductUid.CurrenctGodownId = ReceiveLine.ProductUidCurrentGodownId;
+        //                    ProductUid.CurrenctProcessId = ReceiveLine.ProductUidCurrentProcessId;
+        //                    ProductUid.Status = ReceiveLine.ProductUidStatus;
+
+        //                    ProductUid.ObjectState = Model.ObjectState.Modified;
+
+        //                    db.ProductUid.Add(ProductUid);
+
+        //                    new StockUidService(_unitOfWork).DeleteStockUidForDocLineDB(Receiveheader.JobReceiveHeaderId, Receiveheader.DocTypeId, Receiveheader.SiteId, Receiveheader.DivisionId, ref db);
+
+        //                }
+        //            }
+
+        //            ReceiveLine.ObjectState = Model.ObjectState.Deleted;
+        //            db.JobReceiveLine.Remove(ReceiveLine);
+
+        //            if (StockId != null)
+        //            {
+        //                new StockService(_unitOfWork).DeleteStockDB((int)StockId, ref db, true);
+        //            }
+
+        //            if (StockProcessId != null)
+        //            {
+        //                new StockProcessService(_unitOfWork).DeleteStockProcessDB((int)StockProcessId, ref db, true);
+        //            }
+
+
+
+
+        //            //Receiveheader.Status = (int)StatusConstants.Modified;
+        //            Receiveheader.ModifiedDate = DateTime.Now;
+        //            Receiveheader.ModifiedBy = User.Identity.Name;
+        //            Receiveheader.ObjectState = Model.ObjectState.Modified;
+        //            db.JobReceiveHeader.Add(Receiveheader);
+
+
+        //            var Boms = (from p in db.JobReceiveBom
+        //                        where p.JobReceiveLineId == vm.JobReceiveLineId
+        //                        select p).ToList();
+
+        //            var StockProcessIds = Boms.Select(m => m.StockProcessId).ToArray();
+
+        //            var StockProcRecorcds = (from p in db.StockProcess
+        //                                        where StockProcessIds.Contains(p.StockProcessId)
+        //                                        select p).ToList();
+
+        //            foreach (var item in Boms)
+        //            {
+
+        //                if (item.StockProcessId != null)
+        //                {
+        //                    var TempStockProcess = StockProcRecorcds.Where(m => m.StockProcessId == item.StockProcessId).FirstOrDefault();
+        //                    TempStockProcess.ObjectState = Model.ObjectState.Deleted;
+        //                    db.StockProcess.Remove(TempStockProcess);
+        //                }
+
+        //                item.ObjectState = Model.ObjectState.Deleted;
+        //                db.JobReceiveBom.Remove(item);
+        //            }
+        //        }
+
+
+
+        //        XElement Modifications = new ModificationsCheckService().CheckChanges(LogList);
+
+        //        try
+        //        {
+        //            JobInvoiceReceiveDocEvents.onLineDeleteEvent(this, new JobEventArgs(InvoiceLine.JobInvoiceHeaderId, InvoiceLine.JobInvoiceLineId), ref db);
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            string message = _exception.HandleException(ex);
+        //            TempData["CSEXCL"] += message;
+        //            EventException = true;
+        //        }
+
+        //        try
+        //        {
+        //            if (EventException)
+        //            { throw new Exception(); }
+        //            db.SaveChanges();
+        //            //_unitOfWork.Save();
+        //        }
+
+        //        catch (Exception ex)
+        //        {
+        //            string message = _exception.HandleException(ex);
+        //            TempData["CSEXCL"] += message;
+        //            PrepareViewBag(null);
+        //            return PartialView("_Create", vm);
+        //        }
+
+        //        try
+        //        {
+        //            JobInvoiceReceiveDocEvents.afterLineDeleteEvent(this, new JobEventArgs(InvoiceLine.JobInvoiceHeaderId, InvoiceLine.JobInvoiceLineId), ref db);
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            string message = _exception.HandleException(ex);
+        //            TempData["CSEXC"] += message;
+        //        }
+
+        //        LogActivity.LogActivityDetail(LogVm.Map(new ActiivtyLogViewModel
+        //        {
+        //            DocTypeId = InvoiceHeader.DocTypeId,
+        //            DocId = InvoiceHeader.JobInvoiceHeaderId,
+        //            DocLineId = InvoiceLine.JobInvoiceLineId,
+        //            ActivityType = (int)ActivityTypeContants.Deleted,
+        //            DocNo = InvoiceHeader.DocNo,
+        //            DocDate = InvoiceHeader.DocDate,
+        //            xEModifications = Modifications,
+        //            DocStatus = InvoiceHeader.Status,
+        //        }));
+        //    }
+
+        //    return Json(new { success = true });
+        //}
+
+
         [HttpPost]
-        [ValidateAntiForgeryToken]        
+        [ValidateAntiForgeryToken]
         public ActionResult DeletePost(JobInvoiceLineViewModel vm)
         {
             #region BeforeSave
@@ -2300,6 +2581,13 @@ namespace Jobs.Controllers
                     ExObj = Mapper.Map<JobInvoiceLine>(InvoiceLine),
                 });
 
+                bool IsDeleteFooterCharges = false;
+
+                var JobInvoiceLineForHeader = (from L in db.JobInvoiceLine where L.JobInvoiceHeaderId == InvoiceLine.JobInvoiceHeaderId && L.JobInvoiceLineId != vm.JobInvoiceLineId select L).FirstOrDefault();
+                if (JobInvoiceLineForHeader == null)
+                    IsDeleteFooterCharges = true;
+
+
                 JobInvoiceLineStatus Status = new JobInvoiceLineStatus();
                 Status.JobInvoiceLineId = InvoiceLine.JobInvoiceLineId;
                 db.JobInvoiceLineStatus.Attach(Status);
@@ -2323,17 +2611,30 @@ namespace Jobs.Controllers
                         //new JobInvoiceLineChargeService(_unitOfWork).Delete(item.Id);
                     }
 
-                if (vm.footercharges != null)
-                    foreach (var item in vm.footercharges)
-                    {
-                        var footer = new JobInvoiceHeaderChargeService(_unitOfWork).Find(item.Id);
-                        footer.Rate = item.Rate;
-                        footer.Amount = item.Amount;
 
-                        footer.ObjectState = Model.ObjectState.Modified;
-                        db.JobInvoiceHeaderCharges.Add(footer);
-                        //new JobInvoiceHeaderChargeService(_unitOfWork).Update(footer);
+                if (IsDeleteFooterCharges == true)
+                {
+                    var HeaderChargesList = (from Hc in db.JobInvoiceHeaderCharges where Hc.HeaderTableId == InvoiceHeader.JobInvoiceHeaderId select Hc).ToList();
+                    foreach (var HeaderCharges in HeaderChargesList)
+                    {
+                        HeaderCharges.ObjectState = Model.ObjectState.Deleted;
+                        db.JobInvoiceHeaderCharges.Remove(HeaderCharges);
                     }
+                }
+                else
+                {
+                    if (vm.footercharges != null)
+                        foreach (var item in vm.footercharges)
+                        {
+                            var footer = new JobInvoiceHeaderChargeService(_unitOfWork).Find(item.Id);
+                            footer.Rate = item.Rate;
+                            footer.Amount = item.Amount;
+
+                            footer.ObjectState = Model.ObjectState.Modified;
+                            db.JobInvoiceHeaderCharges.Add(footer);
+                            //new JobInvoiceHeaderChargeService(_unitOfWork).Update(footer);
+                        }
+                }
 
                 if (InvoiceHeader.Status != (int)StatusConstants.Drafted && InvoiceHeader.Status != (int)StatusConstants.Import)
                 {
@@ -2350,13 +2651,13 @@ namespace Jobs.Controllers
                 if (ReceiveLine.JobReceiveHeaderId == InvoiceHeader.JobReceiveHeaderId)
                 {
                     JobReceiveLineStatus LineStatus = (from p in db.JobReceiveLineStatus
-                                                        where p.JobReceiveLineId == ReceiveLine.JobReceiveLineId
-                                                        select p).FirstOrDefault();
+                                                       where p.JobReceiveLineId == ReceiveLine.JobReceiveLineId
+                                                       select p).FirstOrDefault();
 
                     LineStatus.ObjectState = Model.ObjectState.Deleted;
                     db.JobReceiveLineStatus.Remove(LineStatus);
 
-                    JobReceiveHeader Receiveheader = new JobReceiveHeaderService(_unitOfWork).Find(ReceiveLine.JobReceiveHeaderId);
+                    //JobReceiveHeader Receiveheader = new JobReceiveHeaderService(_unitOfWork).Find(ReceiveLine.JobReceiveHeaderId);
 
 
 
@@ -2376,14 +2677,14 @@ namespace Jobs.Controllers
                     if (vm.ProductUidId != null && vm.ProductUidId != 0)
                     {
                         ProductUid ProductUid = (from p in db.ProductUid
-                                                    where p.ProductUIDId == vm.ProductUidId
-                                                    select p).FirstOrDefault();
+                                                 where p.ProductUIDId == vm.ProductUidId
+                                                 select p).FirstOrDefault();
 
                         if (!(ReceiveLine.ProductUidLastTransactionDocNo == ProductUid.LastTransactionDocNo && ReceiveLine.ProductUidLastTransactionDocTypeId == ProductUid.LastTransactionDocTypeId) || InvoiceHeader.SiteId == 17)
                         {
 
 
-                            if ((Receiveheader.DocNo != ProductUid.LastTransactionDocNo || Receiveheader.DocTypeId != ProductUid.LastTransactionDocTypeId))
+                            if ((ReceiveHeader.DocNo != ProductUid.LastTransactionDocNo || ReceiveHeader.DocTypeId != ProductUid.LastTransactionDocTypeId))
                             {
                                 ModelState.AddModelError("", "Bar Code Can't be deleted because this is already Proceed to another process.");
                                 PrepareViewBag(vm);
@@ -2404,7 +2705,7 @@ namespace Jobs.Controllers
 
                             db.ProductUid.Add(ProductUid);
 
-                            new StockUidService(_unitOfWork).DeleteStockUidForDocLineDB(Receiveheader.JobReceiveHeaderId, Receiveheader.DocTypeId, Receiveheader.SiteId, Receiveheader.DivisionId, ref db);
+                            new StockUidService(_unitOfWork).DeleteStockUidForDocLineDB(ReceiveHeader.JobReceiveHeaderId, ReceiveHeader.DocTypeId, ReceiveHeader.SiteId, ReceiveHeader.DivisionId, ref db);
 
                         }
                     }
@@ -2426,10 +2727,10 @@ namespace Jobs.Controllers
 
 
                     //Receiveheader.Status = (int)StatusConstants.Modified;
-                    Receiveheader.ModifiedDate = DateTime.Now;
-                    Receiveheader.ModifiedBy = User.Identity.Name;
-                    Receiveheader.ObjectState = Model.ObjectState.Modified;
-                    db.JobReceiveHeader.Add(Receiveheader);
+                    ReceiveHeader.ModifiedDate = DateTime.Now;
+                    ReceiveHeader.ModifiedBy = User.Identity.Name;
+                    ReceiveHeader.ObjectState = Model.ObjectState.Modified;
+                    db.JobReceiveHeader.Add(ReceiveHeader);
 
 
                     var Boms = (from p in db.JobReceiveBom
@@ -2439,8 +2740,8 @@ namespace Jobs.Controllers
                     var StockProcessIds = Boms.Select(m => m.StockProcessId).ToArray();
 
                     var StockProcRecorcds = (from p in db.StockProcess
-                                                where StockProcessIds.Contains(p.StockProcessId)
-                                                select p).ToList();
+                                             where StockProcessIds.Contains(p.StockProcessId)
+                                             select p).ToList();
 
                     foreach (var item in Boms)
                     {
@@ -2796,6 +3097,27 @@ namespace Jobs.Controllers
             JobReceiveJson.text = JobReceiveLine.FirstOrDefault().JobReceiveNo;
 
             return Json(JobReceiveJson);
+        }
+
+        public JsonResult GetCostCenters(string searchTerm, int pageSize, int pageNum, int filter)//filter:PersonId
+        {
+            JobInvoiceHeader JobInvoiceHeader = new JobInvoiceHeaderService(_unitOfWork).Find(filter);
+
+            var Settings = new JobInvoiceSettingsService(_unitOfWork).GetJobInvoiceSettingsForDocument(JobInvoiceHeader.DocTypeId, JobInvoiceHeader.DivisionId, JobInvoiceHeader.SiteId);
+
+            var temp = new JobInvoiceLineService(_unitOfWork).GetCostCenters(searchTerm, Settings.filterDocTypeCostCenter, JobInvoiceHeader.ProcessId.ToString()).Skip(pageSize * (pageNum - 1)).Take(pageSize).ToList();
+
+            var count = new JobInvoiceLineService(_unitOfWork).GetCostCenters(searchTerm, Settings.filterDocTypeCostCenter, JobInvoiceHeader.ProcessId.ToString()).Count();
+
+            ComboBoxPagedResult Data = new ComboBoxPagedResult();
+            Data.Results = temp;
+            Data.Total = count;
+
+            return new JsonpResult
+            {
+                Data = Data,
+                JsonRequestBehavior = JsonRequestBehavior.AllowGet
+            };
         }
 
 

@@ -108,23 +108,21 @@ FinancialDisplay.controller('MainCtrl', ['$scope', '$log', '$http', 'uiGridConst
                   window.open('/FinancialDisplay/DocumentMenu/?DocTypeId=' + DocTypeId + '&DocId=' + DocId, '_blank');
                   return;
               }
+          
+              $.ajax({
+                  async : false,
+                  cache: false,
+                  type: "POST",
+                  url: '/FinancialDisplay/SaveCurrentSetting',
+                  success: function (data) {
+                  },
+                  error: function (xhr, ajaxOptions, thrownError) {
+                      alert('Failed to retrieve product details.' + thrownError);
+                  }
+              });
+
+              $scope.BindData();
           }
-
-
-          $.ajax({
-              async : false,
-              cache: false,
-              type: "POST",
-              url: '/FinancialDisplay/SaveCurrentSetting',
-              success: function (data) {
-              },
-              error: function (xhr, ajaxOptions, thrownError) {
-                  alert('Failed to retrieve product details.' + thrownError);
-              }
-          });
-
-          $scope.BindData();
-
 
           
       };

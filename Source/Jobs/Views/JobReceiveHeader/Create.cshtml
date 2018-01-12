@@ -522,6 +522,10 @@
     CustomSelectFunction($("#GodownId"), '/ComboHelpList/GetGodown', '/ComboHelpList/SetSingleGodown', ' ', false, 0);
     CustomSelectFunction($("#JobReceiveById"), '/ComboHelpList/GetEmployeeWithProcess', '/ComboHelpList/SetSingleEmployee', ' ', false, 0, $('#ProcessId').val());
 
+    $("#ProcessId").change(function(){
+        CustomSelectFunction($("#JobReceiveById"), '/ComboHelpList/GetEmployeeWithProcess', '/ComboHelpList/SetSingleEmployee', ' ', false, 0, $('#ProcessId').val());
+    });
+
     var id=@Model.JobReceiveHeaderId;
     if(id==null||id==0)
     {

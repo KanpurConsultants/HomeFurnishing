@@ -898,7 +898,13 @@ namespace Jobs.Controllers
 
             int? StockId = 0;
 
+            bool IsDeleteFooterCharges = false;
+
             SaleInvoiceReturnLine SaleInvoiceReturnLine = _SaleInvoiceReturnLineService.Find(vm.SaleInvoiceReturnLineId);
+
+            var SaleInvoiceReturnLineForHeader = (from L in db.SaleInvoiceReturnLine where L.SaleInvoiceReturnHeaderId == SaleInvoiceReturnLine.SaleInvoiceReturnHeaderId && L.SaleInvoiceReturnLineId != vm.SaleInvoiceReturnLineId select L).FirstOrDefault();
+            if (SaleInvoiceReturnLineForHeader == null)
+                IsDeleteFooterCharges = true;
 
             LogList.Add(new LogTypeViewModel
             {
@@ -917,14 +923,28 @@ namespace Jobs.Controllers
                     new SaleInvoiceReturnLineChargeService(_unitOfWork).Delete(item.Id);
                 }
 
-            if (vm.footercharges != null)
-                foreach (var item in vm.footercharges)
+
+            if (IsDeleteFooterCharges == true)
+            {
+                var HeaderChargesList = (from Hc in db.SaleInvoiceReturnHeaderCharge where Hc.HeaderTableId == SaleInvoiceReturnLine.SaleInvoiceReturnHeaderId select Hc).ToList();
+                foreach(var HeaderCharges in HeaderChargesList)
                 {
-                    var footer = new SaleInvoiceReturnHeaderChargeService(_unitOfWork).Find(item.Id);
-                    footer.Rate = item.Rate;
-                    footer.Amount = item.Amount;
-                    new SaleInvoiceReturnHeaderChargeService(_unitOfWork).Update(footer);
+                    new SaleInvoiceReturnHeaderChargeService(_unitOfWork).Delete(HeaderCharges.Id);
                 }
+            }
+            else
+            {
+                if (vm.footercharges != null)
+                    foreach (var item in vm.footercharges)
+                    {
+                        var footer = new SaleInvoiceReturnHeaderChargeService(_unitOfWork).Find(item.Id);
+                        footer.Rate = item.Rate;
+                        footer.Amount = item.Amount;
+                        new SaleInvoiceReturnHeaderChargeService(_unitOfWork).Update(footer);
+                    }
+            }
+
+
 
             _SaleInvoiceReturnLineService.Delete(SaleInvoiceReturnLine.SaleInvoiceReturnLineId);
             SaleInvoiceReturnHeader header = new SaleInvoiceReturnHeaderService(_unitOfWork).Find(SaleInvoiceReturnLine.SaleInvoiceReturnHeaderId);

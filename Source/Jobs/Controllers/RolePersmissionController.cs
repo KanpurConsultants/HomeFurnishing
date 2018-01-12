@@ -142,10 +142,13 @@ namespace Jobs.Controllers
                   string SubmitActionName, bool Submit, string EntryType)
         {
             int? DocTypeId = null;
+            int? ProductTypeId = null;
             int? MenuId = null;
 
             if (EntryType == "Document")
                 DocTypeId = DocumentTypeId;
+            else if (EntryType == "Product")
+                ProductTypeId = DocumentTypeId;
             else
                 MenuId = DocumentTypeId;
 
@@ -154,6 +157,8 @@ namespace Jobs.Controllers
 
             if (EntryType == "Document")
                 RolesDocTypeForAdd = (from L in db.RolesDocType where L.RoleId == RoleId && L.DocTypeId == DocumentTypeId && L.ControllerName == ControllerName && L.ActionName == AddActionName select L).FirstOrDefault();
+            else if (EntryType == "Product")
+                RolesDocTypeForAdd = (from L in db.RolesDocType where L.RoleId == RoleId && L.ProductTypeId == DocumentTypeId && L.ControllerName == ControllerName && L.ActionName == AddActionName select L).FirstOrDefault();
             else
                 RolesDocTypeForAdd = (from L in db.RolesDocType where L.RoleId == RoleId && L.MenuId == DocumentTypeId && L.ControllerName == ControllerName && L.ActionName == AddActionName select L).FirstOrDefault();
 
@@ -164,6 +169,7 @@ namespace Jobs.Controllers
                     RolesDocType RolesDocType = new RolesDocType();
                     RolesDocType.RoleId = RoleId;
                     RolesDocType.DocTypeId = DocTypeId;
+                    RolesDocType.ProductTypeId = ProductTypeId;
                     RolesDocType.MenuId = MenuId;
                     RolesDocType.ControllerName = ControllerName;
                     RolesDocType.ActionName = AddActionName;
@@ -189,6 +195,8 @@ namespace Jobs.Controllers
 
             if (EntryType == "Document")
                 RolesDocTypeForEdit = (from L in db.RolesDocType where L.RoleId == RoleId && L.DocTypeId == DocumentTypeId && L.ControllerName == ControllerName && L.ActionName == EditActionName select L).FirstOrDefault();
+            else if (EntryType == "Product")
+                RolesDocTypeForEdit = (from L in db.RolesDocType where L.RoleId == RoleId && L.ProductTypeId == DocumentTypeId && L.ControllerName == ControllerName && L.ActionName == EditActionName select L).FirstOrDefault();
             else
                 RolesDocTypeForEdit = (from L in db.RolesDocType where L.RoleId == RoleId && L.MenuId == DocumentTypeId && L.ControllerName == ControllerName && L.ActionName == AddActionName select L).FirstOrDefault();
 
@@ -199,6 +207,7 @@ namespace Jobs.Controllers
                     RolesDocType RolesDocType = new RolesDocType();
                     RolesDocType.RoleId = RoleId;
                     RolesDocType.DocTypeId = DocTypeId;
+                    RolesDocType.ProductTypeId = ProductTypeId;
                     RolesDocType.MenuId = MenuId;
                     RolesDocType.ControllerName = ControllerName;
                     RolesDocType.ActionName = EditActionName;
@@ -223,6 +232,8 @@ namespace Jobs.Controllers
             RolesDocType RolesDocTypeForDelete = new RolesDocType();
             if (EntryType == "Document")
                 RolesDocTypeForDelete = (from L in db.RolesDocType where L.RoleId == RoleId && L.DocTypeId == DocumentTypeId && L.ControllerName == ControllerName && L.ActionName == DeleteActionName select L).FirstOrDefault();
+            else if (EntryType == "Product")
+                RolesDocTypeForDelete = (from L in db.RolesDocType where L.RoleId == RoleId && L.ProductTypeId == DocumentTypeId && L.ControllerName == ControllerName && L.ActionName == DeleteActionName select L).FirstOrDefault();
             else
                 RolesDocTypeForDelete = (from L in db.RolesDocType where L.RoleId == RoleId && L.MenuId == DocumentTypeId && L.ControllerName == ControllerName && L.ActionName == DeleteActionName select L).FirstOrDefault();
 
@@ -233,6 +244,7 @@ namespace Jobs.Controllers
                     RolesDocType RolesDocType = new RolesDocType();
                     RolesDocType.RoleId = RoleId;
                     RolesDocType.DocTypeId = DocTypeId;
+                    RolesDocType.ProductTypeId = ProductTypeId;
                     RolesDocType.MenuId = MenuId;
                     RolesDocType.ControllerName = ControllerName;
                     RolesDocType.ActionName = DeleteActionName;
@@ -258,6 +270,8 @@ namespace Jobs.Controllers
 
             if (EntryType == "Document")
                 RolesDocTypeForPrint = (from L in db.RolesDocType where L.RoleId == RoleId && L.DocTypeId == DocumentTypeId && L.ControllerName == ControllerName && L.ActionName == PrintActionName select L).FirstOrDefault();
+            if (EntryType == "Product")
+                RolesDocTypeForPrint = (from L in db.RolesDocType where L.RoleId == RoleId && L.ProductTypeId == DocumentTypeId && L.ControllerName == ControllerName && L.ActionName == PrintActionName select L).FirstOrDefault();
             else
                 RolesDocTypeForPrint = (from L in db.RolesDocType where L.RoleId == RoleId && L.MenuId == DocumentTypeId && L.ControllerName == ControllerName && L.ActionName == PrintActionName select L).FirstOrDefault();
 
@@ -268,6 +282,7 @@ namespace Jobs.Controllers
                     RolesDocType RolesDocType = new RolesDocType();
                     RolesDocType.RoleId = RoleId;
                     RolesDocType.DocTypeId = DocTypeId;
+                    RolesDocType.ProductTypeId = ProductTypeId;
                     RolesDocType.MenuId = MenuId;
                     RolesDocType.ControllerName = ControllerName;
                     RolesDocType.ActionName = PrintActionName;
@@ -292,6 +307,8 @@ namespace Jobs.Controllers
 
             if (EntryType == "Document")
                 RolesDocTypeForSubmit = (from L in db.RolesDocType where L.RoleId == RoleId && L.DocTypeId == DocumentTypeId && L.ControllerName == ControllerName && L.ActionName == SubmitActionName select L).FirstOrDefault();
+            else if (EntryType == "Product")
+                RolesDocTypeForSubmit = (from L in db.RolesDocType where L.RoleId == RoleId && L.ProductTypeId == DocumentTypeId && L.ControllerName == ControllerName && L.ActionName == SubmitActionName select L).FirstOrDefault();
             else
                 RolesDocTypeForSubmit = (from L in db.RolesDocType where L.RoleId == RoleId && L.MenuId == DocumentTypeId && L.ControllerName == ControllerName && L.ActionName == SubmitActionName select L).FirstOrDefault();
 
@@ -303,6 +320,7 @@ namespace Jobs.Controllers
                     RolesDocType RolesDocType = new RolesDocType();
                     RolesDocType.RoleId = RoleId;
                     RolesDocType.DocTypeId = DocTypeId;
+                    RolesDocType.ProductTypeId = ProductTypeId;
                     RolesDocType.MenuId = MenuId;
                     RolesDocType.ControllerName = ControllerName;
                     RolesDocType.ActionName = SubmitActionName;

@@ -258,6 +258,25 @@ namespace Jobs.Controllers
             }
 
 
+            if (vm.SaleInvoiceSettings != null)
+            {
+                if (vm.SaleInvoiceHeaderId <= 0)
+                {
+                    var temp = (from H in db.SaleInvoiceHeader
+                                where H.DocTypeId == vm.DocTypeId && H.DocNo == vm.DocNo && H.SiteId == vm.SiteId && H.DivisionId == vm.DivisionId
+                                select H).FirstOrDefault();
+
+                    if (temp != null)
+                    {
+                        if (vm.SaleInvoiceSettings.IsAutoDocNo == true)
+                        {
+                            vm.DocNo = new DocumentTypeService(_unitOfWork).FGetNewDocNo("DocNo", ConfigurationManager.AppSettings["DataBaseSchema"] + ".SaleInvoiceHeaders", vm.DocTypeId, vm.DocDate, vm.DivisionId, vm.SiteId);
+                        }
+                    }
+                }
+            }
+
+
             if (vm.DocumentTypeHeaderAttributes != null)
             {
                 foreach (var pta in vm.DocumentTypeHeaderAttributes)
@@ -2209,6 +2228,21 @@ namespace Jobs.Controllers
                         DocDate = SaleInvoiceHeader.DocDate,
                         DocStatus = SaleInvoiceHeader.Status,
                     }));
+
+
+                    try
+                    {
+                        StockHeader StockHeader = new StockHeaderService(_unitOfWork).Find((int)GoodsRetHeader.StockHeaderId);
+                        StockHeader.DocHeaderId = GoodsRetHeader.SaleDispatchReturnHeaderId;
+                        new StockHeaderService(_unitOfWork).Update(StockHeader);
+                        _unitOfWork.Save();
+                    }
+                    catch (Exception ex)
+                    {
+                        string message = _exception.HandleException(ex);
+                    }
+
+
 
 
                     //return Json(new { success = true });

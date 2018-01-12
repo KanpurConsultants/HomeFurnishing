@@ -2163,6 +2163,12 @@ namespace Jobs.Controllers
 
                 JobInvoiceReturnLine JobInvoiceReturnLine = db.JobInvoiceReturnLine.Find(vm.JobInvoiceReturnLineId);
 
+                bool IsDeleteFooterCharges = false;
+
+                var JobInvoiceReturnLineForHeader = (from L in db.JobInvoiceReturnLine where L.JobInvoiceReturnHeaderId == JobInvoiceReturnLine.JobInvoiceReturnHeaderId && L.JobInvoiceReturnLineId != vm.JobInvoiceReturnLineId select L).FirstOrDefault();
+                if (JobInvoiceReturnLineForHeader == null)
+                    IsDeleteFooterCharges = true;
+
                 try
                 {
                     JobInvoiceReturnDocEvents.onLineDeleteEvent(this, new JobEventArgs(JobInvoiceReturnLine.JobInvoiceReturnHeaderId, JobInvoiceReturnLine.JobInvoiceReturnLineId), ref db);
@@ -2195,15 +2201,26 @@ namespace Jobs.Controllers
                         db.JobInvoiceReturnLineCharge.Remove(item);
                     }
 
-                if (vm.footercharges != null)
-                    foreach (var item in vm.footercharges)
+                if (IsDeleteFooterCharges == true)
+                {
+                    var HeaderChargesList = (from Hc in db.JobInvoiceReturnHeaderCharge where Hc.HeaderTableId == JobInvoiceReturnLine.JobInvoiceReturnHeaderId select Hc).ToList();
+                    foreach (var HeaderCharges in HeaderChargesList)
                     {
-                        var footer = new JobInvoiceReturnHeaderChargeService(db).Find(item.Id);
-                        footer.Rate = item.Rate;
-                        footer.Amount = item.Amount;
-                        footer.ObjectState = Model.ObjectState.Modified;
-                        db.JobInvoiceReturnHeaderCharge.Add(footer);
+                        new JobInvoiceReturnHeaderChargeService(db).Delete(HeaderCharges.Id);
                     }
+                }
+                else
+                {
+                    if (vm.footercharges != null)
+                        foreach (var item in vm.footercharges)
+                        {
+                            var footer = new JobInvoiceReturnHeaderChargeService(db).Find(item.Id);
+                            footer.Rate = item.Rate;
+                            footer.Amount = item.Amount;
+                            footer.ObjectState = Model.ObjectState.Modified;
+                            db.JobInvoiceReturnHeaderCharge.Add(footer);
+                        }
+                }
 
                 JobInvoiceReturnLine.ObjectState = Model.ObjectState.Deleted;
                 db.JobInvoiceReturnLine.Remove(JobInvoiceReturnLine);

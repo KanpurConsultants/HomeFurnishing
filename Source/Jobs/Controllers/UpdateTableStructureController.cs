@@ -2569,6 +2569,13 @@ namespace Module
 
             AddFields("SaleInvoiceSettings", "isVisibleGodown", "Bit");
 
+            AddFields("JobInvoiceSettings", "filterDocTypeCostCenter", "nvarchar(Max)");
+
+            AddFields("RoleDocTypes", "ProductTypeId", "Int","ProductTypes");
+            AddFields("Menus", "ProductNatureId", "Int", "ProductNatures");
+
+            AddFields("SaleInvoiceSettings", "IsAutoDocNo", "BIT NOT NULL DEFAULT(0)");
+
             ReCreateProcedures();
             DataCorrection();
 

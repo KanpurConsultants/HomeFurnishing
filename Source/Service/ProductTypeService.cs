@@ -157,14 +157,45 @@ namespace Service
             return pt;
         }
 
+        //public IEnumerable<ProductType> GetProductTypeListForMaterial(int id)
+        //{
+        //    var pt = (from p in db.ProductTypes
+        //              where (p.IsCustomUI == false || p.IsCustomUI == null) && p.ProductNatureId == id
+        //              select p
+        //                  );
+
+        //    return pt;
+        //}
+
         public IEnumerable<ProductType> GetProductTypeListForMaterial(int id)
         {
-            var pt = (from p in db.ProductTypes
-                      where (p.IsCustomUI == false || p.IsCustomUI == null) && p.ProductNatureId == id
-                      select p
-                          );
+                        List<string> UserRoles = (List<string>)System.Web.HttpContext.Current.Session["Roles"];
 
-            return pt;
+            var ExistingData = (from L in db.RolesDocType select L).FirstOrDefault();
+            if (ExistingData == null || UserRoles.Contains("Admin"))
+            {
+                var pt = (from p in db.ProductTypes
+                          where (p.IsCustomUI == false || p.IsCustomUI == null) && p.ProductNatureId == id
+                          select p);
+
+                return pt;
+            }
+            else
+            {
+                var TempProductType = (from Rd in db.RolesDocType
+                                        join R in db.Roles on Rd.RoleId equals R.Id into RoleTable
+                                        from RoleTab in RoleTable.DefaultIfEmpty()
+                                        join p in db.ProductTypes on Rd.ProductTypeId equals p.ProductTypeId
+                                        where p.ProductNatureId == id
+                                        && UserRoles.Contains(RoleTab.Name)
+                                        select p.ProductTypeId).ToList();
+
+                var pt = (from p in db.ProductTypes.Where(m => TempProductType.Contains(m.ProductTypeId))
+                          where (p.IsCustomUI == false || p.IsCustomUI == null) && p.ProductNatureId == id
+                          select p);
+
+                return pt;
+            }
         }
 
         public Dimension1Types GetProductTypeDimension1Types(int id)

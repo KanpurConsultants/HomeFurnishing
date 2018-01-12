@@ -41,7 +41,7 @@
                columns.Add(foo => foo.CalculationId, true);
                columns.Add(foo => foo.CalculationName).Sortable(true).Titled("Name").Filterable(true);
                columns.Add(m => m.IsActive).Sortable(true).Titled("Is Active").Filterable(true);
-               columns.Add(true).RenderValueAs(m => CustomHelpers.RenderHEDActionLink("Calculation", m.CalculationId, 0, "All"));
+               //columns.Add(true).RenderValueAs(m => CustomHelpers.RenderHEDActionLink("Calculation", m.CalculationId, 0, "All"));
            }).WithPaging(25).EmptyText("No records found.")
     </div>
 </div>

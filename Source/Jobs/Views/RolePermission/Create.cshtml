@@ -106,7 +106,7 @@
     <div ng-controller="MainCtrl">
         @using (Html.BeginForm())
 {
-            <div class="panel panel-default" style="margin-bottom: 0px; height: 140px">
+            <div class="panel panel-default" style="margin-bottom: 0px; height: 160px">
 
                 <div class="panel-heading">
                     <h3>
@@ -126,7 +126,7 @@
                     </div>
                 </div>
 
-                <div class="panel-info" style="padding-left:15px">
+                <div class="panel-info" style="padding-left:15px;margin-bottom:10px">
                     @Html.AntiForgeryToken()
                     @Html.HiddenFor(m => m.Id)
                     @*@Html.HiddenFor(m => m.LedgerAccountGroup)
@@ -150,7 +150,7 @@
                             </div>
                         </div>
 
-                        <div class="form-group" >
+                        <div class="form-group">
                             <div class="col-md-offset-2 col-md-10">
 
                                 <span style="font-family: Calibri,sans-serif,Verdana;font-size:large">

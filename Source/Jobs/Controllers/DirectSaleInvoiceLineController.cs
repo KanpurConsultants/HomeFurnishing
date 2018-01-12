@@ -1299,6 +1299,12 @@ namespace Jobs.Controllers
 
             SaleInvoiceLineDetail Sid = _SaleInvoiceLineDetailService.Find(vm.SaleInvoiceLineId);
 
+            bool IsDeleteFooterCharges = false;
+
+            var SaleInvoiceLineForHeader = (from L in db.SaleInvoiceLine where L.SaleInvoiceHeaderId == Sl.SaleInvoiceHeaderId && L.SaleInvoiceLineId != vm.SaleInvoiceLineId select L).FirstOrDefault();
+            if (SaleInvoiceLineForHeader == null)
+                IsDeleteFooterCharges = true;
+
 
             if (vm.ProductUidId != null && vm.ProductUidId != 0)
             {
@@ -1355,7 +1361,10 @@ namespace Jobs.Controllers
             {
                 new SaleOrderLineStatusService(_unitOfWork).UpdateSaleQtyOnInvoice((int)Pl.SaleOrderLineId, Sid.SaleInvoiceLineId, Sh.DocDate, 0);
             }
-            _SaleInvoiceLineDetailService.Delete(Sid);
+
+            if (Sid != null)
+                _SaleInvoiceLineDetailService.Delete(Sid);
+
             _SaleInvoiceLineService.Delete(Sl);
             _SaleDispatchLineService.Delete(Dl);
 
@@ -1399,14 +1408,26 @@ namespace Jobs.Controllers
                     new SaleInvoiceLineChargeService(_unitOfWork).Delete(item.Id);
                 }
 
-            if (vm.footercharges != null)
-                foreach (var item in vm.footercharges)
+
+            if (IsDeleteFooterCharges == true)
+            {
+                var HeaderChargesList = (from Hc in db.SaleInvoiceHeaderCharge where Hc.HeaderTableId == Sh.SaleInvoiceHeaderId select Hc).ToList();
+                foreach (var HeaderCharges in HeaderChargesList)
                 {
-                    var footer = new SaleInvoiceHeaderChargeService(_unitOfWork).Find(item.Id);
-                    footer.Rate = item.Rate;
-                    footer.Amount = item.Amount;
-                    new SaleInvoiceHeaderChargeService(_unitOfWork).Update(footer);
+                    new SaleInvoiceHeaderChargeService(_unitOfWork).Delete(HeaderCharges.Id);
                 }
+            }
+            else
+            {
+                if (vm.footercharges != null)
+                    foreach (var item in vm.footercharges)
+                    {
+                        var footer = new SaleInvoiceHeaderChargeService(_unitOfWork).Find(item.Id);
+                        footer.Rate = item.Rate;
+                        footer.Amount = item.Amount;
+                        new SaleInvoiceHeaderChargeService(_unitOfWork).Update(footer);
+                    }
+            }
             XElement Modifications = new ModificationsCheckService().CheckChanges(LogList);
             try
             {

@@ -52,6 +52,7 @@ namespace Service
         IEnumerable<ComboBoxResult> GetJobReceiveHelpListForProduct(int Id, string term);
         IQueryable<ComboBoxResult> GetCustomProducts(int Id, string term);
         JobReceiveLineViewModel GetReceiveLineDetailForInvoice(int id, int InvoiceId);
+        IQueryable<ComboBoxResult> GetCostCenters(string term, string DocTypes, string Process);
     }
 
     public class JobInvoiceLineService : IJobInvoiceLineService
@@ -1845,6 +1846,37 @@ namespace Service
 
             return temp;
 
+        }
+
+        public IQueryable<ComboBoxResult> GetCostCenters(string term, string DocTypes, string Process)
+        {
+
+            string[] ContraDocTypes = null;
+            if (!string.IsNullOrEmpty(DocTypes)) { ContraDocTypes = DocTypes.Split(",".ToCharArray()); }
+            else { ContraDocTypes = new string[] { "NA" }; }
+
+            string[] ContraProcess = null;
+            if (!string.IsNullOrEmpty(Process)) { ContraProcess = Process.Split(",".ToCharArray()); }
+            else { ContraProcess = new string[] { "NA" }; }
+
+            int SiteId = (int)System.Web.HttpContext.Current.Session["SiteId"];
+            int DivisionId = (int)System.Web.HttpContext.Current.Session["DivisionId"];
+
+
+            var temp = (from p in db.CostCenter
+                        where (string.IsNullOrEmpty(DocTypes) ? 1 == 1 : ContraDocTypes.Contains(p.DocTypeId.ToString()))
+                        && (string.IsNullOrEmpty(term) ? 1 == 1 : p.CostCenterName.ToLower().Contains(term.ToLower()))
+                        //&& (string.IsNullOrEmpty(Process) ? 1 == 1 : ContraProcess.Contains(p.ProcessId.ToString()))
+                        && (string.IsNullOrEmpty(p.SiteId.ToString()) ? 1 == 1 : p.SiteId == SiteId)
+                        && (string.IsNullOrEmpty(p.DivisionId.ToString()) ? 1 == 1 : p.DivisionId == DivisionId)
+                        && p.IsActive == true
+                        orderby p.CostCenterName
+                        select new ComboBoxResult
+                        {
+                            text = p.CostCenterName + " | " + p.DocType.DocumentTypeShortName,
+                            id = p.CostCenterId.ToString(),
+                        });
+            return temp;
         }
 
 

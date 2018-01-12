@@ -116,7 +116,6 @@ RolePermission.controller('MainCtrl', ['$rootScope', '$scope', '$log', '$http', 
       var i = 0;
       $scope.BindData = function () {
           $scope.myData = [];
-
           $.ajax({
               url: '/RolePermission/RolePermissionFill/' + $('#Id').val(),
               type: "POST",
@@ -126,8 +125,9 @@ RolePermission.controller('MainCtrl', ['$rootScope', '$scope', '$log', '$http', 
                   if (result.Success == true) {
                       $scope.gridOptions.columnDefs = new Array();
                       $scope.gridOptions.columnDefs.push({ field: 'DocumentTypeId', width: 50, visible: false });
-                      $scope.gridOptions.columnDefs.push({ field: 'DocumentTypeName', width: 430, cellClass: 'cell-text ', headerCellClass: 'header-text' });
+                      $scope.gridOptions.columnDefs.push({ field: 'DocumentTypeName', width: 260, cellClass: 'cell-text ', headerCellClass: 'header-text' });
                       $scope.gridOptions.columnDefs.push({ field: 'ModuleName', displayName: 'Module', width: 120, grouping: { groupPriority: 1 }, sort: { priority: 1, direction: 'asc' }, cellClass: 'cell-text ', headerCellClass: 'header-text' });
+                      $scope.gridOptions.columnDefs.push({ field: 'SubModuleName', displayName: 'SubModule', width: 160, grouping: { groupPriority: 1 }, sort: { priority: 1, direction: 'asc' }, cellClass: 'cell-text ', headerCellClass: 'header-text' });
                       $scope.gridOptions.columnDefs.push({ field: 'EntryType', width: 120, cellClass: 'cell-text ', headerCellClass: 'header-text', visible: false });
                       $scope.gridOptions.columnDefs.push({ field: 'IsVisibleProcess', width: 40, cellClass: 'cell-text ', headerCellClass: 'header-text', visible: false });
                       $scope.gridOptions.columnDefs.push({

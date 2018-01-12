@@ -82,6 +82,7 @@ namespace Model.ViewModel
         public string filterContraSites { get; set; }
         public string filterContraDivisions { get; set; }
         public string filterPersonRoles { get; set; }
+        public string filterDocTypeCostCenter { get; set; }
 
 
         public int ProcessId { get; set; }

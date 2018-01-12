@@ -46,6 +46,8 @@ namespace Model.Models
         public string filterContraDivisions { get; set; }
         public string filterPersonRoles { get; set; }
 
+        public bool IsAutoDocNo { get; set; }
+
         [ForeignKey("DocTypePackingHeader"), Display(Name = "Production Order Type")]
         public int? DocTypePackingHeaderId { get; set; }
         public virtual DocumentType DocTypePackingHeader { get; set; }

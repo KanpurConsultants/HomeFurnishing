@@ -78,7 +78,7 @@ namespace Jobs.Controllers
             else
                 return View("~/Views/Shared/InValidSettings.cshtml").Warning("Document Type named " + MasterDocTypeConstants.Product + " is not defined in database.");
 
-            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, DocTypeId, null, this.ControllerContext.RouteData.Values["controller"].ToString(), "Create") == false)
+            if (_ProductService.IsActionAllowed(UserRoles, DocTypeId, this.ControllerContext.RouteData.Values["controller"].ToString(), "Create") == false)
             {
                 return View("~/Views/Shared/PermissionDenied.cshtml").Warning("You don't have permission to do this task.");
             }
@@ -218,7 +218,7 @@ namespace Jobs.Controllers
             else
                 return View("~/Views/Shared/InValidSettings.cshtml").Warning("Document Type named " + MasterDocTypeConstants.Product + " is not defined in database.");
 
-            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, DocTypeId, null, this.ControllerContext.RouteData.Values["controller"].ToString(), "Edit") == false)
+            if (_ProductService.IsActionAllowed(UserRoles, DocTypeId, this.ControllerContext.RouteData.Values["controller"].ToString(), "Edit") == false)
             {
                 return View("~/Views/Shared/PermissionDenied.cshtml").Warning("You don't have permission to do this task.");
             }
@@ -236,24 +236,18 @@ namespace Jobs.Controllers
 
         public ActionResult Delete(int id)
         {
-            var DocType = new DocumentTypeService(_unitOfWork).FindByName(MasterDocTypeConstants.Product);
-            int DocTypeId = 0;
-
-            if (DocType != null)
-                DocTypeId = DocType.DocumentTypeId;
-            else
-                return View("~/Views/Shared/InValidSettings.cshtml").Warning("Document Type named " + MasterDocTypeConstants.Product + " is not defined in database.");
-
-            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, DocTypeId, null, this.ControllerContext.RouteData.Values["controller"].ToString(), "Delete") == false)
-            {
-                return PartialView("~/Views/Shared/PermissionDenied_Modal.cshtml").Warning("You don't have permission to do this task.");
-            }
-
-
             ProductViewModel Product = _ProductService.GetProduct(id);
             if (Product == null)
             {
                 return HttpNotFound();
+            }
+
+            ProductGroup group = new ProductGroupService(_unitOfWork).Find(Product.ProductGroupId);
+            ProductType Type = new ProductTypeService(_unitOfWork).Find(group.ProductTypeId);
+
+            if (_ProductService.IsActionAllowed(UserRoles, Type.ProductTypeId, this.ControllerContext.RouteData.Values["controller"].ToString(), "Delete") == false)
+            {
+                return View("~/Views/Shared/PermissionDenied.cshtml").Warning("You don't have permission to do this task.");
             }
 
             ReasonViewModel vm = new ReasonViewModel()
@@ -530,6 +524,11 @@ namespace Jobs.Controllers
         public ActionResult CreateMaterial(int id)//ProductType Id
         {
             MaterialViewModel p = new MaterialViewModel();
+
+            if (_ProductService.IsActionAllowed(UserRoles, id, this.ControllerContext.RouteData.Values["controller"].ToString(), "CreateMaterial") == false)
+            {
+                return View("~/Views/Shared/PermissionDenied.cshtml").Warning("You don't have permission to do this task.");
+            }
 
             p.DivisionId = (int)System.Web.HttpContext.Current.Session["DivisionId"];
             p.SiteId = (int)System.Web.HttpContext.Current.Session["SiteId"];
@@ -1099,6 +1098,11 @@ namespace Jobs.Controllers
             ProductGroup group = new ProductGroupService(_unitOfWork).Find(pt.ProductGroupId);
             ProductType Type = new ProductTypeService(_unitOfWork).Find(group.ProductTypeId);
 
+            if (_ProductService.IsActionAllowed(UserRoles, Type.ProductTypeId, this.ControllerContext.RouteData.Values["controller"].ToString(), "EditMaterial") == false)
+            {
+                return View("~/Views/Shared/PermissionDenied.cshtml").Warning("You don't have permission to do this task.");
+            }
+
             ViewBag.Name = Type.ProductTypeName;
             ViewBag.id = group.ProductTypeId;
             ViewBag.ProductGroupList = new ProductGroupService(_unitOfWork).GetProductGroupListForItemType(group.ProductTypeId);
@@ -1142,6 +1146,14 @@ namespace Jobs.Controllers
             if (Product == null)
             {
                 return HttpNotFound();
+            }
+
+            ProductGroup group = new ProductGroupService(_unitOfWork).Find(Product.ProductGroupId);
+            ProductType Type = new ProductTypeService(_unitOfWork).Find(group.ProductTypeId);
+
+            if (_ProductService.IsActionAllowed(UserRoles, Type.ProductTypeId, this.ControllerContext.RouteData.Values["controller"].ToString(), "Delete") == false)
+            {
+                return View("~/Views/Shared/PermissionDenied.cshtml").Warning("You don't have permission to do this task.");
             }
 
             ReasonViewModel vm = new ReasonViewModel()
@@ -1579,6 +1591,9 @@ namespace Jobs.Controllers
 
             return Json(ProductGroupDetail);
         }
+
+
+
 
         protected override void Dispose(bool disposing)
         {

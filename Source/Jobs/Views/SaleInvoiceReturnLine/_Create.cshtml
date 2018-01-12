@@ -323,6 +323,38 @@ else
         CustomSelectFunction($("#SaleInvoiceLineId"), '/SaleinvoiceReturnLine/GetSaleInvoiceForProduct', '/ComboHelpList/SetSingleSaleInvoiceLine', ' ', false, 0,DocID);
 
 
+
+        var IsSaved=false;
+        var ValidationCount=0;
+
+        $('#modform').bind('submit',function(event){
+            if(!IsSaved)
+            {
+                if(!ValidateData())
+                {
+                    return false;
+                }
+                IsSaved=true;
+                $('button:submit').attr('disabled','disabled');
+                return IsSaved;
+            }
+            else
+            {
+                return false;
+            }
+        });
+
+
+        function ValidateData() {
+            var ValidationMessage = "";
+
+            //Client Side Validaion.....
+
+            return  (ValidationMessage=="");
+
+        }
+
+
         $("#SaleInvoiceLineId").change(GetSaleInvoiceDetail);
 
         var Nature='@Model.Nature';

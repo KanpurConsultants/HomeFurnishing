@@ -22,6 +22,10 @@ namespace Model.Models
         public int? DocTypeId { get; set; }
         public virtual DocumentType DocType { get; set; }
 
+        [ForeignKey("ProductType")]
+        public int? ProductTypeId { get; set; }
+        public virtual ProductType ProductType { get; set; }
+
         [ForeignKey("Menu")]
         public int? MenuId { get; set; }
         public virtual Menu Menu { get; set; }

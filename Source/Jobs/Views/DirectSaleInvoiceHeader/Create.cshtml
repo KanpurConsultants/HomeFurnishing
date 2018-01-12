@@ -33,6 +33,7 @@
     @Html.HiddenFor(m => m.CityId)
     @Html.HiddenFor(m => m.ProcessId)
     @Html.HiddenFor(m => m.LockReason)
+    @Html.HiddenFor(m => m.SaleInvoiceSettings.IsAutoDocNo)
 
     <div class="panel panel-default">
         <div class="panel-heading">
@@ -947,6 +948,15 @@
         CustomSelectFunction($("#SalesExecutiveId"), '/ComboHelpList/GetSalesExecutives', '/ComboHelpList/SetSinglePerson', ' ', false, 0);
         CustomSelectFunction($("#SalesTaxGroupPersonId"), '/ComboHelpList/GetSalesTaxGroupPerson', '/ComboHelpList/SetSingleSalesTaxGroupPerson', ' ', false, 0);
         //CustomSelectFunction($("#SalesTaxGroupPersonId"), '/ComboHelpList/GetSalesTaxGroupPerson', '/ComboHelpList/SetSingleSalesTaxGroupPerson', ' ', false, 0);
+
+
+        if ($("#SaleInvoiceSettings_IsAutoDocNo").val() == "True")
+        {
+            $("#DocNo").prop('readonly', true);
+        }
+        else{
+            $("#DocNo").removeAttr("readonly");
+        }
 
         //Adding Hidden Input Fields
         AddFields();

@@ -587,6 +587,15 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.filterDocTypeCostCenter, "Cost Center Doc Type", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.filterDocTypeCostCenter, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.filterDocTypeCostCenter, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

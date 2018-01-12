@@ -122,8 +122,10 @@ namespace Service
             int DivisionId = (int)System.Web.HttpContext.Current.Session["DivisionId"];
             int SiteId = (int)System.Web.HttpContext.Current.Session["SiteId"];
 
+            List<string> UserRoles = (List<string>)System.Web.HttpContext.Current.Session["Roles"];
+
             var ExistingData = (from L in db.RolesDocType select L).FirstOrDefault();
-            if (ExistingData == null)
+            if (ExistingData == null || UserRoles.Contains("Admin"))
             {
                 var DocTypes = from p in db.DocumentType
                                join t in db.DocumentTypeDivision.Where(m => m.DivisionId == DivisionId) on p.DocumentTypeId equals t.DocumentTypeId into table
@@ -138,8 +140,6 @@ namespace Service
             }
             else
             {
-                List<string> UserRoles = (List<string>)System.Web.HttpContext.Current.Session["Roles"];
-
                 var TempDocumentType = (from Rd in db.RolesDocType
                                         join R in db.Roles on Rd.RoleId equals R.Id into RoleTable
                                         from RoleTab in RoleTable.DefaultIfEmpty()
