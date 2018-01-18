@@ -43,6 +43,9 @@ namespace Model.ViewModel
         public int BuyerId { get; set; }
         public string BuyerName{ get; set; }
 
+        public int? SalesTaxGroupPersonId { get; set; }
+        public string SalesTaxGroupPersonName { get; set; }
+
         public bool CalculateDiscountOnRate { get; set; }        
 
         [Display(Name = "Remark")]
@@ -153,6 +156,9 @@ namespace Model.ViewModel
         public int? ProductUidId { get; set; }
         public string ProductUidName { get; set; }
         public string Nature { get; set; }
+        public int? CalculationId { get; set; }
+        public int? SalesTaxGroupProductId { get; set; }
+        public int? SalesTaxGroupPersonId { get; set; }
     }
     public class SaleInvoiceReturnLineIndexViewModel
     {

@@ -79,6 +79,13 @@ namespace Model.Models
         [Display(Name = "Sale Goods Return")]
         public int? SaleDispatchReturnHeaderId { get; set; }
         public virtual SaleDispatchReturnHeader SaleDispatchReturnHeader { get; set; }
+
+
+        [ForeignKey("SalesTaxGroupPerson")]
+        [Display(Name = "SalesTaxGroupPerson")]
+        public int? SalesTaxGroupPersonId { get; set; }
+        public virtual ChargeGroupPerson SalesTaxGroupPerson { get; set; }
+
         [MaxLength(20)]
         public string Nature { get; set; }
 

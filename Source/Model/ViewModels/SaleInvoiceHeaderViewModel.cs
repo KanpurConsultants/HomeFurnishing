@@ -182,6 +182,10 @@ namespace Model.ViewModels
         public decimal? TotalAmount { get; set; }
         public int? DecimalPlaces { get; set; }
 
+        public string ProductUidName { get; set; }
+        public string ProductName { get; set; }
+        public string ProductGroupName { get; set; }
+
     }
     public class SaleInvoiceHeaderIndexViewModelForEdit : SaleInvoiceHeaderIndexViewModel
     {

@@ -192,6 +192,9 @@ namespace Jobs.Controllers
                     temp.isVisibleGodown = pt.isVisibleGodown;
                     temp.isVisibleJobReceiveBy = pt.isVisibleJobReceiveBy;
 
+                    temp.isVisibleProductUid_Index = pt.isVisibleProductUid_Index;
+                    temp.isVisibleProduct_Index = pt.isVisibleProduct_Index;
+                    temp.isVisibleProductGroup_Index = pt.isVisibleProductGroup_Index;
 
 
                     temp.isGenerateProductUid = pt.isGenerateProductUid;
@@ -397,6 +400,11 @@ namespace Jobs.Controllers
                     temp.IsVisibleRate = pt.IsVisibleRate;
                     temp.IsVisibleAdditionalCharges = pt.IsVisibleAdditionalCharges;
 
+                    temp.isVisibleProductUid_Index = pt.isVisibleProductUid_Index;
+                    temp.isVisibleProduct_Index = pt.isVisibleProduct_Index;
+                    temp.isVisibleProductGroup_Index = pt.isVisibleProductGroup_Index;
+
+
                     temp.DocumentPrintReportHeaderId = pt.DocumentPrintReportHeaderId;
                     temp.SqlProcDocumentPrint = pt.SqlProcDocumentPrint;
                     temp.DocumentPrint = pt.DocumentPrint;
@@ -583,6 +591,11 @@ namespace Jobs.Controllers
                     temp.IsVisiblePassQty = pt.IsVisiblePassQty;
                     temp.IsVisibleRate = pt.IsVisibleRate;
                     temp.IsVisibleAdditionalCharges = pt.IsVisibleAdditionalCharges;
+
+                    temp.isVisibleProductUid_Index = pt.isVisibleProductUid_Index;
+                    temp.isVisibleProduct_Index = pt.isVisibleProduct_Index;
+                    temp.isVisibleProductGroup_Index = pt.isVisibleProductGroup_Index;
+
 
                     temp.SqlProcDocumentPrint = pt.SqlProcDocumentPrint;
                     temp.DocumentPrint = pt.DocumentPrint;
@@ -780,6 +793,11 @@ namespace Jobs.Controllers
                     temp.IsVisiblePassQty = pt.IsVisiblePassQty;
                     temp.IsVisibleRate = pt.IsVisibleRate;
                     temp.IsVisibleAdditionalCharges = pt.IsVisibleAdditionalCharges;
+
+                    temp.isVisibleProductUid_Index = pt.isVisibleProductUid_Index;
+                    temp.isVisibleProduct_Index = pt.isVisibleProduct_Index;
+                    temp.isVisibleProductGroup_Index = pt.isVisibleProductGroup_Index;
+
 
                     temp.SqlProcDocumentPrint = pt.SqlProcDocumentPrint;
                     temp.DocumentPrint = pt.DocumentPrint;

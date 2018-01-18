@@ -1279,6 +1279,7 @@ namespace Jobs.Controllers
                 return PartialView("_Create", vm);
             }
 
+
             int? StockId = 0;
 
             SaleInvoiceHeader Sh = new SaleInvoiceHeaderService(_unitOfWork).FindDirectSaleInvoice(vm.SaleInvoiceHeaderId);
@@ -1286,6 +1287,7 @@ namespace Jobs.Controllers
             SaleDispatchHeader Dh = new SaleDispatchHeaderService(_unitOfWork).Find(Sh.SaleDispatchHeaderId.Value);
 
             PackingHeader Ph = new PackingHeaderService(_unitOfWork).Find(Dh.PackingHeaderId.Value);
+
 
             int status = Sh.Status;
 
@@ -1298,6 +1300,15 @@ namespace Jobs.Controllers
             SaleInvoiceLine Sl = _SaleInvoiceLineService.Find(vm.SaleInvoiceLineId);
 
             SaleInvoiceLineDetail Sid = _SaleInvoiceLineDetailService.Find(vm.SaleInvoiceLineId);
+
+            SaleDeliveryLine Sdl = (from L in db.SaleDeliveryLine where L.SaleInvoiceLineId == Sl.SaleInvoiceLineId select L).FirstOrDefault();
+            if (Sdl != null)
+            {
+                ModelState.AddModelError("", "Sale Delivery is created for this invoice.Can't be deleted.");
+                PrepareViewBag();
+                ViewBag.LineMode = "Delete";
+                return PartialView("_Create", vm);
+            }
 
             bool IsDeleteFooterCharges = false;
 
@@ -1747,9 +1758,9 @@ namespace Jobs.Controllers
         //    return Json(saleorderlistforproductjson);
         //}
 
-        public ActionResult GetPromoCodeIdList(string searchTerm, int pageSize, int pageNum, int ProductId, int BuyerId, DateTime DocDate)
+        public ActionResult GetPromoCodeIdList(string searchTerm, int pageSize, int pageNum, int ProductId, int BuyerId, DateTime DocDate, int ProcessId)
         {
-            List<ComboBoxResult> saleorderlistforproductjson = _SaleInvoiceLineService.FGetPromoCodeList(ProductId, BuyerId, DocDate).ToList();
+            List<ComboBoxResult> saleorderlistforproductjson = _SaleInvoiceLineService.FGetPromoCodeList(ProductId, BuyerId, DocDate, ProcessId).ToList();
 
 
             var count = saleorderlistforproductjson.Count();
@@ -1771,9 +1782,9 @@ namespace Jobs.Controllers
             return Json(PromoCode);
         }
 
-        public JsonResult GetFirstPromoCode(int ProductId, int BuyerId, DateTime DocDate)
+        public JsonResult GetFirstPromoCode(int ProductId, int BuyerId, DateTime DocDate, int ProcessId)
         {
-            List<ComboBoxResult> PromoCode = _SaleInvoiceLineService.FGetPromoCodeList(ProductId, BuyerId, DocDate).ToList();
+            List<ComboBoxResult> PromoCode = _SaleInvoiceLineService.FGetPromoCodeList(ProductId, BuyerId, DocDate, ProcessId).ToList();
             return Json(PromoCode);
         }
 

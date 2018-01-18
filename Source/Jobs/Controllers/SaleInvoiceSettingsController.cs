@@ -199,6 +199,11 @@ namespace Jobs.Controllers
                     temp.isVisibleTermsAndConditions = pt.isVisibleTermsAndConditions;
                     temp.isVisibleShipToPartyAddress = pt.isVisibleShipToPartyAddress;
                     temp.isVisibleGodown = pt.isVisibleGodown;
+
+                    temp.isVisibleProductUid_Index = pt.isVisibleProductUid_Index;
+                    temp.isVisibleProduct_Index = pt.isVisibleProduct_Index;
+                    temp.isVisibleProductGroup_Index = pt.isVisibleProductGroup_Index;
+
                     temp.DoNotUpdateProductUidStatus = pt.DoNotUpdateProductUidStatus;
                     temp.CurrencyId = pt.CurrencyId;
                     temp.DeliveryTermsId = pt.DeliveryTermsId;
@@ -384,6 +389,11 @@ namespace Jobs.Controllers
                     temp.isVisibleTermsAndConditions = pt.isVisibleTermsAndConditions;
                     temp.isVisibleShipToPartyAddress = pt.isVisibleShipToPartyAddress;
                     temp.isVisibleGodown = pt.isVisibleGodown;
+
+                    temp.isVisibleProductUid_Index = pt.isVisibleProductUid_Index;
+                    temp.isVisibleProduct_Index = pt.isVisibleProduct_Index;
+                    temp.isVisibleProductGroup_Index = pt.isVisibleProductGroup_Index;
+
                     temp.DoNotUpdateProductUidStatus = pt.DoNotUpdateProductUidStatus;
                     temp.CurrencyId = pt.CurrencyId;
                     temp.DeliveryTermsId = pt.DeliveryTermsId;

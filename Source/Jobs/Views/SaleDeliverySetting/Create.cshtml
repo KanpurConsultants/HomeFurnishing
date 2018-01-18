@@ -101,7 +101,56 @@
                 </div>
 
 
+                <hr style="margin-bottom:0px" />
+                <div class="row">
+                    <h3 class="col-md-12 black">
+                        <span class="glyphicon glyphicon-align-justify"></span>
+                        2.Visibility For Index
+                    </h3>
+                    <div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.isVisibleProductUid_Index, "Product Uid", new { @class = "control-label col-xs-6" })
+                                    <div class="col-xs-4" style=" padding-top:4px">
+                                        @Html.CheckBoxFor(m => m.isVisibleProductUid_Index, new { @class = "checkbox col-xs-2" })
+                                        @Html.ValidationMessageFor(model => model.isVisibleProductUid_Index)
+                                    </div>
+                                </div>
+                            </div>
 
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.isVisibleProduct_Index, "Product", new { @class = "control-label col-xs-6" })
+                                    <div class="col-xs-4" style=" padding-top:4px">
+                                        @Html.CheckBoxFor(m => m.isVisibleProduct_Index, new { @class = "checkbox col-xs-2" })
+                                        @Html.ValidationMessageFor(model => model.isVisibleProduct_Index)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.isVisibleProductGroup_Index, "Product Group", new { @class = "control-label col-xs-6" })
+                                    <div class="col-xs-4" style=" padding-top:4px">
+                                        @Html.CheckBoxFor(m => m.isVisibleProductGroup_Index, new { @class = "checkbox col-xs-2" })
+                                        @Html.ValidationMessageFor(model => model.isVisibleProductGroup_Index)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.isVisibleSaleInvoice_Index, "Sale Invoice", new { @class = "control-label col-xs-6" })
+                                    <div class="col-xs-4" style=" padding-top:4px">
+                                        @Html.CheckBoxFor(m => m.isVisibleSaleInvoice_Index, new { @class = "checkbox col-xs-2" })
+                                        @Html.ValidationMessageFor(model => model.isVisibleSaleInvoice_Index)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
 
 
@@ -109,7 +158,7 @@
                 <div class="row">
                     <h3 class="col-md-12 black">
                         <span class="glyphicon glyphicon-align-justify"></span>
-                        2.Filters
+                        3.Filters
                     </h3>
                     <div>
                         <div class="row">

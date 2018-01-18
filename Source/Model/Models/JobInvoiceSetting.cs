@@ -71,6 +71,12 @@ namespace Model.Models
         public bool? IsVisibleAdditionalCharges { get; set; }
 
 
+        //For Index
+        public bool? isVisibleProductUid_Index { get; set; }
+        public bool? isVisibleProduct_Index { get; set; }
+        public bool? isVisibleProductGroup_Index { get; set; }
+
+
 
         public bool? isPostedInStock { get; set; }
         public bool? isPostedInStockProcess { get; set; }

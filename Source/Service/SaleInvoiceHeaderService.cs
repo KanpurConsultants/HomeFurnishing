@@ -182,6 +182,11 @@ namespace Service
             var DivisionId = (int)System.Web.HttpContext.Current.Session["DivisionId"];
             var SiteId = (int)System.Web.HttpContext.Current.Session["SiteId"];
 
+            int AdditionalChargesProductNatureId = 0;
+            var ProductNature = (from Pt in db.ProductNature where Pt.ProductNatureName == ProductNatureConstants.AdditionalCharges select Pt).FirstOrDefault();
+            if (ProductNature != null)
+                AdditionalChargesProductNatureId = ProductNature.ProductNatureId;
+
             var TempSaleInvoiceHeaderCharges = from H in db.SaleInvoiceHeader
                                               join Hc in db.SaleInvoiceHeaderCharge on H.SaleInvoiceHeaderId equals Hc.HeaderTableId into SaleInvoiceHeaderChargesTable
                                               from SaleInvoiceHeaderChargesTab in SaleInvoiceHeaderChargesTable.DefaultIfEmpty()
@@ -194,11 +199,26 @@ namespace Service
                                                   NetAmount = SaleInvoiceHeaderChargesTab.Amount
                                               };
 
+            var TempProductDetail = from H in db.SaleInvoiceHeader
+                                    join L in db.SaleInvoiceLine on H.SaleInvoiceHeaderId equals L.SaleInvoiceHeaderId into SaleInvoiceLineTable
+                                    from SaleInvoiceLineTab in SaleInvoiceLineTable.DefaultIfEmpty()
+                                    where H.DivisionId == DivisionId && H.SiteId == SiteId && H.DocTypeId == id && SaleInvoiceLineTab.SaleDispatchLine.PackingLine.Product.ProductGroup.ProductType.ProductNatureId != AdditionalChargesProductNatureId && SaleInvoiceLineTab.Qty != 0
+                                    group new { SaleInvoiceLineTab } by new { SaleInvoiceLineTab.SaleInvoiceHeaderId } into Result
+                                    select new
+                                    {
+                                        SaleInvoiceHeaderId = Result.Key.SaleInvoiceHeaderId,
+                                        ProductUidName = Result.Max(i => i.SaleInvoiceLineTab.SaleDispatchLine.PackingLine.ProductUid.ProductUidName),
+                                        ProductName = Result.Max(i => i.SaleInvoiceLineTab.SaleDispatchLine.PackingLine.Product.ProductName),
+                                        ProductGroupName = Result.Max(i => i.SaleInvoiceLineTab.SaleDispatchLine.PackingLine.Product.ProductGroup.ProductGroupName),
+                                    };
+
 
             var temp = from p in db.SaleInvoiceHeader
                        join t in db.Persons on p.BillToBuyerId equals t.PersonID
                        join Hc in TempSaleInvoiceHeaderCharges on p.SaleInvoiceHeaderId equals Hc.SaleInvoiceHeaderId into SaleInvoiceHeaderChargesTable
                        from SaleInvoiceHeaderChargesTab in SaleInvoiceHeaderChargesTable.DefaultIfEmpty()
+                       join Tp in TempProductDetail on p.SaleInvoiceHeaderId equals Tp.SaleInvoiceHeaderId into TempProductDetailTable
+                       from TempProductDetailTab in TempProductDetailTable.DefaultIfEmpty()
                        orderby p.DocDate descending, p.DocNo descending
                        where p.DivisionId == DivisionId && p.SiteId == SiteId && p.DocTypeId == id
                        select new SaleInvoiceHeaderIndexViewModel
@@ -219,6 +239,11 @@ namespace Service
                            GatePassStatus = (p.SaleDispatchHeader.GatePassHeader.Status != null ? p.SaleDispatchHeader.GatePassHeader.Status : 0),
                            TotalQty = p.SaleInvoiceLines.Sum(m => m.Qty),
                            TotalAmount = SaleInvoiceHeaderChargesTab.NetAmount ?? (p.SaleInvoiceLines.Sum(m => m.Amount)),
+
+                           ProductUidName = TempProductDetailTab.ProductUidName,
+                           ProductName = TempProductDetailTab.ProductName,
+                           ProductGroupName = TempProductDetailTab.ProductGroupName,
+
                            DecimalPlaces = (from o in p.SaleInvoiceLines
                                             join rl in db.SaleDispatchLine on o.SaleDispatchLineId equals rl.SaleDispatchLineId
                                             join ol in db.PackingLine on rl.PackingLineId equals ol.PackingLineId

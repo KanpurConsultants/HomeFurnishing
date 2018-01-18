@@ -357,6 +357,7 @@ namespace Jobs.Controllers
 
             s.Nature = H.Nature;
 
+            s.SalesTaxGroupPersonId = H.SalesTaxGroupPersonId;
             s.SaleInvoiceReturnHeaderId = H.SaleInvoiceReturnHeaderId;
             s.SaleInvoiceReturnHeaderDocNo = H.DocNo;
             s.BuyerId = sid;
@@ -602,6 +603,7 @@ namespace Jobs.Controllers
                 {
                     if (svm.Qty > 0)
                     {
+                        line.SalesTaxGroupProductId = svm.SalesTaxGroupProductId;
                         line.DiscountPer = svm.DiscountPer;
                         line.Remark = svm.Remark;
                         line.Qty = svm.Qty;
@@ -895,6 +897,14 @@ namespace Jobs.Controllers
         public ActionResult DeletePost(SaleInvoiceReturnLineViewModel vm)
         {
             List<LogTypeViewModel> LogList = new List<LogTypeViewModel>();
+
+            if (vm.linecharges != null && vm.footercharges == null)
+            {
+                ModelState.AddModelError("", "Something went wrong while deletion.Please try again.");
+                PrepareViewBag(vm);
+                ViewBag.LineMode = "Delete";
+                return PartialView("_Create", vm);
+            }
 
             int? StockId = 0;
 

@@ -232,6 +232,12 @@ namespace Model.ViewModels
         public int GatePassStatus { get; set; }
         public DateTime? GatePassDocDate { get; set; }
 
+
+        public string ProductUidName { get; set; }
+        public string ProductName { get; set; }
+        public string ProductGroupName { get; set; }
+        public string SaleInvoiceNo { get; set; }
+
     }
 
     public class SaleDeliveryHeaderIndexViewModelForEdit : SaleDeliveryHeaderIndexViewModel

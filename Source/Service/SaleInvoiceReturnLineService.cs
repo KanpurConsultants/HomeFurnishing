@@ -281,7 +281,9 @@ namespace Service
                         Specification = t4.Specification,
                         LotNo = t4.LotNo,
                         DiscountPer = p.DiscountPer,
-                        DiscountAmount = p.DiscountAmount
+                        DiscountAmount = p.DiscountAmount,
+                        SalesTaxGroupPersonId = p.SaleInvoiceReturnHeader.SalesTaxGroupPersonId,
+                        SalesTaxGroupProductId = p.SalesTaxGroupProductId
                     }).FirstOrDefault();
         }
 

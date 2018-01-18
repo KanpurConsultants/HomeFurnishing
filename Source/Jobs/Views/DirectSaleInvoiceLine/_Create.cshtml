@@ -358,7 +358,7 @@
 
 
 
-    function CustomSelectFunctionForPromoCode(ElementId, GetAction, SetAction, placehold, IsMultiple,MinLength,ProductId, BuyerId, DocDate) {
+    function CustomSelectFunctionForPromoCode(ElementId, GetAction, SetAction, placehold, IsMultiple,MinLength,ProductId, BuyerId, DocDate, ProcessId) {
         var geturl = GetAction;
         //The url we will send our get request to
         var attendeeUrl = GetAction;
@@ -387,6 +387,7 @@
                         ProductId:ProductId,
                         BuyerId:BuyerId,
                         DocDate:DocDate,
+                        ProcessId:ProcessId,
                     };
                 },
                 results: function (data, page) {
@@ -427,7 +428,7 @@
         CustomSelectFunction($("#Dimension1Id"), '/ComboHelpList/GetDimension1', '/ComboHelpList/SetSingleDimension1', ' ', false, 0);
         CustomSelectFunction($("#Dimension2Id"), '/ComboHelpList/GetDimension2', '/ComboHelpList/SetSingleDimension2', ' ', false, 1);
         CustomSelectFunction($("#GodownId"), '/ComboHelpList/GetGodown', '/ComboHelpList/SetSingleGodown', ' ', false, 1);
-        CustomSelectFunctionForPromoCode($("#PromoCodeId"), '/DirectSaleInvoiceLine/GetPromoCodeIdList', '/ComboHelpList/SetSinglePromoCode', ' ', false, 0, 0, $("#SaleToBuyerId").val(), $("#DocDate").val());
+        CustomSelectFunctionForPromoCode($("#PromoCodeId"), '/DirectSaleInvoiceLine/GetPromoCodeIdList', '/ComboHelpList/SetSinglePromoCode', ' ', false, 0, 0, $("#SaleToBuyerId").val(), $("#DocDate").val(), $('#SaleInvoiceSettings_ProcessId','.modal-body').val());
 
 
         if ($('#SaleInvoiceSettings_SqlProcProductUidHelpList', '.modal-body').val() != null && $('#SaleInvoiceSettings_SqlProcProductUidHelpList', '.modal-body').val() != "")
@@ -622,7 +623,7 @@
                         (data.SalesTaxGroupProductId==null)?(1==1):($("#SalesTaxGroupProductId").select2("data", {id: data.SalesTaxGroupProductId, text: data.SalesTaxGroupProductName}));
 
                         GetUnitConversionMultiplier();
-                        CustomSelectFunctionForPromoCode($("#PromoCodeId"), '/DirectSaleInvoiceLine/GetPromoCodeIdList', '/ComboHelpList/SetSinglePromoCode', ' ', false, 0, $("#ProductId").val(), $("#SaleToBuyerId").val(), $("#DocDate").val());
+                        CustomSelectFunctionForPromoCode($("#PromoCodeId"), '/DirectSaleInvoiceLine/GetPromoCodeIdList', '/ComboHelpList/SetSinglePromoCode', ' ', false, 0, $("#ProductId").val(), $("#SaleToBuyerId").val(), $("#DocDate").val(), $('#SaleInvoiceSettings_ProcessId','.modal-body').val());
                         GetFirstPromoCode();
                         Validate_PromoCode();
 
@@ -688,7 +689,7 @@
                 async : false,
                 type: "POST",
                 url: "@(Url.Action("GetFirstPromoCode"))",
-                data: { ProductId: $("#ProductId").val(), BuyerId: $("#SaleToBuyerId").val(), DocDate: $("#DocDate").val()},
+                data: { ProductId: $("#ProductId").val(), BuyerId: $("#SaleToBuyerId").val(), DocDate: $("#DocDate").val(), ProcessId: $("#SaleInvoiceSettings_ProcessId").val()},
                 success: function (data) {
                     if (data.length > 0)
                     {

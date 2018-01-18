@@ -35,6 +35,15 @@ namespace Model.ViewModel
         public string filterContraDivisions { get; set; }
         public string filterPersonRoles { get; set; }
         public bool isVisibleDealUnit { get; set; }
+
+
+        //For Index
+        public bool isVisibleProductUid_Index { get; set; }
+        public bool isVisibleProduct_Index { get; set; }
+        public bool isVisibleProductGroup_Index { get; set; }
+        public bool isVisibleSaleInvoice_Index { get; set; }
+
+
         public int? ProcessId { get; set; }
 
 

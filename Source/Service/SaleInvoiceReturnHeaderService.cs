@@ -111,6 +111,7 @@ namespace Service
                         Status = H.Status,
                         BuyerId = H.BuyerId,  
                         GodownId = H.SaleDispatchReturnHeader.GodownId,
+                        SalesTaxGroupPersonId = H.SalesTaxGroupPersonId,
                         //SalesTaxGroupId=H.SalesTaxGroupId,
                         Nature = H.Nature,
                         //CurrencyId=H.CurrencyId,

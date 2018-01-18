@@ -84,11 +84,17 @@
     @CustomHelpers.RenderStatusFilters(ViewBag.PendingToSubmit, ViewBag.PendingToReview, ControllerName, ViewBag.id, ViewBag.IndexStatus)*@
     </div>
 
-    <div class="panel-info" style="padding-left: 5px; padding-top: 2px; font-size: 12px">
+    @*<div class="panel-info" style="padding-left: 5px; padding-top: 2px; font-size: 12px">
         @if (ViewBag.IsPostedInStock == true)
         {
             @Html.Grid(Model).Columns(columns =>
            {
+               bool isVisibleProductUid_Index = ViewBag.isVisibleProductUid_Index;
+               bool isVisibleProduct_Index = ViewBag.isVisibleProduct_Index;
+               bool isVisibleProductGroup_Index = ViewBag.isVisibleProductGroup_Index;
+
+               
+               
                columns.Add(m => m.JobInvoiceHeaderId, true).Css("Header_Id");
                columns.Add(m => m.Status, true);
                columns.Add().Encoded(false).Sanitized(false).SetWidth("5%").RenderValueAs(m => CustomHelpers.RenderCheckBox());
@@ -98,6 +104,12 @@
                columns.Add(foo => foo.JobWorkerDocDate).Sortable(true).Titled("Party Doc Date").Format("{0:dd/MMM/yyyy}").Filterable(true);
                columns.Add(m => m.JobWorkerName).Sortable(true).Filterable(true).Titled("Party");
                columns.Add(m => m.GodownName).Sortable(true).Filterable(true).Titled("Godown");
+
+               columns.Add(m => m.ProductUidName, !isVisibleProductUid_Index).Titled("Product Uid").Filterable(true).Sortable(true);
+               columns.Add(m => m.ProductName, !isVisibleProduct_Index).Titled("Product").Filterable(true).Sortable(true);
+               columns.Add(m => m.ProductGroupName, !isVisibleProductGroup_Index).Titled("Product Group").Filterable(true).Sortable(true);
+
+               
                columns.Add().RenderValueAs(m => CustomHelpers.RenderTotal(m.TotalQty, m.DecimalPlaces)).Sanitized(false).Encoded(false).Titled("Tota lQty");
                columns.Add().RenderValueAs(m => CustomHelpers.RenderTotal(m.TotalAmount, 2)).Sanitized(false).Encoded(false).Titled("Total Amount");
                columns.Add().Sanitized(false).Encoded(false).RenderValueAs(m => CustomHelpers.RenderStatus(m.Status)).Titled("Status");
@@ -110,6 +122,12 @@
         {
             @Html.Grid(Model).Columns(columns =>
            {
+               bool isVisibleProductUid_Index = ViewBag.isVisibleProductUid_Index;
+               bool isVisibleProduct_Index = ViewBag.isVisibleProduct_Index;
+               bool isVisibleProductGroup_Index = ViewBag.isVisibleProductGroup_Index;
+
+               
+               
                columns.Add(m => m.JobInvoiceHeaderId, true).Css("Header_Id");
                columns.Add(m => m.Status, true);
                columns.Add().Encoded(false).Sanitized(false).SetWidth("5%").RenderValueAs(m => CustomHelpers.RenderCheckBox());
@@ -118,6 +136,12 @@
                columns.Add(m => m.JobWorkerDocNo).Sortable(true).Titled("Party Doc No").Filterable(true).Sortable(true);
                columns.Add(foo => foo.JobWorkerDocDate).Sortable(true).Titled("Party Doc Date").Format("{0:dd/MMM/yyyy}").Filterable(true);
                columns.Add(m => m.JobWorkerName).Sortable(true).Filterable(true).Titled("Party");
+
+               columns.Add(m => m.ProductUidName, !isVisibleProductUid_Index).Titled("Product Uid").Filterable(true).Sortable(true);
+               columns.Add(m => m.ProductName, !isVisibleProduct_Index).Titled("Product").Filterable(true).Sortable(true);
+               columns.Add(m => m.ProductGroupName, !isVisibleProductGroup_Index).Titled("Product Group").Filterable(true).Sortable(true);
+
+               
                columns.Add().RenderValueAs(m => CustomHelpers.RenderTotal(m.TotalQty, m.DecimalPlaces)).Sanitized(false).Encoded(false).Titled("Total Qty");
                columns.Add().RenderValueAs(m => CustomHelpers.RenderTotal(m.TotalAmount, 2)).Sanitized(false).Encoded(false).Titled("Total Amount");
                columns.Add().Sanitized(false).Encoded(false).RenderValueAs(m => CustomHelpers.RenderStatus(m.Status)).Titled("Status");
@@ -126,5 +150,60 @@
                columns.Add(true).RenderValueAs(m => CustomHelpers.RenderHEDActionLink(ControllerName, m.JobInvoiceHeaderId, m.Status, IndexStatus));
            }).WithPaging(25).EmptyText("No records found.").Sortable().Filterable().WithMultipleFilters()
         }
+    </div>*@
+
+
+
+    <div class="panel-info" style="padding-left: 5px; padding-top: 2px; font-size: 12px">
+            @Html.Grid(Model).Columns(columns =>
+           {
+               bool isVisibleGodown = ViewBag.isVisibleGodown;
+               bool isVisibleProductUid_Index = ViewBag.isVisibleProductUid_Index;
+               bool isVisibleProduct_Index = ViewBag.isVisibleProduct_Index;
+               bool isVisibleProductGroup_Index = ViewBag.isVisibleProductGroup_Index;
+
+
+               string ProductUidCaption = ViewBag.ProductUidCaption;
+               string ProductCaption = ViewBag.ProductCaption;
+               string ProductGroupCaption = ViewBag.ProductGroupCaption;
+
+
+
+               columns.Add(m => m.JobInvoiceHeaderId, true).Css("Header_Id");
+               columns.Add(m => m.Status, true);
+               columns.Add().Encoded(false).Sanitized(false).SetWidth("5%").RenderValueAs(m => CustomHelpers.RenderCheckBox());
+               columns.Add(foo => foo.DocDate).Sortable(true).Titled("Invoice Date").Format("{0:dd/MMM/yyyy}").Filterable(true);
+               columns.Add(m => m.DocNo).Sortable(true).Titled("Invoice No.").Filterable(true).Sortable(true);
+               columns.Add(m => m.JobWorkerDocNo).Sortable(true).Titled("Party Doc No").Filterable(true).Sortable(true);
+               columns.Add(foo => foo.JobWorkerDocDate).Sortable(true).Titled("Party Doc Date").Format("{0:dd/MMM/yyyy}").Filterable(true);
+               columns.Add(m => m.JobWorkerName).Sortable(true).Filterable(true).Titled("Party");
+               columns.Add(m => m.GodownName, !isVisibleGodown).Sortable(true).Filterable(true).Titled("Godown");
+
+               columns.Add(m => m.ProductUidName, !isVisibleProductUid_Index).Titled(ProductUidCaption).Filterable(true).Sortable(true);
+               columns.Add(m => m.ProductName, !isVisibleProduct_Index).Titled(ProductCaption).Filterable(true).Sortable(true);
+               columns.Add(m => m.ProductGroupName, !isVisibleProductGroup_Index).Titled(ProductGroupCaption).Filterable(true).Sortable(true);
+
+               columns.Add().RenderValueAs(m => CustomHelpers.RenderTotal(m.TotalQty, m.DecimalPlaces)).Sanitized(false).Encoded(false).Titled("Tota lQty");
+               columns.Add().RenderValueAs(m => CustomHelpers.RenderTotal(m.TotalAmount, 2)).Sanitized(false).Encoded(false).Titled("Total Amount");
+               columns.Add().Sanitized(false).Encoded(false).RenderValueAs(m => CustomHelpers.RenderStatus(m.Status)).Titled("Status");
+               columns.Add().Titled("").Encoded(false).Sanitized(false).RenderValueAs(m => CustomHelpers.RenderUserImage(m.ModifiedBy)).Titled("User").SetWidth("5%").Css("UserImageIndex");
+               columns.Add().Encoded(false).Sanitized(false).RenderValueAs(m => CustomHelpers.RenderActionColumn(ControllerName, m.JobInvoiceHeaderId, m.Status, m.Reviewed, m.ReviewCount, (string)ViewBag.IndexStatus)).SetWidth(20).Css("icon-Cus-Size");
+               columns.Add(true).RenderValueAs(m => CustomHelpers.RenderHEDActionLink(ControllerName, m.JobInvoiceHeaderId, m.Status, IndexStatus));
+           }).WithPaging(25).EmptyText("No records found.").Sortable().Filterable().WithMultipleFilters()
     </div>
+
+
+
+
+
 </div>
+
+
+<script type="text/javascript">
+    var isVisibleProductUid_Index = '@ViewBag.isVisibleProductUid_Index';
+    var isVisibleProduct_Index = '@ViewBag.isVisibleProduct_Index';
+    var isVisibleProductGroup_Index = '@ViewBag.isVisibleProductGroup_Index';
+
+    if (isVisibleProductUid_Index == "True" || isVisibleProduct_Index == "True" || isVisibleProductGroup_Index == "True")
+        $(".panel-info").css({ 'font-size': '9px' });
+</script>

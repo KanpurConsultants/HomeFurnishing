@@ -46,6 +46,10 @@ namespace Model.Models
 
         public Decimal? Weight { get; set; }
 
+        [ForeignKey("SalesTaxGroupProduct"), Display(Name = "Sales Tax Group Product")]
+        public int? SalesTaxGroupProductId { get; set; }
+        public virtual ChargeGroupProduct SalesTaxGroupProduct { get; set; }
+
 
         [Display(Name = "Rate")]
         public Decimal Rate { get; set; }

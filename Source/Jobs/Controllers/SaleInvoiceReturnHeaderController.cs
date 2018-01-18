@@ -290,6 +290,7 @@ namespace Jobs.Controllers
 
                     //temp.CurrencyId = pt.CurrencyId;
                     //temp.SalesTaxGroupId = pt.SalesTaxGroupId;
+                    temp.SalesTaxGroupPersonId = pt.SalesTaxGroupPersonId;
                     temp.Remark = pt.Remark;
                     temp.BuyerId = pt.BuyerId;
                     temp.DocNo = pt.DocNo;
@@ -1266,6 +1267,19 @@ namespace Jobs.Controllers
             }
             return Json(new { success = "Error", data = "No Records Selected." }, JsonRequestBehavior.AllowGet);
 
+        }
+
+        public JsonResult GetPersonDetail(int PersonId)
+        {
+            var PersonDetail = (from B in db.BusinessEntity
+                                where B.PersonID == PersonId
+                                select new
+                                {
+                                    SalesTaxGroupPartyId = B.SalesTaxGroupPartyId,
+                                    SalesTaxGroupPartyName = B.SalesTaxGroupParty.ChargeGroupPersonName
+                                }).FirstOrDefault();
+
+            return Json(PersonDetail);
         }
         protected override void Dispose(bool disposing)
         {

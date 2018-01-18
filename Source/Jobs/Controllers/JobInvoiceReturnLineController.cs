@@ -2161,6 +2161,14 @@ namespace Jobs.Controllers
 
                 int? StockId = 0;
 
+                if (vm.linecharges != null && vm.footercharges == null)
+                {
+                    ModelState.AddModelError("", "Something Went wrong while deletion.Please try again.");
+                    PrepareViewBag(vm);
+                    ViewBag.LineMode = "Delete";
+                    return PartialView("_Create", vm);
+                }
+
                 JobInvoiceReturnLine JobInvoiceReturnLine = db.JobInvoiceReturnLine.Find(vm.JobInvoiceReturnLineId);
 
                 bool IsDeleteFooterCharges = false;

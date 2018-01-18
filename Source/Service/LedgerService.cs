@@ -224,6 +224,7 @@ namespace Service
                        LedgerHeaderId = p.LedgerHeaderId,
                        LedgerAccountId = p.LedgerAccountId,
                        LedgerAccountName = p.LedgerAccount.LedgerAccountName + ", " + (p.LedgerAccount.PersonId != null ? p.LedgerAccount.Person.Suffix + " [" + p.LedgerAccount.Person.Code + "]" : p.LedgerAccount.LedgerAccountSuffix),
+                       LedgerAccountGroupName = p.LedgerAccount.LedgerAccountGroup.LedgerAccountGroupName,
                        ReferenceId = p.ReferenceId,
                        ReferenceDocNo = tab2.DocNo,
                        ChqNo = p.ChqNo,

@@ -97,9 +97,30 @@ namespace Service
             var DivisionId = (int)System.Web.HttpContext.Current.Session["DivisionId"];
             var SiteId = (int)System.Web.HttpContext.Current.Session["SiteId"];
 
+            int AdditionalChargesProductNatureId = 0;
+            var ProductNature = (from Pt in db.ProductNature where Pt.ProductNatureName == ProductNatureConstants.AdditionalCharges select Pt).FirstOrDefault();
+            if (ProductNature != null)
+                AdditionalChargesProductNatureId = ProductNature.ProductNatureId;
+
+            var TempProductDetail = from H in db.SaleDeliveryHeader
+                                    join L in db.SaleDeliveryLine on H.SaleDeliveryHeaderId equals L.SaleDeliveryHeaderId into SaleDeliveryLineTable
+                                    from SaleDeliveryLineTab in SaleDeliveryLineTable.DefaultIfEmpty()
+                                    where H.DivisionId == DivisionId && H.SiteId == SiteId && H.DocTypeId == id && SaleDeliveryLineTab.SaleInvoiceLine.SaleDispatchLine.PackingLine.Product.ProductGroup.ProductType.ProductNatureId != AdditionalChargesProductNatureId && SaleDeliveryLineTab.Qty != 0
+                                    group new { SaleDeliveryLineTab } by new { SaleDeliveryLineTab.SaleDeliveryHeaderId } into Result
+                                    select new
+                                    {
+                                        SaleDeliveryHeaderId = Result.Key.SaleDeliveryHeaderId,
+                                        ProductUidName = Result.Max(i => i.SaleDeliveryLineTab.SaleInvoiceLine.SaleDispatchLine.PackingLine.ProductUid.ProductUidName),
+                                        ProductName = Result.Max(i => i.SaleDeliveryLineTab.SaleInvoiceLine.SaleDispatchLine.PackingLine.Product.ProductName),
+                                        ProductGroupName = Result.Max(i => i.SaleDeliveryLineTab.SaleInvoiceLine.SaleDispatchLine.PackingLine.Product.ProductGroup.ProductGroupName),
+                                        SaleInvoiceNo = Result.Max(i => i.SaleDeliveryLineTab.SaleInvoiceLine.SaleInvoiceHeader.DocNo),
+                                    };
+
 
             var temp = from p in db.SaleDeliveryHeader
                        join t in db.Persons on p.SaleToBuyerId equals t.PersonID
+                       join Tp in TempProductDetail on p.SaleDeliveryHeaderId equals Tp.SaleDeliveryHeaderId into TempProductDetailTable
+                       from TempProductDetailTab in TempProductDetailTable.DefaultIfEmpty()
                        orderby p.DocDate descending, p.DocNo descending
                        where p.DivisionId == DivisionId && p.SiteId == SiteId && p.DocTypeId == id
                        select new SaleDeliveryHeaderIndexViewModel
@@ -115,6 +136,10 @@ namespace Service
                            GatePassHeaderId = p.GatePassHeaderId,
                            GatePassDocDate = p.GatePassHeader.DocDate,
                            GatePassStatus = (p.GatePassHeaderId != null ? p.GatePassHeader.Status : 0),
+                           ProductUidName = TempProductDetailTab.ProductUidName,
+                           ProductName = TempProductDetailTab.ProductName,
+                           ProductGroupName = TempProductDetailTab.ProductGroupName,
+                           SaleInvoiceNo = TempProductDetailTab.SaleInvoiceNo,
                            ReviewCount = p.ReviewCount,
                            ReviewBy = p.ReviewBy,
                            Reviewed = (SqlFunctions.CharIndex(Uname, p.ReviewBy) > 0),

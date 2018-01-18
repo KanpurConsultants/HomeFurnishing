@@ -43,64 +43,64 @@
     @Html.HiddenFor(m => m.SaleInvoiceReturnHeaderId)
     @Html.HiddenFor(m => m.DocTypeId)
     @Html.HiddenFor(m => m.CreatedDate)
-    @Html.HiddenFor(m => m.Status )
+    @Html.HiddenFor(m => m.Status)
     @Html.HiddenFor(m => m.Nature)
     @Html.HiddenFor(m => m.ProcessId)
-    
-    
+
+
     <div class="panel panel-default">
         <div class="panel-heading">
 
             @CustomHelpers.RenderHeaderInfo(ViewBag.transactionType, (int?)ViewBag.PendingToSubmit, (int?)ViewBag.PendingToReview, ViewBag.Name)
 
             @*@if (ViewBag.transactionType == "submit" || ViewBag.transactionType == "submitContinue")
-            {<h3 style="border-bottom:1px solid #e1dada;padding-bottom:10px;">
-                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>Submit @ViewBag.Name</span>
-                 <button type="submit" name="Command:Submit" class="btn btn-primary right" id="SubmitContinue" style="margin-left:5px;">Submit & Next<span class='badge'>@(ViewBag.PendingToSubmit != 0 ? ViewBag.PendingToSubmit : "")</span></button>
-                <input type="submit" value="Submit" name="Command:Submit" class="btn btn-primary right" style="width: 90px; background-color: #2980b9" />
-                 <input type="hidden" id="IsContinue" name="IsContinue" value="" />
-            </h3>}
-             else if (ViewBag.transactionType == "review" || ViewBag.transactionType == "ReviewContinue")
-            {<h3 style="border-bottom:0px solid #e1dada;padding-bottom:0px;">
-                    <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span> Review @ViewBag.Name</span>
-                    <button type="submit" name="Command:Review" class="btn btn-primary right" style="margin-left:5px" id="ReviewContinue">Review & Next<span class='badge'>@(ViewBag.PendingToReview != 0 ? ViewBag.PendingToReview : "")</span></button>
-                    <button type="submit" class="btn btn-primary right" name="Command:Review">Review</button>
-                    <input type="hidden" id="IsContinue" name="IsContinue" value="" />
-                </h3>
-            }
-            else if (ViewBag.transactionType == "detail")
-            {
-                <h3>
-                    <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>@ViewBag.Name</span>
-                </h3>
-            }
-            else
-            {
-                <h3 style="border-bottom:1px solid #e1dada;padding-bottom:10px;">
-                    <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span> @ViewBag.Name</span>
-                    <input type="submit" value="Save" class="btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9" />
-                </h3>                
-                <hr style="margin-top:10px;margin-bottom:0px" />
-            }*@
-
-            @{
-                string EditAction = "";
-                if (Model.Status == (int)StatusConstants.Drafted || Model.Status == (int)StatusConstants.Import)
-                {
-                    EditAction = "Modify";
+                {<h3 style="border-bottom:1px solid #e1dada;padding-bottom:10px;">
+                    <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>Submit @ViewBag.Name</span>
+                     <button type="submit" name="Command:Submit" class="btn btn-primary right" id="SubmitContinue" style="margin-left:5px;">Submit & Next<span class='badge'>@(ViewBag.PendingToSubmit != 0 ? ViewBag.PendingToSubmit : "")</span></button>
+                    <input type="submit" value="Submit" name="Command:Submit" class="btn btn-primary right" style="width: 90px; background-color: #2980b9" />
+                     <input type="hidden" id="IsContinue" name="IsContinue" value="" />
+                </h3>}
+                 else if (ViewBag.transactionType == "review" || ViewBag.transactionType == "ReviewContinue")
+                {<h3 style="border-bottom:0px solid #e1dada;padding-bottom:0px;">
+                        <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span> Review @ViewBag.Name</span>
+                        <button type="submit" name="Command:Review" class="btn btn-primary right" style="margin-left:5px" id="ReviewContinue">Review & Next<span class='badge'>@(ViewBag.PendingToReview != 0 ? ViewBag.PendingToReview : "")</span></button>
+                        <button type="submit" class="btn btn-primary right" name="Command:Review">Review</button>
+                        <input type="hidden" id="IsContinue" name="IsContinue" value="" />
+                    </h3>
                 }
-                else if ((Model.Status == (int)StatusConstants.Submitted || Model.Status == (int)StatusConstants.Modified))
+                else if (ViewBag.transactionType == "detail")
                 {
-                    EditAction = "ModifyAfter_Submit";
+                    <h3>
+                        <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>@ViewBag.Name</span>
+                    </h3>
                 }
                 else
                 {
-                    EditAction = "DetailInformation";
-                }
+                    <h3 style="border-bottom:1px solid #e1dada;padding-bottom:10px;">
+                        <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span> @ViewBag.Name</span>
+                        <input type="submit" value="Save" class="btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9" />
+                    </h3>
+                    <hr style="margin-top:10px;margin-bottom:0px" />
+                }*@
+
+            @{
+    string EditAction = "";
+    if (Model.Status == (int)StatusConstants.Drafted || Model.Status == (int)StatusConstants.Import)
+    {
+        EditAction = "Modify";
+    }
+    else if ((Model.Status == (int)StatusConstants.Submitted || Model.Status == (int)StatusConstants.Modified))
+    {
+        EditAction = "ModifyAfter_Submit";
+    }
+    else
+    {
+        EditAction = "DetailInformation";
+    }
             }
 
             <div class="panel-info">
-                     <div class="btn-group">
+                <div class="btn-group">
                     @Html.ActionLink(" ", "Create", "SaleInvoiceReturnHeader", new { @id = ViewBag.id }, new { @class = "cbtn btn-circle glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
                     @Html.ActionLink(" ", EditAction, "SaleInvoiceReturnHeader", new { @id = Model.SaleInvoiceReturnHeaderId, IndexType = ViewBag.IndexStatus }, new { @class = "cbtn btn-circle glyphicon glyphicon-edit", @title = "Edit", @data_toggle = "tooltip" })
                     @*@Html.ActionLink(" ", "Print", "SaleInvoiceReturnHeader", new { id = @Model.SaleInvoiceReturnHeaderId }, new { @class = "cbtn btn-circle glyphicon glyphicon-print toolbar", @title = "Print", @data_toggle = "tooltip", @id = "PrintRecord", target = "_blank" })*@
@@ -110,7 +110,7 @@
                     @Html.ActionLink(" ", "Index", "SaleInvoiceReturnHeader", new { @id = ViewBag.id, IndexType = ViewBag.IndexStatus }, new { @class = "cbtn btn-circle glyphicon glyphicon-list", @title = "List", @data_toggle = "tooltip" })
                 </div>
                 <div class="btn-group">
-                 <a class="cbtn btn-circle glyphicon glyphicon-option-horizontal dropdown-toggle"   title="More Option"  aria-expanded="false" style="padding-top: 6px;padding-bottom: 6px;" href="#" data-toggle="dropdown" id="dropdownMenu1">
+                    <a class="cbtn btn-circle glyphicon glyphicon-option-horizontal dropdown-toggle" title="More Option" aria-expanded="false" style="padding-top: 6px;padding-bottom: 6px;" href="#" data-toggle="dropdown" id="dropdownMenu1">
                     </a>
                     <ul class="dropdown-menu pull-right" aria-labelledby="dropdownMenu1">
                         <li><a id="DocHistory" data-modal="" href="@Url.Action("GetHistory", "LogHistory", new { Ids = Model.SaleInvoiceReturnHeaderId, DocTypeId = Model.DocTypeId })"><span class="glyphicon glyphicon-user"> </span> History</a></li>
@@ -124,14 +124,14 @@
         <div class="panel-info" style="padding-left:15px">
             <div class="form-horizontal">
                 @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
-                @Html.HiddenFor(m=>m.SaleInvoiceSettings.DocTypeDispatchReturnId)
-                <div >
+                @Html.HiddenFor(m => m.SaleInvoiceSettings.DocTypeDispatchReturnId)
+                <div>
                     <h4 class="col-md-12 black">
                         <span class="glyphicon glyphicon-align-justify"></span>
                         1.Document Details
                     </h4>
                     <div>
-                        <div >
+                        <div>
                             <div class="col-md-6">
                                 <div class="form-group" style="margin-top:15px">
                                     @Html.LabelFor(model => model.DocDate, (Model.Nature ?? TransactionNatureConstants.Return) + " Date", new { @class = "control-label  col-md-4 col-sm-2" })
@@ -159,7 +159,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div >
+                        <div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     @Html.LabelFor(model => model.BuyerId, (Model.DocumentTypeSettings.PartyCaption ?? "Party"), new { @class = "control-label  col-md-4 col-sm-2" })
@@ -172,7 +172,19 @@
                             </div>
                         </div>
 
-                        <div >
+                        <div class="col-md-6" style="display:@(Model.SaleInvoiceSettings.isVisibleSalesTaxGroupPerson  ? "" : "none")">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.SalesTaxGroupPersonId, "Sales Tax Group Person", new { @class = "control-label col-md-4 col-sm-2" })
+                                @Html.HiddenFor(m => m.SaleInvoiceSettings.isVisibleSalesTaxGroupPerson)
+                                <div class="col-md-7 col-sm-10">
+                                    @Html.TextBoxFor(m => m.SalesTaxGroupPersonId, null, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(m => m.SalesTaxGroupPersonId, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     @Html.LabelFor(model => model.ReasonId, "Reason", new { @class = "control-label  col-md-4 col-sm-2" })
@@ -183,10 +195,10 @@
                                     </div>
                                 </div>
                             </div>
-                            
+
 
                         </div>
-                        <div >
+                        <div>
                             <div class="col-md-6" style="display:@(Model.Nature == TransactionNatureConstants.Return ?"":"none")">
                                 <div class="form-group">
                                     @Html.LabelFor(model => model.GodownId, "Godown", new { @class = "control-label  col-md-4 col-sm-2" })
@@ -220,7 +232,21 @@
                 </div>
 
                 @*<div class="panel-info">
-                    <h5 style="padding:5px 0 3px 0;margin:0px;font-weight:bold">
+                        <h5 style="padding:5px 0 3px 0;margin:0px;font-weight:bold">
+                            <span class="glyphicon glyphicon-plus-sign"></span>
+                            @{string Action = "";
+                            if (Model.Status == (int)StatusConstants.Drafted)
+                            { Action = "CreateLine"; }
+                            else if (Model.Status == (int)StatusConstants.Submitted || Model.Status == (int)StatusConstants.Modified || Model.Status == (int)StatusConstants.ModificationSubmitted)
+                            { Action = "CreateLineAfter_Submit"; }
+                            else if (Model.Status == (int)StatusConstants.Approved)
+                            { Action = "CreateLineAfter_Approve"; }
+                            }
+                            @Html.ActionLink("Add New Row ", "_Create", "SaleInvoiceReturnLine", new { id = @Model.SaleInvoiceReturnHeaderId, sid = @Model.BuyerId }, new { data_modal = "", id = "btnCreate", @class = "toolbar", @title = "Add New", @data_toggle = "tooltip", @data_detailDisabled = "true" })
+                        </h5>
+                    </div>*@
+                <div class="panel-info" style="height:40px">
+                    <div class="btn-group" style="padding:5px 0 3px 0;margin:0px;font-weight:bold">
                         <span class="glyphicon glyphicon-plus-sign"></span>
                         @{string Action = "";
                         if (Model.Status == (int)StatusConstants.Drafted)
@@ -231,21 +257,7 @@
                         { Action = "CreateLineAfter_Approve"; }
                         }
                         @Html.ActionLink("Add New Row ", "_Create", "SaleInvoiceReturnLine", new { id = @Model.SaleInvoiceReturnHeaderId, sid = @Model.BuyerId }, new { data_modal = "", id = "btnCreate", @class = "toolbar", @title = "Add New", @data_toggle = "tooltip", @data_detailDisabled = "true" })
-                    </h5>
-                </div>*@
-                <div class="panel-info" style="height:40px">
-                    <div class="btn-group" style="padding:5px 0 3px 0;margin:0px;font-weight:bold">
-                        <span class="glyphicon glyphicon-plus-sign"></span>
-                        @{string Action = "";
-                            if (Model.Status == (int)StatusConstants.Drafted)
-                            { Action = "CreateLine"; }
-                            else if (Model.Status == (int)StatusConstants.Submitted || Model.Status == (int)StatusConstants.Modified || Model.Status == (int)StatusConstants.ModificationSubmitted)
-                            { Action = "CreateLineAfter_Submit"; }
-                            else if (Model.Status == (int)StatusConstants.Approved)
-                            { Action = "CreateLineAfter_Approve"; }
-                        }
-                        @Html.ActionLink("Add New Row ", "_Create", "SaleInvoiceReturnLine", new { id = @Model.SaleInvoiceReturnHeaderId, sid = @Model.BuyerId }, new { data_modal = "", id = "btnCreate", @class = "toolbar", @title = "Add New", @data_toggle = "tooltip", @data_detailDisabled = "true" })
-                        </div>
+                    </div>
 
                     @if (Model.Nature == TransactionNatureConstants.Return)
                     {
@@ -253,7 +265,7 @@
                             @Html.ActionLink(" ", "_ForInvoice", "SaleInvoiceReturnLine", new { id = @Model.SaleInvoiceReturnHeaderId, sid = @Model.BuyerId }, new { data_modal = "", id = "btnCreateF", @class = "cbtn btn-circle glyphicon glyphicon-link toolbar right", @title = "For Invoice", @data_toggle = "tooltip", @data_detailDeleted = "true" })
                         </div>
                     }
-                    </div>
+                </div>
                 <div style="padding-right:15px">
 
 
@@ -325,15 +337,15 @@
                                         <div class="col-sm-2">
                                             Add/Deduct
                                         </div>
-                                        
+
                                         <div class="col-sm-2 text-right">
                                             Rate
                                         </div>
-                                        
+
                                         <div class="col-sm-3 text-right">
                                             Amount
                                         </div>
-                                        
+
 
                                     </div>
                                 </div>
@@ -358,7 +370,7 @@
 
 
 @if ((ViewBag.Mode == "Add") || (ViewBag.Mode == "Edit"))
-{ 
+{
 
 
     <script type="text/javascript">
@@ -447,7 +459,7 @@
         //});
 
 
-       
+
 
         ////To focus on the first element on modal load
         //$('#myModal').on('shown.bs.modal', function () {
@@ -455,7 +467,7 @@
         //});
 
 
-     
+
 
 
 
@@ -481,8 +493,8 @@
         //    self.UnitConversionMultiplier = $("#UnitConversionMultiplier").val();
         //    self.DealQty = $("#DealQty").val();
         //    self.Amount = $("#Amount").val();
-        //    self.Remark = $("#Remark").val();                       
-            
+        //    self.Remark = $("#Remark").val();
+
         //    self.__RequestVerificationToken= $('[name=__RequestVerificationToken]').val();
         //    var settings=new SettingsViewModel();
         //    self.SaleInvoiceSettings=settings;
@@ -497,7 +509,7 @@
         //function SettingsViewModel(){
         //    var self=this;
         //    var settings;
-            
+
         //    self.CalculationId=$("#SaleInvoiceSettings_CalculationId").val();
         //    self.isVisibleDimension1=$("#SaleInvoiceSettings_isVisibleDimension1").val();
         //    self.isVisibleDimension2=$("#SaleInvoiceSettings_isVisibleDimension2").val();
@@ -510,7 +522,7 @@
         //function bindForm1(dialog) {
         //    //alert("binding1");
         //    $('form#modform', dialog).submit(function () {
-                
+
         //        charges= AssignValuesToCharges();
         //        footercharges=AssignValuesToFooter();
 
@@ -614,12 +626,46 @@
 
     CustomSelectFunction($("#BuyerId"), '/SaleInvoiceReturnHeader/GetCustomPerson', '/ComboHelpList/SetSinglePerson', ' ', false, 0,$('#DocTypeId').val());
     CustomSelectFunction($("#ReasonId"), '/ComboHelpList/GetReason', '/ComboHelpList/SetSingleReason', ' ', false, 0, $('#DocTypeId').val());
+    CustomSelectFunction($("#SalesTaxGroupPersonId"), '/ComboHelpList/GetSalesTaxGroupPerson', '/ComboHelpList/SetSingleSalesTaxGroupPerson', ' ', false, 0);
     //CustomSelectFunction($("#BuyerId"), '/ComboHelpList/GetBuyers', '/ComboHelpList/SetSingleBuyer', ' ', false, 1);
     CustomSelectFunction($("#GodownId"), '/ComboHelpList/GetGodown', '/ComboHelpList/SetSingleGodown', ' ', false, 0);
 
     $("#DocNo").on("change", function () {
         $(this).DuplicateCheckForCreate({ name: 'SaleInvoiceReturnHeader', value: $(this).val(), doctype: $("#DocTypeId").val() });
     });
+
+
+    $("#BuyerId").change(GetPersonDetail);
+
+    function GetPersonDetail()
+    {
+        if ($("#BuyerId").val() != 0 && $("#BuyerId").val() != null)
+        {
+            $.ajax({
+                cache: false,
+                async: false,
+                type: "POST",
+                url: "@(Url.Action("GetPersonDetail"))",
+                data: { PersonId: $("#BuyerId").val() },
+            success: function (data) {
+                if (data != null)
+                {
+                    (data.SalesTaxGroupPartyId == null) ? (1 == 1) : ($("#SalesTaxGroupPersonId").select2("data", { id: data.SalesTaxGroupPartyId, text: data.SalesTaxGroupPartyName }));
+                }
+                else {
+                    $("#SalesTaxGroupPersonId").select2("data", { id: '', text: '' })
+                }
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert('Failed to retrieve Person Detail.' + thrownError);
+                ProcessProgress.hide();
+            }
+        });
+    }
+    else {
+            $("#SalesTaxGroupPersonId").select2("data", { id: '', text: '' })
+        }
+    }
 
 </script>
 
@@ -638,10 +684,15 @@
         var id=@Model.SaleInvoiceReturnHeaderId;
 
         LoadCharges(id,"Web.SaleInvoiceReturnHeaderCharges","Web.SaleInvoiceReturnLineCharges","/TaxCalculation/GetPIRHeaderChargeForEdit/");
-    });   
 
 
-  
+
+
+
+    });
+
+
+
 
 
 
@@ -764,7 +815,7 @@
                         +"                  </div>"
                         +"          <div class='block text-right' style='width:10%'><strong>"+AmountCount.toFixed(2)+"</strong>"
                         +"          </div>"
-                        
+
                         +"      </div>"
                         +"  </div>"
                         +"  <div class='block'  style='width:5%'>"
@@ -785,7 +836,7 @@
     }
 
 
-  
+
 
 </script>
 
@@ -882,7 +933,7 @@
 
 
 <script type="text/javascript">
-        $('a#PrintRecord').click(function (e) {
+    $('a#PrintRecord').click(function (e) {
 
         var editiiid = $('#SaleInvoiceReturnHeaderId').val();
 
@@ -905,11 +956,11 @@
 @if (ViewBag.transactionType != null && (ViewBag.transactionType == "submitContinue" || ViewBag.transactionType == "approveContinue"))
 {
     <script type="text/javascript">
-        
+
         $(document).ready(function(){
             CreateTrasitionEffect();
         })
-        
+
         //CreateTrasitionEffectForSubmit();
 
         //function CreateTrasitionEffectForSubmit(){

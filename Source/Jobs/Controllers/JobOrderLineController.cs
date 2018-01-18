@@ -1984,6 +1984,21 @@ namespace Jobs.Controllers
 
                 int? StockId = 0;
                 int? StockProcessId = 0;
+
+                if (vm.linecharges != null && vm.footercharges == null)
+                {
+                    ModelState.AddModelError("", "Something Went wrong while deletion.Please try again.");
+                    PrepareViewBag(vm);
+                    ViewBag.LineMode = "Delete";
+                    return PartialView("_Create", vm);
+                }
+
+                bool IsDeleteFooterCharges = false;
+
+                var JobOrderLineForHeader = (from L in db.JobOrderLine where L.JobOrderHeaderId == vm.JobOrderHeaderId && L.JobOrderLineId != vm.JobOrderLineId select L).FirstOrDefault();
+                if (JobOrderLineForHeader == null)
+                    IsDeleteFooterCharges = true;
+
                 List<LogTypeViewModel> LogList = new List<LogTypeViewModel>();
 
                 JobOrderLine JobOrderLine = (from p in db.JobOrderLine
@@ -2123,18 +2138,31 @@ namespace Jobs.Controllers
                         db.JobOrderLineCharge.Remove(item);
                     }
 
-                if (vm.footercharges != null)
-                    foreach (var item in vm.footercharges)
-                    {
-                        var footer = (from p in db.JobOrderHeaderCharges
-                                      where p.Id == item.Id
-                                      select p).FirstOrDefault();
 
-                        footer.Rate = item.Rate;
-                        footer.Amount = item.Amount;
-                        footer.ObjectState = Model.ObjectState.Modified;
-                        db.JobOrderHeaderCharges.Add(footer);
+                if (IsDeleteFooterCharges == true)
+                {
+                    var HeaderChargesList = (from Hc in db.JobOrderHeaderCharges where Hc.HeaderTableId == JobOrderLine.JobOrderHeaderId select Hc).ToList();
+                    foreach (var HeaderCharges in HeaderChargesList)
+                    {
+                        HeaderCharges.ObjectState = Model.ObjectState.Deleted;
+                        db.JobOrderHeaderCharges.Remove(HeaderCharges);
                     }
+                }
+                else
+                {
+                    if (vm.footercharges != null)
+                        foreach (var item in vm.footercharges)
+                        {
+                            var footer = (from p in db.JobOrderHeaderCharges
+                                          where p.Id == item.Id
+                                          select p).FirstOrDefault();
+
+                            footer.Rate = item.Rate;
+                            footer.Amount = item.Amount;
+                            footer.ObjectState = Model.ObjectState.Modified;
+                            db.JobOrderHeaderCharges.Add(footer);
+                        }
+                }
 
 
                 var Boms = (from p in db.JobOrderBom

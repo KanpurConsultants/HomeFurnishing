@@ -3289,7 +3289,8 @@ namespace Service
                         select new ComboBoxResult
                         {
                             id = D.LedgerAccountId.ToString(),
-                            text = D.LedgerAccountName + " [" + D.LedgerAccountSuffix + "]"
+                            text = D.LedgerAccountName + " [" + D.LedgerAccountSuffix + "]",
+                            AProp1 = D.LedgerAccountGroup.LedgerAccountGroupName
                         }
               );
             return list;

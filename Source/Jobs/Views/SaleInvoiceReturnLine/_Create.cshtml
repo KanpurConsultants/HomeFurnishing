@@ -42,6 +42,7 @@
                 @Html.HiddenFor(model => model.SaleInvoiceReturnHeaderId)
                 @Html.HiddenFor(m => m.SaleInvoiceReturnLineId)
                 @*@Html.HiddenFor(m => m.SaleInvoiceLineId)*@
+                @Html.HiddenFor(m => m.SalesTaxGroupPersonId)
                 @Html.HiddenFor(m => m.BuyerId)
                 @Html.HiddenFor(m => m.CalculateDiscountOnRate)
                 @Html.HiddenFor(m => m.InvoiceBalQty)
@@ -50,6 +51,7 @@
                 @Html.HiddenFor(m => m.DivisionId)
                 @Html.HiddenFor(m => m.ProductUidId)
                 @Html.HiddenFor(m => m.SaleInvoiceSettings.CalculationId)
+                @Html.HiddenFor(m => m.SaleInvoiceSettings.ProcessId)
 
                 @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
                 <div class="row">
@@ -143,6 +145,17 @@
                         </div>
                     </div>
 
+                    <div class="col-md-6" style="display:@(Model.SaleInvoiceSettings.isVisibleSalesTaxGroupProduct ? "" : "none")">
+                        @Html.HiddenFor(m => m.SaleInvoiceSettings.isVisibleSalesTaxGroupProduct)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.SalesTaxGroupProductId, "Sales Tax Group Product", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.SalesTaxGroupProductId, new { @class = "form-control required" })
+                                @Html.ValidationMessageFor(model => model.SalesTaxGroupProductId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="col-md-6" style="display:@(Model.SaleInvoiceSettings.isVisibleLotNo ? "" : "none")">
                         @Html.HiddenFor(m => m.SaleInvoiceSettings.isVisibleLotNo)
                         <div class="form-group">
@@ -155,12 +168,12 @@
                     </div>
 
                 
-                    <div class="col-md-6" style="display:@(Model.Nature == "Return" ? "" : "none")">
+                    <div class="col-md-6">
                         <div class="form-group">
                             @Html.LabelFor(model => model.Qty, "Qty", new { @class = "control-label col-md-4 col-sm-2" })
                             <div class="col-md-7 col-sm-10" style="padding:0px;">
                                 <div class="col-xs-7" style="padding-right:0px;">
-                                    @Html.TextBoxFor(model => model.Qty, new { @class = "form-control required cusrightnormal" })
+                                    @Html.TextBoxFor(model => model.Qty, new { @class = "form-control required cusrightnormal text-right" })
                                     @Html.ValidationMessageFor(model => model.Qty, "", new { @class = "text-danger" })
                                 </div>
                                 <div class="col-xs-5" style="padding-left:0px">
@@ -188,12 +201,12 @@
 
                 
 
-                    <div class="col-md-6" style="display:@(Model.Nature == "Return" ? "" : "none")">
+                    <div class="col-md-6">
                         @Html.HiddenFor(m => m.Nature)
                         <div class="form-group">
                             @Html.LabelFor(model => model.Rate, "Rate", new { @class = "control-label col-md-4 col-sm-2" })
                             <div class="col-md-7 col-sm-10">
-                                @Html.TextBoxFor(model => model.Rate, new { @class = "form-control col-xs-7 required", @readonly = true })
+                                @Html.TextBoxFor(model => model.Rate, new { @class = "form-control col-xs-7 text-right required", @readonly = true })
                                 @Html.ValidationMessageFor(model => model.Rate, "", new { @class = "text-danger" })
                             </div>
                         </div>
@@ -244,7 +257,7 @@
                         <div class="form-group">
                             @Html.LabelFor(model => model.Amount, "Amount", new { @class = "control-label col-md-4 col-sm-2" })
                             <div class="col-md-7 col-sm-107">
-                                @Html.TextBoxFor(model => model.Amount, new { @class = "form-control col-xs-7 required", @readonly = true })
+                                @Html.TextBoxFor(model => model.Amount, new { @class = "form-control col-xs-7 text-right required", @readonly = true })
                                 @Html.ValidationMessageFor(model => model.Amount, "", new { @class = "text-danger" })
                             </div>
                         </div>
@@ -321,7 +334,7 @@ else
         var DocID = $('#SaleInvoiceReturnHeaderId', '.modal-body').val();
         CustomSelectFunction($("#ProductId"), '/ComboHelpList/GetProducts', '/ComboHelpList/SetSingleProducts', ' ', false, 0);
         CustomSelectFunction($("#SaleInvoiceLineId"), '/SaleinvoiceReturnLine/GetSaleInvoiceForProduct', '/ComboHelpList/SetSingleSaleInvoiceLine', ' ', false, 0,DocID);
-
+        CustomSelectFunction($("#SalesTaxGroupProductId"), '/ComboHelpList/GetSalesTaxGroupProduct', '/ComboHelpList/SetSingleSalesTaxGroupProduct', ' ', false, 0);
 
 
         var IsSaved=false;
@@ -355,10 +368,22 @@ else
         }
 
 
+        $('#SalesTaxGroupProductId').change(function(){
+            Validate_SalesTaxGroupProductId();
+        })
+
+        function Validate_SalesTaxGroupProductId()
+        {
+            if ($("#SalesTaxGroupProductId").val() != 0 && $("#SalesTaxGroupProductId").val() != null) {
+                GetChargeRates('@Model.SaleInvoiceSettings.CalculationId',$('#DocTypeId','.modal-body').val(),$('#SiteId','.modal-body').val(),$('#DivisionId','.modal-body').val(),$('#SaleInvoiceSettings_ProcessId','.modal-body').val(),$('#SalesTaxGroupPersonId','.modal-body').val(),$('#SalesTaxGroupProductId','.modal-body').val(),$('#ProductId','.modal-body').val())
+                Calculation();
+            }
+        }
+
         $("#SaleInvoiceLineId").change(GetSaleInvoiceDetail);
 
         var Nature='@Model.Nature';
-        if (Nature != "Return")
+        if (Nature != "Return" || Nature != "" || Nature != null)
         {
             $("#Rate").removeAttr('readonly');
             $("#Amount").removeAttr('readonly');
@@ -392,10 +417,12 @@ else
                         $("#Dimension3Name").val(data.Dimension3Name)
                         $("#Dimension4Name").val(data.Dimension4Name)
 
-                        if (Nature == "Return")
+                        if (Nature == "Return" || Nature != "" || Nature != null)
                         {
                             $("#DiscountPer").val(data.DiscountPer)
                         }
+                        (data.SalesTaxGroupProductId==null)?(1==1):($("#SalesTaxGroupProductId").select2("data", {id: data.SalesTaxGroupProductId, text: data.SalesTaxGroupProductName}));
+                        GetChargeRates('@Model.SaleInvoiceSettings.CalculationId',$('#DocTypeId','.modal-body').val(),$('#SiteId','.modal-body').val(),$('#DivisionId','.modal-body').val(),$('#SaleInvoiceSettings_ProcessId','.modal-body').val(),$('#SalesTaxGroupPersonId','.modal-body').val(),$('#SalesTaxGroupProductId','.modal-body').val(),$('#ProductId','.modal-body').val())
                         Calculation();
                         //LockFields();
                         //ChargeCalculation();
@@ -479,12 +506,7 @@ else
         //});
 
 
-        @*var Nature='@Model.Nature';
-        if (Nature != "Return")
-        {
-            $("#Rate").removeAttr('readonly');
-            $("#Amount").removeAttr('readonly');
-        }*@
+
 
         $("#ProductId").select2("focus");
 
@@ -690,7 +712,7 @@ else
 
         //$('#Amount').val($('#Rate').val()*$('#DealQty').val());
 
-        if ($('#Rate').val() != null && $('#Rate').val() != "" && $('#Rate').val() != 0 && Nature == "Return")
+        if ($('#Rate').val() != null && $('#Rate').val() != "" && $('#Rate').val() != 0)
         {
             TempAmount = ($('#DealQty').val() * $('#Rate').val())
 

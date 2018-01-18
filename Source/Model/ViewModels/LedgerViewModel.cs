@@ -111,6 +111,8 @@ namespace Model.ViewModels
         public int LedgerAccountId { get; set; }
         public string LedgerAccountName{ get; set; }
 
+        public string LedgerAccountGroupName { get; set; }
+
         [Display(Name = "Contra Ledger Account")]        
         public int? ContraLedgerAccountId { get; set; }
         public string ContraLedgerAccountName{ get; set; }

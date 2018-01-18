@@ -64,7 +64,7 @@ namespace Service
 
         IEnumerable<ComboBoxResult> GetPendingDispatchForInvoice(int id, string term);
 
-        IEnumerable<ComboBoxResult> FGetPromoCodeList(int ProductId, int BuyerId, DateTime DocDate);
+        IEnumerable<ComboBoxResult> FGetPromoCodeList(int ProductId, int BuyerId, DateTime DocDate, int ProcessId);
         IEnumerable<ComboBoxResult> FGetProductUidHelpList(int Id, string term);
         IEnumerable<ComboBoxResult> GetPendingPackingHeaderForSaleInvoice(int SaleInvoiceHeaderId, string term);
 
@@ -733,6 +733,8 @@ namespace Service
                         ProductName = p.Product.ProductName,
                         ProductUidId = tab.PackingLine.ProductUidId,
                         DiscountPer = ((p.Rate * p.DealQty) != 0) ? (p.DiscountPer != 0 && p.DiscountPer != null) ? p.DiscountPer : (p.DiscountAmount * 100 / (p.Rate * p.DealQty)) : 0,
+                        SalesTaxGroupProductId = p.SalesTaxGroupProductId,
+                        SalesTaxGroupProductName = p.SalesTaxGroupProduct.ChargeGroupProductName
                         //Dimension1Id = p.Dimension1Id,
                         //Dimension1Name = p.Dimension1.Dimension1Name,
                         //Dimension2Id = p.Dimension2Id,
@@ -1106,13 +1108,14 @@ namespace Service
                         );
         }
 
-        public IEnumerable<ComboBoxResult> FGetPromoCodeList(int ProductId, int BuyerId, DateTime DocDate)
+        public IEnumerable<ComboBoxResult> FGetPromoCodeList(int ProductId, int BuyerId, DateTime DocDate, int ProcessId)
         {
             SqlParameter SqlParameterProductId = new SqlParameter("@ProductId", ProductId);
             SqlParameter SqlParameterBuyerId = new SqlParameter("@BuyerId", BuyerId);
             SqlParameter SqlParameterDocDate = new SqlParameter("@DocDate", DocDate);
+            SqlParameter SqlParameterProcessId = new SqlParameter("@ProcessId", ProcessId);
 
-            IEnumerable<ComboBoxResult> PromoCodeList = db.Database.SqlQuery<ComboBoxResult>("" + ConfigurationManager.AppSettings["DataBaseSchema"] + ".sp_GetPromoCodeList @ProductId, @BuyerId, @DocDate", SqlParameterProductId, SqlParameterBuyerId, SqlParameterDocDate).ToList();
+            IEnumerable<ComboBoxResult> PromoCodeList = db.Database.SqlQuery<ComboBoxResult>("" + ConfigurationManager.AppSettings["DataBaseSchema"] + ".sp_GetPromoCodeList @ProductId, @BuyerId, @DocDate, @ProcessId", SqlParameterProductId, SqlParameterBuyerId, SqlParameterDocDate, SqlParameterProcessId).ToList();
 
             return PromoCodeList;
         }

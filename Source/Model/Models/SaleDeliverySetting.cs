@@ -26,6 +26,12 @@ namespace Model.Models
         public bool? isVisibleDimension3 { get; set; }
         public bool? isVisibleDimension4 { get; set; }
 
+        //For Index
+        public bool? isVisibleProductUid_Index { get; set; }
+        public bool? isVisibleProduct_Index { get; set; }
+        public bool? isVisibleProductGroup_Index { get; set; }
+        public bool? isVisibleSaleInvoice_Index { get; set; }
+
 
         public string filterLedgerAccountGroups { get; set; }
         public string filterLedgerAccounts { get; set; }

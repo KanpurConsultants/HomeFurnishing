@@ -253,7 +253,7 @@ namespace Service
             SqlParameter SqlParameterLedgerAccountGroup = new SqlParameter("@LedgerAccountGroup", !string.IsNullOrEmpty(LedgerAccountGroup) ? LedgerAccountGroup : (object)DBNull.Value);
 
 
-            string mQry = @"SELECT LA.LedgerAccountId, max(LA.LedgerAccountName + ',' + LA.LedgerAccountSuffix) AS LedgerAccountName, max(LAG.LedgerAccountGroupName) AS LedgerAccountGroupName, 
+            string mQry = @"SELECT LA.LedgerAccountId, max(LA.LedgerAccountName + ', ' + Case When P.PersonId Is Not Null Then P.Code Else LA.LedgerAccountSuffix End) AS LedgerAccountName, max(LAG.LedgerAccountGroupName) AS LedgerAccountGroupName, 
                             CASE WHEN sum(isnull(H.AmtDr,0)) - sum(isnull(H.AmtCr,0)) > 0 THEN sum(isnull(H.AmtDr,0)) - sum(isnull(H.AmtCr,0)) ELSE NULL  END AS AmtDr,
                             CASE WHEN sum(isnull(H.AmtDr,0)) - sum(isnull(H.AmtCr,0)) < 0 THEN abs(sum(isnull(H.AmtDr,0)) - sum(isnull(H.AmtCr,0))) ELSE NULL END AS AmtCr,
                             'Sub Trial Balance' AS ReportType, 'Ledger' AS OpenReportType    
@@ -261,6 +261,7 @@ namespace Service
                             LEFT JOIN web.LedgerHeaders LH WITH (Nolock) ON LH.LedgerHeaderId = H.LedgerHeaderId 
                             LEFT JOIN web.LedgerAccounts LA  WITH (Nolock) ON LA.LedgerAccountId = H.LedgerAccountId 
                             LEFT JOIN web.LedgerAccountGroups LAG  WITH (Nolock) ON LAG.LedgerAccountGroupId = LA.LedgerAccountGroupId 
+                            LEFT JOIN Web.People P On LA.PersonId = P.PersonId
                             WHERE 1 = 1 
                             AND LH.DocDate <= @ToDate " +
                             (SiteId != null ? " AND LH.SiteId IN (SELECT Items FROM [dbo].[Split] (@Site, ','))" : "") +
@@ -375,7 +376,7 @@ namespace Service
 
             string mPrimaryQry = @" WITH cteLedgerBalance AS
                                     ( 
-                                                SELECT L.LedgerAccountId, Max(LA.LedgerAccountName + ',' + LA.LedgerAccountSuffix) AS LedgerAccountName,
+                                                SELECT L.LedgerAccountId, Max(LA.LedgerAccountName + ', ' + Case When P.PersonId Is Not Null Then P.Code Else LA.LedgerAccountSuffix End) AS LedgerAccountName,
                                                 Sum(CASE WHEN H.DocDate < @FromDate THEN L.AmtDr - L.AmtCr ELSE 0 END) AS Opening,
                                                 Sum(CASE WHEN H.DocDate >= @FromDate AND H.DocDate <= @ToDate THEN L.AmtDr ELSE 0 END) AS AmtDr,
                                                 Sum(CASE WHEN H.DocDate >= @FromDate AND H.DocDate <= @ToDate THEN L.AmtCr ELSE 0 END) AS AmtCr,
@@ -384,6 +385,7 @@ namespace Service
                                                 INNER JOIN web.Ledgers L ON L.LedgerHeaderId = H.LedgerHeaderId
                                                 LEFT JOIN web.LedgerAccounts LA ON L.LedgerAccountId = LA.LedgerAccountId
                                                 LEFT JOIN web.LedgerAccountGroups LAG ON LA.LedgerAccountGroupId = LAG.LedgerAccountGroupId  		
+                                                LEFT JOIN Web.People P On LA.PersonId = P.PersonId
                                                 WHERE 1 = 1 " +
                                                 (SiteId != null ? " AND H.SiteId IN (SELECT Items FROM [dbo].[Split] (@Site, ','))" : "") +
                                                 (DivisionId != null ? " AND H.DivisionId IN (SELECT Items FROM [dbo].[Split] (@Division, ','))" : "") +
@@ -537,7 +539,7 @@ namespace Service
 	
 	                            SELECT LH.SiteId, LH.DivisionId, H.LedgerAccountId,  H.LedgerHeaderId, IsNull(LH.DocHeaderId,H.LedgerHeaderId) AS DocHeaderId,  LH.DocTypeId,  LA.LedgerAccountName,LA.PersonId, CLA.LedgerAccountName AS ContraLedgerAccountName, LH.DocNo, DT.DocumentTypeShortName, LH.DocDate  AS DocDate, 
 	                            CASE When '" + IsShowContraAccount + @"' = 'True' And CLA.LedgerAccountName Is Not Null 
-			                            Then '<Strong>' + CLA.LedgerAccountName + '</Strong>' + '</br>' + 
+			                            Then '<Strong>' + CLA.LedgerAccountName + ', ' + Case When P.PersonId Is Not Null Then P.Code Else CLA.LedgerAccountSuffix End  + '</Strong>' + '</br>' + 
 				                            CASE When Lh.PartyDocNo Is Not Null THen 'Party Doc No : ' + LH.PartyDocNo + ', ' Else '' End + 
 				                            CASE When Lh.PartyDocDate Is Not Null THen 'Party Doc Date : ' +  REPLACE(CONVERT(VARCHAR(11),LH.PartyDocDate,106), ' ','/')  + '</br>' Else '' End + 
 				                            CASE When H.ChqNo Is Not Null THen 'Chq No.: ' + H.ChqNo + ', ' Else '' End + 
@@ -559,6 +561,7 @@ namespace Service
 	                            LEFT JOIN web.DocumentTypes DT WITH (Nolock) ON DT.DocumentTypeId = LH.DocTypeId 
 	                            LEFT JOIN web.LedgerAccounts LA  WITH (Nolock) ON LA.LedgerAccountId = H.LedgerAccountId 
 	                            LEFT JOIN web.LedgerAccounts CLA  WITH (Nolock) ON CLA.LedgerAccountId = H.ContraLedgerAccountId  
+                                LEFT JOIN Web.People P On CLA.PersonId = P.PersonId
 	                            LEFT JOIN Web.CostCenters C WITH (Nolock) ON C.CostCenterId=H.CostCenterId
 	                            WHERE LA.LedgerAccountId IS NOT NULL " + mCondStr + mDateCondStr +
                             @" ) VMain 
@@ -984,7 +987,7 @@ namespace Service
 
             mQry = mQry + @"With cteGroupBalance AS
                                     (
-                                        SELECT LA.LedgerAccountGroupId, Max(LAG.LedgerAccountGroupName) LedgerAccountGroupName, 
+                                        SELECT LA.LedgerAccountGroupId, Max(LAG.LedgerAccountGroupName ) LedgerAccountGroupName, 
                                         Max(LAG.ParentLedgerAccountGroupId) ParentLedgerAccountGroupId, Max(PLAG.LedgerAccountGroupName) AS ParentLedgerAccountGroupName, 
                                         Sum(CASE WHEN H.DocDate < @FromDate THEN L.AmtDr-L.AmtCr ELSE 0 END) AS Opening,
                                         Sum(CASE WHEN H.DocDate >= @FromDate AND H.DocDate <= @ToDate THEN L.AmtDr ELSE 0 END) AS AmtDr,
@@ -1019,7 +1022,7 @@ namespace Service
 
             mQry = mQry + @" WITH cteLedgerBalance AS
                                     (
-                                        SELECT L.LedgerAccountId, Max(LA.LedgerAccountName) AS LedgerAccountName,
+                                        SELECT L.LedgerAccountId, Max(LA.LedgerAccountName + ', ' + Case When P.PersonId Is Not Null Then P.Code Else LA.LedgerAccountSuffix End) AS LedgerAccountName,
                                         Sum(CASE WHEN H.DocDate < @FromDate THEN L.AmtDr - L.AmtCr ELSE 0 END) AS Opening,
                                         Sum(CASE WHEN H.DocDate >= @FromDate AND H.DocDate <= @ToDate THEN L.AmtDr ELSE 0 END) AS AmtDr,
                                         Sum(CASE WHEN H.DocDate >= @FromDate AND H.DocDate <= @ToDate THEN L.AmtCr ELSE 0 END) AS AmtCr,
@@ -1028,6 +1031,7 @@ namespace Service
                                         INNER JOIN web.Ledgers L ON L.LedgerHeaderId = H.LedgerHeaderId
                                         LEFT JOIN web.LedgerAccounts LA ON L.LedgerAccountId = LA.LedgerAccountId
                                         LEFT JOIN web.LedgerAccountGroups LAG ON LA.LedgerAccountGroupId = LAG.LedgerAccountGroupId  		
+                                        LEFT JOIN Web.People P On LA.PersonId = P.PersonId
                                         WHERE 1 = 1 " +
                             (SiteId != null ? " AND H.SiteId IN (SELECT Items FROM [dbo].[Split] (@Site, ','))" : "") +
                             (DivisionId != null ? " AND H.DivisionId IN (SELECT Items FROM [dbo].[Split] (@Division, ','))" : "") +

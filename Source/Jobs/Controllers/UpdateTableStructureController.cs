@@ -2576,6 +2576,24 @@ namespace Module
 
             AddFields("SaleInvoiceSettings", "IsAutoDocNo", "BIT NOT NULL DEFAULT(0)");
 
+            AddFields("SaleInvoiceReturnLines", "SalesTaxGroupProductId", "Int", "ChargeGroupProduct");
+            AddFields("SaleInvoiceReturnHeaders", "SalesTaxGroupPersonId", "Int", "ChargeGroupPerson");
+
+
+            AddFields("SaleInvoiceSettings", "isVisibleProductUid_Index", "Bit");
+            AddFields("SaleInvoiceSettings", "isVisibleProduct_Index", "Bit");
+            AddFields("SaleInvoiceSettings", "isVisibleProductGroup_Index", "Bit");
+
+            AddFields("JobInvoiceSettings", "isVisibleProductUid_Index", "Bit");
+            AddFields("JobInvoiceSettings", "isVisibleProduct_Index", "Bit");
+            AddFields("JobInvoiceSettings", "isVisibleProductGroup_Index", "Bit");
+
+            AddFields("SaleDeliverySettings", "isVisibleProductUid_Index", "Bit");
+            AddFields("SaleDeliverySettings", "isVisibleProduct_Index", "Bit");
+            AddFields("SaleDeliverySettings", "isVisibleProductGroup_Index", "Bit");
+            AddFields("SaleDeliverySettings", "isVisibleSaleInvoice_Index", "Bit");
+
+
             ReCreateProcedures();
             DataCorrection();
 

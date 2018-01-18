@@ -44,3 +44,4 @@ D:\Sample\HomeFurnishing\Source\Core\bin\Debug\log4net.dll
 D:\Sample\HomeFurnishing\Source\Core\bin\Debug\log4net.xml
 D:\Sample\HomeFurnishing\Source\Core\obj\Debug\Core.dll
 D:\Sample\HomeFurnishing\Source\Core\obj\Debug\Core.pdb
+D:\Sample\HomeFurnishing\Source\Core\obj\Debug\Core.csprojResolveAssemblyReference.cache

@@ -510,6 +510,11 @@ namespace Service
 
             List<string> UserRoles = (List<string>)System.Web.HttpContext.Current.Session["Roles"];
 
+            int AdditionalChargesProductNatureId = 0;
+            var ProductNature = (from Pt in db.ProductNature where Pt.ProductNatureName == ProductNatureConstants.AdditionalCharges select Pt).FirstOrDefault();
+            if (ProductNature != null)
+                AdditionalChargesProductNatureId = ProductNature.ProductNatureId;
+
 
             var TempJobInvoiceHeaderCharges = from H in db.JobInvoiceHeader
                                                join Hc in db.JobInvoiceHeaderCharges on H.JobInvoiceHeaderId equals Hc.HeaderTableId into JobInvoiceHeaderChargesTable
@@ -523,10 +528,25 @@ namespace Service
                                                    NetAmount = JobInvoiceHeaderChargesTab.Amount
                                                };
 
+            var TempProductDetail = from H in db.JobInvoiceHeader
+                                    join L in db.JobInvoiceLine on H.JobInvoiceHeaderId equals L.JobInvoiceHeaderId into JobInvoiceLineTable
+                                    from JobInvoiceLineTab in JobInvoiceLineTable.DefaultIfEmpty()
+                                    where H.DivisionId == DivisionId && H.SiteId == SiteId && H.DocTypeId == id && JobInvoiceLineTab.JobReceiveLine.Product.ProductGroup.ProductType.ProductNatureId != AdditionalChargesProductNatureId && JobInvoiceLineTab.Qty != 0
+                                    group new { JobInvoiceLineTab } by new { JobInvoiceLineTab.JobInvoiceHeaderId } into Result
+                                    select new
+                                    {
+                                        JobInvoiceHeaderId = Result.Key.JobInvoiceHeaderId,
+                                        ProductUidName = Result.Max(i => i.JobInvoiceLineTab.JobReceiveLine.ProductUid.ProductUidName),
+                                        ProductName = Result.Max(i => i.JobInvoiceLineTab.JobReceiveLine.Product.ProductName),
+                                        ProductGroupName = Result.Max(i => i.JobInvoiceLineTab.JobReceiveLine.Product.ProductGroup.ProductGroupName),
+                                    };
+
 
             return (from p in db.JobInvoiceHeader
                     join Hc in TempJobInvoiceHeaderCharges on p.JobInvoiceHeaderId equals Hc.JobInvoiceHeaderId into JobInvoiceHeaderChargesTable
                     from JobInvoiceHeaderChargesTab in JobInvoiceHeaderChargesTable.DefaultIfEmpty()
+                    join Tp in TempProductDetail on p.JobInvoiceHeaderId equals Tp.JobInvoiceHeaderId into TempProductDetailTable
+                    from TempProductDetailTab in TempProductDetailTable.DefaultIfEmpty()
                     orderby p.DocDate descending, p.DocNo descending
                     where p.SiteId == SiteId && p.DivisionId == DivisionId && p.DocTypeId == id
                     select new JobInvoiceHeaderViewModel
@@ -547,6 +567,12 @@ namespace Service
                         Reviewed = (SqlFunctions.CharIndex(Uname, p.ReviewBy) > 0),
                         TotalQty = p.JobInvoiceLines.Sum(m => m.Qty),
                         TotalAmount = JobInvoiceHeaderChargesTab.NetAmount ?? (p.JobInvoiceLines.Sum(m => m.Amount)),
+
+                        ProductUidName = TempProductDetailTab.ProductUidName,
+                        ProductName = TempProductDetailTab.ProductName,
+                        ProductGroupName = TempProductDetailTab.ProductGroupName,
+
+
                         DecimalPlaces = (from o in p.JobInvoiceLines
                                          join rl in db.JobReceiveLine on o.JobReceiveLineId equals rl.JobReceiveLineId
                                          join ol in db.JobOrderLine on rl.JobOrderLineId equals ol.JobOrderLineId

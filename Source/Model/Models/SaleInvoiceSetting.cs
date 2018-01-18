@@ -35,6 +35,14 @@ namespace Model.Models
         public bool? isVisiblePacking { get; set; }
 
         public bool? isVisibleGodown { get; set; }
+
+
+        //For Index
+        public bool? isVisibleProductUid_Index { get; set; }
+        public bool? isVisibleProduct_Index { get; set; }
+        public bool? isVisibleProductGroup_Index { get; set; }
+
+
         public bool CalculateDiscountOnRate { get; set; }
         public string filterLedgerAccountGroups { get; set; }
         public string filterLedgerAccounts { get; set; }

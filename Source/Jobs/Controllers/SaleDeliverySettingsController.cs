@@ -141,6 +141,12 @@ namespace Jobs.Controllers
                     temp.isVisibleDimension4 = pt.isVisibleDimension4;
                     temp.isVisibleDealUnit = pt.isVisibleDealUnit;
 
+                    temp.isVisibleProductUid_Index = pt.isVisibleProductUid_Index;
+                    temp.isVisibleProduct_Index = pt.isVisibleProduct_Index;
+                    temp.isVisibleProductGroup_Index = pt.isVisibleProductGroup_Index;
+                    temp.isVisibleSaleInvoice_Index = pt.isVisibleSaleInvoice_Index;
+
+
 
                     temp.filterLedgerAccountGroups = pt.filterLedgerAccountGroups;
                     temp.filterLedgerAccounts = pt.filterLedgerAccounts;
@@ -301,6 +307,12 @@ namespace Jobs.Controllers
                     temp.isVisibleDimension2 = pt.isVisibleDimension2;
                     temp.isVisibleDimension3 = pt.isVisibleDimension3;
                     temp.isVisibleDimension4 = pt.isVisibleDimension4;
+
+                    temp.isVisibleProductUid_Index = pt.isVisibleProductUid_Index;
+                    temp.isVisibleProduct_Index = pt.isVisibleProduct_Index;
+                    temp.isVisibleProductGroup_Index = pt.isVisibleProductGroup_Index;
+                    temp.isVisibleSaleInvoice_Index = pt.isVisibleSaleInvoice_Index;
+
                     temp.SqlProcGatePass = pt.SqlProcGatePass;
                     temp.SqlProcDocumentPrint = pt.SqlProcDocumentPrint;
                     temp.UnitConversionForId = pt.UnitConversionForId;

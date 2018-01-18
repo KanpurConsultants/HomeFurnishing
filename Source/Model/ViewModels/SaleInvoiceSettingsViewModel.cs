@@ -74,6 +74,12 @@ namespace Model.ViewModel
         public bool isVisibleSalesExecutive { get; set; }
         public bool isVisibleShipToPartyAddress { get; set; }
 
+
+        //For Index
+        public bool isVisibleProductUid_Index { get; set; }
+        public bool isVisibleProduct_Index { get; set; }
+        public bool isVisibleProductGroup_Index { get; set; }
+
         public int? CurrencyId { get; set; }
         public int? DeliveryTermsId { get; set; }
         public int? ShipMethodId { get; set; }

@@ -78,6 +78,10 @@ namespace Model.ViewModel
         public decimal? TotalQty { get; set; }
         public decimal? TotalAmount { get; set; }
         public int? DecimalPlaces { get; set; }
+
+        public string ProductUidName { get; set; }
+        public string ProductName { get; set; }
+        public string ProductGroupName { get; set; }
         public List<DocumentTypeHeaderAttributeViewModel> DocumentTypeHeaderAttributes { get; set; }
     }
 

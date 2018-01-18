@@ -56,6 +56,13 @@ namespace Model.ViewModel
         public bool isVisibleMfgDate { get; set; }
         public bool isVisibleGodown { get; set; }
         public bool isVisibleJobReceiveBy { get; set; }
+
+
+        //For Index
+        public bool isVisibleProductUid_Index { get; set; }
+        public bool isVisibleProduct_Index { get; set; }
+        public bool isVisibleProductGroup_Index { get; set; }
+
         public bool isPostedInStock { get; set; }
         public bool isPostedInStockProcess { get; set; }
         public bool isPostedInStockVirtual { get; set; }

@@ -112,6 +112,5 @@ D:\Sample\HomeFurnishing\Source\Components\bin\Debug\EntityFramework.SqlServer.x
 D:\Sample\HomeFurnishing\Source\Components\bin\Debug\Microsoft.AspNet.Identity.Core.xml
 D:\Sample\HomeFurnishing\Source\Components\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.xml
 D:\Sample\HomeFurnishing\Source\Components\bin\Debug\log4net.xml
-D:\Sample\HomeFurnishing\Source\Components\obj\Debug\Components.csprojResolveAssemblyReference.cache
 D:\Sample\HomeFurnishing\Source\Components\obj\Debug\Components.dll
 D:\Sample\HomeFurnishing\Source\Components\obj\Debug\Components.pdb
