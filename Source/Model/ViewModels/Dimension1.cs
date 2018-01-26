@@ -20,6 +20,10 @@ namespace Model.ViewModels
         [Key]
         public int Dimension1Id { get; set; }
 
+        public virtual DocumentType DocType { get; set; }
+        [ForeignKey("DocType")]
+        public int? DocTypeId { get; set; }
+
         [Display (Name="Name")]
         [MaxLength(50), Required]
         [Index("IX_Dimension1_Dimension1Name", IsUnique = true)]
@@ -29,6 +33,10 @@ namespace Model.ViewModels
         [Display(Name = "ProductType")]
         public int? ProductTypeId { get; set; }
         public virtual ProductType ProductType { get; set; }
+
+        public Decimal? Multiplier { get; set; }
+        public int? CostCenterId { get; set; }
+
 
         [Display(Name = "Is Active ?")]
         public Boolean IsActive { get; set; }

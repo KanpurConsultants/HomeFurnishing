@@ -99,6 +99,9 @@
     <Compile Include="DatabaseViews\ViewPackingBalance.cs" />
     <Compile Include="DatabaseViews\ViewStockProcessBalance.cs" />
     <Compile Include="DatabaseViews\ViewStockInBalance.cs" />
+    <Compile Include="DatabaseViews\_Menu.cs" />
+    <Compile Include="DatabaseViews\_ReportHeader.cs" />
+    <Compile Include="DatabaseViews\_ReportLine.cs" />
     <Compile Include="DatabaseViews\_Users.cs" />
     <Compile Include="DatabaseViews\ViewMaterialRequestViewModels.cs" />
     <Compile Include="DatabaseViews\SaleInvoiceViewModel.cs" />
@@ -108,19 +111,30 @@
     <Compile Include="DatabaseViews\StockVirtual.cs" />
     <Compile Include="Models\ActivityLog.cs" />
     <Compile Include="Models\BinLocation.cs" />
+    <Compile Include="Models\Caste.cs" />
     <Compile Include="Models\ChargeGroupPersonCalculation.cs" />
+    <Compile Include="Models\CollectionSetting.cs" />
     <Compile Include="Models\DAR.cs" />
+    <Compile Include="Models\Dimension1Extended.cs" />
+    <Compile Include="Models\DiscountType.cs" />
     <Compile Include="Models\DocumentNature.cs" />
     <Compile Include="Models\DocumentLineAttributes.cs" />
     <Compile Include="Models\DocumentHeaderAttributes.cs" />
     <Compile Include="Models\ChargeGroupSettings.cs" />
+    <Compile Include="Models\DocumentTypeAttributes.cs" />
     <Compile Include="Models\DocumentTypeProcess.cs" />
     <Compile Include="Models\JobInvoiceHeaderAttributes.cs" />
     <Compile Include="Models\JobOrderBomMaterialIssue.cs" />
     <Compile Include="Models\Notification.cs" />
     <Compile Include="Models\NotificationSubject.cs" />
     <Compile Include="Models\NotificationUser.cs" />
+    <Compile Include="Models\PaymentMode.cs" />
+    <Compile Include="Models\PaymentModeLedgerAccount.cs" />
+    <Compile Include="Models\PersonAttributes.cs" />
+    <Compile Include="Models\PersonExtended.cs" />
     <Compile Include="Models\PersonProductUid.cs" />
+    <Compile Include="Models\ProductBuyerExtended.cs" />
+    <Compile Include="Models\ProductBuyerLog.cs" />
     <Compile Include="Models\ProductCategorySettings.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -128,6 +142,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Models\Project.cs" />
+    <Compile Include="Models\Religion.cs" />
     <Compile Include="Models\RolesDocTypeProcess.cs" />
     <Compile Include="Models\RolesDocType.cs" />
     <Compile Include="Models\SaleQuotationHeaderAttributes.cs" />
@@ -244,19 +259,27 @@
     <Compile Include="Models\UserTeam.cs" />
     <Compile Include="ViewModels\BankReconciliationViewModel.cs" />
     <Compile Include="ViewModels\ChargeGroupPersonCalculationViewModel.cs" />
+    <Compile Include="ViewModels\CollectionSettingsViewModel.cs" />
+    <Compile Include="ViewModels\CollectionViewModel.cs" />
     <Compile Include="ViewModels\CompanySettingsViewModel.cs" />
     <Compile Include="ViewModels\ControllerActionViewModel.cs" />
     <Compile Include="ViewModels\DARViewModel.cs" />
-    <Compile Include="ViewModels\Dimension1.cs" />
+    <Compile Include="ViewModels\Dimension1.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="ViewModels\DocumentCancelViewModel.cs" />
+    <Compile Include="ViewModels\DocumentTypeAttributeViewModel.cs" />
     <Compile Include="ViewModels\DocumentTypeViewModel.cs" />
     <Compile Include="ViewModels\JobRatePenaltyUpdateViewModel.cs" />
     <Compile Include="ViewModels\LedgerAccountViewModel.cs" />
     <Compile Include="ViewModels\MvcControllerViewModel.cs" />
     <Compile Include="ViewModels\NotificationContentViewModel.cs" />
     <Compile Include="ViewModels\NotificationViewModel.cs" />
+    <Compile Include="ViewModels\PaymentModeViewModel.cs" />
     <Compile Include="ViewModels\PersonProductUidViewModel.cs" />
     <Compile Include="ViewModels\ProjectViewModel.cs" />
+    <Compile Include="ViewModels\PropertyHeaderViewModel.cs" />
+    <Compile Include="ViewModels\PropertyLineViewModel.cs" />
     <Compile Include="ViewModels\PurchaseOrderLineDetailViewModel.cs" />
     <Compile Include="ViewModels\PurchaseOrderLineIndexViewModel.cs" />
     <Compile Include="ViewModels\ReportLineViewModel.cs" />
@@ -264,7 +287,7 @@
     <Compile Include="ViewModels\RolesControllerActionViewModel.cs" />
     <Compile Include="ViewModels\SiteViewModel.cs" />
     <Compile Include="ViewModels\SmsViewModel.cs" />
-    <Compile Include="ViewModels\DocumentTypeAttributeViewModel.cs" />
+    <Compile Include="ViewModels\DocumentTypeHeaderAttributeViewModel.cs" />
     <Compile Include="ViewModels\ImportHeaderViewModel.cs" />
     <Compile Include="ViewModels\ImportLineViewModel.cs" />
     <Compile Include="ViewModels\ImportMessageViewModel.cs" />

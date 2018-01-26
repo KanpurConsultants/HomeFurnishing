@@ -37,6 +37,7 @@ namespace Model.Models
         [Display(Name = "Product Id")]
         public int ProductId { get; set; }
 
+
         [MaxLength(50, ErrorMessage = "ProductCode cannot exceed 50 characters"), Required]
         [Display(Name = "Product Code")]
         [Index("IX_Product_ProductCode", IsUnique = true)]

@@ -1,13 +1,16 @@
 ﻿using System.Web.Mvc;
 using Data.Models;
 using Service;
-using Model.ViewModel;
 using System.Collections.Generic;
-using Core.Common;
-using Model.Models;
 using System;
 using System.Linq;
 using System.IO;
+using Components.Logging;
+using Model.ViewModel;
+using Jobs.Controllers;
+using Model.Models;
+using Core.Common;
+using Model.ViewModels;
 
 namespace Jobs.Controllers
 {
@@ -32,7 +35,6 @@ namespace Jobs.Controllers
         {
 
             List<DocumentAttachmentViewModel> vm = new List<DocumentAttachmentViewModel>();
-
             var Attachments = (from p in db.DocumentAttachment.AsNoTracking()
                                where p.DocId == DocId && p.DocTypeId == p.DocTypeId
                                select p).ToList();
@@ -168,7 +170,7 @@ namespace Jobs.Controllers
         {
             if (!string.IsNullOrEmpty((string)TempData["CSEXC"]))
             {
-                CookieGenerator.CreateNotificationCookie(NotificationTypeConstants.Danger, (string)TempData["CSEXC"]);
+                //CookieGenerator.CreateNotificationCookie(NotificationTypeConstants.Danger, (string)TempData["CSEXC"]);
                 TempData.Remove("CSEXC");
             }
             if (disposing)

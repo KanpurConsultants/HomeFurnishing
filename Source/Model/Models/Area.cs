@@ -9,6 +9,7 @@ namespace Model.Models
         [Key]
         public int AreaId { get; set; }
 
+
         [Display (Name="Name")]
         [MaxLength(50, ErrorMessage = "Area Name cannot exceed 50 characters"), Required]
         [Index("IX_Area_AreaName", IsUnique = true)]

@@ -7039,6 +7039,23 @@ namespace Jobs.Controllers
             };
         }
 
+        public JsonResult GetPersonWithDocType(string searchTerm, int pageSize, int pageNum, int? filter)//filter:PersonId
+        {
+            var temp = cbl.GetPersonHelpListWithDocTypeFilter(filter, searchTerm).Skip(pageSize * (pageNum - 1)).Take(pageSize).ToList();
+
+            var count = cbl.GetPersonHelpListWithDocTypeFilter(filter, searchTerm).Count();
+
+            ComboBoxPagedResult Data = new ComboBoxPagedResult();
+            Data.Results = temp;
+            Data.Total = count;
+
+            return new JsonpResult
+            {
+                Data = Data,
+                JsonRequestBehavior = JsonRequestBehavior.AllowGet
+            };
+        }
+
         public JsonResult SetSingleCalculationFooter(int Ids)
         {
             ComboBoxResult ProductJson = new ComboBoxResult();
@@ -7127,6 +7144,187 @@ namespace Jobs.Controllers
         }
 
 
+
+
+
+        public JsonResult GetArea(string searchTerm, int pageSize, int pageNum)
+        {
+            var Query = cbl.GetArea(searchTerm);
+            var temp = Query.Skip(pageSize * (pageNum - 1)).Take(pageSize).ToList();
+
+            var count = Query.Count();
+
+            ComboBoxPagedResult Data = new ComboBoxPagedResult();
+            Data.Results = temp;
+            Data.Total = count;
+
+            return new JsonpResult
+            {
+                Data = Data,
+                JsonRequestBehavior = JsonRequestBehavior.AllowGet
+            };
+        }
+        public JsonResult SetSingleArea(int Ids)
+        {
+            ComboBoxResult AreaJson = new ComboBoxResult();
+
+            Area Area = (from b in db.Area
+                                       where b.AreaId == Ids
+                                       select b).FirstOrDefault();
+
+            AreaJson.id = Area.AreaId.ToString();
+            AreaJson.text = Area.AreaName;
+
+            return Json(AreaJson);
+        }
+
+
+        public JsonResult GetCaste(string searchTerm, int pageSize, int pageNum)
+        {
+            var Query = cbl.GetCaste(searchTerm);
+            var temp = Query.Skip(pageSize * (pageNum - 1)).Take(pageSize).ToList();
+
+            var count = Query.Count();
+
+            ComboBoxPagedResult Data = new ComboBoxPagedResult();
+            Data.Results = temp;
+            Data.Total = count;
+
+            return new JsonpResult
+            {
+                Data = Data,
+                JsonRequestBehavior = JsonRequestBehavior.AllowGet
+            };
+        }
+        public JsonResult SetSingleCaste(int Ids)
+        {
+            ComboBoxResult CasteJson = new ComboBoxResult();
+
+            Caste Caste = (from b in db.Caste
+                         where b.CasteId == Ids
+                         select b).FirstOrDefault();
+
+            CasteJson.id = Caste.CasteId.ToString();
+            CasteJson.text = Caste.CasteName;
+
+            return Json(CasteJson);
+        }
+
+
+        public JsonResult GetReligion(string searchTerm, int pageSize, int pageNum)
+        {
+            var Query = cbl.GetReligion(searchTerm);
+            var temp = Query.Skip(pageSize * (pageNum - 1)).Take(pageSize).ToList();
+
+            var count = Query.Count();
+
+            ComboBoxPagedResult Data = new ComboBoxPagedResult();
+            Data.Results = temp;
+            Data.Total = count;
+
+            return new JsonpResult
+            {
+                Data = Data,
+                JsonRequestBehavior = JsonRequestBehavior.AllowGet
+            };
+        }
+        public JsonResult SetSingleReligion(int Ids)
+        {
+            ComboBoxResult ReligionJson = new ComboBoxResult();
+
+            Religion Religion = (from b in db.Religion
+                         where b.ReligionId == Ids
+                         select b).FirstOrDefault();
+
+            ReligionJson.id = Religion.ReligionId.ToString();
+            ReligionJson.text = Religion.ReligionName;
+
+            return Json(ReligionJson);
+        }
+
+
+
+        public JsonResult GetDiscountType(string searchTerm, int pageSize, int pageNum)
+        {
+            var Query = cbl.GetDiscountType(searchTerm);
+            var temp = Query.Skip(pageSize * (pageNum - 1)).Take(pageSize).ToList();
+
+            var count = Query.Count();
+
+            ComboBoxPagedResult Data = new ComboBoxPagedResult();
+            Data.Results = temp;
+            Data.Total = count;
+
+            return new JsonpResult
+            {
+                Data = Data,
+                JsonRequestBehavior = JsonRequestBehavior.AllowGet
+            };
+        }
+        public JsonResult SetSingleDiscountType(int Ids)
+        {
+            ComboBoxResult DiscountTypeJson = new ComboBoxResult();
+
+            DiscountType DiscountType = (from b in db.DiscountType
+                                 where b.DiscountTypeId == Ids
+                                 select b).FirstOrDefault();
+
+            DiscountTypeJson.id = DiscountType.DiscountTypeId.ToString();
+            DiscountTypeJson.text = DiscountType.DiscountTypeName;
+
+            return Json(DiscountTypeJson);
+        }
+
+
+
+        public JsonResult GetPaymentMode(string searchTerm, int pageSize, int pageNum)
+        {
+            var Query = cbl.GetPaymentMode(searchTerm);
+            var temp = Query.Skip(pageSize * (pageNum - 1)).Take(pageSize).ToList();
+
+            var count = Query.Count();
+
+            ComboBoxPagedResult Data = new ComboBoxPagedResult();
+            Data.Results = temp;
+            Data.Total = count;
+
+            return new JsonpResult
+            {
+                Data = Data,
+                JsonRequestBehavior = JsonRequestBehavior.AllowGet
+            };
+        }
+        public JsonResult SetSinglePaymentMode(int Ids)
+        {
+            ComboBoxResult PaymentModeJson = new ComboBoxResult();
+
+            PaymentMode PaymentMode = (from b in db.PaymentMode
+                                         where b.PaymentModeId == Ids
+                                         select b).FirstOrDefault();
+
+            PaymentModeJson.id = PaymentMode.PaymentModeId.ToString();
+            PaymentModeJson.text = PaymentMode.PaymentModeName;
+
+            return Json(PaymentModeJson);
+        }
+
+        public JsonResult GetBillingType(string searchTerm, int pageSize, int pageNum)
+        {
+            return new JsonpResult
+            {
+                Data = cbl.GetBillingType(searchTerm, pageSize, pageNum),
+                JsonRequestBehavior = JsonRequestBehavior.AllowGet
+            };
+        }
+        public JsonResult SetSingleBillingType(string Ids)
+        {
+            ComboBoxResult ProductJson = new ComboBoxResult();
+
+            ProductJson.id = Ids;
+            ProductJson.text = Ids;
+
+            return Json(ProductJson);
+        }
     }
 }
 

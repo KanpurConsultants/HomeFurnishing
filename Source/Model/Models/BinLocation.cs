@@ -14,6 +14,9 @@ namespace Model.Models
         [Display(Name = "BinLocation Id")]
         public int BinLocationId { get; set; }
 
+
+
+
         [ForeignKey("Godown")]
         public int GodownId { get; set; }
         public virtual Godown Godown { get; set; }

@@ -164,6 +164,7 @@ namespace Service
         IQueryable<ComboBoxResult> GetJobWorkerHelpListWithProcessFilter(int Processid, string term);
         IQueryable<ComboBoxResult> GetEmployeeHelpListWithProcessFilter(int Processid, string term);
         IQueryable<ComboBoxResult> GetPersonHelpListWithProcessFilter(int? Processid, string term);
+        IQueryable<ComboBoxResult> GetPersonHelpListWithDocTypeFilter(int? DocTypeId, string term);
         IQueryable<ComboBoxResult> GetPersonRateGroupHelpList(string term, int filter);
         IQueryable<ComboBoxResult> GetProductRateGroupHelpList(string term, int filter);
         IQueryable<ComboBoxResult> GetControllerActionList(string term);
@@ -201,6 +202,13 @@ namespace Service
         IQueryable<ComboBoxResult> GetDivisions(string term);
         IQueryable<ComboBoxResult> GetPerson(string term);
         IEnumerable<ComboBoxResult> GetProductIndexFilterParameter(string term);
+
+        IQueryable<ComboBoxResult> GetArea(string term);
+        IQueryable<ComboBoxResult> GetCaste(string term);
+        IQueryable<ComboBoxResult> GetReligion(string term);
+        IQueryable<ComboBoxResult> GetDiscountType(string term);
+        IQueryable<ComboBoxResult> GetPaymentMode(string term);
+        ComboBoxPagedResult GetBillingType(string searchTerm, int pageSize, int pageNum);
 
         List<ComboBoxResult> SetSelct2Data(string Id, string SqlProcSet);
         ComboBoxResult SetSingleSelect2Data(int Id, string SqlProcSet);
@@ -3296,6 +3304,123 @@ namespace Service
             return list;
         }
 
+
+        public IQueryable<ComboBoxResult> GetArea(string term)
+        {
+            var list = (from D in db.Area
+                        where (string.IsNullOrEmpty(term) ? 1 == 1 : (D.AreaName.ToLower().Contains(term.ToLower())))
+                        orderby D.AreaName
+                        select new ComboBoxResult
+                        {
+                            id = D.AreaId.ToString(),
+                            text = D.AreaName
+                        }
+              );
+            return list;
+        }
+
+        public IQueryable<ComboBoxResult> GetCaste(string term)
+        {
+            var list = (from D in db.Caste
+                        where (string.IsNullOrEmpty(term) ? 1 == 1 : (D.CasteName.ToLower().Contains(term.ToLower())))
+                        orderby D.CasteName
+                        select new ComboBoxResult
+                        {
+                            id = D.CasteId.ToString(),
+                            text = D.CasteName
+                        }
+              );
+            return list;
+        }
+
+        public IQueryable<ComboBoxResult> GetReligion(string term)
+        {
+            var list = (from D in db.Religion
+                        where (string.IsNullOrEmpty(term) ? 1 == 1 : (D.ReligionName.ToLower().Contains(term.ToLower())))
+                        orderby D.ReligionName
+                        select new ComboBoxResult
+                        {
+                            id = D.ReligionId.ToString(),
+                            text = D.ReligionName
+                        }
+              );
+            return list;
+        }
+
+        public IQueryable<ComboBoxResult> GetDiscountType(string term)
+        {
+            var list = (from D in db.DiscountType
+                        where (string.IsNullOrEmpty(term) ? 1 == 1 : (D.DiscountTypeName.ToLower().Contains(term.ToLower())))
+                        orderby D.DiscountTypeName
+                        select new ComboBoxResult
+                        {
+                            id = D.DiscountTypeId.ToString(),
+                            text = D.DiscountTypeName
+                        }
+              );
+            return list;
+        }
+
+
+        public IQueryable<ComboBoxResult> GetPaymentMode(string term)
+        {
+            var list = (from D in db.PaymentMode
+                        where (string.IsNullOrEmpty(term) ? 1 == 1 : (D.PaymentModeName.ToLower().Contains(term.ToLower())))
+                        orderby D.PaymentModeName
+                        select new ComboBoxResult
+                        {
+                            id = D.PaymentModeId.ToString(),
+                            text = D.PaymentModeName
+                        }
+              );
+            return list;
+        }
+
+
+        public ComboBoxPagedResult GetBillingType(string searchTerm, int pageSize, int pageNum)
+        {
+            List<ComboBoxResult> list = new List<ComboBoxResult>();
+            list.Add(new ComboBoxResult { id = "Regular", text = "Regular" });
+            list.Add(new ComboBoxResult { id = "Juridicial", text = "Juridicial" });
+            list.Add(new ComboBoxResult { id = "Hold", text = "Hold" });
+
+
+            ComboBoxPagedResult Data = new ComboBoxPagedResult();
+            Data.Results = list;
+
+            return Data;
+        }
+
+
+
+        public IQueryable<ComboBoxResult> GetPersonHelpListWithDocTypeFilter(int? DocTypeId, string term)
+        {
+
+            int CurrentSiteId = (int)System.Web.HttpContext.Current.Session["SiteId"];
+            int CurrentDivisionId = (int)System.Web.HttpContext.Current.Session["DivisionId"];
+
+            string DivId = "|" + CurrentDivisionId.ToString() + "|";
+            string SiteId = "|" + CurrentSiteId.ToString() + "|";
+
+            var list = (from b in db.Persons
+                        join bus in db.BusinessEntity on b.PersonID equals bus.PersonID into BusinessEntityTable
+                        from BusinessEntityTab in BusinessEntityTable.DefaultIfEmpty()
+                        where (DocTypeId.HasValue ? b.DocTypeId == DocTypeId : 1 == 1)
+                        && (string.IsNullOrEmpty(term) ? 1 == 1 : b.Name.ToLower().Contains(term.ToLower()) || b.Code.ToLower().Contains(term.ToLower()))
+                        && (BusinessEntityTab.DivisionIds == null ? 1 == 1 : BusinessEntityTab.DivisionIds.IndexOf(DivId) != -1)
+                        && (BusinessEntityTab.SiteIds == null ? 1 == 1 : BusinessEntityTab.SiteIds.IndexOf(SiteId) != -1)
+                        && (b.IsActive == null ? 1 == 1 : b.IsActive == true)
+                        group b by b.PersonID into G
+                        orderby G.Max(m => m.Name)
+                        select new ComboBoxResult
+                        {
+                            id = G.Key.ToString(),
+                            text = G.Max(m => m.Name) + "|" + G.Max(m => m.Code),
+                        }
+              );
+
+            return list;
+        }
 
         #region "For Sql Procedure Help"
 

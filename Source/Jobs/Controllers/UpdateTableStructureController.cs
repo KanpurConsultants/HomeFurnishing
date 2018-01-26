@@ -2594,6 +2594,420 @@ namespace Module
             AddFields("SaleDeliverySettings", "isVisibleSaleInvoice_Index", "Bit");
 
 
+            //Start Property Tax
+
+            try
+            {
+                if ((int)ExecuteScaler("SELECT Count(*) AS Cnt FROM INFORMATION_SCHEMA.Tables WHERE TABLE_NAME = 'Castes'") == 0)
+                {
+                    mQry = @"CREATE TABLE Web.Castes
+	                        (
+	                        CasteId      INT IDENTITY NOT NULL,
+	                        CasteName    NVARCHAR (50) NOT NULL,
+	                        IsActive     BIT DEFAULT ((1)) NOT NULL,
+	                        CreatedBy    NVARCHAR (max),
+	                        ModifiedBy   NVARCHAR (max),
+	                        CreatedDate  DATETIME NOT NULL,
+	                        ModifiedDate DATETIME NOT NULL,
+	                        OMSId        NVARCHAR (50),
+	                        Site_SiteId  INT,
+	                        GateId       INT,
+	                        DocTypeId    INT,
+	                        CONSTRAINT [PK_Web.Castes] PRIMARY KEY (CasteId)
+	                        WITH (FILLFACTOR = 90),
+	                        CONSTRAINT [FK_Web.Castes_Web.DocumentTypes_DocTypeId] FOREIGN KEY (DocTypeId) REFERENCES Web.DocumentTypes (DocumentTypeId)
+	                        )
+
+                        CREATE UNIQUE INDEX IX_Caste_CasteName
+	                        ON Web.Castes (CasteName)
+	                        WITH (FILLFACTOR = 90) ";
+                    ExecuteQuery(mQry);
+                }
+            }
+            catch (Exception ex)
+            {
+                RecordError(ex);
+            }
+
+
+            try
+            {
+                if ((int)ExecuteScaler("SELECT Count(*) AS Cnt FROM INFORMATION_SCHEMA.Tables WHERE TABLE_NAME = 'DocumentTypeAttributes'") == 0)
+                {
+                    mQry = @"CREATE TABLE Web.DocumentTypeAttributes
+	                        (
+	                        DocumentTypeAttributeId INT IDENTITY NOT NULL,
+	                        Name                    NVARCHAR (max) NOT NULL,
+	                        IsMandatory             BIT NOT NULL,
+	                        DataType                NVARCHAR (max),
+	                        ListItem                NVARCHAR (max),
+	                        DefaultValue            NVARCHAR (max),
+	                        IsActive                BIT NOT NULL,
+	                        DocumentTypeId          INT NOT NULL,
+	                        CreatedBy               NVARCHAR (max),
+	                        ModifiedBy              NVARCHAR (max),
+	                        CreatedDate             DATETIME NOT NULL,
+	                        ModifiedDate            DATETIME NOT NULL,
+	                        OMSId                   NVARCHAR (50),
+	                        CONSTRAINT [PK_Web.DocumentTypeAttributes] PRIMARY KEY (DocumentTypeAttributeId)
+	                        WITH (FILLFACTOR = 90),
+	                        CONSTRAINT [FK_Web.DocumentTypeAttributes_Web.DocumentTypes_DocumentTypeId] FOREIGN KEY (DocumentTypeId) REFERENCES Web.DocumentTypes (DocumentTypeId)
+	                        )
+
+                        CREATE INDEX IX_DocumentType_DocumentTypeId
+	                        ON Web.DocumentTypeAttributes (DocumentTypeId)
+	                        WITH (FILLFACTOR = 90) ";
+                    ExecuteQuery(mQry);
+                }
+            }
+            catch (Exception ex)
+            {
+                RecordError(ex);
+            }
+
+            try
+            {
+                if ((int)ExecuteScaler("SELECT Count(*) AS Cnt FROM INFORMATION_SCHEMA.Tables WHERE TABLE_NAME = 'DiscountTypes'") == 0)
+                {
+                    mQry = @"CREATE TABLE Web.DiscountTypes
+	                        (
+	                        DiscountTypeId   INT IDENTITY NOT NULL,
+	                        DiscountTypeName NVARCHAR (50) NOT NULL,
+	                        Rate             DECIMAL (18, 4) NOT NULL,
+	                        IsActive         BIT DEFAULT ((1)) NOT NULL,
+	                        CreatedBy        NVARCHAR (max),
+	                        ModifiedBy       NVARCHAR (max),
+	                        CreatedDate      DATETIME NOT NULL,
+	                        ModifiedDate     DATETIME NOT NULL,
+	                        OMSId            NVARCHAR (50),
+	                        Site_SiteId      INT,
+	                        GateId           INT,
+	                        DocTypeId        INT,
+	                        CONSTRAINT [PK_Web.DiscountTypes] PRIMARY KEY (DiscountTypeId)
+	                        WITH (FILLFACTOR = 90),
+	                        CONSTRAINT [FK_Web.DiscountTypes_Web.DocumentTypes_DocTypeId] FOREIGN KEY (DocTypeId) REFERENCES Web.DocumentTypes (DocumentTypeId)
+	                        )
+
+                        CREATE UNIQUE INDEX IX_DiscountType_DiscountTypeName
+	                        ON Web.DiscountTypes (DiscountTypeName)
+	                        WITH (FILLFACTOR = 90) ";
+                    ExecuteQuery(mQry);
+                }
+            }
+            catch (Exception ex)
+            {
+                RecordError(ex);
+            }
+
+            try
+            {
+                if ((int)ExecuteScaler("SELECT Count(*) AS Cnt FROM INFORMATION_SCHEMA.Tables WHERE TABLE_NAME = 'ProductBuyerExtendeds'") == 0)
+                {
+                    mQry = @"CREATE TABLE Web.ProductBuyerExtendeds
+	                        (
+	                        ProductBuyerId      INT NOT NULL,
+	                        DateOfConsutruction DATETIME NOT NULL,
+	                        DiscountTypeId      INT,
+	                        PropertyArea        DECIMAL (18, 4),
+	                        TaxableArea         DECIMAL (18, 4),
+	                        ARV                 DECIMAL (18, 4),
+	                        TenantName          NVARCHAR (100),
+	                        BillingType         NVARCHAR (20),
+	                        CoveredArea         DECIMAL (18, 4),
+	                        GarageArea          DECIMAL (18, 4),
+	                        BalconyArea         DECIMAL (18, 4),
+	                        IsRented            BIT,
+	                        TaxAmount           DECIMAL (18, 4),
+	                        TaxPercentage       DECIMAL (18, 4),
+	                        WEF                 DATETIME NOT NULL,
+	                        Description         NVARCHAR (50),
+	                        CONSTRAINT [PK_Web.ProductBuyerExtendeds] PRIMARY KEY (ProductBuyerId)
+	                        WITH (FILLFACTOR = 90),
+	                        CONSTRAINT [FK_Web.ProductBuyerExtendeds_Web.ProductBuyers_ProductBuyerId] FOREIGN KEY (ProductBuyerId) REFERENCES Web.ProductBuyers (ProductBuyerId),
+	                        CONSTRAINT [FK_Web.ProductBuyerExtendeds_Web.DiscountType_DiscountTypeId] FOREIGN KEY (DiscountTypeId) REFERENCES Web.DiscountTypes (DiscountTypeId)
+	                        )
+
+                        CREATE INDEX IX_ProductBuyerId
+	                        ON Web.ProductBuyerExtendeds (ProductBuyerId)
+	                        WITH (FILLFACTOR = 90)
+
+                        CREATE INDEX IX_DiscountTypeId
+	                        ON Web.ProductBuyerExtendeds (DiscountTypeId)
+	                        WITH (FILLFACTOR = 90) ";
+                    ExecuteQuery(mQry);
+                }
+            }
+            catch (Exception ex)
+            {
+                RecordError(ex);
+            }
+
+
+            try
+            {
+                if ((int)ExecuteScaler("SELECT Count(*) AS Cnt FROM INFORMATION_SCHEMA.Tables WHERE TABLE_NAME = 'Religions'") == 0)
+                {
+                    mQry = @"CREATE TABLE Web.Religions
+	                        (
+	                        ReligionId   INT IDENTITY NOT NULL,
+	                        ReligionName NVARCHAR (50) NOT NULL,
+	                        IsActive     BIT DEFAULT ((1)) NOT NULL,
+	                        CreatedBy    NVARCHAR (max),
+	                        ModifiedBy   NVARCHAR (max),
+	                        CreatedDate  DATETIME NOT NULL,
+	                        ModifiedDate DATETIME NOT NULL,
+	                        OMSId        NVARCHAR (50),
+	                        Site_SiteId  INT,
+	                        GateId       INT,
+	                        DocTypeId    INT,
+	                        CONSTRAINT [PK_Web.Religions] PRIMARY KEY (ReligionId)
+	                        WITH (FILLFACTOR = 90),
+	                        CONSTRAINT [FK_Web.Religions_Web.DocumentTypes_DocTypeId] FOREIGN KEY (DocTypeId) REFERENCES Web.DocumentTypes (DocumentTypeId)
+	                        )
+
+                        CREATE UNIQUE INDEX IX_Religion_ReligionName
+	                        ON Web.Religions (ReligionName)
+	                        WITH (FILLFACTOR = 90) ";
+                    ExecuteQuery(mQry);
+                }
+            }
+            catch (Exception ex)
+            {
+                RecordError(ex);
+            }
+
+
+            try
+            {
+                if ((int)ExecuteScaler("SELECT Count(*) AS Cnt FROM INFORMATION_SCHEMA.Tables WHERE TABLE_NAME = 'PersonAttributes'") == 0)
+                {
+                    mQry = @"CREATE TABLE Web.PersonAttributes
+	                        (
+	                        PersonAttributeId       INT IDENTITY NOT NULL,
+	                        PersonId                INT NOT NULL,
+	                        DocumentTypeAttributeId INT NOT NULL,
+	                        PersonAttributeValue    NVARCHAR (max),
+	                        CreatedBy               NVARCHAR (max),
+	                        ModifiedBy              NVARCHAR (max),
+	                        CreatedDate             DATETIME NOT NULL,
+	                        ModifiedDate            DATETIME NOT NULL,
+	                        OMSId                   NVARCHAR (50),
+	                        CONSTRAINT [PK_Web.PersonAttributes] PRIMARY KEY (PersonAttributeId)
+	                        WITH (FILLFACTOR = 90),
+	                        CONSTRAINT [FK_Web.PersonAttributes_Web.Persons_PersonId] FOREIGN KEY (PersonId) REFERENCES Web.People (PersonID)
+	                        )
+
+                        CREATE INDEX IX_PersonId
+	                        ON Web.PersonAttributes (PersonId)
+	                        WITH (FILLFACTOR = 90) ";
+                    ExecuteQuery(mQry);
+                }
+            }
+            catch (Exception ex)
+            {
+                RecordError(ex);
+            }
+
+
+            try
+            {
+                if ((int)ExecuteScaler("SELECT Count(*) AS Cnt FROM INFORMATION_SCHEMA.Tables WHERE TABLE_NAME = 'PersonExtendeds'") == 0)
+                {
+                    mQry = @"CREATE TABLE Web.PersonExtendeds
+	                        (
+	                        PersonId          INT NOT NULL,
+	                        GISId             NVARCHAR (20),
+	                        GodownId          INT,
+	                        BinLocationId     INT,
+	                        HouseNo           NVARCHAR (50),
+	                        AreaId            INT,
+	                        FatherName        NVARCHAR (100),
+	                        CasteId           INT,
+	                        ReligionId        INT,
+	                        PersonRateGroupId INT,
+	                        TotalPropertyArea DECIMAL (18, 4),
+	                        TotalTaxableArea  DECIMAL (18, 4),
+	                        TotalARV          DECIMAL (18, 4),
+	                        TotalTax          DECIMAL (18, 4),
+	                        AadharNo          NVARCHAR (50),
+	                        OldHouseNo        NVARCHAR (50),
+	                        CONSTRAINT [PK_Web.PersonExtendeds] PRIMARY KEY (PersonId)
+	                        WITH (FILLFACTOR = 90),
+	                        CONSTRAINT [FK_Web.PersonExtendeds_Web.People_PersonId] FOREIGN KEY (PersonId) REFERENCES Web.People (PersonID),
+	                        CONSTRAINT [FK_Web.PersonExtendeds_Web.Godown_GodownId] FOREIGN KEY (GodownId) REFERENCES Web.Godowns (GodownId),
+	                        CONSTRAINT [FK_Web.PersonExtendeds_Web.BinLocation_BinLocationId] FOREIGN KEY (BinLocationId) REFERENCES Web.BinLocations (BinLocationId),
+	                        CONSTRAINT [FK_Web.PersonExtendeds_Web.Area_AreaId] FOREIGN KEY (AreaId) REFERENCES Web.Areas (AreaId),
+	                        CONSTRAINT [FK_Web.PersonExtendeds_Web.Caste_CasteId] FOREIGN KEY (CasteId) REFERENCES Web.Castes (CasteId),
+	                        CONSTRAINT [FK_Web.PersonExtendeds_Web.Religion_ReligionId] FOREIGN KEY (ReligionId) REFERENCES Web.Religions (ReligionId),
+	                        CONSTRAINT [FK_Web.PersonExtendeds_Web.PersonRateGroup_PersonRateGroupId] FOREIGN KEY (PersonRateGroupId) REFERENCES Web.PersonRateGroups (PersonRateGroupId)
+	                        )
+
+                        CREATE INDEX IX_PersonId
+	                        ON Web.PersonExtendeds (PersonId)
+	                        WITH (FILLFACTOR = 90)
+
+                        CREATE INDEX IX_GodownId
+	                        ON Web.PersonExtendeds (GodownId)
+	                        WITH (FILLFACTOR = 90)
+
+                        CREATE INDEX IX_BinLocationId
+	                        ON Web.PersonExtendeds (BinLocationId)
+	                        WITH (FILLFACTOR = 90)
+
+                        CREATE INDEX IX_CasteId
+	                        ON Web.PersonExtendeds (CasteId)
+	                        WITH (FILLFACTOR = 90)
+
+                        CREATE INDEX IX_ReligionId
+	                        ON Web.PersonExtendeds (ReligionId)
+	                        WITH (FILLFACTOR = 90)
+
+                        CREATE INDEX IX_PersonRateGroupId
+	                        ON Web.PersonExtendeds (PersonRateGroupId)
+	                        WITH (FILLFACTOR = 90) ";
+                    ExecuteQuery(mQry);
+                }
+            }
+            catch (Exception ex)
+            {
+                RecordError(ex);
+            }
+
+            try
+            {
+                if ((int)ExecuteScaler("SELECT Count(*) AS Cnt FROM INFORMATION_SCHEMA.Tables WHERE TABLE_NAME = 'PaymentModes'") == 0)
+                {
+                    mQry = @"CREATE TABLE Web.PaymentModes
+	                        (
+	                        PaymentModeId   INT IDENTITY NOT NULL,
+	                        PaymentModeName NVARCHAR (50) NOT NULL,
+	                        IsActive        BIT DEFAULT ((1)) NOT NULL,
+	                        CreatedBy       NVARCHAR (max),
+	                        ModifiedBy      NVARCHAR (max),
+	                        CreatedDate     DATETIME NOT NULL,
+	                        ModifiedDate    DATETIME NOT NULL,
+	                        OMSId           NVARCHAR (50),
+	                        DocTypeId       INT,
+	                        CONSTRAINT [PK_Web.PaymentModes] PRIMARY KEY (PaymentModeId)
+	                        WITH (FILLFACTOR = 90),
+	                        CONSTRAINT [FK_Web.PaymentModes_Web.DocumentTypes_DocTypeId] FOREIGN KEY (DocTypeId) REFERENCES Web.DocumentTypes (DocumentTypeId)
+	                        )
+
+                        CREATE UNIQUE INDEX IX_PaymentMode_PaymentModeName
+	                        ON Web.PaymentModes (PaymentModeName)
+	                        WITH (FILLFACTOR = 90) ";
+                    ExecuteQuery(mQry);
+                }
+            }
+            catch (Exception ex)
+            {
+                RecordError(ex);
+            }
+
+
+            try
+            {
+                if ((int)ExecuteScaler("SELECT Count(*) AS Cnt FROM INFORMATION_SCHEMA.Tables WHERE TABLE_NAME = 'PaymentModeLedgerAccounts'") == 0)
+                {
+                    mQry = @"CREATE TABLE Web.PaymentModeLedgerAccounts
+	                            (
+	                            PaymentModeLedgerAccountId INT IDENTITY NOT NULL,
+	                            PaymentModeId              INT NOT NULL,
+	                            LedgerAccountId            INT NOT NULL,
+	                            SiteId                     INT NOT NULL,
+	                            DivisionId                 INT NOT NULL,
+	                            CreatedBy                  NVARCHAR (max),
+	                            ModifiedBy                 NVARCHAR (max),
+	                            CreatedDate                DATETIME NOT NULL,
+	                            ModifiedDate               DATETIME NOT NULL,
+	                            OMSId                      NVARCHAR (50),
+	                            CONSTRAINT [PK_Web.PaymentModeLedgerAccounts] PRIMARY KEY (PaymentModeLedgerAccountId)
+	                            WITH (FILLFACTOR = 90)
+	                            )
+
+                            CREATE UNIQUE INDEX IX_PaymentModeLedgerAccounts
+	                            ON Web.PaymentModeLedgerAccounts (PaymentModeId, SiteId, DivisionId)
+	                            WITH (FILLFACTOR = 90) ";
+                    ExecuteQuery(mQry);
+                }
+            }
+            catch (Exception ex)
+            {
+                RecordError(ex);
+            }
+
+
+
+            try
+            {
+                if ((int)ExecuteScaler("SELECT Count(*) AS Cnt FROM INFORMATION_SCHEMA.Tables WHERE TABLE_NAME = 'CollectionSettings'") == 0)
+                {
+                    mQry = @"CREATE TABLE Web.CollectionSettings
+	                        (
+	                        CollectionSettingsId              INT IDENTITY NOT NULL,
+	                        DocTypeId                         INT NOT NULL,
+	                        IsVisibleIntrestBalance           BIT,
+	                        IsVisibleArearBalance             BIT,
+	                        IsVisibleExcessBalance            BIT,
+	                        IsVisibleCurrentYearBalance       BIT,
+	                        IsVisibleNetOutstanding           BIT,
+	                        IsVisibleReason                   BIT,
+	                        CreatedBy                         NVARCHAR (max),
+	                        ModifiedBy                        NVARCHAR (max),
+	                        CreatedDate                       DATETIME NOT NULL,
+	                        ModifiedDate                      DATETIME NOT NULL,
+	                        DocumentPrint                     NVARCHAR (100),
+	                        SqlProcDocumentPrint              NVARCHAR (100),
+	                        SqlProcDocumentPrint_AfterSubmit  NVARCHAR (100),
+	                        SqlProcDocumentPrint_AfterApprove NVARCHAR (100),
+	                        CONSTRAINT [FK_Web.CollectionSettings_Web.DocumentTypes_DocTypeId] FOREIGN KEY (DocTypeId) REFERENCES Web.DocumentTypes (DocumentTypeId)
+	                        ) ";
+                    ExecuteQuery(mQry);
+                }
+            }
+            catch (Exception ex)
+            {
+                RecordError(ex);
+            }
+
+
+            try
+            {
+                if ((int)ExecuteScaler("SELECT Count(*) AS Cnt FROM INFORMATION_SCHEMA.Tables WHERE TABLE_NAME = 'Dimension1Extended'") == 0)
+                {
+                    mQry = @"CREATE TABLE Web.Dimension1Extended
+	                        (
+	                        Dimension1Id INT NOT NULL,
+	                        Multiplier   DECIMAL (18, 4),
+	                        CostCenterId INT,
+	                        PRIMARY KEY (Dimension1Id) WITH (FILLFACTOR = 90),
+	                        CONSTRAINT [FK__Dimension__Dimen__7C3BFE99] FOREIGN KEY (Dimension1Id) REFERENCES Web.Dimension1 (Dimension1Id),
+	                        CONSTRAINT [FK__Dimension__CostC__7D3022D2] FOREIGN KEY (CostCenterId) REFERENCES Web.CostCenters (CostCenterId)
+	                        ) ";
+                    ExecuteQuery(mQry);
+                }
+            }
+            catch (Exception ex)
+            {
+                RecordError(ex);
+            }
+
+
+            AddFields("Areas", "DocTypeId", "Int","DocumentTypes");
+
+            AddFields("LedgerLines", "PaymentModeId", "Int", "PaymentModes");
+            AddFields("LedgerLines", "AgentId", "Int", "People");
+            AddFields("LedgerLines", "ReferenceLedgerAccountId", "Int", "LedgerAccounts");
+            AddFields("LedgerLines", "DiscountAmount", "Decimal(18,4)");
+
+            AddFields("People", "ReviewBy", "nvarchar(Max)");
+            AddFields("People", "ReviewCount", "Int");
+            AddFields("People", "Status", "Int");
+
+
+            //End Start Property Tax
+
+
             ReCreateProcedures();
             DataCorrection();
 

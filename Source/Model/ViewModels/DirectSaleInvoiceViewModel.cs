@@ -70,6 +70,9 @@ namespace Model.ViewModels
         public string ShipToPartyAddress { get; set; }
 
         public string LockReason { get; set; }
+        public string AdditionalInfo { get; set; }
+        public string ReturnNature { get; set; }
+        public bool IsPartyLocked { get; set; }
         public string Mobile { get; set; }
 
         [MaxLength(100)]
@@ -97,6 +100,7 @@ namespace Model.ViewModels
         public int? FinancierDocTypeId { get; set; }
         public List<DocumentTypeHeaderAttributeViewModel> DocumentTypeHeaderAttributes { get; set; }
         public string DocumentInfo { get; set; }
+
 
     }
    
@@ -146,6 +150,8 @@ namespace Model.ViewModels
         public string LotNo { get; set; }
         public string BaleNo { get; set; }
         public string LockReason { get; set; }
+        public string AdditionalInfo { get; set; }
+        public string ReturnNature { get; set; }
 
         public int? SalesTaxGroupProductId { get; set; }
         public int? SalesTaxGroupPersonId { get; set; }

@@ -3,17 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Model.Models;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Model.ViewModel
+namespace Model.ViewModels
 {
     [Serializable]
-    public class DocumentTypeHeaderAttributeViewModel 
+    public class DocumentTypeAttributeViewModel 
     {      
         [Key]       
-        public int DocumentTypeHeaderAttributeId { get; set; }
+        public int DocumentTypeAttributeId { get; set; }
+        public int DocumentAttributeId { get; set; }
 
         [Required]
         public string Name { get; set; }
@@ -27,13 +27,25 @@ namespace Model.ViewModel
         [Display(Name = "List Item")]
         public string ListItem { get; set; }
 
-        public string Value { get; set; }
+        public string DefaultValue { get; set; }
 
         public bool IsActive { get; set; }
 
         [NotMapped]
         public string PreviousFieldId { get; set; }
 
+        //[ForeignKey("DocumentType")]
         public int DocumentTypeId { get; set; }
+        //public virtual DocumentType DocumentType { get; set; }
+
+        //[Display(Name = "Created By")]
+        //public string CreatedBy { get; set; }
+        //[Display(Name = "Modified By")]
+        //public string ModifiedBy { get; set; }
+        //[Display(Name = "Created Date")]
+        //public DateTime CreatedDate { get; set; }
+        //[Display(Name = "Modified Date")]
+        //public DateTime ModifiedDate { get; set; }
+
     }
 }

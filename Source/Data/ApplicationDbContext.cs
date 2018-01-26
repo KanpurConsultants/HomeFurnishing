@@ -8,6 +8,7 @@ using Model.DatabaseViews;
 using Model;
 //using Models.Login.Models;
 using Model.Tasks.Models;
+using Model.PropertyTax.Models;
 
 //Database.SetInitializer(new ApplicationDbContextInitializer());
 //CreateDatabseFunctions();
@@ -88,7 +89,24 @@ namespace Data.Models
         //public DbSet<ProductConstruction> ProductConstructions { get; set; }
         //public DbSet<ProductDimension> ProductDimensions { get; set; }
 
+        //Property Tax Models
+        public DbSet<DocumentTypeAttribute> DocumentTypeAttribute { get; set; }
+        public DbSet<PersonExtended> PersonExtended { get; set; }
+        public DbSet<PersonAttributes> PersonAttributes { get; set; }
+        public DbSet<ProductBuyerExtended> ProductBuyerExtended { get; set; }
+        public DbSet<DiscountType> DiscountType { get; set; }
+        public DbSet<Dimension1Extended> Dimension1Extended { get; set; }
+        public DbSet<CollectionSettings> CollectionSettings { get; set; }
 
+        public DbSet<ProductBuyerLog> ProductBuyerLog { get; set; }
+
+        public DbSet<PaymentMode> PaymentMode { get; set; }
+        public DbSet<PaymentModeLedgerAccount> PaymentModeLedgerAccount { get; set; }
+
+        public DbSet<Area> Area { get; set; }
+        public DbSet<Caste> Caste { get; set; }
+        public DbSet<Religion> Religion { get; set; }
+        //End Property Tax Models
 
 
 
@@ -586,6 +604,11 @@ namespace Data.Models
         //For Databse Views
         public DbSet<StockUid> StockUid { get; set; }
         public DbSet<StockVirtual> StockVirtual { get; set; }
+
+        public DbSet<_Menu> _Menu { get; set; }
+        public DbSet<_ReportHeader> _ReportHeader { get; set; }
+        public DbSet<_ReportLine> _ReportLine { get; set; }
+        
 
         public DbSet<ViewDesignColourConsumption> ViewDesignColourConsumption { get; set; }
         public DbSet<CostCenterStatus> CostCenterStatus { get; set; }

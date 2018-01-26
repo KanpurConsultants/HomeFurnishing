@@ -1,6 +1,6 @@
-﻿
-using Core.Common;
-namespace Model.ViewModel
+﻿using Core.Common;
+
+namespace Model.ViewModels
 {
     public class DocumentAttachmentViewModel
     {
@@ -14,12 +14,12 @@ namespace Model.ViewModel
 
         public void SetExtension()
         {
-            if(this.FileName.Contains(ExtensionConstants.BMP) || this.FileName.Contains(ExtensionConstants.JPEG) || this.FileName.Contains(ExtensionConstants.JPG)|| this.FileName.Contains(ExtensionConstants.PNG))
+            if (this.FileName.Contains(ExtensionConstants.BMP) || this.FileName.Contains(ExtensionConstants.JPEG) || this.FileName.Contains(ExtensionConstants.JPG) || this.FileName.Contains(ExtensionConstants.PNG))
             {
                 this.Extension = ExtensionConstants.JPG;
                 this.IcoClass = "fa fa-file-image-o fa-2x image atch";
             }
-            else if(this.FileName.Contains(ExtensionConstants.XLS) || this.FileName.Contains(ExtensionConstants.XLSX))
+            else if (this.FileName.Contains(ExtensionConstants.XLS) || this.FileName.Contains(ExtensionConstants.XLSX))
             {
                 this.Extension=ExtensionConstants.XLS;
                 this.IcoClass = "fa fa-file-excel-o fa-2x excel atch";

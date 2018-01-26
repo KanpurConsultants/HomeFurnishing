@@ -448,6 +448,10 @@ namespace Jobs.Controllers
 
                     int status = saleinvoiceheaderdetail.Status;
 
+                    bool IsBillToPartyChanged = false;
+                    if (vm.BillToBuyerId != saleinvoiceheaderdetail.BillToBuyerId)
+                        IsBillToPartyChanged = true;
+
                     if (saleinvoiceheaderdetail.Status != (int)StatusConstants.Drafted)
                     {
                         saleinvoiceheaderdetail.Status = (int)StatusConstants.Modified;
@@ -533,6 +537,29 @@ namespace Jobs.Controllers
                     packingHeader.ObjectState = Model.ObjectState.Modified;
                     packingHeader.ModifiedDate = DateTime.Now;
                     packingHeader.ModifiedBy = User.Identity.Name;
+                    _unitOfWork.Repository<PackingHeader>().Update(packingHeader);
+
+
+
+                    if (IsBillToPartyChanged == true)
+                    {
+                        IEnumerable<SaleInvoiceHeaderCharge> HeaderChargeList = (from Hc in db.SaleInvoiceHeaderCharge where Hc.HeaderTableId == saleinvoiceheaderdetail.SaleInvoiceHeaderId select Hc).ToList();
+                        foreach (SaleInvoiceHeaderCharge HeaderCharge in HeaderChargeList)
+                        {
+                            HeaderCharge.PersonID = vm.BillToBuyerId;
+                            _unitOfWork.Repository<SaleInvoiceHeaderCharge>().Update(HeaderCharge);
+                        }
+
+                        IEnumerable<SaleInvoiceLineCharge> LineChargeList = (from Hc in db.SaleInvoiceLineCharge where Hc.HeaderTableId == saleinvoiceheaderdetail.SaleInvoiceHeaderId select Hc).ToList();
+                        foreach (SaleInvoiceLineCharge LineCharge in LineChargeList)
+                        {
+                            LineCharge.PersonID = vm.BillToBuyerId;
+                            _unitOfWork.Repository<SaleInvoiceLineCharge>().Update(LineCharge);
+                        }
+                    }
+
+
+
 
                     LogList.Add(new LogTypeViewModel
                     {
@@ -633,18 +660,6 @@ namespace Jobs.Controllers
 
             DirectSaleInvoiceHeaderViewModel vm = new DirectSaleInvoiceHeaderViewModel();
 
-
-
-            var SaleInvoiceReturn = db.SaleInvoiceReturnLine.Where(i => i.SaleInvoiceLine.SaleInvoiceHeaderId == id).FirstOrDefault();
-            if (SaleInvoiceReturn != null)
-            {
-                var ReturnNature = (from H in db.SaleInvoiceReturnHeader where H.SaleInvoiceReturnHeaderId == SaleInvoiceReturn.SaleInvoiceReturnHeaderId select new { DocTypeNature = H.DocType.Nature }).FirstOrDefault().DocTypeNature;
-                if (ReturnNature == TransactionNatureConstants.Credit)
-                    s.LockReason = "Credit Note is generated for this invoice.";
-                else
-                    s.LockReason = "Invoice is cancelled.";
-            }
-
             string SiteName = db.Site.Find(s.SiteId).SiteName;
             int LoginSiteId = (int)System.Web.HttpContext.Current.Session["SiteId"];
             if (s.SiteId != LoginSiteId)
@@ -655,7 +670,6 @@ namespace Jobs.Controllers
             #region DocTypeTimeLineValidation
             try
             {
-
                 TimePlanValidation = DocumentValidation.ValidateDocument(Mapper.Map<DocumentUniqueId>(s), DocumentTimePlanTypeConstants.Modify, User.Identity.Name, out ExceptionMsg, out Continue);
 
             }
@@ -683,14 +697,27 @@ namespace Jobs.Controllers
             vm.ShipToPartyAddress = DispactchHeader.ShipToPartyAddress;
             vm.GodownId = packingHeader.GodownId;
 
+            var SaleInvoiceReturn = db.SaleInvoiceReturnLine.Where(i => i.SaleInvoiceLine.SaleInvoiceHeaderId == id).FirstOrDefault();
+            if (SaleInvoiceReturn != null)
+            {
+                vm.ReturnNature = (from H in db.SaleInvoiceReturnHeader where H.SaleInvoiceReturnHeaderId == SaleInvoiceReturn.SaleInvoiceReturnHeaderId select new { DocTypeNature = H.DocType.Nature }).FirstOrDefault().DocTypeNature;
+                if (vm.ReturnNature == TransactionNatureConstants.Credit)
+                    vm.AdditionalInfo = "Credit Note is generated for this invoice.";
+                else
+                    vm.AdditionalInfo = "Invoice is cancelled.";
+            }
 
-
-
-            //var SaleInvoiceReturn = db.SaleInvoiceReturnLine.Where(i => i.SaleInvoiceLine.SaleInvoiceHeaderId == id).FirstOrDefault();
-            //if (SaleInvoiceReturn != null)
-            //{
-            //    vm.LockReason = "Invoice is cancelled.";
-            //}
+            var Line = (from L in db.SaleInvoiceLine where L.SaleInvoiceHeaderId == id select L).FirstOrDefault();
+            if (Line != null)
+            {
+                if (Line.SaleOrderLineId != null)
+                    vm.IsPartyLocked = true;
+                else
+                {
+                    if (s.SaleDispatchHeaderId == null && Line.SaleDispatchLineId != null)
+                        vm.IsPartyLocked = true;
+                }
+            }
 
             List<DocumentTypeHeaderAttributeViewModel> tem = _SaleInvoiceHeaderService.GetDocumentHeaderAttribute(id).ToList();
             vm.DocumentTypeHeaderAttributes = tem;
@@ -780,8 +807,8 @@ namespace Jobs.Controllers
             var SaleInvoiceReturn = db.SaleInvoiceReturnLine.Where(i => i.SaleInvoiceLine.SaleInvoiceHeaderId == id).FirstOrDefault();
             if (SaleInvoiceReturn != null)
             {
-                var ReturnNature = (from H in db.SaleInvoiceReturnHeader where H.SaleInvoiceReturnHeaderId == SaleInvoiceReturn.SaleInvoiceReturnHeaderId select new { DocTypeNature = H.DocType.Nature }).FirstOrDefault().DocTypeNature;
-                if (ReturnNature == TransactionNatureConstants.Credit)
+                vm.ReturnNature = (from H in db.SaleInvoiceReturnHeader where H.SaleInvoiceReturnHeaderId == SaleInvoiceReturn.SaleInvoiceReturnHeaderId select new { DocTypeNature = H.DocType.Nature }).FirstOrDefault().DocTypeNature;
+                if (vm.ReturnNature == TransactionNatureConstants.Credit)
                     vm.LockReason = "Credit Note is generated for this invoice.";
                 else
                     vm.LockReason = "Invoice is cancelled.";
@@ -2312,6 +2339,21 @@ namespace Jobs.Controllers
                 JsonRequestBehavior = JsonRequestBehavior.AllowGet
             };
         }
+
+
+
+        //public JsonResult GetPartialLockReason(int Id)
+        //{
+        //    string PartialLockReason = "";
+
+        //    var SaleInvoiceReturn = db.SaleInvoiceReturnLine.Where(i => i.SaleInvoiceLine.SaleInvoiceHeaderId == Id).FirstOrDefault();
+        //    if (SaleInvoiceReturn != null)
+        //    {
+        //        var ReturnNature = (from H in db.SaleInvoiceReturnHeader where H.SaleInvoiceReturnHeaderId == SaleInvoiceReturn.SaleInvoiceReturnHeaderId select new { DocTypeNature = H.DocType.Nature }).FirstOrDefault().DocTypeNature;
+        //        PartialLockReason = ReturnNature;
+        //    }
+        //    return Json(PartialLockReason);
+        //}
     }
 
 

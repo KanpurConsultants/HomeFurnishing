@@ -1179,6 +1179,16 @@ namespace Jobs.Controllers
             vm.SaleInvoiceSettings = Mapper.Map<SaleInvoiceSetting, SaleInvoiceSettingsViewModel>(settings);
             vm.DocumentTypeSettings = new DocumentTypeSettingsService(_unitOfWork).GetDocumentTypeSettingsForDocument(H.DocTypeId);
 
+            var SaleInvoiceReturn = db.SaleInvoiceReturnLine.Where(i => i.SaleInvoiceLineId == id).FirstOrDefault();
+            if (SaleInvoiceReturn != null)
+            {
+                vm.ReturnNature = (from Rh in db.SaleInvoiceReturnHeader where Rh.SaleInvoiceReturnHeaderId == SaleInvoiceReturn.SaleInvoiceReturnHeaderId select new { DocTypeNature = Rh.DocType.Nature }).FirstOrDefault().DocTypeNature;
+                if (vm.ReturnNature == TransactionNatureConstants.Credit)
+                    vm.AdditionalInfo = "Credit Note is generated for this invoice.";
+                else
+                    vm.AdditionalInfo = "Invoice is cancelled.";
+            }
+
             if (temp.SaleOrderLineId.HasValue && temp.SaleOrderLineId.Value > 0)
             {
                 vm.IsSaleBased = true;
@@ -1251,6 +1261,17 @@ namespace Jobs.Controllers
 
             vm.SaleInvoiceSettings = Mapper.Map<SaleInvoiceSetting, SaleInvoiceSettingsViewModel>(settings);
             vm.DocumentTypeSettings = new DocumentTypeSettingsService(_unitOfWork).GetDocumentTypeSettingsForDocument(H.DocTypeId);
+
+
+            var SaleInvoiceReturn = db.SaleInvoiceReturnLine.Where(i => i.SaleInvoiceLineId == id).FirstOrDefault();
+            if (SaleInvoiceReturn != null)
+            {
+                vm.ReturnNature = (from Rh in db.SaleInvoiceReturnHeader where Rh.SaleInvoiceReturnHeaderId == SaleInvoiceReturn.SaleInvoiceReturnHeaderId select new { DocTypeNature = Rh.DocType.Nature }).FirstOrDefault().DocTypeNature;
+                if (vm.ReturnNature == TransactionNatureConstants.Credit)
+                    vm.AdditionalInfo = "Credit Note is generated for this invoice.";
+                else
+                    vm.AdditionalInfo = "Invoice is cancelled.";
+            }
 
             if (temp.SaleOrderLineId.HasValue && temp.SaleOrderLineId.Value > 0)
             {

@@ -81,5 +81,25 @@ namespace Model.Models
 
         [MaxLength(50)]
         public string OMSId { get; set; }
+
+
+        //Property Tax
+        public virtual PaymentMode PaymentMode { get; set; }
+        [Display(Name = "Payment Mode")]
+        [ForeignKey("PaymentMode")]
+        public int? PaymentModeId { get; set; }
+
+        public virtual LedgerAccount ReferenceLedgerAccount { get; set; }
+        [Display(Name = "ReferenceLedgerAccount")]
+        [ForeignKey("ReferenceLedgerAccount")]
+        public int? ReferenceLedgerAccountId { get; set; }
+
+        public virtual Person Agent { get; set; }
+        [Display(Name = "Agent")]
+        [ForeignKey("Agent")]
+        public int? AgentId { get; set; }
+
+        public decimal? DiscountAmount { get; set; }
+        //End Property Tax
     }
 }

@@ -51,6 +51,9 @@ namespace Service
         ProductDimensions GetProductDimensions(int ProductId, string DealUnitId, int DocTypeId);
         string FGetNewCode(int ProductTypeId, string ProcName);
         bool IsActionAllowed(List<string> UserRoles, int ProductTypeId, string ControllerName, string ActionName);
+
+        bool CheckForNameExists(string Name);
+        bool CheckForNameExists(string Name, int Id);
     }
 
 
@@ -782,6 +785,34 @@ namespace Service
             }
 
             return IsAllowed;
+        }
+
+        public bool CheckForNameExists(string Name)
+        {
+            int SiteId = (int)System.Web.HttpContext.Current.Session["SiteId"];
+            int DivisionId = (int)System.Web.HttpContext.Current.Session["DivisionId"];
+
+            var temp = (from pr in db.Product
+                        where pr.ProductName == Name
+                        select pr).FirstOrDefault();
+            if (temp == null)
+                return false;
+            else
+                return true;
+
+        }
+        public bool CheckForNameExists(string Name, int Id)
+        {
+            int SiteId = (int)System.Web.HttpContext.Current.Session["SiteId"];
+            int DivisionId = (int)System.Web.HttpContext.Current.Session["DivisionId"];
+
+            var temp = (from pr in db.Product
+                        where pr.ProductName == Name && pr.ProductId != Id
+                        select pr).FirstOrDefault();
+            if (temp == null)
+                return false;
+            else
+                return true;
         }
     }
 

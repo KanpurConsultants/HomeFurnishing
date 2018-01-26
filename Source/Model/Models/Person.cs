@@ -75,6 +75,12 @@ namespace Model.Models
         [MaxLength(20)]
         public string Nature { get; set; }
 
+        //Start Property Tax
+        public string ReviewBy { get; set; }
+        public int? ReviewCount { get; set; }
+        public int? Status { get; set; }
+        //End Property Tax
+
 
         
     }

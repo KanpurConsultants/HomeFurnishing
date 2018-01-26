@@ -20,10 +20,13 @@ namespace Service
         Site Find(int Id);
         void Update(Site s);
         IEnumerable<Site> GetSiteList();
+        IQueryable<Site> GetSiteListForIndex();
         IEnumerable<Site> GetSiteList(string RoleId);
         int NextId(int id);
         int PrevId(int id);
         Site FindByPerson(int id);
+        bool CheckForNameExists(string Name);
+        bool CheckForNameExists(string Name, int Id);
 
     }
 
@@ -71,6 +74,15 @@ namespace Service
             var pt = (from p in db.Site
                       orderby p.SiteName
                       select p);            
+
+            return pt;
+        }
+
+        public IQueryable<Site> GetSiteListForIndex()
+        {
+            var pt = (from p in db.Site
+                      orderby p.SiteName
+                      select p);
 
             return pt;
         }
@@ -155,6 +167,34 @@ namespace Service
             return (from p in db.Site
                     where p.SiteCode == SiteCode
                     select p).FirstOrDefault();
+        }
+
+        public bool CheckForNameExists(string Name)
+        {
+            int SiteId = (int)System.Web.HttpContext.Current.Session["SiteId"];
+            int DivisionId = (int)System.Web.HttpContext.Current.Session["DivisionId"];
+
+            var temp = (from pr in db.Site
+                        where pr.SiteName == Name
+                        select pr).FirstOrDefault();
+            if (temp == null)
+                return false;
+            else
+                return true;
+
+        }
+        public bool CheckForNameExists(string Name, int Id)
+        {
+            int SiteId = (int)System.Web.HttpContext.Current.Session["SiteId"];
+            int DivisionId = (int)System.Web.HttpContext.Current.Session["DivisionId"];
+
+            var temp = (from pr in db.Site
+                        where pr.SiteName == Name && pr.SiteId != Id
+                        select pr).FirstOrDefault();
+            if (temp == null)
+                return false;
+            else
+                return true;
         }
 
         public void Dispose()

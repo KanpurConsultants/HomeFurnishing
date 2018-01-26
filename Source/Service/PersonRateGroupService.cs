@@ -25,6 +25,9 @@ namespace Service
         PersonRateGroup GetPersonRateGroupByName(string terms);
         int NextId(int id);
         int PrevId(int id);
+
+        bool CheckForNameExists(string Name);
+        bool CheckForNameExists(string Name, int Id);
     }
 
     public class PersonRateGroupService : IPersonRateGroupService
@@ -141,6 +144,33 @@ namespace Service
                 return id;
         }
 
+        public bool CheckForNameExists(string Name)
+        {
+            int SiteId = (int)System.Web.HttpContext.Current.Session["SiteId"];
+            int DivisionId = (int)System.Web.HttpContext.Current.Session["DivisionId"];
+
+            var temp = (from pr in _PersonRateGroupRepository.Instance
+                        where pr.PersonRateGroupName == Name
+                        select pr).FirstOrDefault();
+            if (temp == null)
+                return false;
+            else
+                return true;
+
+        }
+        public bool CheckForNameExists(string Name, int Id)
+        {
+            int SiteId = (int)System.Web.HttpContext.Current.Session["SiteId"];
+            int DivisionId = (int)System.Web.HttpContext.Current.Session["DivisionId"];
+
+            var temp = (from pr in _PersonRateGroupRepository.Instance
+                        where pr.PersonRateGroupName == Name && pr.PersonRateGroupId != Id
+                        select pr).FirstOrDefault();
+            if (temp == null)
+                return false;
+            else
+                return true;
+        }
         public void Dispose()
         {
         }

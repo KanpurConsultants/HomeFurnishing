@@ -14,6 +14,7 @@ namespace Model.Models
         [Key]
         public int Dimension1Id { get; set; }
 
+
         [Display (Name="Name")]
         [MaxLength(50), Required]
         [Index("IX_Dimension1_Dimension1Name", IsUnique = true)]

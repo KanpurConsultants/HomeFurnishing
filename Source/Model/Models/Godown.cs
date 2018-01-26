@@ -15,9 +15,15 @@ namespace Model.Models
             //DocumentTypes = new List<DocumentType>();
         }
 
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        //[DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Key]
         public int GodownId { get; set; }
+
+
+        [Display(Name = "Code")]
+        [MaxLength(50, ErrorMessage = "Godown Code cannot exceed 50 characters"), Required]
+        [Index("IX_Godown_GodownCode", IsUnique = true)]
+        public string GodownCode { get; set; }
 
         [Display (Name="Name")]
         [MaxLength(50, ErrorMessage = "Godown Name cannot exceed 50 characters"), Required]
@@ -27,6 +33,11 @@ namespace Model.Models
         [ForeignKey("Site"), Display(Name = "Site")]
         public int SiteId { get; set; }
         public virtual Site Site { get; set; }
+
+        public virtual Person Person { get; set; }
+        [Display(Name = "Person")]
+        [ForeignKey("Person")]
+        public int? PersonId { get; set; }
 
         [Display(Name = "Is Active ?")]
         public Boolean IsActive { get; set; }

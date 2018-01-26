@@ -19,7 +19,7 @@ using ImageResizer;
 using System.Configuration;
 using Jobs.Helpers;
 
-namespace Jobs.Controllers.Controllers
+namespace Jobs.Controllers
 {
    [Authorize]
     public class EmployeeController : System.Web.Mvc.Controller

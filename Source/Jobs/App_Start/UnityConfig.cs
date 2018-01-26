@@ -14,6 +14,8 @@ using Components.Logging;
 using Components.ExceptionHandlers;
 using Model.Tasks.ViewModel;
 using Model.DatabaseViews;
+using Services.PropertyTax;
+using Model.PropertyTax.Models;
 
 //using Models.Company.ViewModels;
 
@@ -59,6 +61,89 @@ namespace Jobs.App_Start
 
             // TODO: Register your types here
             // container.RegisterType<IProductRepository, ProductRepository>();
+
+
+            //Property Tax
+            container.RegisterType<ICollectionService, CollectionService>(new PerRequestLifetimeManager());
+
+            container.RegisterType<IRepository<CollectionSettings>, Repository<CollectionSettings>>();
+            container.RegisterType<ICollectionSettingsService, CollectionSettingsService>(new PerRequestLifetimeManager());
+
+            container.RegisterType<IPropertyHeaderService, PropertyHeaderService>(new PerRequestLifetimeManager());
+            container.RegisterType<IPropertyLineService, PropertyLineService>(new PerRequestLifetimeManager());
+            container.RegisterType<IDiscountTypeService, DiscountTypeService>(new PerRequestLifetimeManager());
+            container.RegisterType<IDimension1ExtendedService, Dimension1ExtendedService>(new PerRequestLifetimeManager());
+
+            container.RegisterType<IRepository<PaymentModeLedgerAccount>, Repository<PaymentModeLedgerAccount>>();
+            container.RegisterType<IPaymentModeLedgerAccountService, PaymentModeLedgerAccountService>(new PerRequestLifetimeManager());
+
+            container.RegisterType<IRepository<PaymentMode>, Repository<PaymentMode>>();
+            container.RegisterType<IPaymentModeService, PaymentModeService>(new PerRequestLifetimeManager());
+
+            container.RegisterType<IRepository<BinLocation>, Repository<BinLocation>>();
+            container.RegisterType<IBinLocationService, BinLocationService>(new PerRequestLifetimeManager());
+
+            container.RegisterType<IRepository<Area>, Repository<Area>>();
+            container.RegisterType<IAreaService, AreaService>(new PerRequestLifetimeManager());
+
+            container.RegisterType<IRepository<PersonRateGroup>, Repository<PersonRateGroup>>();
+            container.RegisterType<IPersonRateGroupService, PersonRateGroupService>(new PerRequestLifetimeManager());
+
+            container.RegisterType<IRepository<PaymentMode>, Repository<PaymentMode>>();
+            container.RegisterType<IRepository<PaymentModeLedgerAccount>, Repository<PaymentModeLedgerAccount>>();
+
+            container.RegisterType<IRepository<CollectionSettings>, Repository<CollectionSettings>>();
+
+            container.RegisterType<IRepository<Caste>, Repository<Caste>>();
+            container.RegisterType<ICasteService, CasteService>(new PerRequestLifetimeManager());
+
+            container.RegisterType<IRepository<Religion>, Repository<Religion>>();
+            container.RegisterType<IReligionService, ReligionService>(new PerRequestLifetimeManager());
+
+            container.RegisterType<IRepository<Dimension1Extended>, Repository<Dimension1Extended>>();
+
+            container.RegisterType<IRepository<ProductBuyerExtended>, Repository<ProductBuyerExtended>>();
+            container.RegisterType<IRepository<ProductBuyerLog>, Repository<ProductBuyerLog>>();
+            container.RegisterType<IRepository<DiscountType>, Repository<DiscountType>>();
+
+
+            Mapper.CreateMap<PropertyHeaderViewModel, DocumentUniqueId>();
+            Mapper.CreateMap<ProductBuyer, ProductBuyerLog>();
+            Mapper.CreateMap<ProductBuyerLog, ProductBuyer>();
+            Mapper.CreateMap<ProductBuyerExtended, ProductBuyerLog>();
+            Mapper.CreateMap<ProductBuyerLog, ProductBuyerExtended>();
+
+            
+
+            Mapper.CreateMap<Person, PropertyHeaderViewModel>();
+            Mapper.CreateMap<PropertyHeaderViewModel, Person>();
+            Mapper.CreateMap<BusinessEntity, PropertyHeaderViewModel>();
+            Mapper.CreateMap<PropertyHeaderViewModel, BusinessEntity>();
+            Mapper.CreateMap<PersonAddress, PropertyHeaderViewModel>();
+            Mapper.CreateMap<PropertyHeaderViewModel, PersonAddress>();
+            Mapper.CreateMap<LedgerAccount, PropertyHeaderViewModel>();
+            Mapper.CreateMap<PropertyHeaderViewModel, LedgerAccount>();
+            Mapper.CreateMap<PersonExtended, PropertyHeaderViewModel>();
+            Mapper.CreateMap<PropertyHeaderViewModel, PersonExtended>();
+
+            Mapper.CreateMap<ProductBuyer, PropertyLineViewModel>();
+            Mapper.CreateMap<PropertyLineViewModel, ProductBuyer>();
+            Mapper.CreateMap<ProductBuyerExtended, PropertyLineViewModel>();
+            Mapper.CreateMap<PropertyLineViewModel, ProductBuyerExtended>();
+
+            Mapper.CreateMap<CollectionViewModel, DocumentUniqueId>();
+            Mapper.CreateMap<CollectionViewModel, PropertyHeaderViewModel>();
+            Mapper.CreateMap<PropertyHeaderViewModel, CollectionViewModel>();
+            Mapper.CreateMap<LedgerHeader, CollectionViewModel>();
+            Mapper.CreateMap<CollectionViewModel, LedgerHeader>();
+            Mapper.CreateMap<LedgerLine, CollectionViewModel>();
+            Mapper.CreateMap<CollectionViewModel, LedgerLine>();
+            Mapper.CreateMap<CollectionSettings, CollectionSettingsViewModel>();
+            Mapper.CreateMap<CollectionSettingsViewModel, CollectionSettings>();
+
+
+
+            //End Property Tax
 
             container.RegisterType<IRolesDocTypeService, RolesDocTypeService>(new PerRequestLifetimeManager());
             container.RegisterType<IRolePermissionService, RolePermissionService>(new PerRequestLifetimeManager());

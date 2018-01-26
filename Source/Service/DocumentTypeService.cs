@@ -34,8 +34,9 @@ namespace Service
         Task<DocumentType> FindAsync(int id);
         int NextId(int id);
         int PrevId(int id);
-
+        IEnumerable<DocumentType> FindByDocumentCategory(int DocumentCategoryId);
         IEnumerable<DocumentTypeHeaderAttributeViewModel> GetDocumentTypeHeaderAttribute(int DocumentTypeId);
+        string FGetNewDocNo(string FieldName, string TableName, int DocTypeId, DateTime DocDate, int DivisionId, int SiteId);
     }
 
     public class DocumentTypeService : IDocumentTypeService

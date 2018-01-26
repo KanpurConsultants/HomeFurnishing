@@ -112,6 +112,5 @@ D:\Sample\HomeFurnishing\Source\NotificationContents\bin\Debug\EntityFramework.S
 D:\Sample\HomeFurnishing\Source\NotificationContents\bin\Debug\Microsoft.AspNet.Identity.Core.xml
 D:\Sample\HomeFurnishing\Source\NotificationContents\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.xml
 D:\Sample\HomeFurnishing\Source\NotificationContents\bin\Debug\log4net.xml
-D:\Sample\HomeFurnishing\Source\NotificationContents\obj\Debug\NotificationContents.csprojResolveAssemblyReference.cache
 D:\Sample\HomeFurnishing\Source\NotificationContents\obj\Debug\NotificationContents.dll
 D:\Sample\HomeFurnishing\Source\NotificationContents\obj\Debug\NotificationContents.pdb

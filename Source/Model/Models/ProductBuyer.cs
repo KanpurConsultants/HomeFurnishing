@@ -54,6 +54,16 @@ namespace Model.Models
         [MaxLength(50)]
         public string BuyerSpecification6 { get; set; }
 
+        public virtual Dimension1 Dimension1 { get; set; }
+        [Display(Name = "Dimension1")]
+        [ForeignKey("Dimension1")]
+        public int? Dimension1Id { get; set; }
+        public virtual Dimension2 Dimension2 { get; set; }
+        [Display(Name = "Dimension2")]
+        [ForeignKey("Dimension2")]
+        public int? Dimension2Id { get; set; }
+
+
         [Display(Name = "Created By")]
         public string CreatedBy { get; set; }
 

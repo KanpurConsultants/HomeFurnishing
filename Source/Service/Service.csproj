@@ -114,13 +114,25 @@
   <ItemGroup>
     <Compile Include="AccountService.cs" />
     <Compile Include="AdminSetupService.cs" />
+    <Compile Include="AreaService.cs" />
+    <Compile Include="BinLocationService.cs" />
+    <Compile Include="CasteService.cs" />
     <Compile Include="ChargeGroupPersonCalculationService.cs" />
     <Compile Include="ChargeGroupSettingsService.cs" />
+    <Compile Include="CollectionService.cs" />
+    <Compile Include="CollectionSettingsService.cs" />
     <Compile Include="CompanyService.cs" />
     <Compile Include="CompanySettingsService.cs" />
     <Compile Include="DARService.cs" />
+    <Compile Include="Dimension1ExtendedService.cs" />
+    <Compile Include="DiscountTypeService.cs" />
     <Compile Include="Display_JobInvoiceSummaryService.cs" />
     <Compile Include="Display_SaleOrderInventoryStatusService.cs" />
+    <Compile Include="PaymentModeLedgerAccountService.cs" />
+    <Compile Include="PaymentModeService.cs" />
+    <Compile Include="PropertyHeaderService.cs" />
+    <Compile Include="PropertyLineService.cs" />
+    <Compile Include="ReligionService.cs" />
     <Compile Include="RolePermissionService.cs" />
     <Compile Include="Display_ProdOrderBalanceService.cs" />
     <Compile Include="DashBoardAutoService.cs" />

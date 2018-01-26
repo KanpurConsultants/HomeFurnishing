@@ -779,7 +779,7 @@ namespace Jobs.Controllers
                     ActivityType = (int)ActivityTypeContants.Submitted;
 
 
-                    pd.LockReason = "Sale order is created for enquiry.Now you can't modify enquiry, changes can be done in sale order.";
+                    //pd.LockReason = "Sale order is created for enquiry.Now you can't modify enquiry, changes can be done in sale order.";
                     _SaleEnquiryHeaderService.Update(pd);
 
                     CreateSaleOrder(Id);

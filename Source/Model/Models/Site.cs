@@ -10,9 +10,10 @@ namespace Model.Models
 {
     public class Site : EntityBase, IHistoryLog
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        //[DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Key]
         public int SiteId { get; set; }
+
         [MaxLength(50, ErrorMessage = "Site Name cannot exceed 50 characters"), Required]
         public string SiteName { get; set; }
         [MaxLength(250, ErrorMessage = "Site Name cannot exceed 250 characters")]
@@ -21,7 +22,7 @@ namespace Model.Models
         [MaxLength(50, ErrorMessage = "Phone no cannot exceed 50 characters")]
         public string PhoneNo { get; set; }
 
-        [ForeignKey("City"), Required,Range(1,int.MaxValue,ErrorMessage="The City field is required")]
+        [ForeignKey("City")]
         public int? CityId { get; set; }
         public virtual City City { get; set; }
 

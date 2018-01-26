@@ -24,12 +24,16 @@ namespace Service
         void Update(Godown pt);
         Godown Add(Godown pt);
         IEnumerable<Godown> GetGodownList(int SiteId);
+        IQueryable<Godown> GetGodownListForIndex(int SiteId);
         IQueryable<ComboBoxResult> GetGodownForContraSiteFilters(int id, string term);
         // IEnumerable<Godown> GetGodownList(int buyerId);
         Task<IEquatable<Godown>> GetAsync();
         Task<Godown> FindAsync(int id);
         int NextId(int id);
         int PrevId(int id);
+        bool CheckForNameExists(string Name);
+        bool CheckForNameExists(string Name, int Id);
+        Int32 GetNewId();
     }
 
     public class GodownService : IGodownService
@@ -89,7 +93,21 @@ namespace Service
             return so;
         }
 
+        public Int32 GetNewId()
+        {
+            Int32 NewId = _unitOfWork.Repository<Godown>().Query().Get().Max(m => m.GodownId) + 1;
+
+            return NewId;
+        }
+
         public IEnumerable<Godown> GetGodownList(int SiteId)
+        {
+            var pt = _unitOfWork.Repository<Godown>().Query().Get().OrderBy(m => m.GodownName).Where(m => m.SiteId == SiteId);
+
+            return pt;
+        }
+
+        public IQueryable<Godown> GetGodownListForIndex(int SiteId)
         {
             var pt = _unitOfWork.Repository<Godown>().Query().Get().OrderBy(m => m.GodownName).Where(m => m.SiteId == SiteId);
 
@@ -171,6 +189,33 @@ namespace Service
                 return id;
         }
 
+        public bool CheckForNameExists(string Name)
+        {
+            int SiteId = (int)System.Web.HttpContext.Current.Session["SiteId"];
+            int DivisionId = (int)System.Web.HttpContext.Current.Session["DivisionId"];
+
+            var temp = (from pr in _GodownRepository.Instance
+                        where pr.GodownName == Name && pr.SiteId == SiteId
+                        select pr).FirstOrDefault();
+            if (temp == null)
+                return false;
+            else
+                return true;
+
+        }
+        public bool CheckForNameExists(string Name, int Id)
+        {
+            int SiteId = (int)System.Web.HttpContext.Current.Session["SiteId"];
+            int DivisionId = (int)System.Web.HttpContext.Current.Session["DivisionId"];
+
+            var temp = (from pr in _GodownRepository.Instance
+                        where pr.GodownName == Name && pr.GodownId != Id && pr.SiteId == SiteId
+                        select pr).FirstOrDefault();
+            if (temp == null)
+                return false;
+            else
+                return true;
+        }
 
         public void Dispose()
         {

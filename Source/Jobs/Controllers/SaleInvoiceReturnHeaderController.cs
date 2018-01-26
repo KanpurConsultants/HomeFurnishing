@@ -190,6 +190,18 @@ namespace Jobs.Controllers
                     ModelState.AddModelError("GodownId", "The Godown field is required");
             }
 
+            SiteDivisionSettings SiteDivisionSettings = new SiteDivisionSettingsService(_unitOfWork).GetSiteDivisionSettings(vm.SiteId, vm.DivisionId, vm.DocDate);
+            if (SiteDivisionSettings != null)
+            {
+                if (SiteDivisionSettings.IsApplicableGST == true)
+                {
+                    if (vm.SalesTaxGroupPersonId == 0 || vm.SalesTaxGroupPersonId == null)
+                    {
+                        ModelState.AddModelError("", "Sales Tax Group Person is not defined for party, it is required.");
+                    }
+                }
+            }
+
             #region DocTypeTimeLineValidation
 
             try

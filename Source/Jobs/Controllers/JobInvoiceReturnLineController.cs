@@ -360,7 +360,7 @@ namespace Jobs.Controllers
                             StockViewModel.Remark = GoodsRetHeader.Remark;
                             StockViewModel.Status = GoodsRetHeader.Status;
                             StockViewModel.ProcessId = GoodsRetHeader.ProcessId;
-                            StockViewModel.LotNo = null;
+                            StockViewModel.LotNo = RecRecord.LotNo;
                             StockViewModel.CostCenterId = null;
                             StockViewModel.Qty_Iss = GLine.Qty;
                             StockViewModel.Qty_Rec = 0;
@@ -440,7 +440,7 @@ namespace Jobs.Controllers
                             StockProcessViewModel.Remark = GoodsRetHeader.Remark;
                             StockProcessViewModel.Status = GoodsRetHeader.Status;
                             StockProcessViewModel.ProcessId = GoodsRetHeader.ProcessId;
-                            StockProcessViewModel.LotNo = null;
+                            StockProcessViewModel.LotNo = RecRecord.LotNo;
                             StockProcessViewModel.CostCenterId = null;
                             StockProcessViewModel.Qty_Iss = 0;
                             StockProcessViewModel.Qty_Rec = GLine.Qty;

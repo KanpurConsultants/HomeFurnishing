@@ -14,6 +14,7 @@ namespace Model.Models
         [Key]
         public int PersonRateGroupId { get; set; }
 
+
         [Display(Name = "Person Rate Group")]
         [MaxLength(50), Required]
         [Index("IX_PersonRateGroup_PersonRateGroupName", IsUnique = true,Order=1)]

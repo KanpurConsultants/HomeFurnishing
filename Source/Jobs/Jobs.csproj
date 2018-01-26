@@ -262,6 +262,25 @@
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="App_Start\UnityConfig.cs" />
     <Compile Include="App_Start\UnityMvcActivator.cs" />
+    <Compile Include="Areas\PropertyTax\Controllers\AreaController.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Areas\PropertyTax\Controllers\BinLocationController.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Areas\PropertyTax\Controllers\CasteController.cs" />
+    <Compile Include="Areas\PropertyTax\Controllers\CollectionController.cs" />
+    <Compile Include="Areas\PropertyTax\Controllers\Dimension1Controller.cs" />
+    <Compile Include="Areas\PropertyTax\Controllers\DiscountTypeController.cs" />
+    <Compile Include="Areas\PropertyTax\Controllers\GodownController.cs" />
+    <Compile Include="Areas\PropertyTax\Controllers\PaymentModeController.cs" />
+    <Compile Include="Areas\PropertyTax\Controllers\PersonRateGroupController.cs" />
+    <Compile Include="Areas\PropertyTax\Controllers\ProductController.cs" />
+    <Compile Include="Areas\PropertyTax\Controllers\PropertyHeaderController.cs" />
+    <Compile Include="Areas\PropertyTax\Controllers\PropertyLineController.cs" />
+    <Compile Include="Areas\PropertyTax\Controllers\ReligionController.cs" />
+    <Compile Include="Areas\PropertyTax\Controllers\SiteController.cs" />
+    <Compile Include="Areas\PropertyTax\PropertyTaxAreaRegistration.cs" />
     <Compile Include="Areas\Rug\Controllers\CarpetMasterController.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -2618,6 +2637,8 @@
     <Content Include="AdminLTE\plugins\timepicker\css\bootstrap-timepicker.min.css" />
     <Content Include="AdminLTE\plugins\timepicker\js\bootstrap-timepicker.js" />
     <Content Include="AdminLTE\plugins\timepicker\js\bootstrap-timepicker.min.js" />
+    <Content Include="Areas\PropertyTax\Views\BinLocation\Index.cshtml" />
+    <Content Include="Areas\PropertyTax\Views\Caste\Create.cshtml" />
     <Content Include="Areas\Rug\Views\CarpetMaster\ChooseType.cshtml" />
     <Content Include="Areas\Rug\Views\CarpetMaster\CopyFromExisting.cshtml" />
     <Content Include="Areas\Rug\Views\CarpetMaster\Create.cshtml" />
@@ -3569,6 +3590,46 @@
     <Content Include="Areas\Rug\Views\StockIssueLine\_Results.cshtml" />
     <Content Include="Areas\Rug\Views\StockIssueLine\_ResultsProduction.cshtml" />
     <Content Include="Areas\Rug\Views\StockIssueLine\_ResultsStockIn.cshtml" />
+    <Content Include="Areas\PropertyTax\Views\web.config" />
+    <Content Include="Areas\PropertyTax\Views\PropertyHeader\Create.cshtml" />
+    <Content Include="Areas\PropertyTax\Views\PropertyHeader\Index.cshtml" />
+    <Content Include="Areas\PropertyTax\Views\PropertyHeader\WardIndex.cshtml" />
+    <Content Include="Areas\PropertyTax\Views\PropertyHeader\_Reason.cshtml" />
+    <Content Include="Areas\PropertyTax\Views\PropertyLine\_Create.cshtml" />
+    <Content Include="Areas\PropertyTax\Views\Area\Create.cshtml" />
+    <Content Include="Areas\PropertyTax\Views\Area\Index.cshtml" />
+    <Content Include="Areas\PropertyTax\Views\Area\_Reason.cshtml" />
+    <Content Include="Areas\PropertyTax\Views\BinLocation\_Create.cshtml" />
+    <Content Include="Areas\PropertyTax\Views\Caste\Index.cshtml" />
+    <Content Include="Areas\PropertyTax\Views\Caste\_Reason.cshtml" />
+    <Content Include="Areas\PropertyTax\Views\Collection\Create.cshtml" />
+    <Content Include="Areas\PropertyTax\Views\Collection\Index.cshtml" />
+    <Content Include="Areas\PropertyTax\Views\Collection\PropertyIndex.cshtml" />
+    <Content Include="Areas\PropertyTax\Views\Collection\_Reason.cshtml" />
+    <Content Include="Areas\PropertyTax\Views\DiscountType\Create.cshtml" />
+    <Content Include="Areas\PropertyTax\Views\DiscountType\Index.cshtml" />
+    <Content Include="Areas\PropertyTax\Views\DiscountType\_Reason.cshtml" />
+    <Content Include="Areas\PropertyTax\Views\Godown\Create.cshtml" />
+    <Content Include="Areas\PropertyTax\Views\Godown\Index.cshtml" />
+    <Content Include="Areas\PropertyTax\Views\Godown\_Reason.cshtml" />
+    <Content Include="Areas\PropertyTax\Views\Dimension1\Create.cshtml" />
+    <Content Include="Areas\PropertyTax\Views\Dimension1\Index.cshtml" />
+    <Content Include="Areas\PropertyTax\Views\Dimension1\_Reason.cshtml" />
+    <Content Include="Areas\PropertyTax\Views\PersonRateGroup\Create.cshtml" />
+    <Content Include="Areas\PropertyTax\Views\PersonRateGroup\Index.cshtml" />
+    <Content Include="Areas\PropertyTax\Views\PersonRateGroup\_Reason.cshtml" />
+    <Content Include="Areas\PropertyTax\Views\Product\Create.cshtml" />
+    <Content Include="Areas\PropertyTax\Views\Product\Index.cshtml" />
+    <Content Include="Areas\PropertyTax\Views\Product\_Reason.cshtml" />
+    <Content Include="Areas\PropertyTax\Views\Religion\Create.cshtml" />
+    <Content Include="Areas\PropertyTax\Views\Religion\Index.cshtml" />
+    <Content Include="Areas\PropertyTax\Views\Religion\_Reason.cshtml" />
+    <Content Include="Areas\PropertyTax\Views\Site\Create.cshtml" />
+    <Content Include="Areas\PropertyTax\Views\Site\Index.cshtml" />
+    <Content Include="Areas\PropertyTax\Views\Site\_Reason.cshtml" />
+    <Content Include="Areas\PropertyTax\Views\PaymentMode\Create.cshtml" />
+    <Content Include="Areas\PropertyTax\Views\PaymentMode\Index.cshtml" />
+    <Content Include="Areas\PropertyTax\Views\PaymentMode\_Reason.cshtml" />
     <None Include="Properties\PublishProfiles\Jobs.kanpurconsultants.com - Web Deploy.pubxml" />
     <None Include="Properties\PublishProfiles\Jobs.pubxml" />
     <None Include="Properties\PublishProfiles\Purchase.pubxml" />
@@ -5268,6 +5329,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Areas\PropertyTax\Models\" />
     <Folder Include="Areas\Rug\Models\" />
     <Folder Include="Views\GatePass\" />
   </ItemGroup>
