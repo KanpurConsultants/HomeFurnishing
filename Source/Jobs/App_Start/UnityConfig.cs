@@ -297,6 +297,8 @@ namespace Jobs.App_Start
 
             container.RegisterType<IActivityLogService, ActivityLogService>(new PerRequestLifetimeManager());
 
+            container.RegisterType<IEmployeeChargeService, EmployeeChargeService>(new PerRequestLifetimeManager());
+
             container.RegisterType<IJobOrderHeaderChargeService, JobOrderHeaderChargeService>(new PerRequestLifetimeManager());
 
             container.RegisterType<IJobOrderLineChargeService, JobOrderLineChargeService>(new PerRequestLifetimeManager());
@@ -436,6 +438,9 @@ namespace Jobs.App_Start
             container.RegisterType<IRepository<SaleQuotationSettings>, Repository<SaleQuotationSettings>>();
             container.RegisterType<ISaleQuotationSettingsService, SaleQuotationSettingsService>(new PerRequestLifetimeManager());
 
+            container.RegisterType<IRepository<SalarySettings>, Repository<SalarySettings>>();
+            container.RegisterType<ISalarySettingsService, SalarySettingsService>(new PerRequestLifetimeManager());
+
             container.RegisterType<IRepository<SaleOrderAmendmentHeader>, Repository<SaleOrderAmendmentHeader>>();
             container.RegisterType<ISaleOrderAmendmentHeaderService, SaleOrderAmendmentHeaderService>(new PerRequestLifetimeManager());
 
@@ -463,6 +468,19 @@ namespace Jobs.App_Start
 
             container.RegisterType<ISaleQuotationHeaderChargeService, SaleQuotationHeaderChargeService>(new PerRequestLifetimeManager());
             container.RegisterType<ISaleQuotationLineChargeService, SaleQuotationLineChargeService>(new PerRequestLifetimeManager());
+
+
+
+
+            container.RegisterType<IRepository<SalaryHeader>, Repository<SalaryHeader>>();
+            container.RegisterType<Service.ISalaryHeaderService, Service.SalaryHeaderService>(new PerRequestLifetimeManager());
+
+            container.RegisterType<IRepository<SalaryLine>, Repository<SalaryLine>>();
+            container.RegisterType<Service.ISalaryLineService, Service.SalaryLineService>(new PerRequestLifetimeManager());
+
+            container.RegisterType<ISalaryHeaderChargeService, SalaryHeaderChargeService>(new PerRequestLifetimeManager());
+            container.RegisterType<ISalaryLineChargeService, SalaryLineChargeService>(new PerRequestLifetimeManager());
+
 
 
 
@@ -1921,6 +1939,35 @@ namespace Jobs.App_Start
             Mapper.CreateMap<SaleQuotationHeaderViewModel, DocumentUniqueId>();
 
 
+
+
+
+
+
+
+
+            Mapper.CreateMap<SalaryHeader, SalaryHeaderViewModel>();
+            Mapper.CreateMap<SalaryHeaderViewModel, SalaryHeader>();
+
+            Mapper.CreateMap<SalaryLine, SalaryLineViewModel>();
+            Mapper.CreateMap<SalaryLineViewModel, SalaryLine>();
+
+            Mapper.CreateMap<SalarySettings, SalarySettingsViewModel>();
+            Mapper.CreateMap<SalarySettingsViewModel, SalarySettings>();
+
+            Mapper.CreateMap<LineChargeViewModel, SalaryLineCharge>().ForMember(m => m.Id, x => x.Ignore());
+            Mapper.CreateMap<SalaryLineCharge, LineChargeViewModel>().ForMember(m => m.Id, x => x.Ignore());
+
+            Mapper.CreateMap<HeaderChargeViewModel, SalaryHeaderCharge>().ForMember(m => m.Id, x => x.Ignore());
+            Mapper.CreateMap<SalaryHeaderCharge, HeaderChargeViewModel>().ForMember(m => m.Id, x => x.Ignore());
+
+            Mapper.CreateMap<SalarySettings, SalarySettings>();
+            Mapper.CreateMap<SalaryLine, SalaryLine>();
+
+            Mapper.CreateMap<SalaryHeader, DocumentUniqueId>();
+            Mapper.CreateMap<SalaryHeaderViewModel, DocumentUniqueId>();
+
+
             //////////////////////////////////////////End Sales ViewModel Mapping///////////////////////////////////////////////////
 
 
@@ -2716,6 +2763,14 @@ namespace Jobs.App_Start
 
             Mapper.CreateMap<LineChargeViewModel, JobOrderLineCharge>().ForMember(m => m.Id, x => x.Ignore());
             Mapper.CreateMap<JobOrderLineCharge, LineChargeViewModel>().ForMember(m => m.Id, x => x.Ignore());
+
+            Mapper.CreateMap<HeaderChargeViewModel, EmployeeCharge>().ForMember(m => m.Id, x => x.Ignore());
+            Mapper.CreateMap<EmployeeCharge, HeaderChargeViewModel>().ForMember(m => m.Id, x => x.Ignore());
+
+            Mapper.CreateMap<CalculationFooter, EmployeeCharge>();
+            Mapper.CreateMap<EmployeeCharge, CalculationFooter>();
+
+
 
             Mapper.CreateMap<HeaderChargeViewModel, JobOrderHeaderCharge>().ForMember(m => m.Id, x => x.Ignore());
             Mapper.CreateMap<JobOrderHeaderCharge, HeaderChargeViewModel>().ForMember(m => m.Id, x => x.Ignore());

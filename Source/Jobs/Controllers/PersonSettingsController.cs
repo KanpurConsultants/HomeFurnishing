@@ -184,6 +184,7 @@ namespace Jobs.Controllers
                     temp.isMandatoryGuarantor = pt.isMandatoryGuarantor;
                     temp.isMandatorySalesTaxGroup = pt.isMandatorySalesTaxGroup;
                     temp.LedgerAccountGroupId = pt.LedgerAccountGroupId;
+                    temp.CalculationId = pt.CalculationId;
                     temp.DefaultProcessId = pt.DefaultProcessId;
                     temp.SqlProcPersonCode = pt.SqlProcPersonCode;
                     temp.ModifiedDate = DateTime.Now;

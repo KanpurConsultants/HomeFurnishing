@@ -55,15 +55,17 @@ namespace Jobs.Controllers
 
             //return Json(new CalculationFooterService(_unitOfWork).GetCalculationFooterList(CalculationId ?? 0).ToList());
 
-
-            var count = new PurchaseOrderHeaderChargeService(_unitOfWork).GetCalculationFooterListSProc(HeaderId, HeaderChargeTable, LineChargeTable).Count();
-
-            if(count>0)
+            if (HeaderChargeTable != null && HeaderChargeTable != "")
             {
+                var count = new PurchaseOrderHeaderChargeService(_unitOfWork).GetCalculationFooterListSProc(HeaderId, HeaderChargeTable, LineChargeTable).Count();
 
-                var temp=new PurchaseOrderHeaderChargeService(_unitOfWork).GetCalculationFooterListSProc(HeaderId, HeaderChargeTable, LineChargeTable).ToList();
+                if (count > 0)
+                {
 
-                return Json(temp, JsonRequestBehavior.AllowGet);
+                    var temp = new PurchaseOrderHeaderChargeService(_unitOfWork).GetCalculationFooterListSProc(HeaderId, HeaderChargeTable, LineChargeTable).ToList();
+
+                    return Json(temp, JsonRequestBehavior.AllowGet);
+                }
             }
 
             return Json(new CalculationFooterService(_unitOfWork).GetCalculationFooterList(CalculationId ?? 0,DocTypeId, SiteId, DivisionId).ToList());
@@ -141,6 +143,7 @@ namespace Jobs.Controllers
             return PartialView(new PurchaseOrderHeaderChargeService(_unitOfWork).GetCalculationFooterListSProc(HeaderId, HeaderTable, LineTable).ToList());
         }
 
+
         public ActionResult GetHeaderChargeForEdit(int Id, string HeaderTable, string LineTable)//PurchaseOrderHeader Id
         {
 
@@ -149,6 +152,12 @@ namespace Jobs.Controllers
         }
 
 
+        public ActionResult GetEmpHeaderChargeForEdit(int Id, string HeaderTable, string LineTable)//PurchaseOrderHeader Id
+        {
+            ViewBag.ChargeType = "Employee";
+            var temp = new PurchaseOrderHeaderChargeService(_unitOfWork).GetCalculationFooterListSProc(Id, HeaderTable, LineTable).ToList();
+            return PartialView("FooterChargeEdit", temp);
+        }
 
 
 
@@ -307,6 +316,35 @@ namespace Jobs.Controllers
 
             }
 
+
+            return Json(new { success = true });
+        }
+
+
+
+        [HttpPost]
+        public ActionResult PostEmpCalculationFields(List<HeaderChargeViewModel> temp)
+        {
+            foreach (var item in temp)
+            {
+                var header = new EmployeeChargeService(_unitOfWork).Find(item.Id);
+                header.Rate = item.Rate;
+                header.Amount = item.Amount;
+                new EmployeeChargeService(_unitOfWork).Update(header);
+            }
+
+            try
+            {
+                _unitOfWork.Save();
+            }
+
+            catch (Exception ex)
+            {
+                string message = _exception.HandleException(ex);
+                ModelState.AddModelError("", message);
+
+                return PartialView("FooterChargeEdit", temp);
+            }
 
             return Json(new { success = true });
         }

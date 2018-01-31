@@ -71,5 +71,7 @@ namespace Model.ViewModel
 
         public string SqlProcPersonCode { get; set; }
 
+        public int? CalculationId { get; set; }
+
     }
 }

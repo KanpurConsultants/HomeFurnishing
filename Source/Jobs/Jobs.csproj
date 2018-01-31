@@ -426,6 +426,7 @@
     <Compile Include="Areas\Rug\Controllers\PackingSettingsController.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Controllers\SalaryWizardController.cs" />
     <Compile Include="Controllers\LedgerAccountMergingController.cs" />
     <Compile Include="Areas\Rug\Controllers\PersonMerging.cs">
       <SubType>Code</SubType>
@@ -744,6 +745,9 @@
     <Compile Include="Controllers\ProductController.cs" />
     <Compile Include="Controllers\ProductCustomGroupExcelImportController.cs" />
     <Compile Include="Controllers\SaleEnquiryProductMappingWithGridController.cs" />
+    <Compile Include="Controllers\SalaryHeaderController.cs" />
+    <Compile Include="Controllers\SalaryLineController.cs" />
+    <Compile Include="Controllers\SalarySettingsController.cs" />
     <Compile Include="Controllers\UserRolesNewController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Controllers\ProductCustomGroupHeaderController.cs" />
@@ -3205,6 +3209,7 @@
     <Content Include="Scripts\DashboardV2.js" />
     <Content Include="Scripts\DisplayJobInvoiceSummary\DisplayJobInvoiceSummary.js" />
     <Content Include="Scripts\DisplaySaleOrderInventoryStatus\DisplaySaleOrderInventoryStatus.js" />
+    <Content Include="Scripts\Salary\Salary.js" />
     <Content Include="Scripts\SaleEnquiryProductMappingWithGrid\SaleEnquiryProductMappingWithGrid.js" />
     <Content Include="Scripts\RolePermission\RolePermission.js" />
     <Content Include="Scripts\DisplayJobOrderBalance\DisplayJobOrderBalance.js" />
@@ -4386,11 +4391,8 @@
     <Content Include="Views\Employee\AddToExisting.cshtml" />
     <Content Include="Views\Employee\ChooseContactType.cshtml" />
     <Content Include="Views\Employee\Create.cshtml" />
-    <Content Include="Views\Employee\CreateX.cshtml" />
     <Content Include="Views\Employee\Delete.cshtml" />
-    <Content Include="Views\Employee\Edit.cshtml" />
     <Content Include="Views\Employee\Index.cshtml" />
-    <Content Include="Views\Employee\IndexX.cshtml" />
     <Content Include="Views\Employee\_Reason.cshtml" />
     <Content Include="Views\LeaveType\Create.cshtml" />
     <Content Include="Views\LeaveType\Delete.cshtml" />
@@ -5326,6 +5328,12 @@
     <Content Include="Views\LedgerAccountMerging\Index.cshtml" />
     <Content Include="Views\LedgerAccountMerging\SingleMerging.cshtml" />
     <Content Include="Views\LedgerAccountMerging\Sucess.cshtml" />
+    <Content Include="Views\SalaryHeader\_LineProgress.cshtml" />
+    <Content Include="Views\SalaryHeader\_Reason.cshtml" />
+    <Content Include="Views\SalaryHeader\Create.cshtml" />
+    <Content Include="Views\SalaryHeader\DocumentTypeList.cshtml" />
+    <Content Include="Views\SalaryHeader\Index.cshtml" />
+    <Content Include="Views\SalarySettings\Create.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

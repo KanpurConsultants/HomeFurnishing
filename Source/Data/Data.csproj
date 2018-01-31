@@ -155,6 +155,26 @@
     <Compile Include="Migrations\201712260845023_SampleTesting.Designer.cs">
       <DependentUpon>201712260845023_SampleTesting.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201801270416596_EmployeeCharge.cs" />
+    <Compile Include="Migrations\201801270416596_EmployeeCharge.Designer.cs">
+      <DependentUpon>201801270416596_EmployeeCharge.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201801270637291_EmployeeChargesCorrection.cs" />
+    <Compile Include="Migrations\201801270637291_EmployeeChargesCorrection.Designer.cs">
+      <DependentUpon>201801270637291_EmployeeChargesCorrection.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201801290612208_EmployeeLineCharge.cs" />
+    <Compile Include="Migrations\201801290612208_EmployeeLineCharge.Designer.cs">
+      <DependentUpon>201801290612208_EmployeeLineCharge.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201801291148528_Salary.cs" />
+    <Compile Include="Migrations\201801291148528_Salary.Designer.cs">
+      <DependentUpon>201801291148528_Salary.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201801291155326_Salary1.cs" />
+    <Compile Include="Migrations\201801291155326_Salary1.Designer.cs">
+      <DependentUpon>201801291155326_Salary1.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="NotificationApplicationDbContext.cs" />
     <Compile Include="Infrastructure\IStandardModelDbSets.cs" />
@@ -209,6 +229,21 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201712260845023_SampleTesting.resx">
       <DependentUpon>201712260845023_SampleTesting.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801270416596_EmployeeCharge.resx">
+      <DependentUpon>201801270416596_EmployeeCharge.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801270637291_EmployeeChargesCorrection.resx">
+      <DependentUpon>201801270637291_EmployeeChargesCorrection.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801290612208_EmployeeLineCharge.resx">
+      <DependentUpon>201801290612208_EmployeeLineCharge.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801291148528_Salary.resx">
+      <DependentUpon>201801291148528_Salary.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801291155326_Salary1.resx">
+      <DependentUpon>201801291155326_Salary1.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

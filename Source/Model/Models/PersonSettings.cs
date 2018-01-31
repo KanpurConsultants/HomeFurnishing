@@ -69,6 +69,9 @@ namespace Model.Models
         public bool? isMandatoryCreditLimit { get; set; }
 
 
+        [ForeignKey("Calculation")]
+        public int? CalculationId { get; set; }
+        public virtual Calculation Calculation { get; set; }
 
 
         [ForeignKey("LedgerAccountGroup"), Display(Name = "Account Group"), Required]

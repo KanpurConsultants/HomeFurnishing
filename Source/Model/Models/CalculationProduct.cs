@@ -11,7 +11,7 @@ namespace Model.Models
     public class CalculationProduct : EntityBase, IHistoryLog
     {
 
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        //[DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Key]
         public int CalculationProductId { get; set; }   
 

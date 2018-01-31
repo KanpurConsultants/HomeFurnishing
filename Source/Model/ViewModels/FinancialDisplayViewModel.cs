@@ -27,6 +27,7 @@ namespace Model.ViewModels
         public ReportHeaderCompanyDetail ReportHeaderCompanyDetail { get; set; }
         public int? LedgerAccount { get; set; }
         public string LedgerAccountGroup { get; set; }
+        public string HeaderInfo { get; set; }
          
     }
 }

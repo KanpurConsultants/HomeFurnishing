@@ -43,13 +43,13 @@
 
         @Html.Grid(Model).Columns(columns =>
            {
-               columns.Add(m => m.PersonId, true);
+               columns.Add(m => m.EmployeeId, true);
                columns.Add(m => m.Name).Sortable(true).Titled("Employee Name").Filterable(true).Sortable(true);
                columns.Add(m => m.Code).Sortable(true).Titled("Code").Filterable(true).Sortable(true);
                columns.Add(m => m.Suffix).Sortable(true).Titled("Suffix").Filterable(true).Sortable(true);
                columns.Add(m => m.Phone).Sortable(true).Titled("Phone").Filterable(true).Sortable(true);
                columns.Add(m => m.Mobile).Sortable(true).Titled("Mobile").Filterable(true).Sortable(true);
-               columns.Add(true).RenderValueAs(m => "<a href='/Employee/Edit/" + m.PersonId + "' hidden class='RecEditurl'></a><a href='/Employee/Delete/" + m.PersonId + "' hidden class='RecDelurl'></a>");
+               columns.Add(true).RenderValueAs(m => "<a href='/Employee/Edit/" + m.EmployeeId + "' hidden class='RecEditurl'></a><a href='/Employee/Delete/" + m.EmployeeId + "' hidden class='RecDelurl'></a>");
            }).WithPaging(25).EmptyText("No records found.").Sortable().Filterable().WithMultipleFilters()
     </div>
 </div>
@@ -59,7 +59,7 @@
     $('table.grid-table td').dblclick(function () {
         var $this = $(this);
         var row = $this.closest("tr");
-        var editid = row.find('[data-name="PersonId"]').text();
+        var editid = row.find('[data-name="EmployeeId"]').text();
         var url = '@Url.Action("Edit","Employee")' + "/" + editid;
         window.location.href = url;
     });

@@ -156,3 +156,25 @@
 
 }
 
+
+@if (ViewBag.ChargeType == "Employee")
+{
+
+
+    <script type="text/javascript">
+
+        var headerid=@Model.FirstOrDefault().HeaderTableId;
+
+        LoadCalculationFooter(headerid,"Web.EmployeeCharges","Web.EmployeeLineCharges");
+
+
+        $(function(){
+            var url = '/TaxCalculation/PostEmpCalculationFields';
+            $('form#modform').attr('action',url);
+        })
+
+    </script>
+
+
+
+}

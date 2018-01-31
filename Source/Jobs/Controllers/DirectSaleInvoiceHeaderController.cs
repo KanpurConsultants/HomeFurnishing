@@ -158,6 +158,30 @@ namespace Jobs.Controllers
             ViewBag.PendingToSubmit = PendingToSubmitCount(id);
             ViewBag.PendingToReview = PendingToReviewCount(id);
             ViewBag.IndexStatus = "PTS";
+
+            #region "Setting Section"
+            var DocumentTypeSettings = new DocumentTypeSettingsService(_unitOfWork).GetDocumentTypeSettingsForDocument(id);
+            ViewBag.ProductUidCaption = DocumentTypeSettings.ProductUidCaption ?? "Product Uid";
+            ViewBag.ProductCaption = DocumentTypeSettings.ProductCaption ?? "Product";
+            ViewBag.ProductGroupCaption = DocumentTypeSettings.ProductGroupCaption ?? "Product Group";
+
+            int DivisionId = (int)System.Web.HttpContext.Current.Session["DivisionId"];
+            int SiteId = (int)System.Web.HttpContext.Current.Session["SiteId"];
+            var settings = new SaleInvoiceSettingService(_unitOfWork).GetSaleInvoiceSettingForDocument(id, DivisionId, SiteId);
+            if (settings != null)
+            {
+                ViewBag.isVisibleProductUid_Index = settings.isVisibleProductUid_Index ?? false;
+                ViewBag.isVisibleProduct_Index = settings.isVisibleProduct_Index ?? false;
+                ViewBag.isVisibleProductGroup_Index = settings.isVisibleProductGroup_Index ?? false;
+            }
+            else
+            {
+                ViewBag.isVisibleProductUid_Index = false;
+                ViewBag.isVisibleProduct_Index = false;
+                ViewBag.isVisibleProductGroup_Index = false;
+            }
+            #endregion
+
             return View("Index", PendingToSubmit);
         }
 
@@ -169,6 +193,31 @@ namespace Jobs.Controllers
             ViewBag.PendingToSubmit = PendingToSubmitCount(id);
             ViewBag.PendingToReview = PendingToReviewCount(id);
             ViewBag.IndexStatus = "PTR";
+
+
+            #region "Setting Section"
+            var DocumentTypeSettings = new DocumentTypeSettingsService(_unitOfWork).GetDocumentTypeSettingsForDocument(id);
+            ViewBag.ProductUidCaption = DocumentTypeSettings.ProductUidCaption ?? "Product Uid";
+            ViewBag.ProductCaption = DocumentTypeSettings.ProductCaption ?? "Product";
+            ViewBag.ProductGroupCaption = DocumentTypeSettings.ProductGroupCaption ?? "Product Group";
+
+            int DivisionId = (int)System.Web.HttpContext.Current.Session["DivisionId"];
+            int SiteId = (int)System.Web.HttpContext.Current.Session["SiteId"];
+            var settings = new SaleInvoiceSettingService(_unitOfWork).GetSaleInvoiceSettingForDocument(id, DivisionId, SiteId);
+            if (settings != null)
+            {
+                ViewBag.isVisibleProductUid_Index = settings.isVisibleProductUid_Index ?? false;
+                ViewBag.isVisibleProduct_Index = settings.isVisibleProduct_Index ?? false;
+                ViewBag.isVisibleProductGroup_Index = settings.isVisibleProductGroup_Index ?? false;
+            }
+            else
+            {
+                ViewBag.isVisibleProductUid_Index = false;
+                ViewBag.isVisibleProduct_Index = false;
+                ViewBag.isVisibleProductGroup_Index = false;
+            }
+            #endregion
+
             return View("Index", PendingtoReview);
         }
 

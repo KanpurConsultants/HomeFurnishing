@@ -368,3 +368,8 @@ D:\Sample_New\HomeFurnishing\Source\Data\obj\Debug\Data.csproj.GenerateResource.
 D:\Sample_New\HomeFurnishing\Source\Data\obj\Debug\Data.dll
 D:\Sample_New\HomeFurnishing\Source\Data\obj\Debug\Data.pdb
 D:\Sample\HomeFurnishing\Source\Data\obj\Debug\Data.Migrations.SampleTesting.resources
+D:\Sample\HomeFurnishing\Source\Data\obj\Debug\Data.Migrations.EmployeeCharge.resources
+D:\Sample\HomeFurnishing\Source\Data\obj\Debug\Data.Migrations.EmployeeChargesCorrection.resources
+D:\Sample\HomeFurnishing\Source\Data\obj\Debug\Data.Migrations.EmployeeLineCharge.resources
+D:\Sample\HomeFurnishing\Source\Data\obj\Debug\Data.Migrations.Salary.resources
+D:\Sample\HomeFurnishing\Source\Data\obj\Debug\Data.Migrations.Salary1.resources

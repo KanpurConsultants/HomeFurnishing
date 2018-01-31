@@ -18,6 +18,8 @@ using System.IO;
 using ImageResizer;
 using System.Configuration;
 using Jobs.Helpers;
+using Model.ViewModel;
+using System.Data.SqlClient;
 
 namespace Jobs.Controllers
 {
@@ -141,9 +143,22 @@ namespace Jobs.Controllers
                 return View("~/Views/Shared/PermissionDenied.cshtml").Warning("You don't have permission to do this task.");
             }
 
+            var settings = new PersonSettingsService(_unitOfWork).GetPersonSettingsForDocument(DocTypeId);
+
+            if (settings == null && UserRoles.Contains("SysAdmin"))
+            {
+                return RedirectToAction("Create", "PersonSettings", new { id = DocTypeId }).Warning("Please create Person settings");
+            }
+            else if (settings == null && !UserRoles.Contains("SysAdmin"))
+            {
+                return View("~/Views/Shared/InValidSettings.cshtml");
+            }
+
             EmployeeViewModel p = new EmployeeViewModel();
+            p.CalculationId = settings.CalculationId;
             p.IsActive = true;
             p.Code = new PersonService(_unitOfWork).GetMaxCode();
+            p.LedgerAccountGroupId = settings.LedgerAccountGroupId;
             PrepareViewBag();
             return View("Create", p);
         }
@@ -159,16 +174,16 @@ namespace Jobs.Controllers
                 return View(EmployeeVm).Danger("Account Group field is required");
             }
 
-            if (_PersonService.CheckDuplicate(EmployeeVm.Name, EmployeeVm.Suffix, EmployeeVm.PersonId) == true)
-            {
-                PrepareViewBag();
-                return View(EmployeeVm).Danger("Combination of name and sufix is duplicate");
-            }
+            //if (_PersonService.CheckDuplicate(EmployeeVm.Name, EmployeeVm.Suffix, EmployeeVm.PersonId) == true)
+            //{
+            //    PrepareViewBag();
+            //    return View(EmployeeVm).Danger("Combination of name and sufix is duplicate");
+            //}
 
 
             if (ModelState.IsValid)
             {
-                if (EmployeeVm.PersonId == 0)
+                if (EmployeeVm.EmployeeId == 0)
                 {
                     Person person = Mapper.Map<EmployeeViewModel, Person>(EmployeeVm);
                     BusinessEntity businessentity = Mapper.Map<EmployeeViewModel, BusinessEntity>(EmployeeVm);
@@ -248,6 +263,51 @@ namespace Jobs.Controllers
                         personregistration.ObjectState = Model.ObjectState.Added;
                         _PersonRegistrationService.Create(personregistration);
                     }
+
+
+                    //var Footer = (from H in db.CalculationFooter where H.CalculationId == EmployeeVm.CalculationId select H).ToList();
+                    //IEnumerable<EmployeeCharge> EmployeeChargeList = Mapper.Map < IEnumerable<CalculationFooter>, IEnumerable<EmployeeCharge>>(Footer);
+
+
+                    //int cnt = 0;
+                    //foreach (var item in EmployeeChargeList)
+                    //{
+                    //    item.Id = cnt;
+                    //    item.HeaderTableId = Employee.EmployeeId;
+                    //    new EmployeeChargeService(_unitOfWork).Create(item);
+                    //    cnt = cnt - 1;
+                    //}
+
+
+                    if (EmployeeVm.linecharges != null)
+                        foreach (var item in EmployeeVm.linecharges)
+                        {
+                            item.LineTableId = EmployeeVm.EmployeeId;
+                            item.PersonID = EmployeeVm.PersonId;
+                            item.DealQty = 0;
+                            item.HeaderTableId = EmployeeVm.EmployeeId;
+                            new EmployeeLineChargeService(_unitOfWork).Create(item);
+                        }
+
+                    if (EmployeeVm.footercharges != null)
+                        foreach (var item in EmployeeVm.footercharges)
+                        {
+                            if (item.Id > 0)
+                            {
+
+                                var footercharge = new EmployeeChargeService(_unitOfWork).Find(item.Id);
+                                footercharge.Rate = item.Rate;
+                                footercharge.Amount = item.Amount;
+                                new EmployeeChargeService(_unitOfWork).Update(footercharge);
+                            }
+
+                            else
+                            {
+                                item.HeaderTableId = EmployeeVm.EmployeeId;
+                                item.PersonID = EmployeeVm.EmployeeId;
+                                new EmployeeChargeService(_unitOfWork).Create(item);
+                            }
+                        }
 
                     try
                     {
@@ -383,7 +443,7 @@ namespace Jobs.Controllers
 
 
                     //return RedirectToAction("Create").Success("Data saved successfully");
-                    return RedirectToAction("Edit", new { id = Employee.PersonID }).Success("Data saved Successfully");
+                    return RedirectToAction("Edit", new { id = Employee.EmployeeId }).Success("Data saved Successfully");
                 }
                 else
                 {
@@ -484,12 +544,47 @@ namespace Jobs.Controllers
                     }
 
 
+                    if (EmployeeVm.linecharges != null)
+                    {
+                        var ProductChargeList = (from p in db.EmployeeLineCharge
+                                                 where p.LineTableId == EmployeeVm.EmployeeId
+                                                 select p).ToList();
+
+                        foreach (var item in EmployeeVm.linecharges)
+                        {
+                            var productcharge = (ProductChargeList.Where(m => m.Id == item.Id)).FirstOrDefault();
+
+                            var ExProdcharge = Mapper.Map<EmployeeLineCharge>(productcharge);
+                            productcharge.Rate = item.Rate ?? 0;
+                            productcharge.Amount = item.Amount ?? 0;
+                            productcharge.DealQty = 0;
+                            new EmployeeLineChargeService(_unitOfWork).Update(productcharge);
+                        }
+                    }
+
+                    if (EmployeeVm.footercharges != null)
+                    {
+                        var footerChargerecords = (from p in db.EmployeeCharge
+                                                   where p.HeaderTableId == EmployeeVm.EmployeeId
+                                                   select p).ToList();
+
+                        foreach (var item in EmployeeVm.footercharges)
+                        {
+                            var footercharge = footerChargerecords.Where(m => m.Id == item.Id).FirstOrDefault();
+                            var Exfootercharge = Mapper.Map<EmployeeCharge>(footercharge);
+                            footercharge.Rate = item.Rate ?? 0;
+                            footercharge.Amount = item.Amount ?? 0;
+                            new EmployeeChargeService(_unitOfWork).Update(footercharge);
+                        }
+                    }
+
+
 
                     ////Saving Activity Log::
                     ActivityLog al = new ActivityLog()
                     {
                         ActivityType = (int)ActivityTypeContants.Modified,
-                        DocId = EmployeeVm.PersonId,
+                        DocId = EmployeeVm.EmployeeId,
                         Narration = logstring.ToString(),
                         CreatedDate = DateTime.Now,
                         CreatedBy = User.Identity.Name,
@@ -835,6 +930,9 @@ namespace Jobs.Controllers
         {
             return PartialView("ChooseContactType");
         }
-       
+
+
+
+
     }
 }

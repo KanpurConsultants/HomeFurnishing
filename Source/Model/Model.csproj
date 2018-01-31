@@ -124,7 +124,13 @@
     <Compile Include="Models\DocumentTypeAttributes.cs" />
     <Compile Include="Models\DocumentTypeProcess.cs" />
     <Compile Include="Models\JobInvoiceHeaderAttributes.cs" />
+    <Compile Include="Models\EmployeeCharge.cs" />
     <Compile Include="Models\JobOrderBomMaterialIssue.cs" />
+    <Compile Include="Models\EmployeeLineCharge.cs" />
+    <Compile Include="Models\SalaryLineCharge.cs" />
+    <Compile Include="Models\SalaryHeaderCharge.cs" />
+    <Compile Include="Models\SalaryLine.cs" />
+    <Compile Include="Models\SalaryHeader.cs" />
     <Compile Include="Models\Notification.cs" />
     <Compile Include="Models\NotificationSubject.cs" />
     <Compile Include="Models\NotificationUser.cs" />
@@ -147,6 +153,7 @@
     <Compile Include="Models\RolesDocType.cs" />
     <Compile Include="Models\SaleQuotationHeaderAttributes.cs" />
     <Compile Include="Models\DivisionSettings.cs" />
+    <Compile Include="Models\SalarySettings.cs" />
     <Compile Include="Models\StockHeaderAttributes.cs" />
     <Compile Include="Models\SaleInvoiceHeaderAttributes.cs" />
     <Compile Include="Models\JobOrderHeaderAttributes.cs" />
@@ -285,6 +292,9 @@
     <Compile Include="ViewModels\ReportLineViewModel.cs" />
     <Compile Include="ViewModels\FinancialDisplayViewModel.cs" />
     <Compile Include="ViewModels\RolesControllerActionViewModel.cs" />
+    <Compile Include="ViewModels\SalaryHeaderViewModel.cs" />
+    <Compile Include="ViewModels\SalaryLineViewModel.cs" />
+    <Compile Include="ViewModels\SalarySettingsViewModel.cs" />
     <Compile Include="ViewModels\SiteViewModel.cs" />
     <Compile Include="ViewModels\SmsViewModel.cs" />
     <Compile Include="ViewModels\DocumentTypeHeaderAttributeViewModel.cs" />

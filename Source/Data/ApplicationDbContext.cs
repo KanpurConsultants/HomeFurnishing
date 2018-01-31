@@ -37,7 +37,7 @@ namespace Data.Models
             Database.CommandTimeout = 60;
         }
 
-        //public ApplicationDbContext()
+        //public ApplicationDbContext() 
         //    : base("Data Source=192.168.2.17;Initial Catalog=RUG12;Integrated Security=false; User Id=sa; pwd=", false)
         //{
         //    Configuration.ProxyCreationEnabled = false;
@@ -108,6 +108,12 @@ namespace Data.Models
         public DbSet<Religion> Religion { get; set; }
         //End Property Tax Models
 
+
+        public DbSet<SalarySettings> SalarySettings { get; set; }
+        public DbSet<SalaryHeader> SalaryHeader { get; set; }
+        public DbSet<SalaryHeaderCharge> SalaryHeaderCharge { get; set; }
+        public DbSet<SalaryLine> SalaryLine { get; set; }
+        public DbSet<SalaryLineCharge> SalaryLineCharge { get; set; }
 
 
         //Login Models        
@@ -218,6 +224,8 @@ namespace Data.Models
         public DbSet<DocumentCategory> DocumentCategory { get; set; }
         public DbSet<DocumentType> DocumentType { get; set; }
         public DbSet<Employee> Employee { get; set; }
+        public DbSet<EmployeeCharge> EmployeeCharge { get; set; }
+        public DbSet<EmployeeLineCharge> EmployeeLineCharge { get; set; }
         public DbSet<ProductSiteDetail> ProductSiteDetail { get; set; }
         public DbSet<Transporter> Transporter { get; set; }
         public DbSet<Courier> Courier { get; set; }

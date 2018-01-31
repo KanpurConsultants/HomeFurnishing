@@ -11,7 +11,7 @@ namespace Model.Models
         {            
         }
 
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        //[DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Key]
         [Display(Name = "Calculation Id")]
         public int CalculationId { get; set; }

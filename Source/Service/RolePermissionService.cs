@@ -94,12 +94,17 @@ namespace Service
                     Convert(BIT,Sum(CASE WHEN Ca.DisplayName = 'Print' THEN IsNull(VRolesDocTypes.IsPermissionGranted,0) ELSE 0 END)) AS [Print],
                     Max(CASE WHEN Ca.DisplayName = 'Submit' THEN Ca.ActionName END) AS SubmitActionName, 
                     Convert(BIT,Sum(CASE WHEN Ca.DisplayName = 'Submit' THEN IsNull(VRolesDocTypes.IsPermissionGranted,0) ELSE 0 END)) AS [Submit],
-                    'False' AS IsVisibleProcess, 'Document' As EntryType 
+                    Case When Max(IsNull(VDocumentTypeProcesses.Cnt,0)) > 1 Then 'True' Else 'False' End AS IsVisibleProcess, 'Document' As EntryType 
                     FROM Web.Menus M 
                     LEFT JOIN Web.DocumentTypes Dt ON M.DocumentCategoryId = Dt.DocumentCategoryId
                     LEFT JOIN Web.MenuModules Mm ON M.ModuleId = Mm.ModuleId
                     LEFT JOIN Web.MenuSubModules Sm On M.SubModuleId = Sm.SubModuleId
                     LEFT JOIN Web.ControllerActions Ca ON M.ControllerName = Ca.ControllerName
+                    LEFT JOIN (
+                            Select Dp.DocumentTypeId, Count(*) As Cnt
+                            From Web.DocumentTypeProcesses Dp
+                            Group By Dp.DocumentTypeId
+                    ) As VDocumentTypeProcesses On Dt.DocumentTypeId = VDocumentTypeProcesses.DocumentTypeId
                     LEFT JOIN (SELECT 1 AS IsPermissionGranted, Rd.DocTypeId, Rd.ControllerName, Rd.ActionName
                                 FROM Web.RolesDocTypes Rd
                                 WHERE Rd.RoleId =  @RoleId

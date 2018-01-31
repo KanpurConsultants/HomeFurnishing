@@ -165,11 +165,14 @@ function DrawProductFields(DebugMode) {
 
 
     }
-    var varXAmount = document.getElementById('Amount').value ? document.getElementById('Amount').value : 0;
 
+    var varXAmount = document.getElementById('Amount').value ? document.getElementById('Amount').value : 0;
     temp += "  <input type='hidden' value='" + varXAmount + "' id='xAmount' class='form-control col-xs-7 required text-right' />  "
     //temp += "<hr/>"
+
     $(temp).appendTo('.modal-body .row:last');
+    //$(temp).appendTo('.panel-info .row:last');
+
 
     for (var i = 0; i < ProductFields.length; i++) {
         CustomSelectFunction($('#CALL_' + ProductFields[i].ChargeCode + 'ACDR'), '/ComboHelpList/GetLedgerAccountForGroup', '/ComboHelpList/SetSingleLedgerAccount', ' ', false, 0, ProductFields[i].filterLedgerAccountGroupsDrId);

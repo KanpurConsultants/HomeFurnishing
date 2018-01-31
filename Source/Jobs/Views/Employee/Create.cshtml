@@ -20,6 +20,7 @@
 @using (Html.BeginForm("Create", "Employee", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     @Html.AntiForgeryToken()
+    @Html.HiddenFor(m=>m.EmployeeId)
     @Html.HiddenFor(m=>m.PersonId)
     @Html.HiddenFor(m=>m.PersonAddressID)
     @Html.HiddenFor(m=>m.AccountId)
@@ -27,6 +28,7 @@
     @Html.HiddenFor(m=>m.CreatedBy)
     @Html.HiddenFor(m=>m.CreatedDate)
     @Html.HiddenFor(m=>m.DocTypeId)
+    @Html.HiddenFor(m=>m.CalculationId)
     @Html.HiddenFor(m=>m.ImageFileName)
     @Html.HiddenFor(m=>m.ImageFolderName)
     
@@ -58,8 +60,8 @@
                 <div class="btn-group">
                     @Html.ActionLink(" ", "Create", "Employee", null, new { @class = "cbtn btn-circle glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
                     @Html.ActionLink(" ", "Print", "Employee", null, new { @class = "cbtn btn-circle glyphicon glyphicon-print toolbar", @title = "Print", @data_toggle = "tooltip" })
-                    @Html.ActionLink(" ", "PrevPage", "Employee", new { id = @Model.PersonId }, new { @class = "cbtn btn-circle glyphicon glyphicon-arrow-left toolbar", @title = "Prev Record", @data_toggle = "tooltip" })
-                    @Html.ActionLink(" ", "NextPage", "Employee", new { id = @Model.PersonId }, new { @class = "cbtn btn-circle glyphicon glyphicon-arrow-right toolbar", @title = "Next Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "PrevPage", "Employee", new { id = @Model.EmployeeId }, new { @class = "cbtn btn-circle glyphicon glyphicon-arrow-left toolbar", @title = "Prev Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "NextPage", "Employee", new { id = @Model.EmployeeId }, new { @class = "cbtn btn-circle glyphicon glyphicon-arrow-right toolbar", @title = "Next Record", @data_toggle = "tooltip" })
                     @Html.ActionLink(" ", "Index", "Employee", null, new { @class = "cbtn btn-circle glyphicon glyphicon-list toolbar", @title = "List", @data_toggle = "tooltip" })
                 </div>
                 <div class="btn-group">
@@ -73,320 +75,335 @@
                 </div>
             </div>
         </div>
-        <div class="panel-info" style="padding-left:15px">
+        <div class="panel-info" style="padding-left:15px" id="Test">
             <div class="form-horizontal">                
-                @Html.ValidationSummary(true)
+                
+                    @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
 
-                <div>
-                    <h4 class="col-md-12 black">
-                        <span class="glyphicon glyphicon-align-justify"></span>
-                        1.Personal Details
-                    </h4> 
-                    <div>
+                <div class="modal-body">
+                    <div class="row">
                         <div>
-                            <div class="col-md-6">
+                            <h4 class="col-md-12 black">
+                                <span class="glyphicon glyphicon-align-justify"></span>
+                                Personal Details
+                            </h4>
+                            <div>
                                 <div>
-                                    <div class="col-md-12">
+                                    <div class="col-md-6">
+                                        <div>
+                                            <div class="col-md-12">
+                                                <div class="form-group" style="margin-top:15px">
+                                                    @Html.LabelFor(model => model.Name, "Name", new { @class = "control-label  col-md-4 col-sm-2" })
+                                                    <div class="col-md-7 col-sm-10">
+                                                        @Html.TextBoxFor(model => model.Name, null, new { @class = "form-control col-xs-6 required" })
+                                                        @Html.ValidationMessageFor(m => m.Name)
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    @Html.LabelFor(model => model.Suffix, "Suffix", new { @class = "control-label  col-md-4 col-sm-2" })
+                                                    <div class="col-md-7 col-sm-10">
+                                                        @Html.TextBoxFor(m => m.Suffix, null, new { @class = "form-control col-xs-6 required" })
+                                                        @Html.ValidationMessageFor(m => m.Suffix)
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                        <div>
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    @Html.LabelFor(model => model.Code, "Code", new { @class = "control-label  col-md-4 col-sm-2" })
+                                                    <div class="col-md-7 col-sm-10">
+                                                        @Html.TextBoxFor(m => m.Code, null, new { @class = "form-control col-xs-6 required" })
+                                                        @Html.ValidationMessageFor(model => model.Code)
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div>
+                                            <div class="col-md-offset-4 col-md-8">
+                                                <div class="fileinput fileinput-new" data-provides="fileinput">
+                                                    <div class="fileinput-new thumbnail" style="width: 200px; height: 150px;">
+                                                        <img src="~/Uploads/@(Model.ImageFolderName)/Medium/@(Model.ImageFileName)" alt="...">
+                                                    </div>
+                                                    <div class="fileinput-preview fileinput-exists thumbnail" style="max-width: 200px; max-height: 150px;"></div>
+                                                    <div>
+                                                        <span class="btn btn-default btn-file" style="background-color: transparent; color: black; font-family:Arial; border-radius:5px">
+                                                            <span id="Select" class="fileinput-new">Select</span>
+                                                            <span id="Change" class="fileinput-exists">Change</span>
+                                                            <input type="file" name="upload">
+                                                        </span>
+                                                        <a href="#" class="btn btn-default fileinput-exists" style="background-color: transparent; color: black; font-family: Arial; border-radius: 5px" data-dismiss="fileinput">Remove</a>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <hr style="margin-bottom:0px" />
+                        <div>
+                            <h4 class="col-md-12 black">
+                                <span class="glyphicon glyphicon-shopping-cart"></span>
+                                Contact Details
+                            </h4>
+                            <div>
+                                <div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.Address, "Address", new { @class = "control-label col-md-4 col-sm-2" })
+                                            <div class="col-md-7 col-sm-10">
+                                                @Html.TextAreaFor(model => model.Address, new { @class = "form-control col-xs-6 required" })
+                                                @Html.ValidationMessageFor(model => model.Address)
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.CityId, "City", new { @class = "control-label col-md-4 col-sm-2" })
+                                            <div class="col-md-7 col-sm-10">
+                                                @Html.TextBoxFor(m => m.CityId, new { @class = "form-control col-xs-6 height required" })
+                                                @Html.ValidationMessageFor(model => model.CityId)
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.Zipcode, "Zip Code", new { @class = "control-label col-md-4 col-sm-2" })
+                                            <div class="col-md-7 col-sm-10">
+                                                @Html.TextBoxFor(m => m.Zipcode, new { @class = "form-control col-xs-6 height required" })
+                                                @Html.ValidationMessageFor(model => model.Zipcode)
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.Phone, "Phone", new { @class = "control-label col-md-4 col-sm-2" })
+                                            <div class="col-md-7 col-sm-10">
+                                                @Html.TextBoxFor(m => m.Phone, new { @class = "form-control col-xs-6 height" })
+                                                @Html.ValidationMessageFor(model => model.Phone)
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.Mobile, "Mobile", new { @class = "control-label col-md-4 col-sm-2" })
+                                            <div class="col-md-7 col-sm-10">
+                                                @Html.TextBoxFor(m => m.Mobile, new { @class = "form-control col-xs-6" })
+                                                @Html.ValidationMessageFor(model => model.Mobile)
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.Email, "Email", new { @class = "control-label col-md-4 col-sm-2" })
+                                            <div class="col-md-7 col-sm-10">
+                                                @Html.TextBoxFor(m => m.Email, new { @class = "form-control col-xs-6" })
+                                                @Html.ValidationMessageFor(model => model.Email)
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+
+
+                        <hr style="margin-bottom:0px" />
+                        <div>
+                            <h4 class="col-md-12 black">
+                                <span class="glyphicon glyphicon-shopping-cart"></span>
+                                Business Details
+                            </h4>
+                            <div>
+                                <div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.PanNo, "PAN No", new { @class = "control-label col-md-4 col-sm-2" })
+                                            <div class="col-md-7 col-sm-10">
+                                                @Html.TextBoxFor(model => model.PanNo, null, new { @class = "form-control col-xs-6 " })
+                                                @Html.ValidationMessageFor(model => model.PanNo)
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.GuarantorId, "Guarantor", new { @class = "control-label col-md-4 col-sm-2" })
+                                            <div class="col-md-7 col-sm-10">
+                                                @Html.TextBoxFor(m => m.GuarantorId, new { @class = "form-control col-xs-6 height" })
+                                                @Html.ValidationMessageFor(model => model.GuarantorId)
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+
+                                <div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.TdsCategoryId, "Tds Category", new { @class = "control-label col-md-4 col-sm-2" })
+                                            <div class="col-md-7 col-sm-10">
+                                                @Html.DropDownListFor(m => m.TdsCategoryId, new SelectList(ViewBag.TdsCategoryList as System.Collections.IEnumerable, "TdsCategoryId", "TdsCategoryName"), new { @class = "form-control col-xs-6 height" })
+                                                @Html.ValidationMessageFor(model => model.TdsCategoryId)
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.TdsGroupId, "Tds Group", new { @class = "control-label col-md-4 col-sm-2" })
+                                            <div class="col-md-7 col-sm-10">
+                                                @Html.DropDownListFor(m => m.TdsGroupId, new SelectList(ViewBag.TdsGroupList as System.Collections.IEnumerable, "TdsGroupId", "TdsGroupName"), new { @class = "form-control col-xs-6 height" })
+                                                @Html.ValidationMessageFor(model => model.TdsGroupId)
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.DepartmentId, "Department", new { @class = "control-label col-md-4 col-sm-2" })
+                                            <div class="col-md-7 col-sm-10">
+                                                @Html.DropDownListFor(m => m.DepartmentId, new SelectList(ViewBag.DepartmentList as System.Collections.IEnumerable, "DepartmentId", "DepartmentName"), new { @class = "form-control col-xs-6 height" })
+                                                @Html.ValidationMessageFor(model => model.DepartmentId)
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.DesignationId, "Designation", new { @class = "control-label col-md-4 col-sm-2" })
+                                            <div class="col-md-7 col-sm-10">
+                                                @Html.DropDownListFor(m => m.DesignationId, new SelectList(ViewBag.DesignationList as System.Collections.IEnumerable, "DesignationId", "DesignationName"), new { @class = "form-control col-xs-6 height" })
+                                                @Html.ValidationMessageFor(model => model.DesignationId)
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.LedgerAccountGroupId, "Account Group", new { @class = "control-label col-md-4 col-sm-2" })
+                                            <div class="col-md-7 col-sm-10">
+                                                @Html.TextBoxFor(m => m.LedgerAccountGroupId, new { @class = "form-control col-xs-6 required" })
+                                                @Html.ValidationMessageFor(m => m.LedgerAccountGroupId)
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.Tags, "Tags", new { @class = "control-label col-md-4 col-sm-2" })
+                                            <div class="col-md-7 col-sm-10">
+                                                @Html.TextBoxFor(m => m.Tags, null, new { @class = "form-control col-xs-6" })
+                                                @Html.ValidationMessageFor(model => model.Tags, null, new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div>
+                                    <div class="col-md-6">
                                         <div class="form-group" style="margin-top:15px">
-                                            @Html.LabelFor(model => model.Name, "Name", new { @class = "control-label  col-md-4 col-sm-2" })
-                                            <div class="col-md-7 col-sm-10">
-                                                @Html.TextBoxFor(model => model.Name, null, new { @class = "form-control col-xs-6 required" })
-                                                @Html.ValidationMessageFor(m => m.Name)
+                                            @Html.LabelFor(model => model.IsActive, new { @class = "control-label col-md-4 col-sm-2" })
+                                            <div class="col-md-7 col-sm-10" style="padding-top:4px">
+                                                @Html.CheckBoxFor(m => m.IsActive, new { @class = "checkbox col-xs-1" })
+                                                @Html.ValidationMessageFor(model => model.IsActive)
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group" style="margin-top:15px">
+                                            @Html.LabelFor(model => model.IsSisterConcern, new { @class = "control-label col-md-4 col-sm-2" })
+                                            <div class="col-md-7 col-sm-10" style=" padding-top:4px">
+                                                @Html.CheckBoxFor(m => m.IsSisterConcern, new { @class = "checkbox col-xs-1" })
+                                                @Html.ValidationMessageFor(model => model.IsSisterConcern)
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
+
+
                                 <div>
-                                    <div class="col-md-12">
+                                    <div class="col-md-6">
                                         <div class="form-group">
-                                            @Html.LabelFor(model => model.Suffix, "Suffix", new { @class = "control-label  col-md-4 col-sm-2" })
+                                            @Html.LabelFor(model => model.DivisionIds, "Work In Division", new { @class = "control-label col-md-4 col-sm-2" })
                                             <div class="col-md-7 col-sm-10">
-                                                @Html.TextBoxFor(m => m.Suffix, null, new { @class = "form-control col-xs-6 required" })
-                                                @Html.ValidationMessageFor(m => m.Suffix)
+                                                @Html.TextBoxFor(m => m.DivisionIds, new { @class = "form-control col-xs-6 " })
+                                                @Html.ValidationMessageFor(m => m.DivisionIds)
                                             </div>
                                         </div>
                                     </div>
-                                </div>
 
-
-                                <div>
-                                    <div class="col-md-12">
+                                    <div class="col-md-6">
                                         <div class="form-group">
-                                            @Html.LabelFor(model => model.Code, "Code", new { @class = "control-label  col-md-4 col-sm-2" })
+                                            @Html.LabelFor(model => model.SiteIds, "Work In Branches", new { @class = "control-label col-md-4 col-sm-2" })
                                             <div class="col-md-7 col-sm-10">
-                                                @Html.TextBoxFor(m => m.Code, null, new { @class = "form-control col-xs-6 required" })
-                                                @Html.ValidationMessageFor(model => model.Code)
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div>
-                                    <div class="col-md-offset-4 col-md-8">
-                                        <div class="fileinput fileinput-new" data-provides="fileinput">
-                                            <div class="fileinput-new thumbnail" style="width: 200px; height: 150px;">
-                                                <img src="~/Uploads/@(Model.ImageFolderName)/Medium/@(Model.ImageFileName)" alt="...">
-                                            </div>
-                                            <div class="fileinput-preview fileinput-exists thumbnail" style="max-width: 200px; max-height: 150px;"></div>
-                                            <div>
-                                                <span class="btn btn-default btn-file" style="background-color: transparent; color: black; font-family:Arial; border-radius:5px">
-                                                    <span id="Select" class="fileinput-new">Select</span>
-                                                    <span id="Change" class="fileinput-exists">Change</span>
-                                                    <input type="file" name="upload">
-                                                </span>
-                                                <a href="#" class="btn btn-default fileinput-exists" style="background-color: transparent; color: black; font-family: Arial; border-radius: 5px" data-dismiss="fileinput">Remove</a>
-
+                                                @Html.TextBoxFor(m => m.SiteIds, new { @class = "form-control col-xs-6 " })
+                                                @Html.ValidationMessageFor(m => m.SiteIds)
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-
-                <hr style="margin-bottom:0px" />
-                <div>
-                    <h4 class="col-md-12 black">
-                        <span class="glyphicon glyphicon-shopping-cart"></span>
-                        2.Contact Details
-                    </h4>
-                    <div>
-                        <div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    @Html.LabelFor(model => model.Address, "Address", new { @class = "control-label col-md-4 col-sm-2" })
-                                    <div class="col-md-7 col-sm-10">
-                                        @Html.TextAreaFor(model => model.Address, new { @class = "form-control col-xs-6 required" })
-                                        @Html.ValidationMessageFor(model => model.Address)
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.ProcessIds, "Process List", new { @class = "control-label col-md-4 col-sm-2" })
+                                            <div class="col-md-7 col-sm-10">
+                                                @Html.TextBoxFor(m => m.ProcessIds, new { @class = "form-control col-xs-6 " })
+                                                @Html.ValidationMessageFor(m => m.ProcessIds)
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
 
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    @Html.LabelFor(model => model.CityId, "City", new { @class = "control-label col-md-4 col-sm-2" })
-                                    <div class="col-md-7 col-sm-10">
-                                        @Html.TextBoxFor(m => m.CityId, new { @class = "form-control col-xs-6 height required" })
-                                        @Html.ValidationMessageFor(model => model.CityId)
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.SalesTaxGroupPartyId, "Sales Tax Party", new { @class = "control-label col-md-4 col-sm-2" })
+                                            <div class="col-md-7 col-sm-10">
+                                                @Html.TextBoxFor(m => m.SalesTaxGroupPartyId, new { @class = "form-control col-xs-6 height" })
+                                                @Html.ValidationMessageFor(model => model.SalesTaxGroupPartyId)
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
 
-                        <div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    @Html.LabelFor(model => model.Zipcode, "Zip Code", new { @class = "control-label col-md-4 col-sm-2" })
-                                    <div class="col-md-7 col-sm-10">
-                                        @Html.TextBoxFor(m => m.Zipcode, new { @class = "form-control col-xs-6 height required" })
-                                        @Html.ValidationMessageFor(model => model.Zipcode)
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    @Html.LabelFor(model => model.Phone, "Phone", new { @class = "control-label col-md-4 col-sm-2" })
-                                    <div class="col-md-7 col-sm-10">
-                                        @Html.TextBoxFor(m => m.Phone,  new { @class = "form-control col-xs-6 height" })
-                                        @Html.ValidationMessageFor(model => model.Phone)
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    @Html.LabelFor(model => model.Mobile, "Mobile", new { @class = "control-label col-md-4 col-sm-2" })
-                                    <div class="col-md-7 col-sm-10">
-                                        @Html.TextBoxFor(m => m.Mobile, new { @class = "form-control col-xs-6" })
-                                        @Html.ValidationMessageFor(model => model.Mobile)
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    @Html.LabelFor(model => model.Email, "Email", new { @class = "control-label col-md-4 col-sm-2" })
-                                    <div class="col-md-7 col-sm-10">
-                                        @Html.TextBoxFor(m => m.Email, new { @class = "form-control col-xs-6" })
-                                        @Html.ValidationMessageFor(model => model.Email)
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-
-
-
-                <hr style="margin-bottom:0px" />
-                <div>
-                    <h4 class="col-md-12 black">
-                        <span class="glyphicon glyphicon-shopping-cart"></span>
-                        3.Business Details
-                    </h4>
-                    <div>
-                        <div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    @Html.LabelFor(model => model.PanNo, "PAN No", new { @class = "control-label col-md-4 col-sm-2" })
-                                    <div class="col-md-7 col-sm-10">
-                                        @Html.TextBoxFor(model => model.PanNo, null, new { @class = "form-control col-xs-6 " })
-                                        @Html.ValidationMessageFor(model => model.PanNo)
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    @Html.LabelFor(model => model.GuarantorId, "Guarantor", new { @class = "control-label col-md-4 col-sm-2" })
-                                    <div class="col-md-7 col-sm-10">
-                                        @Html.TextBoxFor(m => m.GuarantorId, new { @class = "form-control col-xs-6 height" })
-                                        @Html.ValidationMessageFor(model => model.GuarantorId)
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        
-
-                        <div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    @Html.LabelFor(model => model.TdsCategoryId, "Tds Category", new { @class = "control-label col-md-4 col-sm-2" })
-                                    <div class="col-md-7 col-sm-10">
-                                        @Html.DropDownListFor(m => m.TdsCategoryId, new SelectList(ViewBag.TdsCategoryList as System.Collections.IEnumerable, "TdsCategoryId", "TdsCategoryName"), new { @class = "form-control col-xs-6 height" })
-                                        @Html.ValidationMessageFor(model => model.TdsCategoryId)
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    @Html.LabelFor(model => model.TdsGroupId, "Tds Group", new { @class = "control-label col-md-4 col-sm-2" })
-                                    <div class="col-md-7 col-sm-10">
-                                        @Html.DropDownListFor(m => m.TdsGroupId, new SelectList(ViewBag.TdsGroupList as System.Collections.IEnumerable, "TdsGroupId", "TdsGroupName"), new { @class = "form-control col-xs-6 height" })
-                                        @Html.ValidationMessageFor(model => model.TdsGroupId)
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    @Html.LabelFor(model => model.DepartmentId, "Department", new { @class = "control-label col-md-4 col-sm-2" })
-                                    <div class="col-md-7 col-sm-10">
-                                        @Html.DropDownListFor(m => m.DepartmentId, new SelectList(ViewBag.DepartmentList as System.Collections.IEnumerable, "DepartmentId", "DepartmentName"), new { @class = "form-control col-xs-6 height" })
-                                        @Html.ValidationMessageFor(model => model.DepartmentId)
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    @Html.LabelFor(model => model.DesignationId, "Designation", new { @class = "control-label col-md-4 col-sm-2" })
-                                    <div class="col-md-7 col-sm-10">
-                                        @Html.DropDownListFor(m => m.DesignationId, new SelectList(ViewBag.DesignationList as System.Collections.IEnumerable, "DesignationId", "DesignationName"), new { @class = "form-control col-xs-6 height" })
-                                        @Html.ValidationMessageFor(model => model.DesignationId)
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    @Html.LabelFor(model => model.LedgerAccountGroupId, "Account Group", new { @class = "control-label col-md-4 col-sm-2" })
-                                    <div class="col-md-7 col-sm-10">
-                                        @Html.TextBoxFor(m => m.LedgerAccountGroupId, new { @class = "form-control col-xs-6 required" })
-                                        @Html.ValidationMessageFor(m => m.LedgerAccountGroupId)
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    @Html.LabelFor(model => model.Tags, "Tags", new { @class = "control-label col-md-4 col-sm-2" })
-                                    <div class="col-md-7 col-sm-10">
-                                        @Html.TextBoxFor(m => m.Tags, null, new { @class = "form-control col-xs-6" })
-                                        @Html.ValidationMessageFor(model => model.Tags, null, new { @class = "text-danger" })
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <div>
-                            <div class="col-md-6">
-                                <div class="form-group" style="margin-top:15px">
-                                    @Html.LabelFor(model => model.IsActive, new { @class = "control-label col-md-4 col-sm-2" })
-                                    <div class="col-md-7 col-sm-10" style="padding-top:4px">
-                                        @Html.CheckBoxFor(m => m.IsActive, new { @class = "checkbox col-xs-1" })
-                                        @Html.ValidationMessageFor(model => model.IsActive)
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="form-group" style="margin-top:15px">
-                                    @Html.LabelFor(model => model.IsSisterConcern, new { @class = "control-label col-md-4 col-sm-2" })
-                                    <div class="col-md-7 col-sm-10" style=" padding-top:4px">
-                                        @Html.CheckBoxFor(m => m.IsSisterConcern, new { @class = "checkbox col-xs-1" })
-                                        @Html.ValidationMessageFor(model => model.IsSisterConcern)
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-
-
-                        <div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    @Html.LabelFor(model => model.DivisionIds, "Work In Division", new { @class = "control-label col-md-4 col-sm-2" })
-                                    <div class="col-md-7 col-sm-10">
-                                        @Html.TextBoxFor(m => m.DivisionIds, new { @class = "form-control col-xs-6 " })
-                                        @Html.ValidationMessageFor(m => m.DivisionIds)
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    @Html.LabelFor(model => model.SiteIds, "Work In Branches", new { @class = "control-label col-md-4 col-sm-2" })
-                                    <div class="col-md-7 col-sm-10">
-                                        @Html.TextBoxFor(m => m.SiteIds, new { @class = "form-control col-xs-6 " })
-                                        @Html.ValidationMessageFor(m => m.SiteIds)
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    @Html.LabelFor(model => model.ProcessIds, "Process List", new { @class = "control-label col-md-4 col-sm-2" })
-                                    <div class="col-md-7 col-sm-10">
-                                        @Html.TextBoxFor(m => m.ProcessIds, new { @class = "form-control col-xs-6 " })
-                                        @Html.ValidationMessageFor(m => m.ProcessIds)
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    @Html.LabelFor(model => model.SalesTaxGroupPartyId, "Sales Tax Party", new { @class = "control-label col-md-4 col-sm-2" })
-                                    <div class="col-md-7 col-sm-10">
-                                        @Html.DropDownListFor(m => m.SalesTaxGroupPartyId, new SelectList(ViewBag.SalesTaxGroupPartyList as System.Collections.IEnumerable, "SalesTaxGroupPartyId", "SalesTaxGroupPartyName"), new { @class = "form-control col-xs-6 height" })
-                                        @Html.ValidationMessageFor(model => model.SalesTaxGroupPartyId)
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.BasicSalary, "Basic Salary", new { @class = "control-label col-md-4 col-sm-2" })
+                                            <div class="col-md-7 col-sm-10">
+                                                @Html.TextBoxFor(m => m.BasicSalary, new { @class = "form-control col-xs-6 height", @id = "Amount" })
+                                                @Html.ValidationMessageFor(model => model.BasicSalary)
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -396,66 +413,86 @@
 
 
 
+                    <hr />
+                    <div class="row">
+                        <h4 class="col-md-12 black" style="margin-top:15px">
+                            <span class="glyphicon glyphicon-shopping-cart"></span>
+                            Contact Person Details
+                        </h4>
+                    </div>
 
-                <hr />
-                <div class="row">
-                    <h4 class="col-md-12 black" style="margin-top:15px">
-                        <span class="glyphicon glyphicon-shopping-cart"></span>
-                        4.Contact Person Details
-                    </h4>
+                    <div class="panel-info">
+                        <h5 style="padding:5px 0 3px 0;margin:0px;font-weight:bold">
+                            <span class="glyphicon glyphicon-plus-sign"></span>
+                            @Html.ActionLink("Add New Row ", "_Create", "PersonContact", new { id = @Model.PersonId }, new { data_modal = "", id = "btnCreate", @class = "toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                        </h5>
+                    </div>
+
+                    <div style="padding-right:15px">
+                        <table class="table table-hover ctable">
+                            <thead id="header">
+                            </thead>
+
+                            <tbody id="Result"></tbody>
+                        </table>
+                    </div>
+
+
+
+
+                    <hr />
+                    <div class="row">
+                        <h4 class="col-md-12 black" style="margin-top:15px">
+                            <span class="glyphicon glyphicon-shopping-cart"></span>
+                            Bank Account Details
+                        </h4>
+                    </div>
+
+                    <div class="panel-info">
+                        <h5 style="padding:5px 0 3px 0;margin:0px;font-weight:bold">
+                            <span class="glyphicon glyphicon-plus-sign"></span>
+                            @Html.ActionLink("Add New Row ", "_Create", "PersonBankAccount", new { id = @Model.PersonId }, new { data_modal = "", id = "btnCreate", @class = "toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                        </h5>
+                    </div>
+
+                    <div style="padding-right:15px">
+                        <table class="table table-hover ctable">
+                            <thead id="BankAccountHeader">
+                            </thead>
+
+                            <tbody id="BankAccoutDetail"></tbody>
+                        </table>
+                    </div>
+
+
+                    <hr />
+                    <div class="row">
+                        <h4 class="col-md-12 black" style="margin-top:15px">
+                            <span class="glyphicon glyphicon-shopping-cart"></span>
+                            Salary Details
+                        </h4>
+                    </div>
+
+                    <div style="padding-right:15px;">
+                        <div class="panel panel-default" id="grid">
+                            <div style="min-width: 700px;">
+                                <div class="panel-info" id="gbody">
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-default" id="gridcharges">
+
+                        </div>
+                    </div>
+
+
+
                 </div>
-
-                <div class="panel-info">
-                    <h5 style="padding:5px 0 3px 0;margin:0px;font-weight:bold">
-                        <span class="glyphicon glyphicon-plus-sign"></span>
-                        @Html.ActionLink("Add New Row ", "_Create", "PersonContact", new { id = @Model.PersonId }, new { data_modal = "", id = "btnCreate", @class = "toolbar", @title = "Add New", @data_toggle = "tooltip" })
-                    </h5>
-                </div>
-
-                <div style="padding-right:15px">
-                    <table class="table table-hover ctable">
-                        <thead id="header">
-                        </thead>
-
-                        <tbody id="Result"></tbody>
-                    </table>
-                </div>
-
-
-
-
-                <hr />
-                <div class="row">
-                    <h4 class="col-md-12 black" style="margin-top:15px">
-                        <span class="glyphicon glyphicon-shopping-cart"></span>
-                        5.Bank Account Details
-                    </h4>
-                </div>
-
-                <div class="panel-info">
-                    <h5 style="padding:5px 0 3px 0;margin:0px;font-weight:bold">
-                        <span class="glyphicon glyphicon-plus-sign"></span>
-                        @Html.ActionLink("Add New Row ", "_Create", "PersonBankAccount", new { id = @Model.PersonId }, new { data_modal = "", id = "btnCreate", @class = "toolbar", @title = "Add New", @data_toggle = "tooltip" })
-                    </h5>
-                </div>
-
-                <div style="padding-right:15px">
-                    <table class="table table-hover ctable">
-                        <thead id="BankAccountHeader">
-                        </thead>
-
-                        <tbody id="BankAccoutDetail"></tbody>
-                    </table>
-                </div>
-
-
-
-
-
-            </div>
         </div>
     </div>
 }
+
 
 <script type="text/javascript">
     $(function()
@@ -467,6 +504,7 @@
             this.value = this.value.toUpperCase() ;
     });
     });
+
 </script>
 
 
@@ -479,18 +517,44 @@
     CustomSelectFunction($("#DivisionIds"), '/ComboHelpList/GetDivision', '/ComboHelpList/SetDivision', ' ', true, 0);
     CustomSelectFunction($("#SiteIds"), '/ComboHelpList/GetSite', '/ComboHelpList/SetSite', ' ', true, 0);
     CustomSelectFunction($("#ProcessIds"), '/ComboHelpList/GetProcess', '/ComboHelpList/SetProcess', ' ', true, 0);
+    CustomSelectFunction($("#SalesTaxGroupPartyId"), '/ComboHelpList/GetSalesTaxGroupParty', '/ComboHelpList/SetSingleSalesTaxGroupParty', ' ', false, 0);
 
     //For Multi Selection Help
     $("#Tags").select2({tags: true,tokenSeparators: [',', ' ']});
 </script>
 
+
+<script type="text/javascript">
+    var id=@Model.EmployeeId;
+    if(id==null||id==0)
+    {
+        $(function(){
+            AddCalculationFields(parseInt($('#EmployeeId').val()), false, '@Model.CalculationId', "Web.EmployeeCharges", "Web.EmployeeLineCharges", 0,0, 0,0);
+        })
+    }
+    else{
+        $(function(){
+            AddCalculationFieldsEdit(parseInt($('#EmployeeId').val()), $('#EmployeeId').val(), false, "Web.EmployeeCharges", "Web.EmployeeLineCharges");
+        })
+    }
+</script>
+
+
+
 <script type="text/javascript">
     var form_clean;
     $(document).ready(function () {
+        enableModalTransitions();
+
 
         //Calling the function to load the table data/ Line information
         LoadPersonContact();
         LoadPersonBankDetail();
+
+
+        var id='@Model.EmployeeId';
+        LoadNewCharges(id,"Web.EmployeeCharges","Web.EmployeeLineCharges","/TaxCalculation/GetEmpHeaderChargeForEdit");
+
 
 
         form_clean = $("form").serialize();
@@ -524,6 +588,9 @@
     $('#myModal').on('hidden.bs.modal', function () {
         LoadPersonContact();
         LoadPersonBankDetail();
+
+        var id='@Model.EmployeeId';
+        LoadNewCharges(id,"Web.EmployeeCharges","Web.EmployeeLineCharges","/TaxCalculation/GetEmpHeaderChargeForEdit");
     });
 
 
@@ -531,6 +598,7 @@
     $('#myModal').on('shown.bs.modal', function () {
         $("#Name").select2("focus");
     });
+
 
 
 
@@ -565,8 +633,10 @@
         });
     }
 
-
-
+    $("#Amount").change(function(){
+        ChargeCalculation();
+    });
+    
 
 
     //Loading the Table data or Line Information
@@ -608,7 +678,7 @@
         var text = $(this).find(".id").val();
         var editurl=$(this).find('a[Modify]').attr('href');
 
-        
+
         $('#myModalContent').load(editurl, function () {
             //alert('2');
             $('#myModal').modal({

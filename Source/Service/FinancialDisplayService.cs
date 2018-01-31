@@ -253,7 +253,11 @@ namespace Service
             SqlParameter SqlParameterLedgerAccountGroup = new SqlParameter("@LedgerAccountGroup", !string.IsNullOrEmpty(LedgerAccountGroup) ? LedgerAccountGroup : (object)DBNull.Value);
 
 
-            string mQry = @"SELECT LA.LedgerAccountId, max(LA.LedgerAccountName + ', ' + Case When P.PersonId Is Not Null Then P.Code Else LA.LedgerAccountSuffix End) AS LedgerAccountName, max(LAG.LedgerAccountGroupName) AS LedgerAccountGroupName, 
+            string mQry = @"SELECT LA.LedgerAccountId, Max(LA.LedgerAccountName + 
+		                    Case WHEN P.PersonId IS NOT NULL 
+			                     THEN CASE WHEN P.Suffix = P.Code THEN ' [' + P.Code + ']'
+			 								                      ELSE ', ' + P.Suffix + ' [' + P.Code + ']' END	
+			                     ELSE  ', ' + LA.LedgerAccountSuffix END) AS LedgerAccountName, max(LAG.LedgerAccountGroupName) AS LedgerAccountGroupName, 
                             CASE WHEN sum(isnull(H.AmtDr,0)) - sum(isnull(H.AmtCr,0)) > 0 THEN sum(isnull(H.AmtDr,0)) - sum(isnull(H.AmtCr,0)) ELSE NULL  END AS AmtDr,
                             CASE WHEN sum(isnull(H.AmtDr,0)) - sum(isnull(H.AmtCr,0)) < 0 THEN abs(sum(isnull(H.AmtDr,0)) - sum(isnull(H.AmtCr,0))) ELSE NULL END AS AmtCr,
                             'Sub Trial Balance' AS ReportType, 'Ledger' AS OpenReportType    
@@ -376,7 +380,11 @@ namespace Service
 
             string mPrimaryQry = @" WITH cteLedgerBalance AS
                                     ( 
-                                                SELECT L.LedgerAccountId, Max(LA.LedgerAccountName + ', ' + Case When P.PersonId Is Not Null Then P.Code Else LA.LedgerAccountSuffix End) AS LedgerAccountName,
+                                                SELECT L.LedgerAccountId, Max(LA.LedgerAccountName + 
+		                                        Case WHEN P.PersonId IS NOT NULL 
+			                                         THEN CASE WHEN P.Suffix = P.Code THEN ' [' + P.Code + ']'
+			 								                                          ELSE ', ' + P.Suffix + ' [' + P.Code + ']' END	
+			                                         ELSE ', ' + LA.LedgerAccountSuffix END) AS LedgerAccountName,
                                                 Sum(CASE WHEN H.DocDate < @FromDate THEN L.AmtDr - L.AmtCr ELSE 0 END) AS Opening,
                                                 Sum(CASE WHEN H.DocDate >= @FromDate AND H.DocDate <= @ToDate THEN L.AmtDr ELSE 0 END) AS AmtDr,
                                                 Sum(CASE WHEN H.DocDate >= @FromDate AND H.DocDate <= @ToDate THEN L.AmtCr ELSE 0 END) AS AmtCr,
@@ -539,7 +547,11 @@ namespace Service
 	
 	                            SELECT LH.SiteId, LH.DivisionId, H.LedgerAccountId,  H.LedgerHeaderId, IsNull(LH.DocHeaderId,H.LedgerHeaderId) AS DocHeaderId,  LH.DocTypeId,  LA.LedgerAccountName,LA.PersonId, CLA.LedgerAccountName AS ContraLedgerAccountName, LH.DocNo, DT.DocumentTypeShortName, LH.DocDate  AS DocDate, 
 	                            CASE When '" + IsShowContraAccount + @"' = 'True' And CLA.LedgerAccountName Is Not Null 
-			                            Then '<Strong>' + CLA.LedgerAccountName + ', ' + Case When P.PersonId Is Not Null Then P.Code Else CLA.LedgerAccountSuffix End  + '</Strong>' + '</br>' + 
+			                            Then '<Strong>' + CLA.LedgerAccountName + 
+		                                    Case WHEN P.PersonId IS NOT NULL 
+			                                     THEN CASE WHEN P.Suffix = P.Code THEN ' [' + P.Code + ']'
+			 								                                      ELSE ', ' + P.Suffix + ' [' + P.Code + ']' END	
+			                                     ELSE ', ' + CLA.LedgerAccountSuffix END  + '</Strong>' + '</br>' + 
 				                            CASE When Lh.PartyDocNo Is Not Null THen 'Party Doc No : ' + LH.PartyDocNo + ', ' Else '' End + 
 				                            CASE When Lh.PartyDocDate Is Not Null THen 'Party Doc Date : ' +  REPLACE(CONVERT(VARCHAR(11),LH.PartyDocDate,106), ' ','/')  + '</br>' Else '' End + 
 				                            CASE When H.ChqNo Is Not Null THen 'Chq No.: ' + H.ChqNo + ', ' Else '' End + 
@@ -1022,7 +1034,11 @@ namespace Service
 
             mQry = mQry + @" WITH cteLedgerBalance AS
                                     (
-                                        SELECT L.LedgerAccountId, Max(LA.LedgerAccountName + ', ' + Case When P.PersonId Is Not Null Then P.Code Else LA.LedgerAccountSuffix End) AS LedgerAccountName,
+                                        SELECT L.LedgerAccountId, Max(LA.LedgerAccountName + 
+		                                Case WHEN P.PersonId IS NOT NULL 
+			                                 THEN CASE WHEN P.Suffix = P.Code THEN ' [' + P.Code + ']'
+			 								                                  ELSE ', ' + P.Suffix + ' [' + P.Code + ']' END	
+			                                 ELSE ', ' + LA.LedgerAccountSuffix END) AS LedgerAccountName,
                                         Sum(CASE WHEN H.DocDate < @FromDate THEN L.AmtDr - L.AmtCr ELSE 0 END) AS Opening,
                                         Sum(CASE WHEN H.DocDate >= @FromDate AND H.DocDate <= @ToDate THEN L.AmtDr ELSE 0 END) AS AmtDr,
                                         Sum(CASE WHEN H.DocDate >= @FromDate AND H.DocDate <= @ToDate THEN L.AmtCr ELSE 0 END) AS AmtCr,

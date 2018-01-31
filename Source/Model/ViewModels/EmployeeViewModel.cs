@@ -7,11 +7,13 @@ using Model.Models;
 using System;
 using Microsoft.AspNet.Identity;
 using System.ComponentModel.DataAnnotations.Schema;
+using Model.ViewModel;
 
 namespace Model.ViewModels
 {
     public class EmployeeViewModel
     {
+        public int EmployeeId { get; set; }
         public int PersonId { get; set; }
 
         public int DocTypeId { get; set; }
@@ -75,7 +77,7 @@ namespace Model.ViewModels
         public int? DepartmentId { get; set; }
         public virtual Department Department { get; set; }
 
-
+        public int? CalculationId { get; set; }
         public int? CreaditDays { get; set; }
 
         public Decimal? CreaditLimit { get; set; }
@@ -108,6 +110,8 @@ namespace Model.ViewModels
 
         public int PersonRegistrationPanNoID { get; set; }
 
+        public Decimal? BasicSalary { get; set; }
+
         public string Tags { get; set; }
 
         [MaxLength(100)]
@@ -115,11 +119,15 @@ namespace Model.ViewModels
 
         [MaxLength(100)]
         public string ImageFileName { get; set; }
+        public PersonSettingsViewModel PersonSettings { get; set; }
+        public List<EmployeeCharge> footercharges { get; set; }
+        public List<EmployeeLineCharge> linecharges { get; set; }
 
     }
 
     public class EmployeeIndexViewModel
     {
+        public int EmployeeId { get; set; }
         public int PersonId { get; set; }
         public string Name { get; set; }
         public string Suffix { get; set; }

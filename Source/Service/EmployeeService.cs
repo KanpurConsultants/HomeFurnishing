@@ -131,7 +131,7 @@ namespace Service
                         join p in db.Persons on b.PersonID equals p.PersonID into PersonTable
                         from PersonTab in PersonTable.DefaultIfEmpty()
                         orderby PersonTab.Name
-                        select b.PersonID).AsEnumerable().SkipWhile(p => p != id).Skip(1).FirstOrDefault();
+                        select b.EmployeeId).AsEnumerable().SkipWhile(p => p != id).Skip(1).FirstOrDefault();
             }
             else
             {
@@ -139,7 +139,7 @@ namespace Service
                         join p in db.Persons on b.PersonID equals p.PersonID into PersonTable
                         from PersonTab in PersonTable.DefaultIfEmpty()
                         orderby PersonTab.Name
-                        select b.PersonID).FirstOrDefault();
+                        select b.EmployeeId).FirstOrDefault();
             }
             if (temp != 0)
                 return temp;
@@ -158,7 +158,7 @@ namespace Service
                         join p in db.Persons on b.PersonID equals p.PersonID into PersonTable
                         from PersonTab in PersonTable.DefaultIfEmpty()
                         orderby PersonTab.Name
-                        select b.PersonID).AsEnumerable().TakeWhile(p => p != id).LastOrDefault();
+                        select b.EmployeeId).AsEnumerable().TakeWhile(p => p != id).LastOrDefault();
             }
             else
             {
@@ -166,7 +166,7 @@ namespace Service
                         join p in db.Persons on b.PersonID equals p.PersonID into PersonTable
                         from PersonTab in PersonTable.DefaultIfEmpty()
                         orderby PersonTab.Name
-                        select b.PersonID).AsEnumerable().LastOrDefault();
+                        select b.EmployeeId).AsEnumerable().LastOrDefault();
             }
             if (temp != 0)
                 return temp;
@@ -185,9 +185,10 @@ namespace Service
                                    from PersonAddressTab in PersonAddressTable.DefaultIfEmpty()
                                    join ac in db.LedgerAccount on b.PersonID equals ac.PersonId into AccountTable
                                    from AccountTab in AccountTable.DefaultIfEmpty()
-                                   where b.PersonID == id
+                                   where b.EmployeeId == id
                                    select new EmployeeViewModel
                                    {
+                                       EmployeeId = b.EmployeeId,
                                        PersonId = b.PersonID,
                                        DocTypeId = PersonTab.DocTypeId,
                                        Name = PersonTab.Name,
@@ -215,13 +216,14 @@ namespace Service
                                        DivisionIds = BusinessEntityTab.DivisionIds,
                                        SiteIds = BusinessEntityTab.SiteIds,
                                        Tags = PersonTab.Tags,
+                                       BasicSalary = b.BasicSalary,
                                        ImageFileName = PersonTab.ImageFileName,
                                        ImageFolderName = PersonTab.ImageFolderName
                                    }
                    ).FirstOrDefault();
 
             var PersonProcess = (from pp in db.PersonProcess
-                                 where pp.PersonId == id
+                                 where pp.PersonId == Employeeviewmodel.PersonId
                                  select new
                                  {
                                      ProcessId = pp.ProcessId
@@ -241,7 +243,7 @@ namespace Service
 
 
             var PersonRegistration = (from pp in db.PersonRegistration
-                                      where pp.PersonId == id
+                                      where pp.PersonId == Employeeviewmodel.PersonId
                                       select new
                                       {
                                           PersonRegistrationId = pp.PersonRegistrationID,
@@ -287,6 +289,7 @@ namespace Service
                        orderby PersonTab.Name
                        select new EmployeeIndexViewModel
                        {
+                           EmployeeId = p.EmployeeId,
                            PersonId = PersonTab.PersonID,
                            Name = PersonTab.Name,
                            Code=PersonTab.Code,

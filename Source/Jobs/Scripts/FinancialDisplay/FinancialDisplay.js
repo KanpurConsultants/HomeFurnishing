@@ -76,12 +76,27 @@ FinancialDisplay.controller('MainCtrl', ['$scope', '$log', '$http', 'uiGridConst
       var LedgerAccountGroupFilterArr = []
       var LedgerAccountFilterArr = []
       var FocusCellArr = []
+      var HeaderInfoArr = []
 
       $scope.ShowDetail = function () {
           var rowCol = $scope.gridApi.cellNav.getFocusedCell();
           $("#ReportType").val(rowCol.row.entity.OpenReportType);
           $("#LedgerAccountGroup").val(rowCol.row.entity.LedgerAccountGroupId);
           $("#LedgerAccount").val(rowCol.row.entity.LedgerAccountId);
+
+
+          if ($("#ReportType").val() != "") {
+              if (rowCol.row.entity.LedgerAccountGroupName != null && rowCol.row.entity.LedgerAccountGroupName != "") {
+                  $("#HeaderInfo").text('[' + rowCol.row.entity.LedgerAccountGroupName.replace('<Strong>', '').replace('</Strong>', '') + ']');
+              }
+              else if (rowCol.row.entity.LedgerAccountName != null && rowCol.row.entity.LedgerAccountName != "") {
+                  $("#HeaderInfo").text('[' + rowCol.row.entity.LedgerAccountName.replace('<Strong>', '').replace('</Strong>', '') + ']');
+              }
+              else {
+                  $("#HeaderInfo").text("");
+              }
+              HeaderInfoArr.push($("#HeaderInfo").text());
+          }
 
           if (rowCol != null)
               FocusCellArr.push(rowCol);
@@ -180,6 +195,14 @@ FinancialDisplay.controller('MainCtrl', ['$scope', '$log', '$http', 'uiGridConst
                   if (LedgerAccountFilterArr.length > 0) {
                       $scope.gridApi.grid.columns[$scope.GetColumnIndexFromName("LedgerAccountName")].filters[0].term = LedgerAccountFilterArr[LedgerAccountFilterArr.length - 1];
                       LedgerAccountFilterArr.pop();
+                  }
+
+                  if (HeaderInfoArr.length > 0) {
+                      HeaderInfoArr.pop();
+                      if (HeaderInfoArr.length > 0)
+                          $("#HeaderInfo").text(HeaderInfoArr[HeaderInfoArr.length - 1]);
+                      else
+                          $("#HeaderInfo").text("");
                   }
 
                   if (FocusCellArr.length > 0) {
