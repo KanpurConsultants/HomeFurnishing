@@ -48,6 +48,7 @@ namespace Jobs.Controllers
             System.Web.HttpContext.Current.Session["CurrentSetting"] = new SaleOrderInventoryStatusDisplayFilterSettings();
             int SiteId = (int)System.Web.HttpContext.Current.Session["SiteId"];
             int DivisionId = (int)System.Web.HttpContext.Current.Session["DivisionId"];
+			int DocTypeId = new DocumentTypeService(_unitOfWork).FindByName("General Sale Order").DocumentTypeId;
 
             List<SelectListItem> ReportType = new List<SelectListItem>();
             ReportType.Add(new SelectListItem { Text = ReportType_Detail, Value = ReportType_Detail });
@@ -65,9 +66,10 @@ namespace Jobs.Controllers
             vm.StatusOnDate = DateTime.Now.Date.ToString("dd/MMM/yyyy");
 
             vm.ReportType = "Detail";
+			vm.ReportFor = "Pending";
             vm.Site = SiteId.ToString();
             vm.Division = DivisionId.ToString();
-
+			vm.DocTypeId = DocTypeId.ToString ();
             return View("Display_SaleOrderInventoryStatus", vm);
         }
 
@@ -88,6 +90,46 @@ namespace Jobs.Controllers
             else if (vm.NextFormat ==  "Loom Detail")
             {
                 IEnumerable<SaleOrderInventoryStatus_LoomViewModel> SaleOrderInventoryStatus = _SaleOrderInventoryStatusService.LoomDetail(SettingParameter);
+                if (SaleOrderInventoryStatus != null)
+                {
+                    JsonResult json = Json(new { Success = true, Data = SaleOrderInventoryStatus.ToList() }, JsonRequestBehavior.AllowGet);
+                    json.MaxJsonLength = int.MaxValue;
+                    return json;
+                }
+            }
+            else if (vm.NextFormat == "Ship Detail")
+            {
+                IEnumerable<SaleOrderInventoryStatus_ShipViewModel> SaleOrderInventoryStatus = _SaleOrderInventoryStatusService.ShipDetail(SettingParameter);
+                if (SaleOrderInventoryStatus != null)
+                {
+                    JsonResult json = Json(new { Success = true, Data = SaleOrderInventoryStatus.ToList() }, JsonRequestBehavior.AllowGet);
+                    json.MaxJsonLength = int.MaxValue;
+                    return json;
+                }
+            }
+            else if (vm.NextFormat == "ToBeIssue Detail")
+            {
+                IEnumerable<SaleOrderInventoryStatus_ToBeIssueViewModel> SaleOrderInventoryStatus = _SaleOrderInventoryStatusService.ToBeIssueDetail(SettingParameter);
+                if (SaleOrderInventoryStatus != null)
+                {
+                    JsonResult json = Json(new { Success = true, Data = SaleOrderInventoryStatus.ToList() }, JsonRequestBehavior.AllowGet);
+                    json.MaxJsonLength = int.MaxValue;
+                    return json;
+                }
+            }
+            else if (vm.NextFormat == "DO Detail")
+            {
+                IEnumerable<SaleOrderInventoryStatus_DOViewModel> SaleOrderInventoryStatus = _SaleOrderInventoryStatusService.DODetail(SettingParameter);
+                if (SaleOrderInventoryStatus != null)
+                {
+                    JsonResult json = Json(new { Success = true, Data = SaleOrderInventoryStatus.ToList() }, JsonRequestBehavior.AllowGet);
+                    json.MaxJsonLength = int.MaxValue;
+                    return json;
+                }
+            }
+            else if (vm.NextFormat == "OX Detail")
+            {
+                IEnumerable<SaleOrderInventoryStatus_OXViewModel> SaleOrderInventoryStatus = _SaleOrderInventoryStatusService.OXDetail(SettingParameter);
                 if (SaleOrderInventoryStatus != null)
                 {
                     JsonResult json = Json(new { Success = true, Data = SaleOrderInventoryStatus.ToList() }, JsonRequestBehavior.AllowGet);
@@ -234,7 +276,47 @@ namespace Jobs.Controllers
         {
             ((List<SaleOrderInventoryStatusDisplayFilterSettings>)System.Web.HttpContext.Current.Session["SettingList"]).Add((SaleOrderInventoryStatusDisplayFilterSettings)System.Web.HttpContext.Current.Session["CurrentSetting"]);
         }
-        
+
+
+        public ActionResult GetSaleOrders(string searchTerm, int pageSize, int pageNum)
+        {
+            var Query = _SaleOrderInventoryStatusService.GetCustomSaleOrders(searchTerm);
+            var temp = Query.Skip(pageSize * (pageNum - 1))
+                .Take(pageSize)
+                .ToList();
+
+            var count = Query.Count();
+
+            ComboBoxPagedResult Data = new ComboBoxPagedResult();
+            Data.Results = temp;
+            Data.Total = count;
+
+            return new JsonpResult
+            {
+                Data = Data,
+                JsonRequestBehavior = JsonRequestBehavior.AllowGet
+            };
+        }
+
+        public JsonResult SetSaleOrders(string Ids)
+        {
+            string[] subStr = Ids.Split(',');
+            List<ComboBoxResult> ProductJson = new List<ComboBoxResult>();
+            for (int i = 0; i < subStr.Length; i++)
+            {
+                int temp = Convert.ToInt32(subStr[i]);
+                //IEnumerable<Product> products = db.Products.Take(3);
+                IEnumerable<SaleOrderHeader> prod = from p in db.SaleOrderHeader
+                                                    where p.SaleOrderHeaderId == temp
+                                                    select p;
+                ProductJson.Add(new ComboBoxResult()
+                {
+                    id = prod.FirstOrDefault().SaleOrderHeaderId.ToString(),
+                    text = prod.FirstOrDefault().DocType.DocumentTypeShortName + "-" +prod.FirstOrDefault().DocNo + "{" + prod.FirstOrDefault().SaleToBuyer.Code +"}"
+                });
+            }
+            return Json(ProductJson);
+        }
 
         public JsonResult GetParameterSettingsForLastDisplay()
         {

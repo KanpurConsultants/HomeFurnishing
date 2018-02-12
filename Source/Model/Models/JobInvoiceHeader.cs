@@ -110,5 +110,7 @@ namespace Model.Models
         public string OMSId { get; set; }
         public int? ReviewCount { get; set; }
         public string ReviewBy { get; set; }
+
+		public bool? IsDocumentPrinted { get; set; }
     }
 }

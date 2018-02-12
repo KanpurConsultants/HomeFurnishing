@@ -685,7 +685,8 @@
 
 
 
-            var data=InitializePopoverForJobReceive(this,$("#ProductUidName").val(),'@Model.JobReceiveSettings.isPostedInStock',$('#JobReceiveHeaderId').val(),TransactionTypeConstantsEnum.Receive);
+            //var data=InitializePopoverForJobReceive(this,$("#ProductUidName").val(),'@Model.JobReceiveSettings.isPostedInStock',$('#JobReceiveHeaderId').val(),TransactionTypeConstantsEnum.Receive);
+            var data=InitializePopoverForWashingReceive(this,$("#ProductUidName").val(),'@Model.JobReceiveSettings.isPostedInStock',$('#JobReceiveHeaderId').val(),TransactionTypeConstantsEnum.Receive,'@Model.JobReceiveSettings.ProcessId');
 
 
             if(!data.status)

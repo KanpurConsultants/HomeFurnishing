@@ -159,6 +159,9 @@ namespace Jobs.Areas.Rug.Controllers
             ProductBuyerSettings ProductBuyerSettings = new ProductBuyerSettingsService(_unitOfWork).GetProductBuyerSettings(H.DivisionId, H.SiteId);
             s.ProductBuyerSettings = Mapper.Map<ProductBuyerSettings, ProductBuyerSettingsViewModel>(ProductBuyerSettings);
 
+            PackingSetting PackingSetting = new PackingSettingService(_unitOfWork).GetPackingSettingForDocument(H.DocTypeId, H.DivisionId, H.SiteId);
+            s.PackingSettings = Mapper.Map<PackingSetting, PackingSettingsViewModel>(PackingSetting);
+
             s.IsShowAllProducts = false ;
 
             ViewBag.DocNo = H.DocNo;
@@ -942,6 +945,9 @@ namespace Jobs.Areas.Rug.Controllers
             ViewBag.DocNo = H.DocNo;
             PackingLineViewModel s = _PackingLineService.GetPackingLineViewModelForLineId(id);
             s.DocTypeId = H.DocTypeId;
+
+            PackingSetting PackingSetting = new PackingSettingService(_unitOfWork).GetPackingSettingForDocument(H.DocTypeId, H.DivisionId, H.SiteId);
+            s.PackingSettings = Mapper.Map<PackingSetting, PackingSettingsViewModel>(PackingSetting);
 
             ProductBuyerSettings ProductBuyerSettings = new ProductBuyerSettingsService(_unitOfWork).GetProductBuyerSettings(H.DivisionId, H.SiteId);
             s.ProductBuyerSettings = Mapper.Map<ProductBuyerSettings, ProductBuyerSettingsViewModel>(ProductBuyerSettings);
@@ -2460,12 +2466,12 @@ namespace Jobs.Areas.Rug.Controllers
         }
 
 
-        public JsonResult GetUnitConversionMultiplier(int ProductId, Decimal Length, Decimal Width, Decimal? Height, string ToUnitId)
+        public JsonResult GetUnitConversionMultiplier(int DocumentTypeId, int ProductId, Decimal Length, Decimal Width, Decimal? Height, string ToUnitId)
         {
             ProductViewModel product = new ProductService(_unitOfWork).GetProduct(ProductId);
 
             Decimal UnitConversionMultiplier = 0;
-            UnitConversionMultiplier = new ProductService(_unitOfWork).GetUnitConversionMultiplier(1, product.UnitId, Length, Width, Height, ToUnitId,db);
+            UnitConversionMultiplier = new ProductService(_unitOfWork).GetUnitConversionMultiplier(1, product.UnitId, Length, Width, Height, ToUnitId,db, DocumentTypeId);
 
             return Json(UnitConversionMultiplier);
         }

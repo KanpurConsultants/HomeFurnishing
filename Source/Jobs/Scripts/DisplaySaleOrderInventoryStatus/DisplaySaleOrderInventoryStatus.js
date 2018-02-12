@@ -51,18 +51,51 @@ SaleOrderInventoryStatusDisplay.controller('MainCtrl', ['$scope', '$log', '$http
       $scope.ShowDetail = function () {
           var rowCol = $scope.gridApi.cellNav.getFocusedCell();
 
+          //alert(rowCol.col.name);
           if (rowCol.col.name == "STK")
           {
               $("#NextFormat").val("Stock Detail");
-              $("#TextHidden").val(rowCol.row.entity.SaleOrderLineId);
+               if ($("#ReportType").val() == "Summary")
+                   $("#TextHidden").val(rowCol.row.entity.ProductId);
+               else
+                   $("#TextHidden").val(rowCol.row.entity.SaleOrderLineId);
           }
 
           if (rowCol.col.name == "LOOM") {
               $("#NextFormat").val("Loom Detail");
-              $("#TextHidden").val(rowCol.row.entity.SaleOrderLineId);
+              if ($("#ReportType").val() == "Summary")
+                  $("#TextHidden").val(rowCol.row.entity.ProductId);
+              else
+                  $("#TextHidden").val(rowCol.row.entity.SaleOrderLineId);
           }
-          
-        
+          if (rowCol.col.name == "SHP") {
+              $("#NextFormat").val("Ship Detail");
+              if ($("#ReportType").val() == "Summary")
+                  $("#TextHidden").val(rowCol.row.entity.ProductId);
+              else
+                  $("#TextHidden").val(rowCol.row.entity.SaleOrderLineId);
+          }
+          if (rowCol.col.name == "UX") {
+              $("#NextFormat").val("ToBeIssue Detail");
+              if ($("#ReportType").val() == "Summary")
+                  $("#TextHidden").val(rowCol.row.entity.ProductId);
+              else
+                  $("#TextHidden").val(rowCol.row.entity.SaleOrderLineId);
+          }
+          if (rowCol.col.name == "D_O") {
+              $("#NextFormat").val("DO Detail");
+              if ($("#ReportType").val() == "Summary")
+                  $("#TextHidden").val(rowCol.row.entity.ProductId);
+              else
+                  $("#TextHidden").val(rowCol.row.entity.SaleOrderLineId);
+          }
+         if (rowCol.col.name == "O_X") {
+              $("#NextFormat").val("OX Detail");
+              if ($("#ReportType").val() == "Summary")
+                  $("#TextHidden").val(rowCol.row.entity.ProductId);
+              else
+                  $("#TextHidden").val(rowCol.row.entity.SaleOrderLineId);
+         }
            var DocTypeId = parseInt(rowCol.row.entity.DocTypeId);
            var DocId = parseInt(rowCol.row.entity.SaleOrderHeaderId);
            if (rowCol.row.entity.SaleOrderHeaderId != null)
@@ -118,14 +151,14 @@ SaleOrderInventoryStatusDisplay.controller('MainCtrl', ['$scope', '$log', '$http
                    CustomSelectFunction($("#Format"), '/Display_SaleOrderBalance/GetFilterFormat', '/Display_JobOrderBalance/SetFilterFormat', ' ', false, 0);
                    CustomSelectFunction($("#Division"), '/ComboHelpList/GetDivision', '/ComboHelpList/SetSingleDivision', ' ', false, 0);
                    CustomSelectFunction($("#Site"), '/ComboHelpList/GetSite', '/ComboHelpList/SetSingleSite', ' ', false, 0);
-                   CustomSelectFunction($("#ProductNature"), '/ComboHelpList/GetProductNature', '/ComboHelpList/SetProductNature', ' ', false, 0);
-                   CustomSelectFunction($("#ProductType"), '/ComboHelpList/GetProductType', '/ComboHelpList/SetProductType', ' ', false, 0);
-                   CustomSelectFunction($("#Buyer"), '/ComboHelpList/GetPerson', '/ComboHelpList/SetSinglePerson', ' ', false, 0);
-                   CustomSelectFunction($("#ProductCategory"), '/ComboHelpList/GetProductCategory', '/ComboHelpList/SetProductCategory', ' ', false, 0);
-                   CustomSelectFunction($("#ProductQuality"), '/ComboHelpList/GetProductQuality', '/ComboHelpList/SetProductQuality', ' ', false, 0);
-                   CustomSelectFunction($("#DocTypeId"), '/ComboHelpList/GetDocumentType', '/ComboHelpList/SetSingleDocumentType', ' ', false, 0);
-                   CustomSelectFunction($("#Product"), '/ComboHelpList/GetProducts', '/ComboHelpList/SetSingleProduct', ' ', false, 0);
-                   CustomSelectFunction($("#SaleOrderHeaderId"), '/ComboHelpList/GetSaleOrders', '/ComboHelpList/SetSingleSaleOrder', ' ', false, 0);
+                   CustomSelectFunction($("#ProductNature"), '/ComboHelpList/GetProductNature', '/ComboHelpList/SetProductNature', ' ', true, 0);
+                   CustomSelectFunction($("#ProductType"), '/ComboHelpList/GetProductType', '/ComboHelpList/SetProductType', ' ', true, 0);
+                   CustomSelectFunction($("#Buyer"), '/ComboHelpList/GetPerson', '/ComboHelpList/SetBuyers', ' ', true, 0);
+                   CustomSelectFunction($("#ProductCategory"), '/ComboHelpList/GetProductCategory', '/ComboHelpList/SetProductCategory', ' ', true, 0);
+                   CustomSelectFunction($("#ProductQuality"), '/ComboHelpList/GetProductQuality', '/ComboHelpList/SetProductQuality', ' ', true, 0);
+                   CustomSelectFunction($("#DocTypeId"), '/ComboHelpList/GetDocumentType', '/ComboHelpList/SetDocumentType', ' ', true, 0);
+                   CustomSelectFunction($("#Product"), '/ComboHelpList/GetProducts', '/ComboHelpList/SetProducts', ' ', true, 0);
+                   CustomSelectFunction($("#SaleOrderHeaderId"), '/ComboHelpList/GetSaleOrders', '/ComboHelpList/SetSaleOrder', ' ', true, 0);
                    if (result.Buyer == null)
                        $("#Buyer").select2('data', { id: '', text: '' });
                    if (result.ProductType == null)
@@ -170,6 +203,7 @@ SaleOrderInventoryStatusDisplay.controller('MainCtrl', ['$scope', '$log', '$http
                   if (result.Success == true) {
                       $scope.gridOptions.columnDefs = new Array();
 
+                      //alert($("#ReportType").val());
                       if ($("#ReportType").val() == "Detail" && ($("#NextFormat").val() == "" || $("#NextFormat").val() == null))
                       {
                           $scope.gridOptions.columnDefs.push({ field: 'SaleOrderLineId', width: 50, visible: false });
@@ -185,16 +219,18 @@ SaleOrderInventoryStatusDisplay.controller('MainCtrl', ['$scope', '$log', '$http
                           $scope.gridOptions.columnDefs.push({ field: 'ORD', width: 90, aggregationType: uiGridConstants.aggregationTypes.sum, aggregationHideLabel: true, headerCellClass: 'text-right header-text', footerCellClass: 'text-right ', cellClass: 'text-right cell-text' });
                           $scope.gridOptions.columnDefs.push({ field: 'O_C', width: 90, aggregationType: uiGridConstants.aggregationTypes.sum, aggregationHideLabel: true, headerCellClass: 'text-right header-text', footerCellClass: 'text-right ', cellClass: 'text-right cell-text' });
                           $scope.gridOptions.columnDefs.push({ field: 'SLP', width: 90, aggregationType: uiGridConstants.aggregationTypes.sum, aggregationHideLabel: true, headerCellClass: 'text-right header-text', footerCellClass: 'text-right ', cellClass: 'text-right cell-text' });
+                          $scope.gridOptions.columnDefs.push({ field: 'UX', width: 90, aggregationType: uiGridConstants.aggregationTypes.sum, aggregationHideLabel: true, headerCellClass: 'text-right header-text', footerCellClass: 'text-right ', cellClass: 'text-right cell-text' });
                           $scope.gridOptions.columnDefs.push({ field: 'LOOM', width: 90, aggregationType: uiGridConstants.aggregationTypes.sum, aggregationHideLabel: true, headerCellClass: 'text-right header-text', footerCellClass: 'text-right ', cellClass: 'text-right cell-text' });
                           $scope.gridOptions.columnDefs.push({ field: 'STK', width: 105, aggregationType: uiGridConstants.aggregationTypes.sum, aggregationHideLabel: true, headerCellClass: 'text-right header-text', footerCellClass: 'text-right ', cellClass: 'text-right cell-text' });
                           $scope.gridOptions.columnDefs.push({ field: 'SHP', width: 105, aggregationType: uiGridConstants.aggregationTypes.sum, aggregationHideLabel: true, headerCellClass: 'text-right header-text', footerCellClass: 'text-right ', cellClass: 'text-right cell-text' });
                           $scope.gridOptions.columnDefs.push({ field: 'BAL', width: 100, aggregationType: uiGridConstants.aggregationTypes.sum, aggregationHideLabel: true, headerCellClass: 'text-right header-text', footerCellClass: 'text-right ', cellClass: 'text-right cell-text' });
-                          $scope.gridOptions.columnDefs.push({ field: 'O_D', width: 100, aggregationType: uiGridConstants.aggregationTypes.sum, aggregationHideLabel: true, headerCellClass: 'text-right header-text', footerCellClass: 'text-right ', cellClass: 'text-right cell-text' });
-                          $scope.gridOptions.columnDefs.push({ field: 'O_B', width: 100, aggregationType: uiGridConstants.aggregationTypes.sum, aggregationHideLabel: true, headerCellClass: 'text-right header-text', footerCellClass: 'text-right ', cellClass: 'text-right cell-text' });
+                          $scope.gridOptions.columnDefs.push({ field: 'D_O', width: 100, aggregationType: uiGridConstants.aggregationTypes.sum, aggregationHideLabel: true, headerCellClass: 'text-right header-text', footerCellClass: 'text-right ', cellClass: 'text-right cell-text' });
+                          $scope.gridOptions.columnDefs.push({ field: 'D_B', width: 100, aggregationType: uiGridConstants.aggregationTypes.sum, aggregationHideLabel: true, headerCellClass: 'text-right header-text', footerCellClass: 'text-right ', cellClass: 'text-right cell-text' });
                           $scope.gridOptions.columnDefs.push({ field: 'O_X', width: 100, aggregationType: uiGridConstants.aggregationTypes.sum, aggregationHideLabel: true, headerCellClass: 'text-right header-text', footerCellClass: 'text-right ', cellClass: 'text-right cell-text' });
                       }
-                      else if ($("#ReportType").val() == "Summary")
+                      else if ($("#ReportType").val() == "Summary" && ($("#NextFormat").val() == "" || $("#NextFormat").val() == null))
                       {
+                          $scope.gridOptions.columnDefs.push({ field: 'ProductId', width: 50, visible: false });
                           $scope.gridOptions.columnDefs.push({ field: 'Quality', width: 150, cellClass: 'cell-text ', headerCellClass: 'header-text' });
                           $scope.gridOptions.columnDefs.push({ field: 'Design', width: 150, cellClass: 'cell-text ', headerCellClass: 'header-text' });
                           $scope.gridOptions.columnDefs.push({ field: 'Size', width: 150, cellClass: 'cell-text ', headerCellClass: 'header-text' });
@@ -203,26 +239,27 @@ SaleOrderInventoryStatusDisplay.controller('MainCtrl', ['$scope', '$log', '$http
                           $scope.gridOptions.columnDefs.push({ field: 'ORD', width: 100, aggregationType: uiGridConstants.aggregationTypes.sum, aggregationHideLabel: true, headerCellClass: 'text-right header-text', footerCellClass: 'text-right ', cellClass: 'text-right cell-text' });
                           $scope.gridOptions.columnDefs.push({ field: 'O_C', width: 100, aggregationType: uiGridConstants.aggregationTypes.sum, aggregationHideLabel: true, headerCellClass: 'text-right header-text', footerCellClass: 'text-right ', cellClass: 'text-right cell-text' });
                           $scope.gridOptions.columnDefs.push({ field: 'SLP', width: 100, aggregationType: uiGridConstants.aggregationTypes.sum, aggregationHideLabel: true, headerCellClass: 'text-right header-text', footerCellClass: 'text-right ', cellClass: 'text-right cell-text' });
+                          $scope.gridOptions.columnDefs.push({ field: 'UX', width: 90, aggregationType: uiGridConstants.aggregationTypes.sum, aggregationHideLabel: true, headerCellClass: 'text-right header-text', footerCellClass: 'text-right ', cellClass: 'text-right cell-text' });
                           $scope.gridOptions.columnDefs.push({ field: 'LOOM', width: 100, aggregationType: uiGridConstants.aggregationTypes.sum, aggregationHideLabel: true, headerCellClass: 'text-right header-text', footerCellClass: 'text-right ', cellClass: 'text-right cell-text' });
                           $scope.gridOptions.columnDefs.push({ field: 'STK', width: 100, aggregationType: uiGridConstants.aggregationTypes.sum, aggregationHideLabel: true, headerCellClass: 'text-right header-text', footerCellClass: 'text-right ', cellClass: 'text-right cell-text' });
                           $scope.gridOptions.columnDefs.push({ field: 'SHP', width: 100, aggregationType: uiGridConstants.aggregationTypes.sum, aggregationHideLabel: true, headerCellClass: 'text-right header-text', footerCellClass: 'text-right ', cellClass: 'text-right cell-text' });
                           $scope.gridOptions.columnDefs.push({ field: 'BAL', width: 100, aggregationType: uiGridConstants.aggregationTypes.sum, aggregationHideLabel: true, headerCellClass: 'text-right header-text', footerCellClass: 'text-right ', cellClass: 'text-right cell-text' });
-                          $scope.gridOptions.columnDefs.push({ field: 'O_D', width: 100, aggregationType: uiGridConstants.aggregationTypes.sum, aggregationHideLabel: true, headerCellClass: 'text-right header-text', footerCellClass: 'text-right ', cellClass: 'text-right cell-text' });
+                          $scope.gridOptions.columnDefs.push({ field: 'D_O', width: 100, aggregationType: uiGridConstants.aggregationTypes.sum, aggregationHideLabel: true, headerCellClass: 'text-right header-text', footerCellClass: 'text-right ', cellClass: 'text-right cell-text' });
                           $scope.gridOptions.columnDefs.push({ field: 'D_B', width: 100, aggregationType: uiGridConstants.aggregationTypes.sum, aggregationHideLabel: true, headerCellClass: 'text-right header-text', footerCellClass: 'text-right ', cellClass: 'text-right cell-text' });
                           $scope.gridOptions.columnDefs.push({ field: 'O_X', width: 100, aggregationType: uiGridConstants.aggregationTypes.sum, aggregationHideLabel: true, headerCellClass: 'text-right header-text', footerCellClass: 'text-right ', cellClass: 'text-right cell-text' });
                       }
-                      else if ($("#ReportType").val() == "Detail" && $("#NextFormat").val() == "Loom Detail") {
-                          $scope.gridOptions.columnDefs.push({ field: 'Branch', width: 100, cellClass: 'cell-text ', headerCellClass: 'header-text' });
+                      else if ($("#NextFormat").val() == "Loom Detail") {
+                          $scope.gridOptions.columnDefs.push({ field: 'Branch', width: 150, cellClass: 'cell-text ', headerCellClass: 'header-text' });
                           $scope.gridOptions.columnDefs.push({ field: 'Purza_No', width: 100, cellClass: 'cell-text ', headerCellClass: 'header-text' });
                           $scope.gridOptions.columnDefs.push({ field: 'Date', width: 100, cellClass: 'cell-text ', headerCellClass: 'header-text' });
-                          $scope.gridOptions.columnDefs.push({ field: 'Weaver', width: 100, cellClass: 'cell-text ', headerCellClass: 'header-text' });
+                          $scope.gridOptions.columnDefs.push({ field: 'Weaver', width: 150, cellClass: 'cell-text ', headerCellClass: 'header-text' });
                           $scope.gridOptions.columnDefs.push({ field: 'Quality', width: 100, cellClass: 'cell-text ', headerCellClass: 'header-text' });
                           $scope.gridOptions.columnDefs.push({ field: 'Design', width: 100, cellClass: 'cell-text ', headerCellClass: 'header-text' });
                           $scope.gridOptions.columnDefs.push({ field: 'Colour', width: 100, cellClass: 'cell-text ', headerCellClass: 'header-text' });
                           $scope.gridOptions.columnDefs.push({ field: 'Size', width: 100, cellClass: 'cell-text ', headerCellClass: 'header-text' });
                           $scope.gridOptions.columnDefs.push({ field: 'LoomQty', width: 100, aggregationType: uiGridConstants.aggregationTypes.sum, aggregationHideLabel: true, headerCellClass: 'text-right header-text', footerCellClass: 'text-right ', cellClass: 'text-right cell-text' });
                       }
-                      else if ($("#ReportType").val() == "Detail" && $("#NextFormat").val() == "Stock Detail") {
+                      else if ($("#NextFormat").val() == "Stock Detail") {
                           $scope.gridOptions.columnDefs.push({ field: 'CarpetNo', width: 100, cellClass: 'cell-text ', headerCellClass: 'header-text' });
                           $scope.gridOptions.columnDefs.push({ field: 'Date', width: 100, cellClass: 'cell-text ', headerCellClass: 'header-text' });
                           $scope.gridOptions.columnDefs.push({ field: 'Type', width: 100, cellClass: 'cell-text ', headerCellClass: 'header-text' });
@@ -232,8 +269,57 @@ SaleOrderInventoryStatusDisplay.controller('MainCtrl', ['$scope', '$log', '$http
                           $scope.gridOptions.columnDefs.push({ field: 'Size', width: 100, cellClass: 'cell-text ', headerCellClass: 'header-text' });
                           $scope.gridOptions.columnDefs.push({ field: 'Qty', width: 100, aggregationType: uiGridConstants.aggregationTypes.sum, aggregationHideLabel: true, headerCellClass: 'text-right header-text', footerCellClass: 'text-right ', cellClass: 'text-right cell-text' });
                       }
-
+                      else if ($("#NextFormat").val() == "Ship Detail") {
+                          $scope.gridOptions.columnDefs.push({ field: 'Invoice_No', width: 100, cellClass: 'cell-text ', headerCellClass: 'header-text' });
+                          $scope.gridOptions.columnDefs.push({ field: 'Date', width: 100, cellClass: 'cell-text ', headerCellClass: 'header-text' });
+                          $scope.gridOptions.columnDefs.push({ field: 'Roll_No', width: 100, cellClass: 'cell-text ', headerCellClass: 'header-text' });
+                          $scope.gridOptions.columnDefs.push({ field: 'Remark', width: 100, cellClass: 'cell-text ', headerCellClass: 'header-text' });
+                          $scope.gridOptions.columnDefs.push({ field: 'CarpetNo', width: 100, cellClass: 'cell-text ', headerCellClass: 'header-text' });
+                          $scope.gridOptions.columnDefs.push({ field: 'Type', width: 100, cellClass: 'cell-text ', headerCellClass: 'header-text' });
+                          $scope.gridOptions.columnDefs.push({ field: 'Quality', width: 100, cellClass: 'cell-text ', headerCellClass: 'header-text' });
+                          $scope.gridOptions.columnDefs.push({ field: 'Design', width: 100, cellClass: 'cell-text ', headerCellClass: 'header-text' });
+                          $scope.gridOptions.columnDefs.push({ field: 'Colour', width: 100, cellClass: 'cell-text ', headerCellClass: 'header-text' });
+                          $scope.gridOptions.columnDefs.push({ field: 'Size', width: 100, cellClass: 'cell-text ', headerCellClass: 'header-text' });
+                          $scope.gridOptions.columnDefs.push({ field: 'Qty', width: 100, aggregationType: uiGridConstants.aggregationTypes.sum, aggregationHideLabel: true, headerCellClass: 'text-right header-text', footerCellClass: 'text-right ', cellClass: 'text-right cell-text' });
+                      }
+                      else if ($("#NextFormat").val() == "ToBeIssue Detail") {
+                          $scope.gridOptions.columnDefs.push({ field: 'Branch', width: 150, cellClass: 'cell-text ', headerCellClass: 'header-text' });
+                          $scope.gridOptions.columnDefs.push({ field: 'Slip_Date', width: 100, cellClass: 'cell-text ', headerCellClass: 'header-text' });
+                          $scope.gridOptions.columnDefs.push({ field: 'Quality', width: 100, cellClass: 'cell-text ', headerCellClass: 'header-text' });
+                          $scope.gridOptions.columnDefs.push({ field: 'Design', width: 100, cellClass: 'cell-text ', headerCellClass: 'header-text' });
+                          $scope.gridOptions.columnDefs.push({ field: 'Colour', width: 100, cellClass: 'cell-text ', headerCellClass: 'header-text' });
+                          $scope.gridOptions.columnDefs.push({ field: 'Size', width: 100, cellClass: 'cell-text ', headerCellClass: 'header-text' });
+                          $scope.gridOptions.columnDefs.push({ field: 'Qty', width: 100, aggregationType: uiGridConstants.aggregationTypes.sum, aggregationHideLabel: true, headerCellClass: 'text-right header-text', footerCellClass: 'text-right ', cellClass: 'text-right cell-text' });
+                          $scope.gridOptions.columnDefs.push({ field: 'Iss', width: 100, aggregationType: uiGridConstants.aggregationTypes.sum, aggregationHideLabel: true, headerCellClass: 'text-right header-text', footerCellClass: 'text-right ', cellClass: 'text-right cell-text' });
+                          $scope.gridOptions.columnDefs.push({ field: 'UX', width: 100, aggregationType: uiGridConstants.aggregationTypes.sum, aggregationHideLabel: true, headerCellClass: 'text-right header-text', footerCellClass: 'text-right ', cellClass: 'text-right cell-text' });
+                      }
+                      else if ($("#NextFormat").val() == "DO Detail") {
+                          $scope.gridOptions.columnDefs.push({ field: 'Carpet No', width: 100, cellClass: 'cell-text ', headerCellClass: 'header-text' });
+                          $scope.gridOptions.columnDefs.push({ field: 'Date', width: 100, cellClass: 'cell-text ', headerCellClass: 'header-text' });
+                          $scope.gridOptions.columnDefs.push({ field: 'Type', width: 100, cellClass: 'cell-text ', headerCellClass: 'header-text' });
+                          $scope.gridOptions.columnDefs.push({ field: 'Quality', width: 100, cellClass: 'cell-text ', headerCellClass: 'header-text' });
+                          $scope.gridOptions.columnDefs.push({ field: 'Design', width: 100, cellClass: 'cell-text ', headerCellClass: 'header-text' });
+                          $scope.gridOptions.columnDefs.push({ field: 'Colour', width: 100, cellClass: 'cell-text ', headerCellClass: 'header-text' });
+                          $scope.gridOptions.columnDefs.push({ field: 'Size', width: 100, cellClass: 'cell-text ', headerCellClass: 'header-text' });
+                          $scope.gridOptions.columnDefs.push({ field: 'Qty', width: 100, aggregationType: uiGridConstants.aggregationTypes.sum, aggregationHideLabel: true, headerCellClass: 'text-right header-text', footerCellClass: 'text-right ', cellClass: 'text-right cell-text' });
+                          $scope.gridOptions.columnDefs.push({ field: 'Buyer', width: 100, cellClass: 'cell-text ', headerCellClass: 'header-text' });
+                      }
                   
+                      else if ($("#NextFormat").val() == "OX Detail") {
+                          $scope.gridOptions.columnDefs.push({ field: 'Order No', width: 100, cellClass: 'cell-text ', headerCellClass: 'header-text' });
+                          $scope.gridOptions.columnDefs.push({ field: 'Carpet No', width: 100, cellClass: 'cell-text ', headerCellClass: 'header-text' });
+                          $scope.gridOptions.columnDefs.push({ field: 'Date', width: 100, cellClass: 'cell-text ', headerCellClass: 'header-text' });
+                          $scope.gridOptions.columnDefs.push({ field: 'Type', width: 100, cellClass: 'cell-text ', headerCellClass: 'header-text' });
+                          $scope.gridOptions.columnDefs.push({ field: 'Quality', width: 100, cellClass: 'cell-text ', headerCellClass: 'header-text' });
+                          $scope.gridOptions.columnDefs.push({ field: 'Design', width: 100, cellClass: 'cell-text ', headerCellClass: 'header-text' });
+                          $scope.gridOptions.columnDefs.push({ field: 'Colour', width: 100, cellClass: 'cell-text ', headerCellClass: 'header-text' });
+                          $scope.gridOptions.columnDefs.push({ field: 'Size', width: 100, cellClass: 'cell-text ', headerCellClass: 'header-text' });
+                          $scope.gridOptions.columnDefs.push({ field: 'Qty', width: 100, aggregationType: uiGridConstants.aggregationTypes.sum, aggregationHideLabel: true, headerCellClass: 'text-right header-text', footerCellClass: 'text-right ', cellClass: 'text-right cell-text' });
+                          $scope.gridOptions.columnDefs.push({ field: 'Buyer', width: 100, cellClass: 'cell-text ', headerCellClass: 'header-text' });
+                      $scope.gridOptions.data = result.Data;
+                      $scope.gridApi.grid.refresh();
+
+                   }
                       $scope.gridOptions.data = result.Data;
                       $scope.gridApi.grid.refresh();
 

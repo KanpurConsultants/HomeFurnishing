@@ -135,45 +135,9 @@
     <Compile Include="Constants\SubModuleConstants.cs" />
     <Compile Include="InitializeTables.cs" />
     <Compile Include="LogApplicationDbContext.cs" />
-    <Compile Include="Migrations\201710261003181_JobOrderBomMaterialIssue.cs" />
-    <Compile Include="Migrations\201710261003181_JobOrderBomMaterialIssue.Designer.cs">
-      <DependentUpon>201710261003181_JobOrderBomMaterialIssue.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201711020703518_DivisionSetting.cs" />
-    <Compile Include="Migrations\201711020703518_DivisionSetting.Designer.cs">
-      <DependentUpon>201711020703518_DivisionSetting.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201711200812047_RoleDocType.cs" />
-    <Compile Include="Migrations\201711200812047_RoleDocType.Designer.cs">
-      <DependentUpon>201711200812047_RoleDocType.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201711290413381_RoleDocTypeProcess.cs" />
-    <Compile Include="Migrations\201711290413381_RoleDocTypeProcess.Designer.cs">
-      <DependentUpon>201711290413381_RoleDocTypeProcess.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201712260845023_SampleTesting.cs" />
-    <Compile Include="Migrations\201712260845023_SampleTesting.Designer.cs">
-      <DependentUpon>201712260845023_SampleTesting.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201801270416596_EmployeeCharge.cs" />
-    <Compile Include="Migrations\201801270416596_EmployeeCharge.Designer.cs">
-      <DependentUpon>201801270416596_EmployeeCharge.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201801270637291_EmployeeChargesCorrection.cs" />
-    <Compile Include="Migrations\201801270637291_EmployeeChargesCorrection.Designer.cs">
-      <DependentUpon>201801270637291_EmployeeChargesCorrection.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201801290612208_EmployeeLineCharge.cs" />
-    <Compile Include="Migrations\201801290612208_EmployeeLineCharge.Designer.cs">
-      <DependentUpon>201801290612208_EmployeeLineCharge.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201801291148528_Salary.cs" />
-    <Compile Include="Migrations\201801291148528_Salary.Designer.cs">
-      <DependentUpon>201801291148528_Salary.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201801291155326_Salary1.cs" />
-    <Compile Include="Migrations\201801291155326_Salary1.Designer.cs">
-      <DependentUpon>201801291155326_Salary1.cs</DependentUpon>
+    <Compile Include="Migrations\201802050758131_PropertyTax.cs" />
+    <Compile Include="Migrations\201802050758131_PropertyTax.Designer.cs">
+      <DependentUpon>201802050758131_PropertyTax.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="NotificationApplicationDbContext.cs" />
@@ -215,35 +179,8 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201710261003181_JobOrderBomMaterialIssue.resx">
-      <DependentUpon>201710261003181_JobOrderBomMaterialIssue.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201711020703518_DivisionSetting.resx">
-      <DependentUpon>201711020703518_DivisionSetting.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201711200812047_RoleDocType.resx">
-      <DependentUpon>201711200812047_RoleDocType.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201711290413381_RoleDocTypeProcess.resx">
-      <DependentUpon>201711290413381_RoleDocTypeProcess.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201712260845023_SampleTesting.resx">
-      <DependentUpon>201712260845023_SampleTesting.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201801270416596_EmployeeCharge.resx">
-      <DependentUpon>201801270416596_EmployeeCharge.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201801270637291_EmployeeChargesCorrection.resx">
-      <DependentUpon>201801270637291_EmployeeChargesCorrection.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201801290612208_EmployeeLineCharge.resx">
-      <DependentUpon>201801290612208_EmployeeLineCharge.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201801291148528_Salary.resx">
-      <DependentUpon>201801291148528_Salary.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201801291155326_Salary1.resx">
-      <DependentUpon>201801291155326_Salary1.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201802050758131_PropertyTax.resx">
+      <DependentUpon>201802050758131_PropertyTax.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -159,6 +159,10 @@ namespace Jobs.Areas.Rug.Controllers
             ProductBuyerSettings ProductBuyerSettings = new ProductBuyerSettingsService(_unitOfWork).GetProductBuyerSettings(H.DivisionId, H.SiteId);
             s.ProductBuyerSettings = Mapper.Map<ProductBuyerSettings, ProductBuyerSettingsViewModel>(ProductBuyerSettings);
 
+            PackingSetting PackingSetting = new PackingSettingService(_unitOfWork).GetPackingSettingForDocument(H.DocTypeId, H.DivisionId, H.SiteId);
+            s.PackingSettings = Mapper.Map<PackingSetting, PackingSettingsViewModel>(PackingSetting);
+
+            s.IsShowAllProducts = false ;
 
             ViewBag.DocNo = H.DocNo;
             ViewBag.Status = H.Status;
@@ -332,13 +336,33 @@ namespace Jobs.Areas.Rug.Controllers
 
                     if ( svm.SaleOrderNo != "" && svm.SaleOrderNo != null && svm.ProductName != "" && svm.ProductName != null)
                     {
-                        packingline.PartyProductUid = svm.SaleOrderNo + "|" + svm.ProductName + "_" + _PackingLineService.FGetRandonNoForLabel();
+                        packingline.PartyProductUid = (svm.SaleOrderNo + "|" + svm.ProductName + "_" + _PackingLineService.FGetRandonNoForLabel());
+                        PersonProductUid PUU = new PersonProductUidService(_unitOfWork).FindPendingToPack((int)svm.SaleOrderLineId);
+                        if (PUU !=null )
+                        packingline.PersonProductUidId = PUU.PersonProductUidId;
                     }
+
+                    if(packingline.PartyProductUid.ToString().Length >50)
+                    packingline.PartyProductUid = packingline.PartyProductUid.ToString().Substring(0, 50);
 
                     packingline.CreatedDate = DateTime.Now;
                     packingline.ModifiedDate = DateTime.Now;
                     packingline.CreatedBy = User.Identity.Name;
                     packingline.ModifiedBy = User.Identity.Name;
+
+
+                    if (svm.StockInId != null)
+                    {
+                        StockAdj Adj_IssQty = new StockAdj();
+                        Adj_IssQty.StockInId = (int)svm.StockInId;
+                        Adj_IssQty.StockOutId = (int)StockViewModel_Issue.StockId;
+                        Adj_IssQty.DivisionId = packingheader.DivisionId;
+                        Adj_IssQty.SiteId = packingheader.SiteId;
+                        Adj_IssQty.AdjustedQty = packingline.Qty;
+                        Adj_IssQty.ObjectState = Model.ObjectState.Added;
+                        //db.StockAdj.Add(Adj_IssQty);
+                        new StockAdjService(_unitOfWork).Create(Adj_IssQty);
+                    }
 
 
 
@@ -378,6 +402,41 @@ namespace Jobs.Areas.Rug.Controllers
                         new ProductUidService(_unitOfWork).Update(productuid);
                     }
 
+
+                    if ( svm.LotNo  != null && svm.ProductUidId == null)
+                    {
+                        ProductUid productuid = new ProductUidService(_unitOfWork).Find(svm.LotNo);
+
+
+                        packingline.ProductUidLastTransactionDocId = productuid.LastTransactionDocId;
+                        packingline.ProductUidLastTransactionDocDate = productuid.LastTransactionDocDate;
+                        packingline.ProductUidLastTransactionDocNo = productuid.LastTransactionDocNo;
+                        packingline.ProductUidLastTransactionDocTypeId = productuid.LastTransactionDocTypeId;
+                        packingline.ProductUidLastTransactionPersonId = productuid.LastTransactionPersonId;
+                        packingline.ProductUidStatus = productuid.Status;
+                        packingline.ProductUidCurrentProcessId = productuid.CurrenctProcessId;
+                        packingline.ProductUidCurrentGodownId = productuid.CurrenctGodownId;
+
+                        productuid.LastTransactionDocId = packingheader.PackingHeaderId;
+                        productuid.LastTransactionDocNo = packingheader.DocNo;
+                        productuid.LastTransactionDocTypeId = packingheader.DocTypeId;
+                        productuid.LastTransactionDocDate = packingheader.DocDate;
+                        productuid.LastTransactionPersonId = packingheader.JobWorkerId;
+                        productuid.CurrenctGodownId = packingheader.GodownId;
+                        productuid.CurrenctProcessId = new ProcessService(_unitOfWork).Find(ProcessConstants.Packing).ProcessId;
+                        productuid.Status = ProductUidStatusConstants.Pack;
+                        if (productuid.ProcessesDone == null)
+                        {
+                            productuid.ProcessesDone = "|" + new ProcessService(_unitOfWork).Find(ProcessConstants.Packing).ProcessId.ToString() + "|";
+                        }
+                        else
+                        {
+                            productuid.ProcessesDone = productuid.ProcessesDone + ",|" + new ProcessService(_unitOfWork).Find(ProcessConstants.Packing).ProcessId.ToString() + "|";
+                        }
+
+
+                        new ProductUidService(_unitOfWork).Update(productuid);
+                    }
 
                     packingline.ObjectState = Model.ObjectState.Added;
                     _PackingLineService.Create(packingline);
@@ -497,23 +556,29 @@ namespace Jobs.Areas.Rug.Controllers
                     ProductBuyer productbuyer = (from p in db.ProductBuyer
                                              where p.BuyerId  == packingheader.BuyerId && p.ProductId == svm.ProductId
                                              select p).AsNoTracking().FirstOrDefault();
-                    if (productbuyer.BuyerSku != svm.BuyerSku || productbuyer.BuyerSpecification != svm.BuyerSpecification || productbuyer.BuyerSpecification1 != svm.BuyerSpecification1 || productbuyer.BuyerSpecification2 != svm.BuyerSpecification2 || productbuyer.BuyerSpecification3 != svm.BuyerSpecification3)
+                    if (productbuyer == null)
                     {
                         List<LogTypeViewModel> LogListProductBuyer = new List<LogTypeViewModel>();
                         ProductBuyer ExRecProductBuyer = new ProductBuyer();
-                        ExRecProductBuyer = Mapper.Map<ProductBuyer>(productbuyer);
 
-                        productbuyer.BuyerSku = svm.BuyerSku;
-                        productbuyer.BuyerSpecification = svm.BuyerSpecification;
-                        productbuyer.BuyerSpecification1 = svm.BuyerSpecification1;
-                        productbuyer.BuyerSpecification2 = svm.BuyerSpecification2;
-                        productbuyer.BuyerSpecification3 = svm.BuyerSpecification3;
-                        new ProductBuyerService(_unitOfWork).Update(productbuyer);
+                        ExRecProductBuyer.BuyerId = (int)packingheader.BuyerId;
+                        ExRecProductBuyer.ProductId = (int)svm.ProductId;
+                        ExRecProductBuyer.BuyerSku = svm.BuyerSku;
+                        ExRecProductBuyer.BuyerSpecification = svm.BuyerSpecification;
+                        ExRecProductBuyer.BuyerSpecification1 = svm.BuyerSpecification1;
+                        ExRecProductBuyer.BuyerSpecification2 = svm.BuyerSpecification2;
+                        ExRecProductBuyer.BuyerSpecification3 = svm.BuyerSpecification3;
+                        ExRecProductBuyer.ObjectState = Model.ObjectState.Added;
+                        ExRecProductBuyer.CreatedDate = DateTime.Now;
+                        ExRecProductBuyer.CreatedBy = User.Identity.Name;
+                        ExRecProductBuyer.ModifiedDate = DateTime.Now;
+                        ExRecProductBuyer.ModifiedBy = User.Identity.Name;
+                        new ProductBuyerService(_unitOfWork).Create(ExRecProductBuyer);
 
                         LogListProductBuyer.Add(new LogTypeViewModel
                         {
                             ExObj = ExRecProductBuyer,
-                            Obj = productbuyer,
+                            Obj = ExRecProductBuyer,
                         });
                         XElement ModificationsProductBuyer = new ModificationsCheckService().CheckChanges(LogListProductBuyer);
 
@@ -533,7 +598,48 @@ namespace Jobs.Areas.Rug.Controllers
                             DocStatus = (int)StatusConstants.Modified,
                         }));
 
-                        //End of Saving the Activity Log
+
+                    }
+                    else
+                    {
+                        if (productbuyer.BuyerSku != svm.BuyerSku || productbuyer.BuyerSpecification != svm.BuyerSpecification || productbuyer.BuyerSpecification1 != svm.BuyerSpecification1 || productbuyer.BuyerSpecification2 != svm.BuyerSpecification2 || productbuyer.BuyerSpecification3 != svm.BuyerSpecification3)
+                        {
+                            List<LogTypeViewModel> LogListProductBuyer = new List<LogTypeViewModel>();
+                            ProductBuyer ExRecProductBuyer = new ProductBuyer();
+                            ExRecProductBuyer = Mapper.Map<ProductBuyer>(productbuyer);
+
+                            productbuyer.BuyerSku = svm.BuyerSku;
+                            productbuyer.BuyerSpecification = svm.BuyerSpecification;
+                            productbuyer.BuyerSpecification1 = svm.BuyerSpecification1;
+                            productbuyer.BuyerSpecification2 = svm.BuyerSpecification2;
+                            productbuyer.BuyerSpecification3 = svm.BuyerSpecification3;
+                            new ProductBuyerService(_unitOfWork).Update(productbuyer);
+
+                            LogListProductBuyer.Add(new LogTypeViewModel
+                            {
+                                ExObj = ExRecProductBuyer,
+                                Obj = productbuyer,
+                            });
+                            XElement ModificationsProductBuyer = new ModificationsCheckService().CheckChanges(LogListProductBuyer);
+
+
+
+                            //Saving the Activity Log
+
+                            LogActivity.LogActivityDetail(LogVm.Map(new ActiivtyLogViewModel
+                            {
+                                DocTypeId = packingheader.DocTypeId,
+                                DocId = packingline.PackingHeaderId,
+                                DocLineId = packingline.PackingLineId,
+                                ActivityType = (int)ActivityTypeContants.Modified,
+                                DocNo = packingheader.DocNo,
+                                xEModifications = ModificationsProductBuyer,
+                                DocDate = packingheader.DocDate,
+                                DocStatus = (int)StatusConstants.Modified,
+                            }));
+
+                            //End of Saving the Activity Log
+                        }
                     }
                     #endregion
 
@@ -598,6 +704,30 @@ namespace Jobs.Areas.Rug.Controllers
                     packingline.ModifiedDate = DateTime.Now;
                     packingline.ModifiedBy = User.Identity.Name;
                     _PackingLineService.Update(packingline);
+
+                    StockAdj Adj = (from L in db.StockAdj
+                                    where L.StockOutId == packingline.StockIssueId
+                                    select L).FirstOrDefault();
+
+                    if (Adj != null)
+                    {
+                        Adj.ObjectState = Model.ObjectState.Deleted;
+                        db.StockAdj.Remove(Adj);
+                        //new StockAdjService(_unitOfWork).Delete(Adj);
+                    }
+
+                    if (svm.StockInId != null)
+                    {
+                        StockAdj Adj_IssQty = new StockAdj();
+                        Adj_IssQty.StockInId = (int)svm.StockInId;
+                        Adj_IssQty.StockOutId = (int)packingline.StockIssueId;
+                        Adj_IssQty.DivisionId = packingheader.DivisionId;
+                        Adj_IssQty.SiteId = packingheader.SiteId;
+                        Adj_IssQty.AdjustedQty = svm.Qty;
+                        Adj_IssQty.ObjectState = Model.ObjectState.Added;
+                        //db.StockAdj.Add(Adj_IssQty);
+                        new StockAdjService(_unitOfWork).Create(Adj_IssQty);
+                    }
 
 
                     PackingLineExtended LineExtended = (from Ld in db.PackingLineExtended where Ld.PackingLineId == packingline.PackingLineId select Ld).FirstOrDefault();
@@ -717,6 +847,8 @@ namespace Jobs.Areas.Rug.Controllers
             LastProduct lastproduct = new LastProduct();
             lastproduct.ProductId = svm.ProductId;
             lastproduct.ProductName = svm.ProductName;
+            lastproduct.Remark = svm.Remark;
+            lastproduct.SealNo = svm.SealNo;
             System.Web.HttpContext.Current.Session[LastProductSessionVarName] = lastproduct;
 
 
@@ -949,6 +1081,8 @@ namespace Jobs.Areas.Rug.Controllers
             StockIssueId = PackingLine.StockIssueId;
             StockReceiveId = PackingLine.StockReceiveId;
 
+
+
            
 
             //StockViewModel StockViewModel_OldIssue = GetStockViewModelIssueForPackingLine(PackingLine.PackingLineId);
@@ -1011,6 +1145,39 @@ namespace Jobs.Areas.Rug.Controllers
             }
 
 
+            if (PackingLine.LotNo  != null && PackingLine.ProductUidId == null )
+            {
+                //ProductUidDetail ProductUidDetail = new ProductUidService(_unitOfWork).FGetProductUidLastValues((int)PackingLine.ProductUidId, "Packing-" +  vm.PackingHeaderId.ToString());
+
+                ProductUid ProductUid = new ProductUidService(_unitOfWork).Find(PackingLine.LotNo);
+
+
+                ProductUid.LastTransactionDocDate = PackingLine.ProductUidLastTransactionDocDate;
+                ProductUid.LastTransactionDocId = PackingLine.ProductUidLastTransactionDocId;
+                ProductUid.LastTransactionDocNo = PackingLine.ProductUidLastTransactionDocNo;
+                ProductUid.LastTransactionDocTypeId = PackingLine.ProductUidLastTransactionDocTypeId;
+                ProductUid.LastTransactionPersonId = PackingLine.ProductUidLastTransactionPersonId;
+                ProductUid.CurrenctGodownId = PackingLine.ProductUidCurrentGodownId;
+                ProductUid.CurrenctProcessId = PackingLine.ProductUidCurrentProcessId;
+                ProductUid.Status = PackingLine.ProductUidStatus;
+                ProductUid.IsActive = true;
+                ProductUid.ProcessesDone = ProductUid.ProcessesDone.Replace("|" + new ProcessService(_unitOfWork).Find(ProcessConstants.Packing).ProcessId.ToString() + "|", "");
+
+                //ProductUid.LastTransactionDocDate = ProductUidDetail.LastTransactionDocDate;
+                //ProductUid.LastTransactionDocId = ProductUidDetail.LastTransactionDocId;
+                //ProductUid.LastTransactionDocNo = ProductUidDetail.LastTransactionDocNo;
+                //ProductUid.LastTransactionDocTypeId = ProductUidDetail.LastTransactionDocTypeId;
+                //ProductUid.LastTransactionPersonId = ProductUidDetail.LastTransactionPersonId;
+                //ProductUid.CurrenctGodownId = ProductUidDetail.CurrenctGodownId;
+                //ProductUid.CurrenctProcessId = ProductUidDetail.CurrenctProcessId;
+                //ProductUid.Status = ProductUidDetail.Status;
+
+
+                new ProductUidService(_unitOfWork).Update(ProductUid);
+
+                new StockUidService(_unitOfWork).DeleteStockUidForDocLine(PackingLine.PackingLineId, PackingHeader.DocTypeId, PackingHeader.SiteId, PackingHeader.DivisionId);
+            }
+
 
 
             new PackingLineExtendedService(_unitOfWork).Delete(vm.PackingLineId);
@@ -1021,6 +1188,17 @@ namespace Jobs.Areas.Rug.Controllers
 
             if (StockIssueId != null)
             {
+                StockAdj Adj = (from L in db.StockAdj
+                                where L.StockOutId == StockIssueId
+                                select L).FirstOrDefault();
+
+                if (Adj != null)
+                {
+                    new StockAdjService(_unitOfWork).Delete(Adj);
+                    //Adj.ObjectState = Model.ObjectState.Deleted;
+                    //db.StockAdj.Remove(Adj);
+                }
+
                 new StockService(_unitOfWork).DeleteStock((int)StockIssueId);
             }
 
@@ -1125,7 +1303,21 @@ namespace Jobs.Areas.Rug.Controllers
 
         public string DataValidation(PackingLineViewModel svm)
         {
+
+            PackingHeader PH = new PackingHeaderService(_unitOfWork).GetPackingHeader(svm.PackingHeaderId);
+
+            PackingSetting PS =new PackingSettingService(_unitOfWork).GetPackingSettingForDocument(PH.DocTypeId, PH.DivisionId, PH.SiteId);
             string ValidationMsg = "";
+
+            if (PS.IsMandatoryStockIn == true  )
+            {
+                if (svm.StockInId == null)
+                {
+                    ValidationMsg = "StockIn No is required.";
+                    return ValidationMsg;
+                }
+            }
+
             if (svm.Qty <= 0)
             {
                 ValidationMsg = "Qty is required.";
@@ -1580,12 +1772,14 @@ namespace Jobs.Areas.Rug.Controllers
 
                     AreaFT2 = Convert.ToDecimal(Totalf.ExecuteScalar() == DBNull.Value ? 0 : Totalf.ExecuteScalar());
                 }
+
+                if (productarea != null)
+                {
+                    productarea.ProductArea = AreaFT2;
+                }
             }
 
-            if (productarea != null)
-            {
-                productarea.ProductArea = AreaFT2;
-            }
+
 
             Decimal AreaInDeliveryUnit = 0;
 
@@ -1687,6 +1881,7 @@ namespace Jobs.Areas.Rug.Controllers
                 ProductUidDetailJson.Add(new ProductUidDetail()
                 {
                     ProductId = productuiddetail.ProductId,
+                    Status= productuiddetail.Status, 
                     ProductName = productuiddetail.ProductName,
                     ProductUidId = productuiddetail.ProductUidId,
                     PrevProcessId = productuiddetail.PrevProcessId,
@@ -1811,9 +2006,9 @@ namespace Jobs.Areas.Rug.Controllers
 
 
 
-        public JsonResult GetNewPackingBaleNoJson(int PackingHeaderId, int? ProductInvoiceGroupId, int? SaleOrderLineId, int BaleNoPatternId,decimal DealQty)
+        public JsonResult GetNewPackingBaleNoJson_WithProductId(int PackingHeaderId, int? ProductInvoiceGroupId, int? SaleOrderLineId, int BaleNoPatternId,decimal DealQty, int? ProductId)
         {
-            PackingBaleNo packingbaleno = _PackingLineService.FGetNewPackingBaleNo(PackingHeaderId, ProductInvoiceGroupId, SaleOrderLineId, BaleNoPatternId,DealQty);
+            PackingBaleNo packingbaleno = _PackingLineService.FGetNewPackingBaleNo_WithProductId(PackingHeaderId, ProductInvoiceGroupId, SaleOrderLineId, BaleNoPatternId,DealQty, ProductId);
             List<PackingBaleNo> PackingBaleNoJson = new List<PackingBaleNo>();
 
 
@@ -1826,6 +2021,21 @@ namespace Jobs.Areas.Rug.Controllers
             return Json(PackingBaleNoJson);
         }
 
+
+        public JsonResult GetNewPackingBaleNoJson(int PackingHeaderId, int? ProductInvoiceGroupId, int? SaleOrderLineId, int BaleNoPatternId, decimal DealQty)
+        {
+            PackingBaleNo packingbaleno = _PackingLineService.FGetNewPackingBaleNo(PackingHeaderId, ProductInvoiceGroupId, SaleOrderLineId, BaleNoPatternId, DealQty);
+            List<PackingBaleNo> PackingBaleNoJson = new List<PackingBaleNo>();
+
+
+            PackingBaleNoJson.Add(new PackingBaleNo()
+            {
+                PackingHeaderId = packingbaleno.PackingHeaderId,
+                NewBaleNo = packingbaleno.NewBaleNo
+
+            });
+            return Json(PackingBaleNoJson);
+        }
 
 
         public JsonResult GetSaleOrderLineIdListJson(int ProductId, int PackingHeaderId, int PackingLineId)
@@ -2205,9 +2415,36 @@ namespace Jobs.Areas.Rug.Controllers
             return Json(CreateExtraSaleOrder);
         }
 
-        public ActionResult GetCustomProducts(string searchTerm, int pageSize, int pageNum, int filter)//DocTypeId
+        //public ActionResult GetCustomProducts(string searchTerm, int pageSize, int pageNum, int filter )//DocTypeId
+        //{
+        //   Boolean isShowAllProducts= true;
+
+        //     var Query = _PackingLineService.GetCustomProductsWithBuyerSku_ForAllProducts(filter, searchTerm, isShowAllProducts);
+
+        //    var temp = Query.Skip(pageSize * (pageNum - 1))
+        //        .Take(pageSize)
+        //        .ToList();
+
+        //    var count = Query.Count();
+
+        //    ComboBoxPagedResult Data = new ComboBoxPagedResult();
+        //    Data.Results = temp;
+        //    Data.Total = count;
+
+        //    return new JsonpResult
+        //    {
+        //        Data = Data,
+        //        JsonRequestBehavior = JsonRequestBehavior.AllowGet
+        //    };
+        //}
+
+
+        public ActionResult GetCustomProducts(string searchTerm, int pageSize, int pageNum, int filter, Boolean isShowAllProducts)//DocTypeId
         {
-            var Query = _PackingLineService.GetCustomProductsWithBuyerSku(filter, searchTerm);
+            //Boolean isShowAllProducts = true;
+
+            var Query = _PackingLineService.GetCustomProductsWithBuyerSku_ForAllProducts(filter, searchTerm, isShowAllProducts);
+
             var temp = Query.Skip(pageSize * (pageNum - 1))
                 .Take(pageSize)
                 .ToList();
@@ -2225,6 +2462,7 @@ namespace Jobs.Areas.Rug.Controllers
             };
         }
 
+
         public JsonResult GetUnitConversionMultiplier(int ProductId, Decimal Length, Decimal Width, Decimal? Height, string ToUnitId)
         {
             ProductViewModel product = new ProductService(_unitOfWork).GetProduct(ProductId);
@@ -2239,6 +2477,72 @@ namespace Jobs.Areas.Rug.Controllers
         {
             ProductDimensions ProductDimensions = new ProductService(_unitOfWork).GetProductDimensions(ProductId, DealUnitId, DocTypeId);
             return Json(ProductDimensions);
+        }
+
+        public ActionResult GetStockInForProduct(string searchTerm, int pageSize, int pageNum, int filter, int? ProductId, int? Dimension1Id, int? Dimension2Id, int? Dimension3Id, int? Dimension4Id)//DocTypeId
+        {
+            var Query = _PackingLineService.GetPendingStockInForIssue(filter, ProductId, Dimension1Id, Dimension2Id, Dimension3Id, Dimension4Id, searchTerm);
+            var temp = Query.Skip(pageSize * (pageNum - 1))
+                .Take(pageSize)
+                .ToList();
+
+            var count = Query.Count();
+
+            ComboBoxPagedResult Data = new ComboBoxPagedResult();
+            Data.Results = temp;
+            Data.Total = count;
+
+            return new JsonpResult
+            {
+                Data = Data,
+                JsonRequestBehavior = JsonRequestBehavior.AllowGet
+            };
+        }
+
+        public JsonResult GetStockInDetailJson(int StockInId)
+        {
+            var temp = (from p in db.ViewStockInBalance
+                        join S in db.Stock on p.StockInId equals S.StockId into StockTable
+                        from StockTab in StockTable.DefaultIfEmpty()
+                        join pt in db.Product on p.ProductId equals pt.ProductId into ProductTable
+                        from ProductTab in ProductTable.DefaultIfEmpty()
+                        join D1 in db.Dimension1 on p.Dimension1Id equals D1.Dimension1Id into Dimension1Table
+                        from Dimension1Tab in Dimension1Table.DefaultIfEmpty()
+                        join D2 in db.Dimension2 on p.Dimension2Id equals D2.Dimension2Id into Dimension2Table
+                        from Dimension2Tab in Dimension2Table.DefaultIfEmpty()
+                        join D3 in db.Dimension3 on p.Dimension3Id equals D3.Dimension3Id into Dimension3Table
+                        from Dimension3Tab in Dimension3Table.DefaultIfEmpty()
+                        join D4 in db.Dimension4 on p.Dimension4Id equals D4.Dimension4Id into Dimension4Table
+                        from Dimension4Tab in Dimension4Table.DefaultIfEmpty()
+                        where p.StockInId == StockInId
+                        select new
+                        {
+                            ProductUidId = StockTab.ProductUidId,
+                            ProductUidName = StockTab.ProductUid.ProductUidName,
+                            ProductId = p.ProductId,
+                            ProductName = ProductTab.ProductName,
+                            Dimension1Id = p.Dimension1Id,
+                            Dimension1Name = Dimension1Tab.Dimension1Name,
+                            Dimension2Id = p.Dimension2Id,
+                            Dimension2Name = Dimension2Tab.Dimension2Name,
+                            Dimension3Id = p.Dimension3Id,
+                            Dimension3Name = Dimension3Tab.Dimension3Name,
+                            Dimension4Id = p.Dimension4Id,
+                            Dimension4Name = Dimension4Tab.Dimension4Name,
+                            BalanceQty = p.BalanceQty,
+                            LotNo = p.LotNo,
+                            FromProcessId = StockTab.ProcessId,
+                            FromProcessName = StockTab.Process.ProcessName
+                        }).FirstOrDefault();
+
+            if (temp != null)
+            {
+                return Json(temp);
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 

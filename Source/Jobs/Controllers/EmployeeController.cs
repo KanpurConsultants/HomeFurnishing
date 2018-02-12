@@ -126,6 +126,17 @@ namespace Jobs.Controllers
             ViewBag.PersonRateGroupList = new PersonRateGroupService(_unitOfWork).GetPersonRateGroupList().ToList();
             ViewBag.DesignationList = new DesignationService(_unitOfWork).GetDesignationList().ToList();
             ViewBag.DepartmentList = new DepartmentService(_unitOfWork).GetDepartmentList().ToList();
+
+            List<SelectListItem> WagesPayTypeList = new List<SelectListItem>();
+            WagesPayTypeList.Add(new SelectListItem { Text = "Daily", Value = "Daily" });
+            WagesPayTypeList.Add(new SelectListItem { Text = "Monthly", Value = "Monthly" });
+            ViewBag.WagesPayTypeList = WagesPayTypeList;
+
+            List<SelectListItem> PaymentTypeList = new List<SelectListItem>();
+            PaymentTypeList.Add(new SelectListItem { Text = "Cash", Value = "Cash" });
+            PaymentTypeList.Add(new SelectListItem { Text = "Cheque", Value = "Cheque" });
+            PaymentTypeList.Add(new SelectListItem { Text = "Transfer", Value = "Transfer" });
+            ViewBag.PaymentTypeList = PaymentTypeList;
         }
 
         public ActionResult Create()
@@ -154,11 +165,15 @@ namespace Jobs.Controllers
                 return View("~/Views/Shared/InValidSettings.cshtml");
             }
 
+
+
             EmployeeViewModel p = new EmployeeViewModel();
             p.CalculationId = settings.CalculationId;
             p.IsActive = true;
             p.Code = new PersonService(_unitOfWork).GetMaxCode();
             p.LedgerAccountGroupId = settings.LedgerAccountGroupId;
+            p.DateOfJoining = DateTime.Now;
+            p.DateOfRelieving = DateTime.Now;
             PrepareViewBag();
             return View("Create", p);
         }

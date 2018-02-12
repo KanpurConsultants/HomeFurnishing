@@ -136,6 +136,8 @@ namespace Services.PropertyTax
                             IsRented = ProductBuyerExtendedTab.IsRented ?? false,
                             TaxPercentage = ProductBuyerExtendedTab.TaxPercentage,
                             TaxAmount = ProductBuyerExtendedTab.TaxAmount,
+                            WaterTaxPercentage = ProductBuyerExtendedTab.WaterTaxPercentage,
+                            WaterTaxAmount = ProductBuyerExtendedTab.WaterTaxAmount,
                             OldARV = ProductBuyerExtendedTab.ARV,
                         }).FirstOrDefault();
 
@@ -287,7 +289,10 @@ namespace Services.PropertyTax
 
             if (svm.ARV != svm.OldARV)
             {
-                ProductBuyerLog productbuyerlog = Mapper.Map<ProductBuyerExtended, ProductBuyerLog>(productbuyerextended);
+                //ProductBuyerLog productbuyerlog = Mapper.Map<ProductBuyerExtended, ProductBuyerLog>(productbuyerextended);
+                ProductBuyerLog productbuyerlog = new ProductBuyerLog();
+
+
                 productbuyerlog.ProductBuyerId = productbuyer.ProductBuyerId;
                 productbuyerlog.ProductId = productbuyer.ProductId;
                 productbuyerlog.BuyerId = productbuyer.BuyerId;
@@ -301,6 +306,26 @@ namespace Services.PropertyTax
                 productbuyerlog.BuyerSpecification4 = productbuyer.BuyerSpecification4;
                 productbuyerlog.BuyerSpecification5 = productbuyer.BuyerSpecification5;
                 productbuyerlog.BuyerSpecification6 = productbuyer.BuyerSpecification6;
+
+
+                productbuyerlog.DateOfConsutruction = productbuyerextended.DateOfConsutruction;
+                productbuyerlog.DiscountTypeId = productbuyerextended.DiscountTypeId;
+                productbuyerlog.PropertyArea = productbuyerextended.PropertyArea;
+                productbuyerlog.TaxableArea = productbuyerextended.TaxableArea;
+                productbuyerlog.ARV = productbuyerextended.ARV;
+                productbuyerlog.TenantName = productbuyerextended.TenantName;
+                productbuyerlog.BillingType = productbuyerextended.BillingType;
+                productbuyerlog.Description = productbuyerextended.Description;
+                productbuyerlog.CoveredArea = productbuyerextended.CoveredArea;
+                productbuyerlog.GarageArea = productbuyerextended.GarageArea;
+                productbuyerlog.BalconyArea = productbuyerextended.BalconyArea;
+                productbuyerlog.IsRented = productbuyerextended.IsRented;
+                productbuyerlog.TaxPercentage = productbuyerextended.TaxPercentage;
+                productbuyerlog.TaxAmount = productbuyerextended.TaxAmount;
+                productbuyerlog.WaterTaxPercentage = productbuyerextended.WaterTaxPercentage;
+                productbuyerlog.WaterTaxAmount = productbuyerextended.WaterTaxAmount;
+                productbuyerlog.WEF = svm.WEF;
+
 
 
                 productbuyerlog.ModifyRemark = svm.ModifyRemark;
@@ -338,6 +363,8 @@ namespace Services.PropertyTax
             productbuyerextended.IsRented = svm.IsRented;
             productbuyerextended.TaxPercentage = svm.TaxPercentage;
             productbuyerextended.TaxAmount = svm.TaxAmount;
+            productbuyerextended.WaterTaxPercentage = svm.WaterTaxPercentage;
+            productbuyerextended.WaterTaxAmount = svm.WaterTaxAmount;
             productbuyerextended.WEF = svm.WEF;
             if (svm.WEF != null)
                 productbuyerextended.WEF = (DateTime)svm.NewWEF;
@@ -472,6 +499,12 @@ namespace Services.PropertyTax
             XElement Modifications = _modificationCheck.CheckChanges(LogList);
 
             _unitOfWork.Save();
+
+            if (vm != null)
+            {
+                SqlParameter SqlParameterPersonId = new SqlParameter("@PersonId", vm.PersonId);
+                _unitOfWork.SqlQuery<PropertyLineViewModel>("" + ConfigurationManager.AppSettings["DataBaseSchema"] + ".sp_CalculatePropertyTax @PersonId", SqlParameterPersonId).ToList();
+            }
 
             //Saving the Activity Log
 

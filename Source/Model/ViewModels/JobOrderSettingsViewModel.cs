@@ -30,7 +30,7 @@ namespace Model.ViewModel
 
         public bool isVisibleStockIn { get; set; }
         public bool IsMandatoryStockIn { get; set; }
-
+        public bool isVisibleLineUnitConversionFor { get; set; }
         public bool isVisibleLoss { get; set; }
         public bool isVisibleDealUnit { get; set; }
         public bool isVisibleDiscountPer { get; set; }
@@ -97,6 +97,7 @@ namespace Model.ViewModel
         public string filterContraSites { get; set; }
         public string filterContraDivisions { get; set; }
         public string filterPersonRoles { get; set; }
+        public string filterUnitConversionFors { get; set; }
         public int? WizardMenuId { get; set; }
         public string WizardMenuName { get; set; }
         public int? ImportMenuId { get; set; }

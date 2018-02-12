@@ -69,6 +69,21 @@ namespace Jobs.Controllers
                     obj.BuyerSpecification2 = temp.BuyerSpecification2;
                     obj.BuyerSpecification3 = temp.BuyerSpecification3;
 
+                    if (temp.DealUnitId == "MT2")
+                    {
+
+                        string SizeinFeet = "";
+
+                        using (SqlConnection sqlConnection = new SqlConnection((string)System.Web.HttpContext.Current.Session["DefaultConnectionString"]))
+                        {
+                            sqlConnection.Open();
+                            SqlCommand Totalf = new SqlCommand("SELECT Web.FGetSizeinFeet('" + temp.BuyerSpecification1 + "')", sqlConnection);
+
+                            SizeinFeet = Convert.ToString(Totalf.ExecuteScalar() == DBNull.Value ? "" : Totalf.ExecuteScalar());
+                        }
+
+                        obj.TempRemark = "Feet :" + SizeinFeet;
+                    }  
                     SaleEnquiryProductMappingWithGrid_TempList.Add(obj);
                 }
 
@@ -335,7 +350,7 @@ namespace Jobs.Controllers
         public string SaleEnquiryHeaderDocDate { get; set; }
         public int ProgressPerc { get; set; }
         public int unitDecimalPlaces { get; set; }
-
+		public string TempRemark { get; set; }
 
     }
 }

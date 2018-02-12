@@ -591,10 +591,10 @@ namespace Jobs.Controllers
                         order.ModifiedDate = DateTime.Now;
                         
                         var temp = context.MaterialPlanLine.Local.Where(m => m.ProductId == item.ProductId).FirstOrDefault();
-                        if (temp != null)
-                        {
-                            order.MaterialPlanLineId = context.MaterialPlanLine.Local.Where(m => m.ProductId == item.ProductId).FirstOrDefault().MaterialPlanLineId;
-                        }
+                        //if (temp != null)
+                        //{
+                        //    order.MaterialPlanLineId = context.MaterialPlanLine.Local.Where(m => m.ProductId == item.ProductId).FirstOrDefault().MaterialPlanLineId;
+                        //}
 
                         order.ObjectState = Model.ObjectState.Added;
                         context.MaterialPlanForSaleOrder.Add(order);
@@ -975,8 +975,8 @@ namespace Jobs.Controllers
                                        dim4Name = DT4 == null ? "" : (DT4.Dimension4Name),
                                        procid = g.Key.ProcessId,
                                        procName = PT == null ? "" : (PT.ProcessName),
-                                       //QtySum = Math.Ceiling(g.Sum(m => m.Qty)),
-                                       QtySum = g.Sum(m => m.Qty),
+                                       QtySum = Math.Ceiling(g.Sum(m => m.Qty)),
+                                       //QtySum = g.Sum(m => m.Qty),
                                        UnitName = u1.UnitName,
                                        DecimalPlaces = u1.DecimalPlaces,
                                        GroupedItems = g,
@@ -1413,6 +1413,11 @@ namespace Jobs.Controllers
                             line.Sr = MPFPOLSr++;
                             line.ObjectState = Model.ObjectState.Added;
                             //line.MaterialPlanLineId = context.MaterialPlanLine.Local.Where(m => m.ProductId == line.ProductId && m.Dimension1Id == line.Dimension1Id && m.Dimension2Id == line.Dimension2Id && m.Dimension3Id == line.Dimension3Id && m.Dimension4Id == line.Dimension4Id && m.ProcessId == line.ProcessId).FirstOrDefault().MaterialPlanLineId;
+
+                            var MPlan =  context.MaterialPlanLine.Local.Where(m => m.ProductId == line.ProductId && m.Dimension1Id == line.Dimension1Id && m.Dimension2Id == line.Dimension2Id && m.Dimension3Id == line.Dimension3Id && m.Dimension4Id == line.Dimension4Id && m.ProcessId == line.ProcessId).FirstOrDefault();
+                            if (MPlan != null)
+                                line.MaterialPlanLineId = MPlan.MaterialPlanLineId;
+
                             context.MaterialPlanForProdOrderLine.Add(line);
                         }
 

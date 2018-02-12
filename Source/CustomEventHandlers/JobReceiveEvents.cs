@@ -4,6 +4,8 @@ using System;
 using JobReceiveDocumentEvents;
 using System.Linq;
 using Core.Common;
+using System.Data;
+using System.Data.SqlClient;
 
 namespace Jobs.Controllers
 {
@@ -24,11 +26,63 @@ namespace Jobs.Controllers
             _onLineSaveBulk += JobReceiveEvents_BranchValidation;
             _onLineSave += JobReceiveEvents__onLineSave;
             _onLineSave += JobReceiveEvents_BranchValidation;
+			_onHeaderSubmit += JobReceiveEvents__onHeaderSubmit;
             _onLineDelete += JobReceiveEvents__onLineDelete;
             _onHeaderDelete += JobReceiveEvents__onHeaderDelete;
             //_beforeLineDelete += JobReceiveEvents__beforeLineDelete;
             //_afterHeaderDelete += JobReceiveEvents__afterHeaderDelete;
             //_beforeLineSave += JobReceiveEvents__beforeLineSave;            
+        }
+
+        void JobReceiveEvents__onHeaderSubmit(object sender, JobEventArgs EventArgs, ref ApplicationDbContext db)
+        {
+
+            int Id = EventArgs.DocId;
+
+            string ConnectionString = (string)System.Web.HttpContext.Current.Session["DefaultConnectionString"];
+
+
+            try
+            {
+                var JobReceive = (from H in db.JobReceiveHeader
+                                join D in db.DocumentType on H.DocTypeId equals D.DocumentTypeId into DocumentTypeTable
+                                from DocumentTypeTab in DocumentTypeTable.DefaultIfEmpty()
+                                where H.JobReceiveHeaderId == EventArgs.DocId
+                                select new { DocTypeName = DocumentTypeTab.DocumentTypeName, Status = H.Status }).FirstOrDefault();
+
+                if (JobReceive.DocTypeName == "Trace Map Order Receive" )
+                {
+                    using (SqlConnection sqlConnection = new SqlConnection(ConnectionString))
+                    {
+                        sqlConnection.Open();
+
+
+                        using (SqlCommand cmd = new SqlCommand("Web.SpCreate_ProductUid_FromTracemapReceive"))
+                        {
+                            cmd.CommandType = CommandType.StoredProcedure;
+                            cmd.Connection = sqlConnection;
+                            cmd.Parameters.AddWithValue("@JobReceiveHeaderId", Id);
+                            cmd.CommandTimeout = 1000;
+                            //cmd.Connection.Open();
+                            cmd.ExecuteNonQuery();
+                            //cmd.Connection.Close();
+                        }
+
+                    }
+                }
+            }
+
+            catch (Exception ex)
+            {
+                //Header.Status = (int)StatusConstants.Drafted;
+                //new JobReceiveHeaderService(_unitOfWork).Update(Header);
+                //_unitOfWork.Save();
+                throw ex;
+            }
+
+
+
+
         }
 
         void JobReceiveEvents__onHeaderDelete(object sender, JobEventArgs EventArgs, ref ApplicationDbContext db)

@@ -23,19 +23,19 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
-                            @Html.LabelFor(model => model.AsOnDate, "As On Date", new { @class = "control-label col-md-4 col-sm-2" })
+                            @Html.LabelFor(model => model.ReceiveFromDate, "From Date", new { @class = "control-label col-md-4 col-sm-2" })
                             <div class="col-md-7 col-sm-10">
-                                @Html.TextBoxFor(m => m.AsOnDate, "{0:dd/MMMM/yyyy}", new { @class = "datepicker form-control required" })
-                                @Html.ValidationMessageFor(model => model.AsOnDate, "", new { @class = "text-danger" })
+                                @Html.TextBoxFor(m => m.ReceiveFromDate, "{0:dd/MMMM/yyyy}", new { @class = "datepicker form-control required" })
+                                @Html.ValidationMessageFor(model => model.ReceiveFromDate, "", new { @class = "text-danger" })
                             </div>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
-                            @Html.LabelFor(model => model.JobOrderHeaderId, "Order No.", new { @class = "control-label col-md-4 col-sm-2" })
+                            @Html.LabelFor(model => model.ReceiveToDate, "To Date", new { @class = "control-label col-md-4 col-sm-2" })
                             <div class="col-md-7 col-sm-10">
-                                @Html.TextBoxFor(model => model.JobOrderHeaderId, new { @class = "form-control required" })
-                                @Html.ValidationMessageFor(model => model.JobOrderHeaderId, "", new { @class = "text-danger" })
+                                @Html.TextBoxFor(m => m.ReceiveToDate, "{0:dd/MMMM/yyyy}", new { @class = "datepicker form-control required" })
+                                @Html.ValidationMessageFor(model => model.ReceiveToDate, "", new { @class = "text-danger" })
                             </div>
                         </div>
                     </div>
@@ -71,6 +71,16 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.JobOrderHeaderId, "Order No.", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.JobOrderHeaderId, new { @class = "form-control required" })
+                                @Html.ValidationMessageFor(model => model.JobOrderHeaderId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
                 </div>               
 
                 <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
@@ -82,7 +92,6 @@
         }
     </div>
 </div>
-
 
 <script type="text/javascript">
 

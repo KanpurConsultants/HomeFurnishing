@@ -33,6 +33,9 @@ namespace Model.ViewModels
         public DateTime WEF { get; set; }
         public Decimal? TaxAmount { get; set; }
         public Decimal? TaxPercentage { get; set; }
+
+        public Decimal? WaterTaxAmount { get; set; }
+        public Decimal? WaterTaxPercentage { get; set; }
         public DateTime? NewWEF { get; set; }
         public string ModifyRemark { get; set; }
         public Decimal? OldARV { get; set; }

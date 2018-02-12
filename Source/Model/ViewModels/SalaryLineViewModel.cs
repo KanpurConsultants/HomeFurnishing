@@ -21,6 +21,11 @@ namespace Model.ViewModels
         public virtual SalaryHeader SalaryHeader { get; set; }
         public string SalaryDocNo { get; set; }
 
+        public int EmployeeId { get; set; }
+        public string EmployeeName { get; set; }
+
+        public decimal Days { get; set; }
+        public decimal NetSalary { get; set; }
 
         public SalarySettingsViewModel SalarySettings { get; set; }
         public DocumentTypeSettingsViewModel DocumentTypeSettings { get; set; }

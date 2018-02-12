@@ -46,7 +46,7 @@ namespace Service
         ProductPrevProcess FGetProductPrevProcess(int ProductId, int GodownId, int DocTypeId);
         ComboBoxPagedResult GetProductHelpList(string searchTerm, int pageSize, int pageNum);
 
-        Decimal GetUnitConversionMultiplier(Decimal FromQty, string FromUnitId, Decimal Length, Decimal Width, Decimal? Height, string ToUnitId, ApplicationDbContext db);
+        Decimal GetUnitConversionMultiplier(Decimal FromQty, string FromUnitId, Decimal Length, Decimal Width, Decimal? Height, string ToUnitId, ApplicationDbContext db, int DocumentTypeId);
 
         ProductDimensions GetProductDimensions(int ProductId, string DealUnitId, int DocTypeId);
         string FGetNewCode(int ProductTypeId, string ProcName);
@@ -689,7 +689,7 @@ namespace Service
             return Data;
         }
 
-        public Decimal GetUnitConversionMultiplier(Decimal FromQty, string FromUnitId, Decimal Length, Decimal Width, Decimal? Height, string ToUnitId, ApplicationDbContext db)
+        public Decimal GetUnitConversionMultiplier(Decimal FromQty, string FromUnitId, Decimal Length, Decimal Width, Decimal? Height, string ToUnitId, ApplicationDbContext db, int DocumentTypeId)
         {
             SqlParameter SQLFromQty = new SqlParameter("@FromQty", FromQty);
             SqlParameter SQLFromUnitId = new SqlParameter("@FromUnitId", FromUnitId);
@@ -697,8 +697,9 @@ namespace Service
             SqlParameter SQLWidth = new SqlParameter("@Width", Width);
             SqlParameter SQLHeight = new SqlParameter("@Height", Height ?? 0);
             SqlParameter SQLToUnitId = new SqlParameter("@ToUnitId", ToUnitId);
+            SqlParameter SQLDocumentTypeId = new SqlParameter("@DocumentTypeId", DocumentTypeId);
 
-            UnitConversionMultiplier Temp = db.Database.SqlQuery<UnitConversionMultiplier>("Web.sp_GetUnitConversion @FromQty, @FromUnitId, @Length,@Width, @Height, @ToUnitId ", SQLFromQty, SQLFromUnitId, SQLLength, SQLWidth, SQLHeight, SQLToUnitId).FirstOrDefault();
+            UnitConversionMultiplier Temp = db.Database.SqlQuery<UnitConversionMultiplier>("Web.sp_GetUnitConversion @FromQty, @FromUnitId, @Length,@Width, @Height, @ToUnitId, @DocumentTypeId ", SQLFromQty, SQLFromUnitId, SQLLength, SQLWidth, SQLHeight, SQLToUnitId, SQLDocumentTypeId).FirstOrDefault();
 
             if (Temp != null)
             {

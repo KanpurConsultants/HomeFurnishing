@@ -59,6 +59,7 @@ namespace Services.PropertyTax
         ComboBoxPagedResult GetProperty(string searchTerm, int pageSize, int pageNum);
         IEnumerable<DocumentTypeAttributeViewModel> GetAttributeForDocumentType(int DocumentTypeId);
         IEnumerable<DocumentTypeAttributeViewModel> GetAttributeForPerson(int id);
+        IQueryable<WardIndexViewModel> GetGodownListForIndex(int SiteId);
 
         #region Helper Methods
         void LogDetailInfo(PropertyHeaderViewModel vm);
@@ -626,6 +627,13 @@ namespace Services.PropertyTax
                 ProductBuyerExtended.ObjectState = Model.ObjectState.Deleted;
                 _unitOfWork.Repository<ProductBuyerExtended>().Delete(ProductBuyerExtended);
 
+                var ProductBuyerLogList = _unitOfWork.Repository<ProductBuyerLog>().Query().Get().Where(m => m.ProductBuyerId == item.ProductBuyerId).ToList();
+                foreach (var ProductBuyerLog in ProductBuyerLogList)
+                {
+                    ProductBuyerLog.ObjectState = Model.ObjectState.Deleted;
+                    _unitOfWork.Repository<ProductBuyerLog>().Delete(ProductBuyerLog);
+                }
+
                 item.ObjectState = Model.ObjectState.Deleted;
                 _unitOfWork.Repository<ProductBuyer>().Delete(item);
             }
@@ -1161,7 +1169,36 @@ namespace Services.PropertyTax
             return temp;
         }
 
-        
+        public IQueryable<WardIndexViewModel> GetGodownListForIndex(int SiteId)
+        {
+            //var pt = _unitOfWork.Repository<Godown>().Query().Get().OrderBy(m => m.GodownName).Where(m => m.SiteId == SiteId);
+
+            var WardProperty = from L in _unitOfWork.Repository<PersonExtended>().Instance
+                               group new { L } by new { L.GodownId } into Result
+                               select new
+                               {
+                                   GodownId = Result.Key.GodownId,
+                                   Count = Result.Count()
+                               };
+
+            var pt = from H in _unitOfWork.Repository<Godown>().Instance
+                     join L in WardProperty on H.GodownId equals L.GodownId into WardPropertyTable
+                     from WardPropertyTab in WardPropertyTable.DefaultIfEmpty()
+                     orderby H.GodownName
+                     select new WardIndexViewModel
+                     {
+                         GodownId = H.GodownId,
+                         GodownCode = H.GodownCode,
+                         GodownName = H.GodownName,
+                         PropertyCount = WardPropertyTab.Count
+                     };
+
+
+
+            return pt;
+        }
+
+
 
         public void Dispose()
         {

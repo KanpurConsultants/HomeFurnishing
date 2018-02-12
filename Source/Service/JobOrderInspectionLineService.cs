@@ -676,8 +676,10 @@ namespace Service
                         {
                             Rec = (from t in db.JobOrderLine
                                    join v in db.ViewJobOrderBalanceForInspection on t.JobOrderLineId equals v.JobOrderLineId
+								   join PU in db.ProductUid on v.ProductUidId equals PU.ProductUIDId
                                    where v.ProductUidId == p.ProductUIDId && v.BalanceQty > 0
                                    join Jol in db.JobOrderLine on t.JobOrderLineId equals Jol.JobOrderLineId
+                                   where 1==1 && p.LastTransactionDocTypeId == p.GenDocTypeId && p.LastTransactionDocId == p.GenDocId									
                                    select new JobOrderInspectionLineViewModel
                                    {
                                        JobOrderLineId = t.JobOrderLineId,

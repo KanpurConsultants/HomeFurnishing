@@ -91,7 +91,7 @@ namespace Jobs.Areas.PropertyTax.Controllers
         {
             var SiteId = (int)System.Web.HttpContext.Current.Session["SiteId"];
 
-            IQueryable<Godown> Godown = _GodownService.GetGodownListForIndex(SiteId);
+            IQueryable<WardIndexViewModel> Godown = _PropertyHeaderService.GetGodownListForIndex(SiteId);
             ViewBag.id = id;
             return View(Godown);
         }
@@ -928,4 +928,6 @@ namespace Jobs.Areas.PropertyTax.Controllers
         }
 
     }
+
+
 }

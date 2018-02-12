@@ -1,5 +1,6 @@
 ﻿using Model;
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace Model.ViewModel
 {
@@ -14,6 +15,18 @@ namespace Model.ViewModel
         public string RolesList { get; set; }
         public string RoleIdList { get; set; }
         public DateTime? ExpiryDate { get; set; }
+
+        [Display(Name = "Created By")]
+        public string CreatedBy { get; set; }
+
+        [Display(Name = "Created Date")]
+        public DateTime CreatedDate { get; set; }
+
+        [Display(Name = "Modified By")]
+        public string ModifiedBy { get; set; }
+
+        [Display(Name = "Modified Date")]
+        public DateTime ModifiedDate { get; set; }
 
     }
 

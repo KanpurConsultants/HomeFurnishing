@@ -87,7 +87,7 @@ namespace Jobs.Areas.Rug.Controllers
         {
             System.Web.HttpContext.Current.Session["BarCodesWeavingWizardJobOrder"] = Selected;
 
-            return Json(new { Success = "URL", Data = "/WeavingReceiveWizard/Create" }, JsonRequestBehavior.AllowGet);
+            return Json(new { Success = "URL", Data = "/Rug/WeavingReceiveWizard/Create" }, JsonRequestBehavior.AllowGet);
         }
 
         [Serializable]
@@ -121,7 +121,7 @@ namespace Jobs.Areas.Rug.Controllers
             p.SiteId = (int)System.Web.HttpContext.Current.Session["SiteId"];
             List<string> UserRoles = (List<string>)System.Web.HttpContext.Current.Session["Roles"];
 
-            int DocTypeId = new DocumentTypeService(_unitOfWork).Find(TransactionDoctypeConstants.WeavingBazar).DocumentTypeId;
+            int DocTypeId = new DocumentTypeService(_unitOfWork).Find(TransactionDoctypeConstants.TraceMapReceive).DocumentTypeId;
             p.DocTypeId = DocTypeId;
 
             //Getting Settings
@@ -229,7 +229,10 @@ namespace Jobs.Areas.Rug.Controllers
                         s.CreatedBy = User.Identity.Name;
                         s.ModifiedBy = User.Identity.Name;
                         s.Status = (int)StatusConstants.Drafted;
-                        _JobReceiveHeaderService.Create(s);
+
+                        JobReceiveHeaderService j = new JobReceiveHeaderService(_unitOfWork);
+                        j.Create(s);
+                        //_JobReceiveHeaderService.Create(s);
 
 
                         int Cnt = 0;
@@ -458,6 +461,7 @@ namespace Jobs.Areas.Rug.Controllers
                                             //line.ProductUidHeaderId = ProdUidHeader.ProductUidHeaderId;
                                             line.ProductUidHeaderId = ProductUidHeaderId;
                                             //line.ProductUidId = ProdUid.ProductUIDId;
+											line.ProductId = StockViewModel.ProductId;
                                             line.ProductUidId = ProductUidId;
                                             line.JobReceiveHeaderId = s.JobReceiveHeaderId;
                                             line.JobOrderLineId = JobOrderLine.JobOrderLineId;

@@ -449,6 +449,19 @@
                                 </div>
                             </div>
                         </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.isVisibleLineUnitConversionFor, "Line Unit Conversion For", new { @class = "control-label col-xs-6" })
+                                    <div class="col-xs-4" style=" padding-top:4px">
+                                        @Html.CheckBoxFor(m => m.isVisibleLineUnitConversionFor, new { @class = "checkbox col-xs-2" })
+                                        @Html.ValidationMessageFor(model => model.isVisibleLineUnitConversionFor)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 
@@ -710,6 +723,16 @@
                                     <div class="col-xs-6">
                                         @Html.TextBoxFor(m => m.filterPersonRoles, new { @class = "form-control col-xs-6" })
                                         @Html.ValidationMessageFor(m => m.filterPersonRoles, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.filterUnitConversionFors, "Unit Conversion Fors", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.filterUnitConversionFors, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.filterUnitConversionFors, "", new { @class = "text-danger" })
                                     </div>
                                 </div>
                             </div>
@@ -1023,6 +1046,7 @@
         CustomSelectFunction($("#filterContraDivisions"), '/ComboHelpList/GetDivision', '/ComboHelpList/SetDivision', ' ', true, 0);
         CustomSelectFunction($("#filterContraSites"), '/ComboHelpList/GetSite', '/ComboHelpList/SetSite', ' ', true, 0);
         CustomSelectFunction($("#filterPersonRoles"), '/ComboHelpList/GetPersonRoles', '/ComboHelpList/SetPersonRole', ' ', true, 0);
+        CustomSelectFunction($("#filterUnitConversionFors"), '/ComboHelpList/GetUnitConversionFors', '/ComboHelpList/SetUnitConversionFor', ' ', true, 0);
         CustomSelectFunction($("#DealUnitId"), '/ComboHelpList/GetUnits', '/ComboHelpList/SetSingleUnit', ' ', false, 0);
     });
 

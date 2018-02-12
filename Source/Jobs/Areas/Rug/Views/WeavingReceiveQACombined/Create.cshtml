@@ -1115,7 +1115,9 @@
     });
 
     $('#Length,#Width').focusout(function(){
-        RoundDimensions();
+        //RoundDimensions();
+        GetUnitConversionMultiplier();
+        Calculation();
     });
 
     function RoundDimensions()
@@ -1214,7 +1216,7 @@
                     type: "POST",
                     async: false,
                     url: "@(Url.Action("GetUnitConversionMultiplier"))",
-                    data: { ProductId: $("#ProductId").val(),Length: $("#Length").val(),Width: $("#Width").val(),Height: $("#Height").val(),ToUnitId: $("#DealUnitId").val()},
+                    data: { DocumentTypeId: $("#DocTypeId").val(),ProductId: $("#ProductId").val(),Length: $("#Length").val(),Width: $("#Width").val(),Height: $("#Height").val(),ToUnitId: $("#DealUnitId").val()},
                 success: function (data) {
                     if (data) {
                         $('#UnitConversionMultiplier').val(0);

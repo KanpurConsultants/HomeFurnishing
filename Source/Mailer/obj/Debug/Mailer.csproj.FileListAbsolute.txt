@@ -136,3 +136,26 @@ D:\Sample_New\HomeFurnishing\Source\Mailer\bin\Debug\log4net.xml
 D:\Sample_New\HomeFurnishing\Source\Mailer\obj\Debug\Mailer.csprojResolveAssemblyReference.cache
 D:\Sample_New\HomeFurnishing\Source\Mailer\obj\Debug\Mailer.dll
 D:\Sample_New\HomeFurnishing\Source\Mailer\obj\Debug\Mailer.pdb
+D:\Kanpur Consultants\HomeFurnishing\Source\Mailer\bin\Debug\Mailer.dll.config
+D:\Kanpur Consultants\HomeFurnishing\Source\Mailer\bin\Debug\Mailer.dll
+D:\Kanpur Consultants\HomeFurnishing\Source\Mailer\bin\Debug\Mailer.pdb
+D:\Kanpur Consultants\HomeFurnishing\Source\Mailer\bin\Debug\EntityFramework.dll
+D:\Kanpur Consultants\HomeFurnishing\Source\Mailer\bin\Debug\EntityFramework.SqlServer.dll
+D:\Kanpur Consultants\HomeFurnishing\Source\Mailer\bin\Debug\Microsoft.AspNet.Identity.Core.dll
+D:\Kanpur Consultants\HomeFurnishing\Source\Mailer\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.dll
+D:\Kanpur Consultants\HomeFurnishing\Source\Mailer\bin\Debug\Model.dll
+D:\Kanpur Consultants\HomeFurnishing\Source\Mailer\bin\Debug\SendGrid.SmtpApi.dll
+D:\Kanpur Consultants\HomeFurnishing\Source\Mailer\bin\Debug\SendGridMail.dll
+D:\Kanpur Consultants\HomeFurnishing\Source\Mailer\bin\Debug\Core.dll
+D:\Kanpur Consultants\HomeFurnishing\Source\Mailer\bin\Debug\log4net.dll
+D:\Kanpur Consultants\HomeFurnishing\Source\Mailer\bin\Debug\Remotion.Data.Linq.dll
+D:\Kanpur Consultants\HomeFurnishing\Source\Mailer\bin\Debug\Model.pdb
+D:\Kanpur Consultants\HomeFurnishing\Source\Mailer\bin\Debug\EntityFramework.xml
+D:\Kanpur Consultants\HomeFurnishing\Source\Mailer\bin\Debug\EntityFramework.SqlServer.xml
+D:\Kanpur Consultants\HomeFurnishing\Source\Mailer\bin\Debug\Microsoft.AspNet.Identity.Core.xml
+D:\Kanpur Consultants\HomeFurnishing\Source\Mailer\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.xml
+D:\Kanpur Consultants\HomeFurnishing\Source\Mailer\bin\Debug\Core.pdb
+D:\Kanpur Consultants\HomeFurnishing\Source\Mailer\bin\Debug\log4net.xml
+D:\Kanpur Consultants\HomeFurnishing\Source\Mailer\obj\Debug\Mailer.csprojResolveAssemblyReference.cache
+D:\Kanpur Consultants\HomeFurnishing\Source\Mailer\obj\Debug\Mailer.dll
+D:\Kanpur Consultants\HomeFurnishing\Source\Mailer\obj\Debug\Mailer.pdb

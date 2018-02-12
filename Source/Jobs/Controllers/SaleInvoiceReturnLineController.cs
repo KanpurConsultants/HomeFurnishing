@@ -601,18 +601,16 @@ namespace Jobs.Controllers
 
                 if (ModelState.IsValid)
                 {
-                    if (svm.Qty > 0)
-                    {
-                        line.SalesTaxGroupProductId = svm.SalesTaxGroupProductId;
-                        line.DiscountPer = svm.DiscountPer;
-                        line.Remark = svm.Remark;
-                        line.Qty = svm.Qty;
-                        line.Weight  = svm.Weight;
-                        line.DealQty = svm.DealQty;
-                        line.Amount = svm.Amount;
-                        line.ModifiedBy = User.Identity.Name;
-                        line.ModifiedDate = DateTime.Now;
-                    }
+                    line.SalesTaxGroupProductId = svm.SalesTaxGroupProductId;
+                    line.Rate = svm.Rate;
+                    line.DiscountPer = svm.DiscountPer;
+                    line.Remark = svm.Remark;
+                    line.Qty = svm.Qty;
+                    line.Weight  = svm.Weight;
+                    line.DealQty = svm.DealQty;
+                    line.Amount = svm.Amount;
+                    line.ModifiedBy = User.Identity.Name;
+                    line.ModifiedDate = DateTime.Now;
 
                     _SaleInvoiceReturnLineService.Update(line);
 

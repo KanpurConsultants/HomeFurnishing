@@ -155,6 +155,10 @@ namespace Model.ViewModel
         public string Dimension2Name { get; set; }
 
 
+        [Display(Name = "Unit Conversion For Type")]
+        public byte? UnitConversionForId { get; set; }
+        public string UnitConversionForName { get; set; }
+
 
         public int? Dimension3Id { get; set; }
         public string Dimension3Name { get; set; }

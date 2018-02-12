@@ -77,6 +77,13 @@ namespace Core.Common
 
     //}
 
+    public static class MeasurementConstants
+    {
+        static public string Length = "Length";
+        static public string Width = "Width";
+        static public string Hight = "Hight";
+    }
+
     public enum UnitConversionFors
     {
         Standard = 1,
@@ -85,6 +92,9 @@ namespace Core.Common
         Finishing = 4,
         Manufacturing = 5,
         PattiMuraiDurry = 6,
+        LengthPerimeter = 7,
+        WidthPerimeter = 8,
+        TotalPerimeter = 9,
     }
 
 

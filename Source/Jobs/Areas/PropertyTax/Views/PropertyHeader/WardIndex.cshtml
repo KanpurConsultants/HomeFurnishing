@@ -1,6 +1,6 @@
 ﻿@using GridMvc.Html;
 
-@model IQueryable<Model.Models.Godown>
+@model IQueryable<Model.ViewModels.WardIndexViewModel>
 
 @{
     ViewBag.Title = "Index";
@@ -43,6 +43,7 @@
                columns.Add(m => m.GodownId, true).Css("Header_Id");
                columns.Add(m => m.GodownCode).Sortable(true).Titled("Ward No.").Filterable(true).Sortable(true);
                columns.Add(m => m.GodownName).Sortable(true).Titled("Ward Name").Filterable(true).Sortable(true);
+               columns.Add(m => m.PropertyCount).Sortable(true).Titled("Properties").Filterable(true).Sortable(true);
            }).WithPaging(25).EmptyText("No records found.")
     </div>
 </div>

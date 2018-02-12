@@ -2309,7 +2309,7 @@ namespace Jobs.Controllers
                 SalesTaxGroupProductName = product.SalesTaxGroupProductName
             });
         }
-        public JsonResult getunitconversiondetailjson(int prodid, string UnitId, string DealUnitId, int JobOrderId)
+        public JsonResult getunitconversiondetailjson(int prodid, string UnitId, string DealUnitId, int JobOrderId, int? UnitConversionForId)
         {
 
 
@@ -2319,8 +2319,9 @@ namespace Jobs.Controllers
             int siteId = Header.SiteId;
             int DivId = Header.DivisionId;
 
-
-            UnitConversion uc = new UnitConversionService(_unitOfWork).GetUnitConversion(prodid, UnitId, (int)Header.UnitConversionForId, DealUnitId);
+            int UnitConversionForIdValue = UnitConversionForId ==null   ? (int)Header.UnitConversionForId : (int)UnitConversionForId ;
+            
+			UnitConversion uc = new UnitConversionService(_unitOfWork).GetUnitConversion(prodid, UnitId, UnitConversionForIdValue, DealUnitId);
 
 
             byte DecimalPlaces = new UnitService(_unitOfWork).Find(DealUnitId).DecimalPlaces;
@@ -2617,6 +2618,42 @@ namespace Jobs.Controllers
             ProductUidJson.text = ProductUid.FirstOrDefault().text;
 
             return Json(ProductUidJson);
+        }
+
+
+        public ActionResult GetUnitConversionForHelpList(string searchTerm, int pageSize, int pageNum, int filter)//SaleInvoiceHeaderId
+        {
+            List<ComboBoxResult> UnitConversionForJson = _JobOrderLineService.FGetUnitConversionForHelpList(filter, searchTerm).ToList();
+
+            var count = UnitConversionForJson.Count();
+
+            ComboBoxPagedResult Data = new ComboBoxPagedResult();
+            Data.Results = UnitConversionForJson;
+            Data.Total = count;
+
+            return new JsonpResult
+            {
+                Data = Data,
+                JsonRequestBehavior = JsonRequestBehavior.AllowGet
+            };
+        }
+
+        public JsonResult SetSingleUnitConversionFor(int Ids)
+        {
+            ComboBoxResult UnitConversionForJson = new ComboBoxResult();
+
+            var ProductUid = from L in db.UnitConversonFor
+                             where L.UnitconversionForId == Ids
+                             select new
+                             {
+                                 id = L.UnitconversionForId,
+                                 text = L.UnitconversionForName
+                             };
+
+            UnitConversionForJson.id = ProductUid.FirstOrDefault().id.ToString();
+            UnitConversionForJson.text = ProductUid.FirstOrDefault().text;
+
+            return Json(UnitConversionForJson);
         }
 
         public ActionResult GetCustomProducts(string searchTerm, int pageSize, int pageNum, int filter)//DocTypeId

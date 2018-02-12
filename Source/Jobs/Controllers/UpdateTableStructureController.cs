@@ -164,6 +164,7 @@ namespace Module
 
 
             AddFields("JobInvoiceHeaders", "FinancierId", "INT");
+            AddFields("JobInvoiceHeaders", "IsDocumentPrinted", "Bit");
 
             AddFields("JobInvoiceLines", "RateDiscountPer", "Decimal(18,4)");
             AddFields("JobReceiveLines", "MfgDate", "DATETIME");
@@ -177,6 +178,7 @@ namespace Module
             AddFields("JobInvoiceSettings", "isVisibleMfgDate", "BIT");
             AddFields("JobInvoiceSettings", "isVisibleFinancier", "BIT");
             AddFields("JobInvoiceSettings", "isVisibleRateDiscountPer", "BIT");
+            AddFields("JobInvoiceSettings", "isAllowedDuplicatePrint", "BIT NOT NULL DEFAULT(1)");
 
             AddFields("JobOrderSettings", "isVisibleFinancier", "BIT");
             AddFields("JobOrderSettings", "isVisibleSalesExecutive", "BIT");
@@ -194,6 +196,11 @@ namespace Module
             AddFields("SaleInvoiceSettings", "isVisibleSalesExecutive", "BIT");
             AddFields("SaleInvoiceHeaders", "FinancierId", "Int", "People");
             AddFields("SaleInvoiceHeaders", "SalesExecutiveId", "Int", "People");
+
+            AddFields("SaleInvoiceSettings", "isVisibleBLNo", "BIT");
+            AddFields("SaleInvoiceSettings", "isVisibleCircularNo", "BIT");
+            AddFields("SaleInvoiceSettings", "isVisibleOrderNo", "BIT");
+            AddFields("SaleInvoiceSettings", "isVisibleKindsOfackages", "BIT");
 
             AddFields("JobOrderSettings", "isVisibleProcessHeader", "BIT");
 
@@ -890,7 +897,13 @@ namespace Module
             AddFields("LedgerHeaders", "DrCr", "nvarchar(2)");
             AddFields("LedgerSettings", "isVisibleDrCr", "BIT");
 
+            AddFields("ProductionOrderSettings", "ImportMenuId", "Int", "Menus");
+            AddFields("ProductionOrderSettings", "ExportMenuId", "Int", "Menus");
+            AddFields("ProductionOrderSettings", "WizardMenuId", "Int", "Menus");
 
+            AddFields("ProdOrderSettings", "WizardMenuId", "Int", "Menus");
+
+            AddFields("JobInvoiceSettings", "IsVisibleCreditDays", "Bit");
 
             try
             {
@@ -1414,6 +1427,7 @@ namespace Module
             AddFields("StockHeaderSettings", "SqlProcProductUidHelpList", "nvarchar(100)");
             AddFields("SaleDispatchReturnLines", "GodownId", "Int","Godowns");
             AddFields("SaleInvoiceSettings", "SaleInvoiceReturnDocTypeId", "Int", "DocumentTypes");
+            AddFields("JobOrderSettings", "filterUnitConversionFors", "nvarchar(Max)");
 
             AddFields("LedgerSettings", "isVisibleLineDrCr", "Bit");
 
@@ -1491,6 +1505,13 @@ namespace Module
             AddFields("SaleInvoiceSettings", "DoNotUpdateProductUidStatus", "BIT");
 
             AddFields("StockHeaderSettings", "isPostedInStock", "BIT NOT NULL DEFAULT(1)");
+
+            AddFields("PackingSettings", "isVisibleHeaderJobWorker", "BIT");
+            AddFields("PackingSettings", "isVisibleBaleNoPattern", "BIT");
+            AddFields("PackingSettings", "isVisibleGrossWeight", "BIT");
+            AddFields("PackingSettings", "isVisibleNetWeight", "BIT");
+            AddFields("PackingSettings", "isVisibleProductInvoiceGroup", "BIT");
+            AddFields("PackingSettings", "isVisibleSaleDeliveryOrder", "BIT");
 
             AddFields("PackingSettings", "isVisibleProductUID", "BIT");
             AddFields("PackingSettings", "isVisibleShipMethod", "BIT");
@@ -1907,6 +1928,37 @@ namespace Module
             }
 
 
+            try
+            {
+                if ((int)ExecuteScaler("SELECT Count(*) AS Cnt FROM Web.UnitConversionFors WHERE UnitconversionForName = 'LengthPerimeter'") == 0)
+                {
+                    mQry = @"INSERT INTO Web.UnitConversionFors (UnitconversionForId, UnitconversionForName)
+                            VALUES (7, 'LengthPerimeter')";
+                    ExecuteQuery(mQry);
+                }
+
+                if ((int)ExecuteScaler("SELECT Count(*) AS Cnt FROM Web.UnitConversionFors WHERE UnitconversionForName = 'WidthPerimeter'") == 0)
+                {
+                    mQry = @"INSERT INTO Web.UnitConversionFors (UnitconversionForId, UnitconversionForName)
+                            VALUES (8, 'WidthPerimeter')";
+                    ExecuteQuery(mQry);
+                }
+
+                if ((int)ExecuteScaler("SELECT Count(*) AS Cnt FROM Web.UnitConversionFors WHERE UnitconversionForName = 'TotalPerimeter'") == 0)
+                {
+                    mQry = @"INSERT INTO Web.UnitConversionFors (UnitconversionForId, UnitconversionForName)
+                            VALUES (9, 'TotalPerimeter')";
+                    ExecuteQuery(mQry);
+                }
+            }
+            catch (Exception ex)
+            {
+                RecordError(ex);
+            }
+
+
+            AddFields ("JobOrderSettings", "isVisibleLineUnitConversionFor", "BIT NOT NULL DEFAULT(0)");
+
             AddFields("CalculationLineLedgerAccounts", "IsVisibleLedgerAccountDr", "BIT");
             AddFields("CalculationLineLedgerAccounts", "IsVisibleLedgerAccountCr", "BIT");
             AddFields("CalculationLineLedgerAccounts", "filterLedgerAccountGroupsDrId", "Int", "LedgerAccountGroups");
@@ -1987,6 +2039,8 @@ namespace Module
 
             AddFields("JobOrderSettings", "IsMandatoryStockIn", "BIT");
             AddFields("StockHeaderSettings", "IsMandatoryStockIn", "BIT");
+            AddFields("StockHeaderSettings", "isMandatoryLotNo", "BIT");
+            AddFields("StockHeaderSettings", "isMandatoryLotNoOrDimension1", "BIT");
 
             try
             {
@@ -2348,6 +2402,7 @@ namespace Module
 
             AddFields("JobOrderSettings", "CalculateDiscountOnRate", "Bit");
 
+            AddFields("JobOrderLines", "UnitConversionForId", "TINYINT", "UnitConversionFors");
 
             AddFields("Menus", "ControllerName", "nvarchar(100)");
             AddFields("Menus", "ActionName", "nvarchar(100)");
@@ -2632,6 +2687,74 @@ namespace Module
 
             try
             {
+                if ((int)ExecuteScaler("SELECT Count(*) AS Cnt FROM INFORMATION_SCHEMA.Tables WHERE TABLE_NAME = 'ProductBuyerLogs'") == 0)
+                {
+                    mQry = @"CREATE TABLE Web.ProductBuyerLogs
+	                        (
+	                        ProductBuyerLogId   INT IDENTITY NOT NULL,
+	                        ProductBuyerId      INT NOT NULL,
+	                        ProductId           INT NOT NULL,
+	                        BuyerId             INT NOT NULL,
+	                        BuyerSku            NVARCHAR (50) NULL,
+	                        BuyerProductCode    NVARCHAR (50) NULL,
+	                        BuyerUpcCode        NVARCHAR (20) NULL,
+	                        BuyerSpecification  NVARCHAR (50) NULL,
+	                        BuyerSpecification1 NVARCHAR (50) NULL,
+	                        BuyerSpecification2 NVARCHAR (50) NULL,
+	                        BuyerSpecification3 NVARCHAR (50) NULL,
+	                        BuyerSpecification4 NVARCHAR (50) NULL,
+	                        BuyerSpecification5 NVARCHAR (50) NULL,
+	                        BuyerSpecification6 NVARCHAR (50) NULL,
+	                        DateOfConsutruction DATETIME NOT NULL,
+	                        DiscountTypeId      INT NULL,
+	                        PropertyArea        DECIMAL (18, 4) NULL,
+	                        TaxableArea         DECIMAL (18, 4) NULL,
+	                        ARV                 DECIMAL (18, 4) NULL,
+	                        TenantName          NVARCHAR (max) NULL,
+	                        BillingType         NVARCHAR (max) NULL,
+	                        Description         NVARCHAR (max) NULL,
+	                        CoveredArea         DECIMAL (18, 4) NULL,
+	                        GarageArea          DECIMAL (18, 4) NULL,
+	                        BalconyArea         DECIMAL (18, 4) NULL,
+	                        IsRented            BIT NULL,
+	                        WEF                 DATETIME NOT NULL,
+	                        TaxAmount           DECIMAL (18, 4) NULL,
+	                        TaxPercentage       DECIMAL (18, 4) NULL,
+	                        ModifyRemark        NVARCHAR (max) NULL,
+	                        CreatedBy           NVARCHAR (max) NULL,
+	                        ModifiedBy          NVARCHAR (max) NULL,
+	                        CreatedDate         DATETIME NOT NULL,
+	                        ModifiedDate        DATETIME NOT NULL,
+	                        OMSId               NVARCHAR (50) NULL,
+	                        CONSTRAINT [PK_Web.ProductBuyerLogs] PRIMARY KEY (ProductBuyerLogId),
+	                        CONSTRAINT [FK_Web.ProductBuyerLogs_Web.People_BuyerId] FOREIGN KEY (BuyerId) REFERENCES Web.People (PersonID),
+	                        CONSTRAINT [FK_Web.ProductBuyerLogs_Web.DiscountTypes_DiscountTypeId] FOREIGN KEY (DiscountTypeId) REFERENCES Web.DiscountTypes (DiscountTypeId),
+	                        CONSTRAINT [FK_Web.ProductBuyerLogs_Web.Products_ProductId] FOREIGN KEY (ProductId) REFERENCES Web.Products (ProductId),
+	                        CONSTRAINT [FK_Web.ProductBuyerLogs_Web.ProductBuyers_ProductBuyerId] FOREIGN KEY (ProductBuyerId) REFERENCES Web.ProductBuyers (ProductBuyerId)
+	                        )
+
+                        CREATE INDEX IX_ProductBuyerId
+	                        ON Web.ProductBuyerLogs (ProductBuyerId)
+
+                        CREATE INDEX IX_ProductId
+	                        ON Web.ProductBuyerLogs (ProductId)
+
+                        CREATE INDEX IX_BuyerId
+	                        ON Web.ProductBuyerLogs (BuyerId)
+
+                        CREATE INDEX IX_DiscountTypeId
+	                        ON Web.ProductBuyerLogs (DiscountTypeId) ";
+                    ExecuteQuery(mQry);
+                }
+            }
+            catch (Exception ex)
+            {
+                RecordError(ex);
+            }
+
+
+            try
+            {
                 if ((int)ExecuteScaler("SELECT Count(*) AS Cnt FROM INFORMATION_SCHEMA.Tables WHERE TABLE_NAME = 'DocumentTypeAttributes'") == 0)
                 {
                     mQry = @"CREATE TABLE Web.DocumentTypeAttributes
@@ -2721,6 +2844,7 @@ namespace Module
 	                        TaxPercentage       DECIMAL (18, 4),
 	                        WEF                 DATETIME NOT NULL,
 	                        Description         NVARCHAR (50),
+                            LedgerHeaderId      Int,
 	                        CONSTRAINT [PK_Web.ProductBuyerExtendeds] PRIMARY KEY (ProductBuyerId)
 	                        WITH (FILLFACTOR = 90),
 	                        CONSTRAINT [FK_Web.ProductBuyerExtendeds_Web.ProductBuyers_ProductBuyerId] FOREIGN KEY (ProductBuyerId) REFERENCES Web.ProductBuyers (ProductBuyerId),
@@ -3004,18 +3128,20 @@ namespace Module
             AddFields("People", "ReviewCount", "Int");
             AddFields("People", "Status", "Int");
 
+            AddFields("ProductBuyerExtendeds", "WaterTaxAmount", "Decimal(18,4)");
+            AddFields("ProductBuyerExtendeds", "WaterTaxPercentage", "Decimal(18,4)");
 
 
+            AddFields("PersonExtendeds", "TotalWaterTax", "Decimal(18,4)");
 
 
             //End Start Property Tax
 
 
             AddFields("PersonSettings", "CalculationId", "Int", "Calculations");
-            AddFields("Employee", "EmployeeId", "Int");
 
-
-            AddFields("Employee", "BasicSalary", "Decimal(18,4)");
+            AddFields("Employee", "EmployeeId", "INT IDENTITY NOT NULL");
+            AddFields("Employees", "BasicSalary", "Decimal(18,4)");
 
 
             try
@@ -3465,6 +3591,84 @@ namespace Module
             }
 
 
+
+            try
+            {
+                if ((int)ExecuteScaler("SELECT Count(*) AS Cnt FROM INFORMATION_SCHEMA.Tables WHERE TABLE_NAME = 'SalarySettings'") == 0)
+                {
+                    mQry = @"CREATE TABLE Web.SalarySettings
+	                        (
+	                        SalarySettingsId                  INT IDENTITY NOT NULL,
+	                        DocTypeId                         INT NOT NULL,
+	                        SiteId                            INT NOT NULL,
+	                        DivisionId                        INT NOT NULL,
+	                        filterContraSites                 NVARCHAR (max) NULL,
+	                        filterContraDivisions             NVARCHAR (max) NULL,
+	                        DocumentPrint                     NVARCHAR (100) NULL,
+	                        NoOfPrintCopies                   INT NULL,
+	                        SqlProcDocumentPrint              NVARCHAR (100) NULL,
+	                        SqlProcDocumentPrint_AfterSubmit  NVARCHAR (100) NULL,
+	                        SqlProcDocumentPrint_AfterApprove NVARCHAR (100) NULL,
+	                        ImportMenuId                      INT NULL,
+	                        WizardMenuId                      INT NULL,
+	                        ExportMenuId                      INT NULL,
+	                        CalculationId                     INT NULL,
+	                        DocumentPrintReportHeaderId       INT NULL,
+	                        CreatedBy                         NVARCHAR (max) NULL,
+	                        ModifiedBy                        NVARCHAR (max) NULL,
+	                        CreatedDate                       DATETIME NOT NULL,
+	                        ModifiedDate                      DATETIME NOT NULL,
+	                        OMSId                             NVARCHAR (50) NULL,
+	                        CONSTRAINT [PK_Web.SalarySettings] PRIMARY KEY (SalarySettingsId),
+	                        CONSTRAINT [FK_Web.SalarySettings_Web.Calculations_CalculationId] FOREIGN KEY (CalculationId) REFERENCES Web.Calculations (CalculationId),
+	                        CONSTRAINT [FK_Web.SalarySettings_Web.Divisions_DivisionId] FOREIGN KEY (DivisionId) REFERENCES Web.Divisions (DivisionId),
+	                        CONSTRAINT [FK_Web.SalarySettings_Web.DocumentTypes_DocTypeId] FOREIGN KEY (DocTypeId) REFERENCES Web.DocumentTypes (DocumentTypeId),
+	                        CONSTRAINT [FK_Web.SalarySettings_Web.ReportHeaders_DocumentPrintReportHeaderId] FOREIGN KEY (DocumentPrintReportHeaderId) REFERENCES Web.ReportHeaders (ReportHeaderId),
+	                        CONSTRAINT [FK_Web.SalarySettings_Web.Menus_ExportMenuId] FOREIGN KEY (ExportMenuId) REFERENCES Web.Menus (MenuId),
+	                        CONSTRAINT [FK_Web.SalarySettings_Web.Menus_ImportMenuId] FOREIGN KEY (ImportMenuId) REFERENCES Web.Menus (MenuId),
+	                        CONSTRAINT [FK_Web.SalarySettings_Web.Sites_SiteId] FOREIGN KEY (SiteId) REFERENCES Web.Sites (SiteId),
+	                        CONSTRAINT [FK_Web.SalarySettings_Web.Menus_WizardMenuId] FOREIGN KEY (WizardMenuId) REFERENCES Web.Menus (MenuId)
+	                        )
+
+                        CREATE INDEX IX_DocTypeId
+	                        ON Web.SalarySettings (DocTypeId)
+
+                        CREATE INDEX IX_SiteId
+	                        ON Web.SalarySettings (SiteId)
+
+                        CREATE INDEX IX_DivisionId
+	                        ON Web.SalarySettings (DivisionId)
+
+                        CREATE INDEX IX_ImportMenuId
+	                        ON Web.SalarySettings (ImportMenuId)
+
+                        CREATE INDEX IX_WizardMenuId
+	                        ON Web.SalarySettings (WizardMenuId)
+
+                        CREATE INDEX IX_ExportMenuId
+	                        ON Web.SalarySettings (ExportMenuId)
+
+                        CREATE INDEX IX_CalculationId
+	                        ON Web.SalarySettings (CalculationId)
+
+                        CREATE INDEX IX_DocumentPrintReportHeaderId
+	                        ON Web.SalarySettings (DocumentPrintReportHeaderId) ";
+                    ExecuteQuery(mQry);
+                }
+            }
+            catch (Exception ex)
+            {
+                RecordError(ex);
+            }
+
+
+            AddFields("Employees", "DateOfJoining", "DATETIME");
+            AddFields("Employees", "DateOfRelieving", "DATETIME");
+
+            AddFields("Employees", "WagesPayType", "nvarchar(10)");
+            AddFields("Employees", "PaymentType", "nvarchar(10)");
+
+
             ReCreateProcedures();
             DataCorrection();
 
@@ -3500,6 +3704,12 @@ namespace Module
                 RecordError(ex);
             }
         }
+
+
+
+
+
+
 
 
         public void DropFields(string TableName, string FieldName)
@@ -3996,6 +4206,8 @@ namespace Module
                     mQry = @"ALTER TABLE Web.JobInvoiceAmendmentHeaders DROP CONSTRAINT [FK_Web.JobInvoiceAmendmentHeaders_Web.Employees_OrderById] ";
                     ExecuteQuery(mQry);
                     mQry = @"ALTER TABLE Web.JobOrderHeaders DROP CONSTRAINT [FK_Web.JobOrderHeaders_Web.Employees_OrderById] ";
+                    ExecuteQuery(mQry);
+                    mQry = @"ALTER TABLE Web.JobOrderCancelHeaders DROP CONSTRAINT [FK_Web.JobOrderCancelHeaders_Web.Employees_OrderById] ";
                     ExecuteQuery(mQry);
                     mQry = @"ALTER TABLE Web.JobOrderInspectionHeaders DROP CONSTRAINT [FK_Web.JobOrderInspectionHeaders_Web.Employees_InspectionById] ";
                     ExecuteQuery(mQry);

@@ -67,6 +67,19 @@ namespace Model.ViewModels
         [Display(Name = "Is Sister Concern ?")]
         public Boolean IsSisterConcern { get; set; }
 
+        [Display(Name = "Date Of Joining"), DisplayFormat(DataFormatString = "{0:dd/MMM/yyyy}")]
+        public DateTime DateOfJoining { get; set; }
+
+        [Display(Name = "Date Of Relieving"), DisplayFormat(DataFormatString = "{0:dd/MMM/yyyy}")]
+        public DateTime DateOfRelieving { get; set; }
+
+        [MaxLength(10)]
+        public string WagesPayType { get; set; }
+
+        [MaxLength(10)]
+        public string PaymentType { get; set; }
+
+
         [ForeignKey("Designation")]
         [Display(Name = "Person Rate Group")]
         public int? DesignationId { get; set; }

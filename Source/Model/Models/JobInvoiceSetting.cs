@@ -85,6 +85,8 @@ namespace Model.Models
         public bool? isLedgerPostingLineWise { get; set; }
         public bool? isGenerateProductUid { get; set; }
 
+        public bool? isAllowedDuplicatePrint { get; set; }
+
         [ForeignKey("DocumentPrintReportHeader")]
         public int? DocumentPrintReportHeaderId { get; set; }
         public virtual ReportHeader DocumentPrintReportHeader { get; set; }

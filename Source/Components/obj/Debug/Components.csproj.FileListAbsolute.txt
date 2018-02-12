@@ -114,3 +114,26 @@ D:\Sample\HomeFurnishing\Source\Components\bin\Debug\Microsoft.AspNet.Identity.E
 D:\Sample\HomeFurnishing\Source\Components\bin\Debug\log4net.xml
 D:\Sample\HomeFurnishing\Source\Components\obj\Debug\Components.dll
 D:\Sample\HomeFurnishing\Source\Components\obj\Debug\Components.pdb
+D:\Kanpur Consultants\HomeFurnishing\Source\Components\bin\Debug\Components.dll.config
+D:\Kanpur Consultants\HomeFurnishing\Source\Components\bin\Debug\Components.dll
+D:\Kanpur Consultants\HomeFurnishing\Source\Components\bin\Debug\Components.pdb
+D:\Kanpur Consultants\HomeFurnishing\Source\Components\bin\Debug\Core.dll
+D:\Kanpur Consultants\HomeFurnishing\Source\Components\bin\Debug\Data.dll
+D:\Kanpur Consultants\HomeFurnishing\Source\Components\bin\Debug\EntityFramework.dll
+D:\Kanpur Consultants\HomeFurnishing\Source\Components\bin\Debug\EntityFramework.SqlServer.dll
+D:\Kanpur Consultants\HomeFurnishing\Source\Components\bin\Debug\Microsoft.AspNet.Identity.Core.dll
+D:\Kanpur Consultants\HomeFurnishing\Source\Components\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.dll
+D:\Kanpur Consultants\HomeFurnishing\Source\Components\bin\Debug\Model.dll
+D:\Kanpur Consultants\HomeFurnishing\Source\Components\bin\Debug\log4net.dll
+D:\Kanpur Consultants\HomeFurnishing\Source\Components\bin\Debug\Remotion.Data.Linq.dll
+D:\Kanpur Consultants\HomeFurnishing\Source\Components\bin\Debug\Core.pdb
+D:\Kanpur Consultants\HomeFurnishing\Source\Components\bin\Debug\Data.pdb
+D:\Kanpur Consultants\HomeFurnishing\Source\Components\bin\Debug\Model.pdb
+D:\Kanpur Consultants\HomeFurnishing\Source\Components\bin\Debug\EntityFramework.xml
+D:\Kanpur Consultants\HomeFurnishing\Source\Components\bin\Debug\EntityFramework.SqlServer.xml
+D:\Kanpur Consultants\HomeFurnishing\Source\Components\bin\Debug\Microsoft.AspNet.Identity.Core.xml
+D:\Kanpur Consultants\HomeFurnishing\Source\Components\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.xml
+D:\Kanpur Consultants\HomeFurnishing\Source\Components\bin\Debug\log4net.xml
+D:\Kanpur Consultants\HomeFurnishing\Source\Components\obj\Debug\Components.csprojResolveAssemblyReference.cache
+D:\Kanpur Consultants\HomeFurnishing\Source\Components\obj\Debug\Components.dll
+D:\Kanpur Consultants\HomeFurnishing\Source\Components\obj\Debug\Components.pdb

@@ -407,6 +407,7 @@ namespace Service
                            SaleEnquiryHeaderDocDate = tab1.DocDate,
                            SaleToBuyerId = tab1.SaleToBuyerId,
                            SaleToBuyerName = tab1.SaleToBuyer.Name,
+                           DealUnitId=p.DealUnitId,
                            BuyerSpecification = SaleEnquiryLineTab.BuyerSpecification,
                            BuyerSpecification1 = SaleEnquiryLineTab.BuyerSpecification1,
                            BuyerSpecification3 = SaleEnquiryLineTab.BuyerSpecification3,

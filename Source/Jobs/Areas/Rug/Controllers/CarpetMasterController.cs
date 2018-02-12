@@ -942,6 +942,10 @@ namespace Jobs.Areas.Rug.Controllers
                                     int UnitConversionBinding = (int)UnitConversionFors.Binding;
                                     int UnitConversionGachhai = (int)UnitConversionFors.Gachhai;
                                     int UnitConversionPattiMuraiDurry = (int)UnitConversionFors.PattiMuraiDurry;
+                                    int UnitConversionLengthPerimeter = (int)UnitConversionFors.LengthPerimeter;
+                                    int UnitConversionWidthPerimeter = (int)UnitConversionFors.WidthPerimeter;
+                                    int UnitConversionTotalPerimeter = (int)UnitConversionFors.TotalPerimeter;
+
 
                                     if (pta.ProductTypeAttributeId == (int)ProductTypeAttributeTypess.Gachhai || pta.ProductTypeAttributeId == (int)ProductTypeAttributeTypess.Binding
                                         || pta.ProductTypeAttributeId == (int)ProductTypeAttributeTypess.PattiMuraiDurry)
@@ -1033,6 +1037,164 @@ namespace Jobs.Areas.Rug.Controllers
                                                     new UnitConversionService(_unitOfWork).Delete(BindingUnitConversion);
                                                 }
                                             }
+
+                                            if (pta.ProductTypeAttributeId == (int)ProductTypeAttributeTypess.Binding)
+                                            {
+                                                UnitConversion UnitConvL = new UnitConversion();
+                                                UnitConvL.CreatedBy = User.Identity.Name;
+                                                UnitConvL.CreatedDate = DateTime.Now;
+                                                UnitConvL.ModifiedBy = User.Identity.Name;
+                                                UnitConvL.ModifiedDate = DateTime.Now;
+                                                UnitConvL.ProductId = prod.ProductId;
+                                                UnitConvL.FromQty = 1;
+                                                UnitConvL.FromUnitId = UnitConstants.Pieces;
+                                                UnitConvL.ToUnitId = UnitConstants.Feet;
+                                                UnitConvL.UnitConversionForId = (int)UnitConversionFors.LengthPerimeter;
+
+                                                if (vm.CarpetSkuSettings.PerimeterSizeTypeId == (int)ProductSizeTypeConstants.StandardSize)
+                                                {
+                                                    UnitConvL.ToQty = GetUnitConversionQty(vm.StandardSizeId, UnitConstants.Feet, MeasurementConstants.Length);
+                                                }
+                                                else if (vm.CarpetSkuSettings.PerimeterSizeTypeId == (int)ProductSizeTypeConstants.ManufacturingSize)
+                                                {
+                                                    UnitConvL.ToQty = GetUnitConversionQty(vm.ManufacturingSizeId, UnitConstants.Feet, MeasurementConstants.Length);
+                                                }
+                                                else
+                                                {
+                                                    UnitConvL.ToQty = GetUnitConversionQty(vm.FinishingSizeId, UnitConstants.Feet, MeasurementConstants.Length);
+                                                }
+
+                                                UnitConversion LengthPerimeterUnitConversion = (from U in db.UnitConversion
+                                                                                                where U.ProductId == prod.ProductId && U.UnitConversionForId == UnitConversionLengthPerimeter
+                                                                                                select U).FirstOrDefault();
+
+
+                                                if (LengthPerimeterUnitConversion == null)
+                                                {
+                                                    if (pta.DefaultValue != ProductTypeAttributeValuess.NA)
+                                                    {
+                                                        new UnitConversionService(_unitOfWork).Create(UnitConvL);
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    if (pta.DefaultValue != ProductTypeAttributeValuess.NA)
+                                                    {
+                                                        LengthPerimeterUnitConversion.ToQty = UnitConvL.ToQty;
+                                                        new UnitConversionService(_unitOfWork).Update(LengthPerimeterUnitConversion);
+                                                    }
+                                                    else
+                                                    {
+                                                        new UnitConversionService(_unitOfWork).Delete(LengthPerimeterUnitConversion);
+                                                    }
+                                                }
+
+
+
+                                                UnitConversion UnitConvW = new UnitConversion();
+                                                UnitConvW.CreatedBy = User.Identity.Name;
+                                                UnitConvW.CreatedDate = DateTime.Now;
+                                                UnitConvW.ModifiedBy = User.Identity.Name;
+                                                UnitConvW.ModifiedDate = DateTime.Now;
+                                                UnitConvW.ProductId = prod.ProductId;
+                                                UnitConvW.FromQty = 1;
+                                                UnitConvW.FromUnitId = UnitConstants.Pieces;
+                                                UnitConvW.ToUnitId = UnitConstants.Feet;
+                                                UnitConvW.UnitConversionForId = (int)UnitConversionFors.WidthPerimeter;
+
+                                                if (vm.CarpetSkuSettings.PerimeterSizeTypeId == (int)ProductSizeTypeConstants.StandardSize)
+                                                {
+                                                    UnitConvW.ToQty = GetUnitConversionQty(vm.StandardSizeId, UnitConstants.Feet, MeasurementConstants.Width);
+                                                }
+                                                else if (vm.CarpetSkuSettings.PerimeterSizeTypeId == (int)ProductSizeTypeConstants.ManufacturingSize)
+                                                {
+                                                    UnitConvW.ToQty = GetUnitConversionQty(vm.ManufacturingSizeId, UnitConstants.Feet, MeasurementConstants.Width);
+                                                }
+                                                else
+                                                {
+                                                    UnitConvW.ToQty = GetUnitConversionQty(vm.FinishingSizeId, UnitConstants.Feet, MeasurementConstants.Width);
+                                                }
+
+                                                UnitConversion WidthPerimeterUnitConversion = (from U in db.UnitConversion
+                                                                                               where U.ProductId == prod.ProductId && U.UnitConversionForId == UnitConversionWidthPerimeter
+                                                                                               select U).FirstOrDefault();
+
+
+                                                if (WidthPerimeterUnitConversion == null)
+                                                {
+                                                    if (pta.DefaultValue != ProductTypeAttributeValuess.NA)
+                                                    {
+                                                        new UnitConversionService(_unitOfWork).Create(UnitConvW);
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    if (pta.DefaultValue != ProductTypeAttributeValuess.NA)
+                                                    {
+                                                        WidthPerimeterUnitConversion.ToQty = UnitConvW.ToQty;
+                                                        new UnitConversionService(_unitOfWork).Update(WidthPerimeterUnitConversion);
+                                                    }
+                                                    else
+                                                    {
+                                                        new UnitConversionService(_unitOfWork).Delete(WidthPerimeterUnitConversion);
+                                                    }
+                                                }
+
+
+                                                UnitConversion UnitConvT = new UnitConversion();
+                                                UnitConvT.CreatedBy = User.Identity.Name;
+                                                UnitConvT.CreatedDate = DateTime.Now;
+                                                UnitConvT.ModifiedBy = User.Identity.Name;
+                                                UnitConvT.ModifiedDate = DateTime.Now;
+                                                UnitConvT.ProductId = prod.ProductId;
+                                                UnitConvT.FromQty = 1;
+                                                UnitConvT.FromUnitId = UnitConstants.Pieces;
+                                                UnitConvT.ToUnitId = UnitConstants.Feet;
+                                                UnitConvT.UnitConversionForId = (int)UnitConversionFors.TotalPerimeter;
+
+                                                if (vm.CarpetSkuSettings.PerimeterSizeTypeId == (int)ProductSizeTypeConstants.StandardSize)
+                                                {
+                                                    UnitConvT.ToQty = GetUnitConversionQty(vm.StandardSizeId, UnitConstants.Feet, "Length + Width");
+                                                }
+                                                else if (vm.CarpetSkuSettings.PerimeterSizeTypeId == (int)ProductSizeTypeConstants.ManufacturingSize)
+                                                {
+                                                    UnitConvT.ToQty = GetUnitConversionQty(vm.ManufacturingSizeId, UnitConstants.Feet, "Length + Width");
+                                                }
+                                                else
+                                                {
+                                                    UnitConvT.ToQty = GetUnitConversionQty(vm.FinishingSizeId, UnitConstants.Feet, "Length + Width");
+                                                }
+
+
+                                                UnitConversion TotalPerimeterUnitConversion = (from U in db.UnitConversion
+                                                                                               where U.ProductId == prod.ProductId && U.UnitConversionForId == UnitConversionTotalPerimeter
+                                                                                               select U).FirstOrDefault();
+
+
+                                                if (TotalPerimeterUnitConversion == null)
+                                                {
+                                                    if (pta.DefaultValue != ProductTypeAttributeValuess.NA)
+                                                    {
+                                                        new UnitConversionService(_unitOfWork).Create(UnitConvT);
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    if (pta.DefaultValue != ProductTypeAttributeValuess.NA)
+                                                    {
+                                                        TotalPerimeterUnitConversion.ToQty = UnitConvT.ToQty;
+                                                        new UnitConversionService(_unitOfWork).Update(TotalPerimeterUnitConversion);
+                                                    }
+                                                    else
+                                                    {
+                                                        new UnitConversionService(_unitOfWork).Delete(TotalPerimeterUnitConversion);
+                                                    }
+                                                }
+
+
+                                            }
+
+
                                         }
 
                                         if (pta.ProductTypeAttributeId == (int)ProductTypeAttributeTypess.Gachhai)
@@ -2165,6 +2327,103 @@ namespace Jobs.Areas.Rug.Controllers
                                     UnitConv.ToQty = GetUnitConversionQty(vm.FinishingSizeId, UnitConstants.Feet, item.DefaultValue);
                                 }
                                 new UnitConversionService(_unitOfWork).Create(UnitConv);
+
+                                if (item.ProductTypeAttributeId == (int)ProductTypeAttributeTypess.Binding)
+                                {
+                                    UnitConversion UnitConvL = new UnitConversion();
+                                    UnitConvL.CreatedBy = User.Identity.Name;
+                                    UnitConvL.CreatedDate = DateTime.Now;
+                                    UnitConvL.ModifiedBy = User.Identity.Name;
+                                    UnitConvL.ModifiedDate = DateTime.Now;
+                                    UnitConvL.ProductId = pro.ProductId;
+                                    UnitConvL.FromQty = 1;
+                                    UnitConvL.FromUnitId = UnitConstants.Pieces;
+                                    UnitConvL.ToUnitId = UnitConstants.Feet;
+
+                                    if (item.ProductTypeAttributeId == (int)ProductTypeAttributeTypess.Binding)
+                                    {
+                                        UnitConvL.UnitConversionForId = (int)UnitConversionFors.LengthPerimeter;
+                                    }
+
+
+                                    if (vm.CarpetSkuSettings.PerimeterSizeTypeId == (int)ProductSizeTypeConstants.StandardSize)
+                                    {
+                                        UnitConvL.ToQty = GetUnitConversionQty(vm.StandardSizeId, UnitConstants.Feet, MeasurementConstants.Length);
+                                    }
+                                    else if (vm.CarpetSkuSettings.PerimeterSizeTypeId == (int)ProductSizeTypeConstants.ManufacturingSize)
+                                    {
+                                        UnitConvL.ToQty = GetUnitConversionQty(vm.ManufacturingSizeId, UnitConstants.Feet, MeasurementConstants.Length);
+                                    }
+                                    else
+                                    {
+                                        UnitConvL.ToQty = GetUnitConversionQty(vm.FinishingSizeId, UnitConstants.Feet, MeasurementConstants.Length);
+                                    }
+                                    new UnitConversionService(_unitOfWork).Create(UnitConvL);
+
+
+
+                                    UnitConversion UnitConvW = new UnitConversion();
+                                    UnitConvW.CreatedBy = User.Identity.Name;
+                                    UnitConvW.CreatedDate = DateTime.Now;
+                                    UnitConvW.ModifiedBy = User.Identity.Name;
+                                    UnitConvW.ModifiedDate = DateTime.Now;
+                                    UnitConvW.ProductId = pro.ProductId;
+                                    UnitConvW.FromQty = 1;
+                                    UnitConvW.FromUnitId = UnitConstants.Pieces;
+                                    UnitConvW.ToUnitId = UnitConstants.Feet;
+
+                                    if (item.ProductTypeAttributeId == (int)ProductTypeAttributeTypess.Binding)
+                                    {
+                                        UnitConvW.UnitConversionForId = (int)UnitConversionFors.WidthPerimeter;
+                                    }
+
+
+                                    if (vm.CarpetSkuSettings.PerimeterSizeTypeId == (int)ProductSizeTypeConstants.StandardSize)
+                                    {
+                                        UnitConvW.ToQty = GetUnitConversionQty(vm.StandardSizeId, UnitConstants.Feet, MeasurementConstants.Width);
+                                    }
+                                    else if (vm.CarpetSkuSettings.PerimeterSizeTypeId == (int)ProductSizeTypeConstants.ManufacturingSize)
+                                    {
+                                        UnitConvW.ToQty = GetUnitConversionQty(vm.ManufacturingSizeId, UnitConstants.Feet, MeasurementConstants.Width);
+                                    }
+                                    else
+                                    {
+                                        UnitConvW.ToQty = GetUnitConversionQty(vm.FinishingSizeId, UnitConstants.Feet, MeasurementConstants.Width);
+                                    }
+                                    new UnitConversionService(_unitOfWork).Create(UnitConvW);
+
+
+                                    UnitConversion UnitConvT = new UnitConversion();
+                                    UnitConvT.CreatedBy = User.Identity.Name;
+                                    UnitConvT.CreatedDate = DateTime.Now;
+                                    UnitConvT.ModifiedBy = User.Identity.Name;
+                                    UnitConvT.ModifiedDate = DateTime.Now;
+                                    UnitConvT.ProductId = pro.ProductId;
+                                    UnitConvT.FromQty = 1;
+                                    UnitConvT.FromUnitId = UnitConstants.Pieces;
+                                    UnitConvT.ToUnitId = UnitConstants.Feet;
+
+                                    if (item.ProductTypeAttributeId == (int)ProductTypeAttributeTypess.Binding)
+                                    {
+                                        UnitConvT.UnitConversionForId = (int)UnitConversionFors.TotalPerimeter;
+                                    }
+
+
+                                    if (vm.CarpetSkuSettings.PerimeterSizeTypeId == (int)ProductSizeTypeConstants.StandardSize)
+                                    {
+                                        UnitConvT.ToQty = GetUnitConversionQty(vm.StandardSizeId, UnitConstants.Feet, "Length + Width");
+                                    }
+                                    else if (vm.CarpetSkuSettings.PerimeterSizeTypeId == (int)ProductSizeTypeConstants.ManufacturingSize)
+                                    {
+                                        UnitConvT.ToQty = GetUnitConversionQty(vm.ManufacturingSizeId, UnitConstants.Feet, "Length + Width");
+                                    }
+                                    else
+                                    {
+                                        UnitConvT.ToQty = GetUnitConversionQty(vm.FinishingSizeId, UnitConstants.Feet, "Length + Width");
+                                    }
+                                    new UnitConversionService(_unitOfWork).Create(UnitConvT);
+
+                                }
                             }
                         }
                     }

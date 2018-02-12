@@ -5334,6 +5334,9 @@
     <Content Include="Views\SalaryHeader\DocumentTypeList.cshtml" />
     <Content Include="Views\SalaryHeader\Index.cshtml" />
     <Content Include="Views\SalarySettings\Create.cshtml" />
+    <Content Include="Views\SalaryLine\_Create.cshtml" />
+    <Content Include="Views\SalaryLine\_Index.cshtml" />
+    <Content Include="Views\SalaryWizard\SalaryWizard.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

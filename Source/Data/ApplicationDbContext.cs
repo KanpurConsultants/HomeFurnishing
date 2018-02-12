@@ -37,8 +37,8 @@ namespace Data.Models
             Database.CommandTimeout = 60;
         }
 
-        //public ApplicationDbContext() 
-        //    : base("Data Source=192.168.2.17;Initial Catalog=RUG12;Integrated Security=false; User Id=sa; pwd=", false)
+        //public ApplicationDbContext()
+        //    : base("Data Source=DESKTOP-IGOMECN\\SQLEXPRESS;Initial Catalog=RUG12;Integrated Security=true; User Id=sa; pwd=P@ssw0rd!", false)
         //{
         //    Configuration.ProxyCreationEnabled = false;
         //    Database.ExecuteSqlCommand("SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED");

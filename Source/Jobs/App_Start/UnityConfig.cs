@@ -107,6 +107,7 @@ namespace Jobs.App_Start
             container.RegisterType<IRepository<DiscountType>, Repository<DiscountType>>();
 
 
+            Mapper.CreateMap<Person, DocumentUniqueId>();
             Mapper.CreateMap<PropertyHeaderViewModel, DocumentUniqueId>();
             Mapper.CreateMap<ProductBuyer, ProductBuyerLog>();
             Mapper.CreateMap<ProductBuyerLog, ProductBuyer>();
@@ -144,6 +145,9 @@ namespace Jobs.App_Start
 
 
             //End Property Tax
+
+
+            container.RegisterType<ISalaryWizardService, SalaryWizardService>(new PerRequestLifetimeManager());
 
             container.RegisterType<IRolesDocTypeService, RolesDocTypeService>(new PerRequestLifetimeManager());
             container.RegisterType<IRolePermissionService, RolePermissionService>(new PerRequestLifetimeManager());

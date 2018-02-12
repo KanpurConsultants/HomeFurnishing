@@ -111,6 +111,8 @@ namespace Jobs.Areas.PropertyTax.Controllers
             bool BeforeSave = true;
             Person temp = _PropertyHeaderService.Find(svm.PersonId);
 
+            if (svm.ARV == 0)
+                ModelState.AddModelError("ARV", "ARV is required.");
 
             if (svm.ARV != svm.OldARV && svm.ProductBuyerId != 0)
             {

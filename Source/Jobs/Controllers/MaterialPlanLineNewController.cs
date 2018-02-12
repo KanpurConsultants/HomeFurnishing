@@ -590,7 +590,7 @@ namespace Jobs.Controllers
                         order.ModifiedBy = User.Identity.Name;
                         order.ModifiedDate = DateTime.Now;
                         
-                        var temp = context.MaterialPlanLine.Local.Where(m => m.ProductId == item.ProductId).FirstOrDefault();
+                        //var temp = context.MaterialPlanLine.Local.Where(m => m.ProductId == item.ProductId).FirstOrDefault();
                         //if (temp != null)
                         //{
                         //    order.MaterialPlanLineId = context.MaterialPlanLine.Local.Where(m => m.ProductId == item.ProductId).FirstOrDefault().MaterialPlanLineId;

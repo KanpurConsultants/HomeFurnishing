@@ -40,10 +40,10 @@ namespace Jobs.Controllers
             var Caption= new ProductTypeSettingsService(_unitOfWork).GetProductTypeSettings(ProductTypeId);
             
             List<SelectListItem> temp = new List<SelectListItem>();
-            temp.Add(new SelectListItem { Text = Caption.Dimension1Caption.ToString()!="" ? Caption.Dimension1Caption.ToString() : StockInHandGroupOnConstants.Dimension1, Value = StockInHandGroupOnConstants.Dimension1 });
-            temp.Add(new SelectListItem { Text = Caption.Dimension2Caption.ToString() != "" ? Caption.Dimension2Caption.ToString() : StockInHandGroupOnConstants.Dimension2, Value = StockInHandGroupOnConstants.Dimension2 });
-            temp.Add(new SelectListItem { Text =Caption.Dimension3Caption.ToString() != "" ? Caption.Dimension3Caption.ToString() : StockInHandGroupOnConstants.Dimension3, Value = StockInHandGroupOnConstants.Dimension3 });
-            temp.Add(new SelectListItem { Text =Caption.Dimension4Caption.ToString() != "" ? Caption.Dimension4Caption.ToString() : StockInHandGroupOnConstants.Dimension4, Value = StockInHandGroupOnConstants.Dimension4 });
+            temp.Add(new SelectListItem { Text =Caption.Dimension1Caption != null && Caption.Dimension1Caption.ToString()!="" ? Caption.Dimension1Caption.ToString() : StockInHandGroupOnConstants.Dimension1, Value = StockInHandGroupOnConstants.Dimension1 });
+            temp.Add(new SelectListItem { Text =Caption.Dimension2Caption != null && Caption.Dimension2Caption.ToString() != "" ? Caption.Dimension2Caption.ToString() : StockInHandGroupOnConstants.Dimension2, Value = StockInHandGroupOnConstants.Dimension2 });
+            temp.Add(new SelectListItem { Text =Caption.Dimension3Caption != null  && Caption.Dimension3Caption.ToString() != "" ? Caption.Dimension3Caption.ToString() : StockInHandGroupOnConstants.Dimension3, Value = StockInHandGroupOnConstants.Dimension3 });
+            temp.Add(new SelectListItem { Text =Caption.Dimension4Caption != null && Caption.Dimension4Caption.ToString() != "" ? Caption.Dimension4Caption.ToString() : StockInHandGroupOnConstants.Dimension4, Value = StockInHandGroupOnConstants.Dimension4 });
             if (Routeid == "Stock")
             {
                 temp.Add(new SelectListItem { Text = StockInHandGroupOnConstants.Godown, Value = StockInHandGroupOnConstants.Godown });

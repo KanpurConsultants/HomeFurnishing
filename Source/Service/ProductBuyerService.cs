@@ -50,7 +50,7 @@ namespace Service
 
         public ProductBuyer Find(string Name)
         {
-            return ProductBuyerRepository.Get().Where(i => i.Buyer.Person.Name == Name).FirstOrDefault();
+            return ProductBuyerRepository.Get().Where(i => i.Buyer.Name == Name).FirstOrDefault();
         }
 
 
@@ -112,7 +112,7 @@ namespace Service
                           ProductBuyerId=p.ProductBuyerId,
                           ProductName=p.Product.ProductName,
                           ProductId=p.ProductId,
-                          BuyerName = p.Buyer.Person.Name,
+                          BuyerName = p.Buyer.Name,
                           BuyerSku = p.BuyerSku,
                           BuyerSpecification = p.BuyerSpecification,
                           BuyerUpcCode = p.BuyerUpcCode,

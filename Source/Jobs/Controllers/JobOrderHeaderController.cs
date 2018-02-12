@@ -2602,20 +2602,20 @@ namespace Jobs.Controllers
                     return View("~/Views/Shared/PermissionDenied.cshtml").Warning("You don't have permission to do this task.");
                 }
 
-                DataTable Dt = new DataTable();
-                String MainQuery = Settings.SqlProcDocumentPrint + " " + Ids.Split(',')[0];
-                using (SqlConnection sqlConnection = new SqlConnection((string)System.Web.HttpContext.Current.Session["DefaultConnectionString"]))
-                {
-                    SqlDataAdapter sqlDataAapter = new SqlDataAdapter(MainQuery, sqlConnection);
-                    sqlDataAapter.Fill(Dt);
-                }
-                string Reportname = "";
-                string path = "";
-                if (Dt.Rows.Count > 0)
-                {
-                    Reportname = Dt.Rows[0]["ReportName"].ToString();
-                    path = ConfigurationManager.AppSettings["PhysicalRDLCPath"] + ConfigurationManager.AppSettings["ReportsPathFromService"] + Dt.Rows[0]["ReportName"].ToString();
-                }
+       //         DataTable Dt = new DataTable();
+			    //String MainQuery = Settings.SqlProcDocumentPrint + " " + Ids.Split(',')[0];
+       //         using (SqlConnection sqlConnection = new SqlConnection((string)System.Web.HttpContext.Current.Session["DefaultConnectionString"]))
+       //         {
+       //             SqlDataAdapter sqlDataAapter = new SqlDataAdapter(MainQuery, sqlConnection);
+       //             sqlDataAapter.Fill(Dt);
+       //         }
+       //         string Reportname = "";
+       //         string path = "";
+       //         if (Dt.Rows.Count > 0)
+       //         {
+       //             Reportname = Dt.Rows[0]["ReportName"].ToString();
+       //             path = ConfigurationManager.AppSettings["PhysicalRDLCPath"] + ConfigurationManager.AppSettings["ReportsPathFromService"] + Dt.Rows[0]["ReportName"].ToString();
+       //         }
                 //if (System.IO.File.Exists(path))
                 //{ 
                 string ReportSql = "";
@@ -2660,20 +2660,41 @@ namespace Jobs.Controllers
                             {
                                 if (pd.Status == (int)StatusConstants.Drafted || pd.Status == (int)StatusConstants.Import || pd.Status == (int)StatusConstants.Modified)
                                 {
-                                    //LogAct(item.ToString());
+
+                                    if (Settings.SqlProcDocumentPrint == null || Settings.SqlProcDocumentPrint == "")
+                                    {
+                                        List<string> QueryList = new List<string>();
+                                        QueryList = DocumentPrintData(item);
+                                        Pdf = drp.DocumentPrint(QueryList, User.Identity.Name);
+                                    }
+                                    else
                                     Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint, User.Identity.Name, item);
 
                                     PdfStream.Add(Pdf);
                                 }
                                 else if (pd.Status == (int)StatusConstants.Submitted || pd.Status == (int)StatusConstants.ModificationSubmitted)
                                 {
-                                    Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint_AfterSubmit, User.Identity.Name, item);
+                                    if (Settings.SqlProcDocumentPrint_AfterSubmit == null || Settings.SqlProcDocumentPrint_AfterSubmit == "")
+                                    {
+                                        List<string> QueryList = new List<string>();
+                                        QueryList = DocumentPrintData(item);
+                                        Pdf = drp.DocumentPrint(QueryList, User.Identity.Name);
+                                    }
+                                    else
+                                        Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint_AfterSubmit, User.Identity.Name, item);
 
                                     PdfStream.Add(Pdf);
                                 }
                                 else
                                 {
-                                    Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint_AfterApprove, User.Identity.Name, item);
+                                    if (Settings.SqlProcDocumentPrint_AfterApprove == null || Settings.SqlProcDocumentPrint_AfterApprove == "")
+                                    {
+                                        List<string> QueryList = new List<string>();
+                                        QueryList = DocumentPrintData(item);
+                                        Pdf = drp.DocumentPrint(QueryList, User.Identity.Name);
+                                    }
+                                    else
+                                        Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint_AfterApprove, User.Identity.Name, item);
                                     PdfStream.Add(Pdf);
                                 }
                             }
@@ -2731,6 +2752,137 @@ namespace Jobs.Controllers
 
 
         }
+
+
+
+        
+		private List<string> DocumentPrintData(int item)
+        {
+            List<string> DocumentPrintData = new List<string>();
+            String mQry;
+            mQry = @"DECLARE @TotalAmount DECIMAL 
+            DECLARE @Id INT  =" + item + @"
+
+            SET @TotalAmount = (SELECT Max(Amount) FROM web.jobOrderheadercharges WHERE HeaderTableId = @Id AND ChargeId = 34 ) 
+
+            SELECT H.JobOrderHeaderId AS JobOrderHeaderId,P.Name,P.Code,PA.Address,City.CityName AS CityName, P.Mobile AS MobileNo
+            ,(SELECT TOP 1  PR.RegistrationNo  FROM web.PersonRegistrations PR WHERE PersonId =H.JobWorkerId   AND RegistrationType ='Tin No' ) AS TinNo
+             , DT.DocumentTypeShortName +'-'+ H.DocNo AS SlipNo, replace(convert(VARCHAR, H.DocDate, 106), ' ', '/')  AS Date,replace(convert(VARCHAR, H.DueDate, 106), ' ', '/')  AS DueDate
+             , H.CreditDays,PD.ProductName,D1.Dimension1Name AS shade, D1.Description AS Colour,D2.Dimension2Name AS Design,POH.DocNo AS 'PoNo',
+             L.Qty AS Qty,L.DealQty AS DealQty, L.Rate, L.Amount AS Amount,H.Remark, H.TermsAndConditions
+             ,DT.DocumentTypeShortName, H.DocNo,L.JobOrderlineid
+            ,L.DueDate AS LineDueDate,L.Remark AS LineRemark, U.UnitName AS Unit, isnull(U.DecimalPlaces,0) AS DecimalPlaces,   
+              UD.UnitName AS DealUnit, isnull(UD.DecimalPlaces,0) AS DeliveryUnitDecimalPlace, B.Code AS BuyerCode,
+             H.ModifiedBy +' ' + Replace(replace(convert(NVARCHAR, H.ModifiedDate, 106), ' ', '/'),'/20','/') + substring (convert(NVARCHAR,H.ModifiedDate),13,7) AS ModifiedBy, H.ModifiedDate,
+             (Dt.DocumentTypeName)  AS ReportTitle,
+             WD.DivisionName AS DIVISION, WP.Name AS OrderBy,
+             H.SiteId AS SiteId,H.DivisionId, 'JobOrderPrint.rdl' AS ReportName,@TotalAmount AS NetAmount,
+             H.GatePassHeaderId AS  GatePassHeaderId,'web.jobOrderheadercharges' AS ChargesTableName,  G.GodownName AS Godown,
+            CASE WHEN Isnull(H.Status,0)=0 OR Isnull(H.Status,0)=8 THEN 0 ELSE 1 END AS Status 
+            FROM ( SELECT * FROM [Web]._JobOrderHeaders WITH (nolock) WHERE JobOrderHeaderId	= @Id ) H 
+            LEFT JOIN Web.Godowns G WITH (Nolock) ON G.GodownId=H.GodownId
+            LEFT JOIN Web._JobOrderLines L WITH (nolock)  ON H.JobOrderHeaderId=L.JobOrderHeaderId
+            LEFT JOIN Web.DocumentTypes DT WITH (nolock) ON DT.DocumentTypeId = H.DocTypeId 
+            LEFT JOIN Web.People P WITH (nolock) ON P.PersonID = H.JobWorkerId
+            LEFT JOIN Web.PersonAddresses PA WITH (nolock) ON PA.PersonId = P.PersonID 
+            LEFT JOIN Web.Cities City WITH (nolock) ON City.CityId = PA.CityId
+            LEFT JOIN Web.Products PD WITH (nolock) ON PD.ProductId = L.ProductId 
+            LEFT JOIN web.ProductGroups PG WITH (nolock) ON PG.ProductGroupId = PD.ProductGroupId
+            LEFT JOIN Web.Divisions WD WITH (nolock) ON WD.DivisionId=H.DivisionId
+            LEFT JOIN Web.Sites WS WITH (nolock) ON WS.SiteId=H.SiteId
+            LEFT JOIN Web._People WP WITH (nolock) ON   WP.PersonId=H.OrderById
+            LEFT JOIN web.ProductTypes PT WITH (nolock) ON PT.ProductTypeId = PG.ProductTypeId
+            LEFT JOIN Web.Units U WITH (nolock) ON U.UnitId = PD.UnitId 
+            LEFT JOIN Web.Units UD WITH (nolock) ON UD.UnitId = L.DealUnitId  
+            LEFT JOIN web.Dimension1 D1  WITH (nolock) ON D1.Dimension1Id=L.Dimension1Id
+            LEFT JOIN web.Dimension2 D2 WITH (nolock) ON D2.Dimension2Id=L.Dimension2Id
+            LEFT JOIN Web.ProdOrderLines PO WITH (nolock) ON PO.ProdOrderLineId=L.ProdOrderLineId
+            LEFT JOIN Web.ProdOrderHeaders  POH WITH (nolock) ON  POH.ProdOrderHeaderId=PO.ProdOrderHeaderId
+            LEFT JOIN Web.People  B WITH (Nolock) ON B.PersonId = POH.BuyerId
+            WHERE H.JobOrderHeaderId	= @Id";
+
+
+            String mQry1;
+            mQry1 = @"DECLARE @Id INT = " + item + @"
+                    DECLARE @TableName NVARCHAR(255) = 'web.JobInvoiceHeaderCharges'
+
+                    DECLARE @StrGrossAmount AS NVARCHAR(50)
+                    DECLARE @StrBasicExciseDuty AS NVARCHAR(50)
+                    DECLARE @StrExciseECess AS NVARCHAR(50)
+                    DECLARE @StrExciseHECess AS NVARCHAR(50)
+
+                    DECLARE @StrSalesTaxTaxableAmt AS NVARCHAR(50)
+                    DECLARE @StrVAT AS NVARCHAR(50)
+                    DECLARE @StrSAT AS NVARCHAR(50)
+                    DECLARE @StrCST AS NVARCHAR(50)
+
+                    SET @StrGrossAmount = 'Gross Amount'
+                    SET @StrBasicExciseDuty = 'Basic Excise Duty'
+                    SET @StrExciseECess = 'Excise ECess'
+                    SET @StrExciseHECess = 'Excise HECess'
+
+                    SET @StrSalesTaxTaxableAmt = 'Sales Tax Taxable Amt'
+                    SET @StrVAT = 'VAT'
+                    SET @StrSAT = 'SAT'
+                    SET @StrCST = 'CST'
+
+                    DECLARE @Qry NVARCHAR(Max);
+                                                        SET @Qry = '
+                            DECLARE @GrossAmount AS DECIMAL
+                            DECLARE @BasicExciseDutyAmount AS DECIMAL
+                            DECLARE @SalesTaxTaxableAmt AS DECIMAL
+
+                            SELECT @GrossAmount = sum(CASE WHEN C.ChargeName = ''' + @StrGrossAmount + ''' THEN  H.Amount  ELSE 0 END),
+                            @BasicExciseDutyAmount = sum(CASE WHEN C.ChargeName = ''' + @StrBasicExciseDuty + ''' THEN  H.Amount  ELSE 0 END),
+                            @SalesTaxTaxableAmt = sum(CASE WHEN C.ChargeName = ''' + @StrSalesTaxTaxableAmt + ''' THEN  H.Amount  ELSE 0 END)
+                            FROM ' + @TableName + ' H
+                            LEFT JOIN web.ChargeTypes CT ON CT.ChargeTypeId = H.ChargeTypeId
+                            LEFT JOIN web.Charges C ON C.ChargeId = H.ChargeId
+                            WHERE H.Amount <> 0 AND H.HeaderTableId = ' + Convert(Varchar,@Id ) + '
+                            GROUP BY H.HeaderTableId
+
+
+                            SELECT H.Id, H.HeaderTableId, H.Sr, C.ChargeName, H.Amount, H.ChargeTypeId,  CT.ChargeTypeName, 
+		                    --CASE WHEN C.ChargeName = ''Vat'' THEN(H.Amount * 100 / @GrossAmount) ELSE H.Rate End  AS Rate,
+                            CASE
+                            WHEN @SalesTaxTaxableAmt> 0 And C.ChargeName IN (''' + @StrVAT + ''', ''' + @StrSAT + ''', ''' + @StrCST+ ''')  THEN(H.Amount * 100 / @SalesTaxTaxableAmt)
+                            WHEN @GrossAmount> 0 AND C.ChargeName IN (''' + @StrBasicExciseDuty + ''')  THEN(H.Amount * 100 / @GrossAmount)
+                            WHEN @BasicExciseDutyAmount> 0 AND C.ChargeName IN (''' + @StrExciseECess + ''', ''' +@StrExciseHECess+ ''')  THEN(H.Amount * 100 / @BasicExciseDutyAmount)
+                            ELSE 0 End AS Rate,
+		                    ''TransactionChargesPrint.rdl'' AS ReportName,
+                            ''Transaction Charges'' AS ReportTitle
+                            FROM  ' + @TableName + '  H
+                            LEFT JOIN web.ChargeTypes CT ON CT.ChargeTypeId = H.ChargeTypeId
+                            LEFT JOIN web.Charges C ON C.ChargeId = H.ChargeId
+                            WHERE(isnull(H.ChargeTypeId, 0) <> ''4'' OR C.ChargeName = ''Net Amount'') AND H.Amount <> 0
+                            AND H.HeaderTableId = ' + Convert(Varchar,@Id ) + ''
+
+
+                        DECLARE @TmpData TABLE
+                        (
+                        id BIGINT,
+                        HeaderTableId INT,
+                        Sr INT,
+                        ChargeName NVARCHAR(50),
+                        Amount DECIMAL(18, 4),
+                        ChargeTypeId INT,
+                        ChargeTypeName NVARCHAR(50),
+                        Rate DECIMAL(38, 20),
+                        ReportName nVarchar(255),
+                        ReportTitle nVarchar(255)
+                        );
+
+
+                                    Insert Into @TmpData EXEC(@Qry)
+                                    SELECT id, HeaderTableId, Sr, ChargeName, Amount, ChargeTypeId, ChargeTypeName, Rate, ReportName FROM @TmpData
+                                    ORDER BY Sr";
+
+            DocumentPrintData.Add(mQry);
+            DocumentPrintData.Add(mQry1);
+            return DocumentPrintData;
+
+        }
+
 
         protected string GetIPAddress()
         {

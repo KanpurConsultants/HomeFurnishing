@@ -14,6 +14,11 @@ namespace Service
         IEnumerable<SaleOrderInventoryStatusViewModel> SaleOrderInventoryStatusDetail(SaleOrderInventoryStatusDisplayFilterSettings Settings);
         IEnumerable<SaleOrderInventoryStatus_StockViewModel> StockDetail(SaleOrderInventoryStatusDisplayFilterSettings Settings);
         IEnumerable<SaleOrderInventoryStatus_LoomViewModel> LoomDetail(SaleOrderInventoryStatusDisplayFilterSettings Settings);
+        IEnumerable<SaleOrderInventoryStatus_ShipViewModel> ShipDetail(SaleOrderInventoryStatusDisplayFilterSettings Settings);
+        IEnumerable<SaleOrderInventoryStatus_ToBeIssueViewModel> ToBeIssueDetail(SaleOrderInventoryStatusDisplayFilterSettings Settings);
+        IEnumerable<SaleOrderInventoryStatus_DOViewModel> DODetail(SaleOrderInventoryStatusDisplayFilterSettings Settings);
+        IEnumerable<SaleOrderInventoryStatus_OXViewModel> OXDetail(SaleOrderInventoryStatusDisplayFilterSettings Settings);
+        IQueryable<ComboBoxResult> GetCustomSaleOrders(string term);
     }
 
     public class Display_SaleOrderInventoryStatusService : IDisplay_SaleOrderInventoryStatusService
@@ -21,7 +26,29 @@ namespace Service
         ApplicationDbContext db = new ApplicationDbContext();
         private readonly IUnitOfWorkForService _unitOfWork;
 
-      
+
+
+        public IQueryable<ComboBoxResult> GetCustomSaleOrders( string term)
+        {
+            
+            var list = (from p in db.SaleOrderHeader
+                        join TY in db.DocumentType on p.DocTypeId equals TY.DocumentTypeId into TYTable
+                        from TYTab in TYTable.DefaultIfEmpty()
+                        join B in db.Persons  on p.SaleToBuyerId equals B.PersonID into BTable
+                        from BTab in BTable.DefaultIfEmpty()
+                        where 1==1
+                        && (string.IsNullOrEmpty(term) ? 1 == 1 : (p.DocNo.ToLower().Contains(term.ToLower()) || TYTab.DocumentTypeShortName.ToLower().Contains(term.ToLower()) || BTab.Code.ToLower().Contains(term.ToLower())))
+                        group new { p, TYTab, BTab } by new { p.SaleOrderHeaderId } into Result
+                        orderby Result.Max(m => m.p.DocNo )
+                        select new ComboBoxResult
+                        {
+                            id = Result.Key.SaleOrderHeaderId.ToString(),
+                            text = Result.Max(m => m.TYTab.DocumentTypeShortName + "-" + m.p.DocNo + "{" + m.BTab.Code + "}"),
+                        }
+              );
+
+            return list;
+        }
 
         public Display_SaleOrderInventoryStatusService(IUnitOfWorkForService unitOfWork)
         {
@@ -53,8 +80,10 @@ namespace Service
 
             string StatusOnDate = StatusOnDateSetting.Value;
             string DocTypeId = DocTypeIdSetting.Value;
-            string Site = SiteSetting.Value;
-            string Division = DivisionSetting.Value;
+            //string Site = SiteSetting.Value;
+            //string Division = DivisionSetting.Value;
+            string Site = "1";
+            string Division = "1";
             string FromDate = FromDateSetting.Value;
             string ToDate = ToDateSetting.Value;
             string Buyer = BuyerSetting.Value;
@@ -217,7 +246,7 @@ namespace Service
                     FROM web.SaleDispatchHeaders H WITH (Nolock)
                     LEFT JOIN web.SaleDispatchLines L WITH (Nolock) ON L.SaleDispatchHeaderId = H.SaleDispatchHeaderId 
                     LEFT JOIN web.PackingLines PL WITH (Nolock) ON PL.PackingLineId = L.PackingLineId 
-                    LEFT JOIN web.ProductUids PU WITH (Nolock) ON PU.ProductUIDId = PL.ProductUidId 
+                    LEFT JOIN web.ProductUids PU WITH (Nolock) ON PU.ProductUIDId = PL.ProductUidId OR PU.ProductUidName = PL.LotNo
                     LEFT JOIN Web._ViewRugSize VRS WITH (Nolock) ON PL.ProductId=VRS.ProductId
                     WHERE 1 = 1 
                     And H.SiteId =@Site 
@@ -248,13 +277,13 @@ namespace Service
 
                     ----------- Main Query-------------
 
-                    SELECT Max(H.SaleOrderLineId) AS SaleOrderLineId, Max(H.Buyer) Buyer,max(H.DocDate) AS Order_Date, max(H.DocNo) AS OrderNo, max(H.DueDate) AS DueDate,	 DateDiff(Day,max(H.DueDate),GetDate()) AS Days,
+                    SELECT Max(H.SaleOrderLineId) AS SaleOrderLineId,P.ProductId, Max(H.Buyer) Buyer,max(H.DocDate) AS Order_Date, max(H.DocNo) AS OrderNo, max(H.DueDate) AS DueDate,	 DateDiff(Day,max(H.DueDate),GetDate()) AS Days,
                     Max(P.ProductName) ProductName, Max(PQ.ProductQualityName) AS Quality,Max(PG.ProductGroupName) AS Design, Max(VRS.ManufaturingSizeName) AS Size, Max(C.ColourName) AS Colour,
                     Max(PB.BuyerSpecification) AS BuyerSpecification,Max(PB.BuyerSpecification1) AS BuyerSpecification1,Max(PB.BuyerSpecification2) AS BuyerSpecification2,Max(PB.BuyerSpecification3) AS BuyerSpecification3,Max(PB.BuyerSpecification4) AS BuyerSpecification4,
                     isnull(sum(H.OrdQty),0) AS Order_Qty,isnull(sum(H.CancelQty),0) AS Cancel_Qty,isnull(sum(H.OrdQty),0) - isnull(sum(H.CancelQty),0) AS Net_Qty, isnull(sum(H.DispQty),0) AS Ship_Qty,isnull(sum(H.BalQty),0) AS Bal_Qty,
                     isnull(sum(POB.BalanceQty),0) AS To_Be_Issue, isnull(sum(OrderIssue.OrderQty),0) AS Slip_Qty, 
                     isnull(sum(FWob.BalanceQty),0) + isnull(sum(FWobM.BalanceQty),0) AS Loom_Qty, 
-                    isnull(sum(FWR.Qty),0)- isnull(sum(Disp.DispQty),0) AS Stock_Qty,
+                    case When isnull(sum(FWR.Qty),0)- isnull(sum(Disp.DispQty),0) <=0 then 0 else isnull(sum(FWR.Qty),0)- isnull(sum(Disp.DispQty),0) end  AS Stock_Qty,
                     isnull(sum(H.OrdQty),0)-isnull(sum(H.CancelQty),0)-isnull(sum(PO.Qty),0) AS PendingToPlanQty,isnull(sum(POB.BalanceQty),0) AS ToBeIssue,
                     isnull(sum(OrderIssueB.BalanceQty),0) AS To_Be_IssueInBranch, 
                     isnull(sum(FWob.OrderQty),0) AS OrderIssueinBranch,
@@ -291,19 +320,19 @@ namespace Service
             {
                 mQry += @" SELECT H.SaleOrderLineId,
                             H.Buyer, H.OrderNo AS Order_No, Convert(NVARCHAR,H.Order_Date,103) AS Order_Date , Convert(NVARCHAR,H.DueDate,103) AS Delivery_Date,
-                            H.BuyerSpecification3 Quality, H.BuyerSpecification AS Design, H.BuyerSpecification1 Size, H.BuyerSpecification2 Colour, 
+                            '`'+H.BuyerSpecification3 Quality, H.BuyerSpecification AS Design, H.BuyerSpecification1 Size, H.BuyerSpecification2 Colour, 
                             H.ProductName, H.Order_Qty AS ORD, H.Cancel_Qty AS O_C,
-                            H.Slip_Qty AS SLP, H.Loom_Qty AS LOOM, H.Stock_Qty AS STK, H.Ship_Qty AS SHP, H.Bal_Qty AS BAL,H.O_D, H.O_B AS D_B, H.O_X 
+                            H.Slip_Qty AS SLP, H.To_Be_IssueInBranch AS UX, H.Loom_Qty AS LOOM, H.Stock_Qty AS STK, H.Ship_Qty AS SHP, H.Bal_Qty AS BAL,H.O_D, H.O_B AS D_B, H.O_X 
                             FROM TempGrid_SaleOrderTracking H
                         ";
             }
             else if (ReportType == "Summary")
             {
-                mQry += @" SELECT '`'+H.BuyerSpecification3 Quality, H.BuyerSpecification AS Design, H.BuyerSpecification1 Size, H.BuyerSpecification2 Colour, 
-                    H.ProductName, sum(H.Order_Qty) AS ORD, sum(H.Cancel_Qty) AS O_C,
-                    sum(H.Slip_Qty) AS SLP, sum(H.Loom_Qty) AS LOOM, sum(H.Stock_Qty) AS STK, sum(H.Ship_Qty) AS SHP, sum(H.Bal_Qty) AS BAL, sum(H.O_D) AS O_D, sum(H.O_B) AS D_B, sum(H.O_X) AS O_X 
+                mQry += @" SELECT H.ProductId, '`'+H.BuyerSpecification3 Quality, H.BuyerSpecification AS Design, H.BuyerSpecification1 Size, H.BuyerSpecification2 Colour, 
+                    Max(H.ProductName) AS ProductName, sum(H.Order_Qty) AS ORD, sum(H.Cancel_Qty) AS O_C,
+                    sum(H.Slip_Qty) AS SLP, SUM(H.To_Be_IssueInBranch) AS UX, sum(H.Loom_Qty) AS LOOM, sum(H.Stock_Qty) AS STK, sum(H.Ship_Qty) AS SHP, sum(H.Bal_Qty) AS BAL, sum(H.O_D) AS O_D, sum(H.O_B) AS D_B, sum(H.O_X) AS O_X 
                     FROM TempGrid_SaleOrderTracking H
-                    GROUP BY H.BuyerSpecification3,H.BuyerSpecification,H.BuyerSpecification1,H.BuyerSpecification2, H.ProductName ";
+                    GROUP BY H.BuyerSpecification3,H.BuyerSpecification,H.BuyerSpecification1,H.BuyerSpecification2, H.ProductId ";
             }
 
             IEnumerable<SaleOrderInventoryStatusViewModel> SaleOrderInventoryStatusList = db.Database.SqlQuery<SaleOrderInventoryStatusViewModel>(mQry, SqlParameterStatusOnDate, SqlParameterDocTypeId, SqlParameterSite, SqlParameterDivision, SqlParameterFromDate, SqlParameterToDate, SqlParameterBuyer, SqlParameterSaleOrderHeaderId, SqlParameterProduct, SqlParameterProductCategory, SqlParameterProductQuality, SqlParameterProductGroup, SqlParameterProductSize, SqlParameterReportFor, SqlParameterBuyerDesign).ToList();
@@ -312,8 +341,6 @@ namespace Service
             return SaleOrderInventoryStatusList;
 
         }
-
-
 
         public IEnumerable<SaleOrderInventoryStatus_StockViewModel> StockDetail(SaleOrderInventoryStatusDisplayFilterSettings Settings)
         {
@@ -340,8 +367,10 @@ namespace Service
 
             string StatusOnDate = StatusOnDateSetting.Value;
             string DocTypeId = DocTypeIdSetting.Value;
-            string Site = SiteSetting.Value;
-            string Division = DivisionSetting.Value;
+            //string Site = SiteSetting.Value;
+            //string Division = DivisionSetting.Value;
+            string Site = "1";
+            string Division = "1";
             string FromDate = FromDateSetting.Value;
             string ToDate = ToDateSetting.Value;
             string Buyer = BuyerSetting.Value;
@@ -380,10 +409,9 @@ namespace Service
             SqlParameter SqlParameterBuyerDesign = new SqlParameter("@BuyerDesign", !string.IsNullOrEmpty(BuyerDesign) ? BuyerDesign : (object)DBNull.Value);
             SqlParameter SqlParameterTextHidden = new SqlParameter("@TextHidden", !string.IsNullOrEmpty(TextHidden) ? TextHidden : (object)DBNull.Value);
 
-
             mQry = @"SELECT PU.ProductUidName AS CarpetNo, Convert(NVARCHAR,H.DocDate,103) AS Date,PC.ProductCategoryName AS Type, PQ.ProductQualityName AS Quality, PG.ProductGroupName AS Design, C.ColourName AS Colour, VRS.ManufaturingSizeName AS Size, H.Qty  
-                    FROM Web.FJobReceive_OneProcess (GetDate(),1,1,'01/Apr/2017',GetDate(),43) H
-                    LEFT JOIN web.ProductUids PU ON PU.ProductUIDId = H.ProductUIDId OR PU.ProductUidName = H.LotNo
+                    FROM Web.FJobReceive_OneProcess (@StatusOnDate,@Site,@Division,@FromDate,@ToDate,43) H
+                    LEFT JOIN web.ProductUids PU WITH (Nolock) ON PU.ProductUIDId = H.ProductUIDId OR PU.ProductUidName = H.LotNo
                     LEFT JOIN web.Products P WITH (Nolock) ON P.ProductId = H.ProductId 
                     LEFT JOIN web.ProductGroups PG WITH (Nolock) ON PG.ProductGroupId = P.ProductGroupId
                     LEFT JOIN web.FinishedProduct FP WITH (Nolock) ON FP.ProductId = P.ProductId 
@@ -391,17 +419,28 @@ namespace Service
                     LEFT JOIN web.ViewRugSize VRS WITH (Nolock) ON VRS.ProductId = P.ProductId 
                     LEFT JOIN web.ProductCategories PC WITH (Nolock) ON PC.ProductCategoryId = P.ProductCategoryId 
                     LEFT JOIN web.ProductQualities PQ WITH (Nolock) ON PQ.ProductQualityId = FP.ProductQualityId  
-                    WHERE 1=1 AND PU.Status <> 'Dispatched'
-                    AND PU.SaleOrderLineId = @TextHidden ";
+                    LEFT JOIN web.SaleOrderLines SOL WITH (Nolock) ON SOL.SaleOrderLineId = PU.SaleOrderLineId
+                    LEFT JOIN web.SaleOrderHeaders SOH WITH (Nolock) ON SOH.SaleOrderHeaderId = SOL.SaleOrderHeaderId
+                    WHERE 1=1 AND PU.Status <> 'Dispatch'" +
+                    (DocTypeId != null ? " AND SOH.DocTypeId IN (SELECT Items FROM [dbo].[Split] (@DocTypeId, ','))" : "") +
+                    (Product != null ? " AND P.ProductId IN (SELECT Items FROM [dbo].[Split] (@Product, ','))" : "") +
+                    (ProductQuality != null ? " AND Fp.ProductQualityId IN (SELECT Items FROM  Web.[Split] (@ProductQuality, ','))" : "") +
+                    (ProductCategory != null ? " AND P.ProductCategoryId  IN (SELECT Items FROM  Web.[Split] (@ProductCategory, ','))" : "") +
+                    (ProductGroup != null ? " AND P.ProductGroupId IN (SELECT Items FROM  Web.[Split] (@ProductGroup, ','))" : "") +
+                    (SaleOrderHeaderId != null ? " AND SOH.SaleOrderHeaderId IN (SELECT Items FROM [dbo].[Split] (@SaleOrderHeaderId, ','))" : "") +
+                    (Buyer != null ? " AND SOH.SaleToBuyerId  IN (SELECT Items FROM [dbo].[Split] (@Buyer, ','))" : "") ;
 
+            if (ReportTypeSetting.Value=="Summary")
+                mQry = mQry+ " AND H.ProductId = @TextHidden ";
+            else
+                mQry = mQry + " AND PU.SaleOrderLineId = @TextHidden ";
 
-            IEnumerable<SaleOrderInventoryStatus_StockViewModel> SaleOrderInventoryStatusList = db.Database.SqlQuery<SaleOrderInventoryStatus_StockViewModel>(mQry, SqlParameterTextHidden).ToList();
+            IEnumerable<SaleOrderInventoryStatus_StockViewModel> SaleOrderInventoryStatusList = db.Database.SqlQuery<SaleOrderInventoryStatus_StockViewModel>(mQry, SqlParameterTextHidden, SqlParameterStatusOnDate, SqlParameterDocTypeId, SqlParameterSite, SqlParameterDivision, SqlParameterFromDate, SqlParameterToDate, SqlParameterBuyer, SqlParameterSaleOrderHeaderId, SqlParameterProduct, SqlParameterProductCategory, SqlParameterProductQuality, SqlParameterProductGroup, SqlParameterProductSize, SqlParameterReportFor, SqlParameterBuyerDesign).ToList();
 
 
             return SaleOrderInventoryStatusList;
 
         }
-
 
         public IEnumerable<SaleOrderInventoryStatus_LoomViewModel> LoomDetail(SaleOrderInventoryStatusDisplayFilterSettings Settings)
         {
@@ -428,8 +467,10 @@ namespace Service
 
             string StatusOnDate = StatusOnDateSetting.Value;
             string DocTypeId = DocTypeIdSetting.Value;
-            string Site = SiteSetting.Value;
-            string Division = DivisionSetting.Value;
+            //string Site = SiteSetting.Value;
+            //string Division = DivisionSetting.Value;
+            string Site = "1";
+            string Division = "1";
             string FromDate = FromDateSetting.Value;
             string ToDate = ToDateSetting.Value;
             string Buyer = BuyerSetting.Value;
@@ -488,19 +529,462 @@ namespace Service
                     LEFT JOIN web.ViewRugSize VRS WITH (Nolock) ON VRS.ProductId = P.ProductId 
                     LEFT JOIN web.ProductCategories PC WITH (Nolock) ON PC.ProductCategoryId = P.ProductCategoryId 
                     LEFT JOIN web.ProductQualities PQ WITH (Nolock) ON PQ.ProductQualityId = FP.ProductQualityId 
-                    LEFT JOIN web.MaterialPlanForSaleOrders MOS ON MOS.MaterialPlanLineId = POL1.MaterialPlanLineId  
+                    LEFT JOIN web.MaterialPlanForSaleOrders MOS WITH (Nolock) ON MOS.MaterialPlanLineId = POL1.MaterialPlanLineId  
+                    LEFT JOIN web.SaleOrderLines SOL WITH (Nolock) ON SOL.SaleOrderLineId = MOS.SaleOrderLineId
+                    LEFT JOIN web.SaleOrderHeaders SOH WITH (Nolock) ON SOH.SaleOrderHeaderId = SOL.SaleOrderHeaderId
                     WHERE 1=1 AND isnull(J.IsSisterConcern,0)=0 
-                    AND isnull(H.BalanceQty,0) >0
-                    AND MOS.SaleOrderLineId = @TextHidden ";
+                    AND isnull(H.BalanceQty,0) >0 " +
+                    (DocTypeId != null ? " AND SOH.DocTypeId IN (SELECT Items FROM [dbo].[Split] (@DocTypeId, ','))" : "") +
+                    (Product != null ? " AND P.ProductId IN (SELECT Items FROM [dbo].[Split] (@Product, ','))" : "") +
+                    (ProductQuality != null ? " AND Fp.ProductQualityId IN (SELECT Items FROM  Web.[Split] (@ProductQuality, ','))" : "") +
+                    (ProductCategory != null ? " AND P.ProductCategoryId  IN (SELECT Items FROM  Web.[Split] (@ProductCategory, ','))" : "") +
+                    (ProductGroup != null ? " AND P.ProductGroupId IN (SELECT Items FROM  Web.[Split] (@ProductGroup, ','))" : "") +
+                    (SaleOrderHeaderId != null ? " AND SOH.SaleOrderHeaderId IN (SELECT Items FROM [dbo].[Split] (@SaleOrderHeaderId, ','))" : "") +
+                    (Buyer != null ? " AND SOH.SaleToBuyerId  IN (SELECT Items FROM [dbo].[Split] (@Buyer, ','))" : "");
+
+            if (ReportTypeSetting.Value == "Summary")
+                mQry = mQry + " AND P.ProductId = @TextHidden ";
+            else
+                mQry = mQry + " AND MOS.SaleOrderLineId = @TextHidden ";
 
 
-            IEnumerable<SaleOrderInventoryStatus_LoomViewModel> SaleOrderInventoryStatusList = db.Database.SqlQuery<SaleOrderInventoryStatus_LoomViewModel>(mQry, SqlParameterTextHidden).ToList();
+            IEnumerable<SaleOrderInventoryStatus_LoomViewModel> SaleOrderInventoryStatusList = db.Database.SqlQuery<SaleOrderInventoryStatus_LoomViewModel>(mQry, SqlParameterTextHidden, SqlParameterStatusOnDate, SqlParameterDocTypeId, SqlParameterSite, SqlParameterDivision, SqlParameterFromDate, SqlParameterToDate, SqlParameterBuyer, SqlParameterSaleOrderHeaderId, SqlParameterProduct, SqlParameterProductCategory, SqlParameterProductQuality, SqlParameterProductGroup, SqlParameterProductSize, SqlParameterReportFor, SqlParameterBuyerDesign).ToList();
 
 
             return SaleOrderInventoryStatusList;
 
         }
-      
+
+        public IEnumerable<SaleOrderInventoryStatus_ShipViewModel> ShipDetail(SaleOrderInventoryStatusDisplayFilterSettings Settings)
+        {
+            var StatusOnDateSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "StatusOnDate" select H).FirstOrDefault();
+            var DocTypeIdSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "DocTypeId" select H).FirstOrDefault();
+            var SiteSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "Site" select H).FirstOrDefault();
+            var DivisionSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "Division" select H).FirstOrDefault();
+            var FromDateSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "FromDate" select H).FirstOrDefault();
+            var ToDateSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "ToDate" select H).FirstOrDefault();
+            var BuyerSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "Buyer" select H).FirstOrDefault();
+            var SaleOrderHeaderIdSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "SaleOrderHeaderId" select H).FirstOrDefault();
+            var ProductSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "Product" select H).FirstOrDefault();
+            var ProductCategorySetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "ProductCategory" select H).FirstOrDefault();
+            var ProductQualitySetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "ProductQuality" select H).FirstOrDefault();
+            var ProductGroupSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "ProductGroup" select H).FirstOrDefault();
+            var ProductSizeSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "ProductSize" select H).FirstOrDefault();
+            var ReportTypeSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "ReportType" select H).FirstOrDefault();
+            var ReportForSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "ReportFor" select H).FirstOrDefault();
+            var NextFormatSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "NextFormat" select H).FirstOrDefault();
+            var BuyerDesignSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "BuyerDesign" select H).FirstOrDefault();
+            var TextHiddenSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "TextHidden" select H).FirstOrDefault();
+
+
+
+            string StatusOnDate = StatusOnDateSetting.Value;
+            string DocTypeId = DocTypeIdSetting.Value;
+            //string Site = SiteSetting.Value;
+            //string Division = DivisionSetting.Value;
+            string Site = "1";
+            string Division = "1";
+            string FromDate = FromDateSetting.Value;
+            string ToDate = ToDateSetting.Value;
+            string Buyer = BuyerSetting.Value;
+            string SaleOrderHeaderId = SaleOrderHeaderIdSetting.Value;
+            string Product = ProductSetting.Value;
+            string ProductCategory = ProductCategorySetting.Value;
+            string ProductQuality = ProductQualitySetting.Value;
+            string ProductGroup = ProductGroupSetting.Value;
+            string ProductSize = ProductSizeSetting.Value;
+            string ReportType = ReportTypeSetting.Value;
+            string ReportFor = ReportForSetting.Value;
+            string NextFormat = NextFormatSetting.Value;
+            string BuyerDesign = BuyerDesignSetting.Value;
+            string TextHidden = TextHiddenSetting.Value;
+
+
+            string mQry;
+
+
+            SqlParameter SqlParameterStatusOnDate = new SqlParameter("@StatusOnDate", !string.IsNullOrEmpty(StatusOnDate) ? StatusOnDate : (object)DBNull.Value);
+            SqlParameter SqlParameterDocTypeId = new SqlParameter("@DocTypeId", !string.IsNullOrEmpty(DocTypeId) ? DocTypeId : (object)DBNull.Value);
+            SqlParameter SqlParameterSite = new SqlParameter("@Site", !string.IsNullOrEmpty(Site) ? Site : (object)DBNull.Value);
+            SqlParameter SqlParameterDivision = new SqlParameter("@Division", !string.IsNullOrEmpty(Division) ? Division : (object)DBNull.Value);
+            SqlParameter SqlParameterFromDate = new SqlParameter("@FromDate", !string.IsNullOrEmpty(FromDate) ? FromDate : (object)DBNull.Value);
+            SqlParameter SqlParameterToDate = new SqlParameter("@ToDate", !string.IsNullOrEmpty(ToDate) ? ToDate : (object)DBNull.Value);
+            SqlParameter SqlParameterBuyer = new SqlParameter("@Buyer", !string.IsNullOrEmpty(Buyer) ? Buyer : (object)DBNull.Value);
+            SqlParameter SqlParameterSaleOrderHeaderId = new SqlParameter("@SaleOrderHeaderId", !string.IsNullOrEmpty(SaleOrderHeaderId) ? SaleOrderHeaderId : (object)DBNull.Value);
+            SqlParameter SqlParameterProduct = new SqlParameter("@Product", !string.IsNullOrEmpty(Product) ? Product : (object)DBNull.Value);
+            SqlParameter SqlParameterProductCategory = new SqlParameter("@ProductCategory", !string.IsNullOrEmpty(ProductCategory) ? ProductCategory : (object)DBNull.Value);
+            SqlParameter SqlParameterProductQuality = new SqlParameter("@ProductQuality", !string.IsNullOrEmpty(ProductQuality) ? ProductQuality : (object)DBNull.Value);
+            SqlParameter SqlParameterProductGroup = new SqlParameter("@ProductGroup", !string.IsNullOrEmpty(ProductGroup) ? ProductGroup : (object)DBNull.Value);
+            SqlParameter SqlParameterProductSize = new SqlParameter("@ProductSize", !string.IsNullOrEmpty(ProductSize) ? ProductSize : (object)DBNull.Value);
+            SqlParameter SqlParameterReportType = new SqlParameter("@ReportType", !string.IsNullOrEmpty(ReportType) ? ReportType : (object)DBNull.Value);
+            SqlParameter SqlParameterReportFor = new SqlParameter("@ReportFor", !string.IsNullOrEmpty(ReportFor) ? ReportFor : (object)DBNull.Value);
+            SqlParameter SqlParameterNextFormat = new SqlParameter("@NextFormat", !string.IsNullOrEmpty(NextFormat) ? NextFormat : (object)DBNull.Value);
+            SqlParameter SqlParameterBuyerDesign = new SqlParameter("@BuyerDesign", !string.IsNullOrEmpty(BuyerDesign) ? BuyerDesign : (object)DBNull.Value);
+            SqlParameter SqlParameterTextHidden = new SqlParameter("@TextHidden", !string.IsNullOrEmpty(TextHidden) ? TextHidden : (object)DBNull.Value);
+
+
+            mQry = @"SELECT H.DocNo AS Invoice_No, Convert(NVARCHAR,H.DocDate,103) AS Date, PL.BaleNo AS Roll_No, PL.Remark, PU.ProductUidName AS CarpetNo, PC.ProductCategoryName AS Type,
+                    PQ.ProductQualityName AS Quality, PG.ProductGroupName AS Design, C.ColourName AS Colour, VRS.ManufaturingSizeName AS Size, PL.Qty  
+                    FROM web.SaleInvoiceHeaders H WITH (Nolock)
+                    LEFT JOIN web.SaleInvoiceLines L WITH (Nolock) ON L.SaleInvoiceHeaderId = H.SaleInvoiceHeaderId 
+                    LEFT JOIN web.SaleDispatchLines SDL WITH (Nolock) ON SDL.SaleDispatchLineId = L.SaleDispatchLineId 
+                    LEFT JOIN web.PackingLines PL WITH (Nolock) ON PL.PackingLineId = SDL.PackingLineId
+                    LEFT JOIN web.ProductUids PU ON PU.ProductUIDId = PL.ProductUIDId OR PU.ProductUidName = PL.LotNo 
+                    LEFT JOIN web.Products P WITH (Nolock) ON P.ProductId = PL.ProductId 
+                    LEFT JOIN web.ProductGroups PG WITH (Nolock) ON PG.ProductGroupId = P.ProductGroupId
+                    LEFT JOIN web.FinishedProduct FP WITH (Nolock) ON FP.ProductId = P.ProductId 
+                    LEFT JOIN web.Colours C WITH (Nolock) ON C.ColourId = FP.ColourId 
+                    LEFT JOIN web.ViewRugSize VRS WITH (Nolock) ON VRS.ProductId = P.ProductId 
+                    LEFT JOIN web.ProductCategories PC WITH (Nolock) ON PC.ProductCategoryId = P.ProductCategoryId 
+                    LEFT JOIN web.ProductQualities PQ WITH (Nolock) ON PQ.ProductQualityId = FP.ProductQualityId 
+                    LEFT JOIN web.SaleOrderLines SOL WITH (Nolock) ON SOL.SaleOrderLineId = PL.SaleOrderLineId
+                    LEFT JOIN web.SaleOrderHeaders SOH WITH (Nolock) ON SOH.SaleOrderHeaderId = SOL.SaleOrderHeaderId
+                    Where 1=1 " +
+                    (DocTypeId != null ? " AND SOH.DocTypeId IN (SELECT Items FROM[dbo].[Split](@DocTypeId, ','))" : "") +
+                      (Product != null ? " AND P.ProductId IN (SELECT Items FROM [dbo].[Split] (@Product, ','))" : "") +
+                      (ProductQuality != null ? " AND Fp.ProductQualityId IN (SELECT Items FROM  Web.[Split] (@ProductQuality, ','))" : "") +
+                      (ProductCategory != null ? " AND P.ProductCategoryId  IN (SELECT Items FROM  Web.[Split] (@ProductCategory, ','))" : "") +
+                      (ProductGroup != null ? " AND P.ProductGroupId IN (SELECT Items FROM  Web.[Split] (@ProductGroup, ','))" : "") +
+                      (SaleOrderHeaderId != null ? " AND SOH.SaleOrderHeaderId IN (SELECT Items FROM [dbo].[Split] (@SaleOrderHeaderId, ','))" : "") +
+                      (Buyer != null ? " AND SOH.SaleToBuyerId  IN (SELECT Items FROM [dbo].[Split] (@Buyer, ','))" : "");
+
+
+             if (ReportTypeSetting.Value == "Summary")
+                mQry = mQry + " AND P.ProductId = @TextHidden ";
+            else
+                mQry = mQry + " AND PL.SaleOrderLineId = @TextHidden ";
+
+            IEnumerable<SaleOrderInventoryStatus_ShipViewModel> SaleOrderInventoryStatusList = db.Database.SqlQuery<SaleOrderInventoryStatus_ShipViewModel>(mQry, SqlParameterTextHidden, SqlParameterStatusOnDate, SqlParameterDocTypeId, SqlParameterSite, SqlParameterDivision, SqlParameterFromDate, SqlParameterToDate, SqlParameterBuyer, SqlParameterSaleOrderHeaderId, SqlParameterProduct, SqlParameterProductCategory, SqlParameterProductQuality, SqlParameterProductGroup, SqlParameterProductSize, SqlParameterReportFor, SqlParameterBuyerDesign).ToList();
+
+
+            return SaleOrderInventoryStatusList;
+
+        }
+
+        public IEnumerable<SaleOrderInventoryStatus_ToBeIssueViewModel> ToBeIssueDetail(SaleOrderInventoryStatusDisplayFilterSettings Settings)
+        {
+            var StatusOnDateSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "StatusOnDate" select H).FirstOrDefault();
+            var DocTypeIdSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "DocTypeId" select H).FirstOrDefault();
+            var SiteSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "Site" select H).FirstOrDefault();
+            var DivisionSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "Division" select H).FirstOrDefault();
+            var FromDateSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "FromDate" select H).FirstOrDefault();
+            var ToDateSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "ToDate" select H).FirstOrDefault();
+            var BuyerSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "Buyer" select H).FirstOrDefault();
+            var SaleOrderHeaderIdSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "SaleOrderHeaderId" select H).FirstOrDefault();
+            var ProductSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "Product" select H).FirstOrDefault();
+            var ProductCategorySetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "ProductCategory" select H).FirstOrDefault();
+            var ProductQualitySetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "ProductQuality" select H).FirstOrDefault();
+            var ProductGroupSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "ProductGroup" select H).FirstOrDefault();
+            var ProductSizeSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "ProductSize" select H).FirstOrDefault();
+            var ReportTypeSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "ReportType" select H).FirstOrDefault();
+            var ReportForSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "ReportFor" select H).FirstOrDefault();
+            var NextFormatSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "NextFormat" select H).FirstOrDefault();
+            var BuyerDesignSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "BuyerDesign" select H).FirstOrDefault();
+            var TextHiddenSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "TextHidden" select H).FirstOrDefault();
+
+
+
+            string StatusOnDate = StatusOnDateSetting.Value;
+            string DocTypeId = DocTypeIdSetting.Value;
+            //string Site = SiteSetting.Value;
+            //string Division = DivisionSetting.Value;
+            string Site = "1";
+            string Division = "1";
+            string FromDate = FromDateSetting.Value;
+            string ToDate = ToDateSetting.Value;
+            string Buyer = BuyerSetting.Value;
+            string SaleOrderHeaderId = SaleOrderHeaderIdSetting.Value;
+            string Product = ProductSetting.Value;
+            string ProductCategory = ProductCategorySetting.Value;
+            string ProductQuality = ProductQualitySetting.Value;
+            string ProductGroup = ProductGroupSetting.Value;
+            string ProductSize = ProductSizeSetting.Value;
+            string ReportType = ReportTypeSetting.Value;
+            string ReportFor = ReportForSetting.Value;
+            string NextFormat = NextFormatSetting.Value;
+            string BuyerDesign = BuyerDesignSetting.Value;
+            string TextHidden = TextHiddenSetting.Value;
+
+
+            string mQry;
+
+
+            SqlParameter SqlParameterStatusOnDate = new SqlParameter("@StatusOnDate", !string.IsNullOrEmpty(StatusOnDate) ? StatusOnDate : (object)DBNull.Value);
+            SqlParameter SqlParameterDocTypeId = new SqlParameter("@DocTypeId", !string.IsNullOrEmpty(DocTypeId) ? DocTypeId : (object)DBNull.Value);
+            SqlParameter SqlParameterSite = new SqlParameter("@Site", !string.IsNullOrEmpty(Site) ? Site : (object)DBNull.Value);
+            SqlParameter SqlParameterDivision = new SqlParameter("@Division", !string.IsNullOrEmpty(Division) ? Division : (object)DBNull.Value);
+            SqlParameter SqlParameterFromDate = new SqlParameter("@FromDate", !string.IsNullOrEmpty(FromDate) ? FromDate : (object)DBNull.Value);
+            SqlParameter SqlParameterToDate = new SqlParameter("@ToDate", !string.IsNullOrEmpty(ToDate) ? ToDate : (object)DBNull.Value);
+            SqlParameter SqlParameterBuyer = new SqlParameter("@Buyer", !string.IsNullOrEmpty(Buyer) ? Buyer : (object)DBNull.Value);
+            SqlParameter SqlParameterSaleOrderHeaderId = new SqlParameter("@SaleOrderHeaderId", !string.IsNullOrEmpty(SaleOrderHeaderId) ? SaleOrderHeaderId : (object)DBNull.Value);
+            SqlParameter SqlParameterProduct = new SqlParameter("@Product", !string.IsNullOrEmpty(Product) ? Product : (object)DBNull.Value);
+            SqlParameter SqlParameterProductCategory = new SqlParameter("@ProductCategory", !string.IsNullOrEmpty(ProductCategory) ? ProductCategory : (object)DBNull.Value);
+            SqlParameter SqlParameterProductQuality = new SqlParameter("@ProductQuality", !string.IsNullOrEmpty(ProductQuality) ? ProductQuality : (object)DBNull.Value);
+            SqlParameter SqlParameterProductGroup = new SqlParameter("@ProductGroup", !string.IsNullOrEmpty(ProductGroup) ? ProductGroup : (object)DBNull.Value);
+            SqlParameter SqlParameterProductSize = new SqlParameter("@ProductSize", !string.IsNullOrEmpty(ProductSize) ? ProductSize : (object)DBNull.Value);
+            SqlParameter SqlParameterReportType = new SqlParameter("@ReportType", !string.IsNullOrEmpty(ReportType) ? ReportType : (object)DBNull.Value);
+            SqlParameter SqlParameterReportFor = new SqlParameter("@ReportFor", !string.IsNullOrEmpty(ReportFor) ? ReportFor : (object)DBNull.Value);
+            SqlParameter SqlParameterNextFormat = new SqlParameter("@NextFormat", !string.IsNullOrEmpty(NextFormat) ? NextFormat : (object)DBNull.Value);
+            SqlParameter SqlParameterBuyerDesign = new SqlParameter("@BuyerDesign", !string.IsNullOrEmpty(BuyerDesign) ? BuyerDesign : (object)DBNull.Value);
+            SqlParameter SqlParameterTextHidden = new SqlParameter("@TextHidden", !string.IsNullOrEmpty(TextHidden) ? TextHidden : (object)DBNull.Value);
+
+
+            mQry = @"SELECT S.SiteName AS Branch, convert(NVARCHAR,POH.DocDate,103) AS Slip_Date, PQ.ProductQualityName AS Quality, PG.ProductGroupName AS Design, C.ColourName AS Colour, VRS.ManufaturingSizeName AS Size,
+                    H.Qty, H.ORdQty AS Iss,isnull((H.BalanceQty),0) AS UX
+                    FROM Web.FProdOrderBalance_OneDocumentType_InBrabch(getdate(),273) H
+                    LEFT JOIN web.Sites S ON S.SiteId = H.SiteId
+                    LEFT JOIN web.ProdOrderLines POL WITH (Nolock) ON POL.ProdOrderLineId = H.ProdOrderLineId
+                    LEFT JOIN web.JobOrderLines JOL WITH (Nolock) ON JOL.JobOrderLineId = POL.ReferenceDocLineId 
+                    LEFT JOIN web.ProdOrderLines POL1 WITH (Nolock) ON POL1.ProdOrderLineId = JOL.ProdOrderLineId 
+                    LEFT JOIN web.ProdOrderHeaders POH WITH (Nolock) ON  POH.ProdOrderHeaderId = POL1.ProdOrderHeaderId 
+                    LEFT JOIN web.Products P WITH (Nolock) ON P.ProductId = POL.ProductId 
+                    LEFT JOIN web.ProductGroups PG WITH (Nolock) ON PG.ProductGroupId = P.ProductGroupId
+                    LEFT JOIN web.FinishedProduct FP WITH (Nolock) ON FP.ProductId = P.ProductId 
+                    LEFT JOIN web.Colours C WITH (Nolock) ON C.ColourId = FP.ColourId 
+                    LEFT JOIN web.ViewRugSize VRS WITH (Nolock) ON VRS.ProductId = P.ProductId 
+                    LEFT JOIN web.ProductCategories PC WITH (Nolock) ON PC.ProductCategoryId = P.ProductCategoryId 
+                    LEFT JOIN web.ProductQualities PQ WITH (Nolock) ON PQ.ProductQualityId = FP.ProductQualityId 
+                    LEFT JOIN web.MaterialPlanForSaleOrders MOS WITH (Nolock) ON MOS.MaterialPlanLineId = POL1.MaterialPlanLineId  
+                    LEFT JOIN web.SaleOrderLines SOL WITH (Nolock) ON SOL.SaleOrderLineId = MOS.SaleOrderLineId
+                    LEFT JOIN web.SaleOrderHeaders SOH WITH (Nolock) ON SOH.SaleOrderHeaderId = SOL.SaleOrderHeaderId
+                    WHERE 1=1 " +
+                    (DocTypeId != null ? " AND SOH.DocTypeId IN (SELECT Items FROM[dbo].[Split](@DocTypeId, ','))" : "") +
+                  (Product != null ? " AND P.ProductId IN (SELECT Items FROM [dbo].[Split] (@Product, ','))" : "") +
+                  (ProductQuality != null ? " AND Fp.ProductQualityId IN (SELECT Items FROM  Web.[Split] (@ProductQuality, ','))" : "") +
+                  (ProductCategory != null ? " AND P.ProductCategoryId  IN (SELECT Items FROM  Web.[Split] (@ProductCategory, ','))" : "") +
+                  (ProductGroup != null ? " AND P.ProductGroupId IN (SELECT Items FROM  Web.[Split] (@ProductGroup, ','))" : "") +
+                  (SaleOrderHeaderId != null ? " AND SOH.SaleOrderHeaderId IN (SELECT Items FROM [dbo].[Split] (@SaleOrderHeaderId, ','))" : "") +
+                  (Buyer != null ? " AND SOH.SaleToBuyerId  IN (SELECT Items FROM [dbo].[Split] (@Buyer, ','))" : "");
+
+            if (ReportTypeSetting.Value == "Summary")
+                mQry = mQry + " AND H.ProductId = @TextHidden ";
+            else
+                mQry = mQry + " AND MOS.SaleOrderLineId = @TextHidden ";
+
+
+            IEnumerable<SaleOrderInventoryStatus_ToBeIssueViewModel> SaleOrderInventoryStatusList = db.Database.SqlQuery<SaleOrderInventoryStatus_ToBeIssueViewModel>(mQry, SqlParameterTextHidden, SqlParameterStatusOnDate, SqlParameterDocTypeId, SqlParameterSite, SqlParameterDivision, SqlParameterFromDate, SqlParameterToDate, SqlParameterBuyer, SqlParameterSaleOrderHeaderId, SqlParameterProduct, SqlParameterProductCategory, SqlParameterProductQuality, SqlParameterProductGroup, SqlParameterProductSize, SqlParameterReportFor, SqlParameterBuyerDesign).ToList();
+
+
+            return SaleOrderInventoryStatusList;
+
+        }
+
+        public IEnumerable<SaleOrderInventoryStatus_DOViewModel> DODetail(SaleOrderInventoryStatusDisplayFilterSettings Settings)
+        {
+            var StatusOnDateSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "StatusOnDate" select H).FirstOrDefault();
+            var DocTypeIdSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "DocTypeId" select H).FirstOrDefault();
+            var SiteSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "Site" select H).FirstOrDefault();
+            var DivisionSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "Division" select H).FirstOrDefault();
+            var FromDateSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "FromDate" select H).FirstOrDefault();
+            var ToDateSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "ToDate" select H).FirstOrDefault();
+            var BuyerSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "Buyer" select H).FirstOrDefault();
+            var SaleOrderHeaderIdSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "SaleOrderHeaderId" select H).FirstOrDefault();
+            var ProductSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "Product" select H).FirstOrDefault();
+            var ProductCategorySetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "ProductCategory" select H).FirstOrDefault();
+            var ProductQualitySetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "ProductQuality" select H).FirstOrDefault();
+            var ProductGroupSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "ProductGroup" select H).FirstOrDefault();
+            var ProductSizeSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "ProductSize" select H).FirstOrDefault();
+            var ReportTypeSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "ReportType" select H).FirstOrDefault();
+            var ReportForSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "ReportFor" select H).FirstOrDefault();
+            var NextFormatSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "NextFormat" select H).FirstOrDefault();
+            var BuyerDesignSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "BuyerDesign" select H).FirstOrDefault();
+            var TextHiddenSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "TextHidden" select H).FirstOrDefault();
+
+
+
+            string StatusOnDate = StatusOnDateSetting.Value;
+            string DocTypeId = DocTypeIdSetting.Value;
+            //string Site = SiteSetting.Value;
+            //string Division = DivisionSetting.Value;
+            string Site = "1";
+            string Division = "1";
+            string FromDate = FromDateSetting.Value;
+            string ToDate = ToDateSetting.Value;
+            string Buyer = BuyerSetting.Value;
+            string SaleOrderHeaderId = SaleOrderHeaderIdSetting.Value;
+            string Product = ProductSetting.Value;
+            string ProductCategory = ProductCategorySetting.Value;
+            string ProductQuality = ProductQualitySetting.Value;
+            string ProductGroup = ProductGroupSetting.Value;
+            string ProductSize = ProductSizeSetting.Value;
+            string ReportType = ReportTypeSetting.Value;
+            string ReportFor = ReportForSetting.Value;
+            string NextFormat = NextFormatSetting.Value;
+            string BuyerDesign = BuyerDesignSetting.Value;
+            string TextHidden = TextHiddenSetting.Value;
+
+
+            string mQry;
+
+
+            SqlParameter SqlParameterStatusOnDate = new SqlParameter("@StatusOnDate", !string.IsNullOrEmpty(StatusOnDate) ? StatusOnDate : (object)DBNull.Value);
+            SqlParameter SqlParameterDocTypeId = new SqlParameter("@DocTypeId", !string.IsNullOrEmpty(DocTypeId) ? DocTypeId : (object)DBNull.Value);
+            SqlParameter SqlParameterSite = new SqlParameter("@Site", !string.IsNullOrEmpty(Site) ? Site : (object)DBNull.Value);
+            SqlParameter SqlParameterDivision = new SqlParameter("@Division", !string.IsNullOrEmpty(Division) ? Division : (object)DBNull.Value);
+            SqlParameter SqlParameterFromDate = new SqlParameter("@FromDate", !string.IsNullOrEmpty(FromDate) ? FromDate : (object)DBNull.Value);
+            SqlParameter SqlParameterToDate = new SqlParameter("@ToDate", !string.IsNullOrEmpty(ToDate) ? ToDate : (object)DBNull.Value);
+            SqlParameter SqlParameterBuyer = new SqlParameter("@Buyer", !string.IsNullOrEmpty(Buyer) ? Buyer : (object)DBNull.Value);
+            SqlParameter SqlParameterSaleOrderHeaderId = new SqlParameter("@SaleOrderHeaderId", !string.IsNullOrEmpty(SaleOrderHeaderId) ? SaleOrderHeaderId : (object)DBNull.Value);
+            SqlParameter SqlParameterProduct = new SqlParameter("@Product", !string.IsNullOrEmpty(Product) ? Product : (object)DBNull.Value);
+            SqlParameter SqlParameterProductCategory = new SqlParameter("@ProductCategory", !string.IsNullOrEmpty(ProductCategory) ? ProductCategory : (object)DBNull.Value);
+            SqlParameter SqlParameterProductQuality = new SqlParameter("@ProductQuality", !string.IsNullOrEmpty(ProductQuality) ? ProductQuality : (object)DBNull.Value);
+            SqlParameter SqlParameterProductGroup = new SqlParameter("@ProductGroup", !string.IsNullOrEmpty(ProductGroup) ? ProductGroup : (object)DBNull.Value);
+            SqlParameter SqlParameterProductSize = new SqlParameter("@ProductSize", !string.IsNullOrEmpty(ProductSize) ? ProductSize : (object)DBNull.Value);
+            SqlParameter SqlParameterReportType = new SqlParameter("@ReportType", !string.IsNullOrEmpty(ReportType) ? ReportType : (object)DBNull.Value);
+            SqlParameter SqlParameterReportFor = new SqlParameter("@ReportFor", !string.IsNullOrEmpty(ReportFor) ? ReportFor : (object)DBNull.Value);
+            SqlParameter SqlParameterNextFormat = new SqlParameter("@NextFormat", !string.IsNullOrEmpty(NextFormat) ? NextFormat : (object)DBNull.Value);
+            SqlParameter SqlParameterBuyerDesign = new SqlParameter("@BuyerDesign", !string.IsNullOrEmpty(BuyerDesign) ? BuyerDesign : (object)DBNull.Value);
+            SqlParameter SqlParameterTextHidden = new SqlParameter("@TextHidden", !string.IsNullOrEmpty(TextHidden) ? TextHidden : (object)DBNull.Value);
+
+
+            mQry = @"SELECT SOH.DocNo AS Order_No, PU.ProductUidName AS CarpetNo, Convert(NVARCHAR,H.DocDate,103) AS Date,  PC.ProductCategoryName AS Type,
+                    PQ.ProductQualityName AS Quality, PG.ProductGroupName AS Design, C.ColourName AS Colour, VRS.ManufaturingSizeName AS Size, PL.Qty , B.Name AS Buyer 
+                    FROM web.SaleInvoiceHeaders H WITH (Nolock)
+                    LEFT JOIN web.SaleInvoiceLines L WITH (Nolock) ON L.SaleInvoiceHeaderId = H.SaleInvoiceHeaderId 
+                    LEFT JOIN web.SaleDispatchLines SDL WITH (Nolock) ON SDL.SaleDispatchLineId = L.SaleDispatchLineId 
+                    LEFT JOIN web.PackingLines PL WITH (Nolock) ON PL.PackingLineId = SDL.PackingLineId
+                    LEFT JOIN web.ProductUids PU ON PU.ProductUIDId = PL.ProductUIDId OR PU.ProductUidName = PL.LotNo 
+                    LEFT JOIN web.Products P WITH (Nolock) ON P.ProductId = PL.ProductId 
+                    LEFT JOIN web.ProductGroups PG WITH (Nolock) ON PG.ProductGroupId = P.ProductGroupId
+                    LEFT JOIN web.FinishedProduct FP WITH (Nolock) ON FP.ProductId = P.ProductId 
+                    LEFT JOIN web.Colours C WITH (Nolock) ON C.ColourId = FP.ColourId 
+                    LEFT JOIN web.ViewRugSize VRS WITH (Nolock) ON VRS.ProductId = P.ProductId 
+                    LEFT JOIN web.ProductCategories PC WITH (Nolock) ON PC.ProductCategoryId = P.ProductCategoryId 
+                    LEFT JOIN web.ProductQualities PQ WITH (Nolock) ON PQ.ProductQualityId = FP.ProductQualityId 
+                    LEFT JOIN web.SaleOrderLines SOL WITH (Nolock) ON SOL.SaleOrderLineId = PL.SaleOrderLineId
+                    LEFT JOIN web.SaleOrderHeaders SOH WITH (Nolock) ON SOH.SaleOrderHeaderId = SOL.SaleOrderHeaderId
+                    LEFT JOIN web.People B WITH (Nolock) ON SOH.SaleToBuyerId = B.PersonID
+                    Where 1=1 " +
+                    (DocTypeId != null ? " AND SOH.DocTypeId IN (SELECT Items FROM[dbo].[Split](@DocTypeId, ','))" : "") +
+                      (Product != null ? " AND P.ProductId IN (SELECT Items FROM [dbo].[Split] (@Product, ','))" : "") +
+                      (ProductQuality != null ? " AND Fp.ProductQualityId IN (SELECT Items FROM  Web.[Split] (@ProductQuality, ','))" : "") +
+                      (ProductCategory != null ? " AND P.ProductCategoryId  IN (SELECT Items FROM  Web.[Split] (@ProductCategory, ','))" : "") +
+                      (ProductGroup != null ? " AND P.ProductGroupId IN (SELECT Items FROM  Web.[Split] (@ProductGroup, ','))" : "") +
+                      (SaleOrderHeaderId != null ? " AND SOH.SaleOrderHeaderId IN (SELECT Items FROM [dbo].[Split] (@SaleOrderHeaderId, ','))" : "") +
+                      (Buyer != null ? " AND SOH.SaleToBuyerId  IN (SELECT Items FROM [dbo].[Split] (@Buyer, ','))" : "");
+
+
+            if (ReportTypeSetting.Value == "Summary")
+                mQry = mQry + " AND P.ProductId = @TextHidden ";
+            else
+                mQry = mQry + " AND PL.SaleOrderLineId = @TextHidden ";
+
+            IEnumerable<SaleOrderInventoryStatus_DOViewModel> SaleOrderInventoryStatusList = db.Database.SqlQuery<SaleOrderInventoryStatus_DOViewModel>(mQry, SqlParameterTextHidden, SqlParameterStatusOnDate, SqlParameterDocTypeId, SqlParameterSite, SqlParameterDivision, SqlParameterFromDate, SqlParameterToDate, SqlParameterBuyer, SqlParameterSaleOrderHeaderId, SqlParameterProduct, SqlParameterProductCategory, SqlParameterProductQuality, SqlParameterProductGroup, SqlParameterProductSize, SqlParameterReportFor, SqlParameterBuyerDesign).ToList();
+
+
+            return SaleOrderInventoryStatusList;
+
+        }
+
+        public IEnumerable<SaleOrderInventoryStatus_OXViewModel> OXDetail(SaleOrderInventoryStatusDisplayFilterSettings Settings)
+        {
+            var StatusOnDateSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "StatusOnDate" select H).FirstOrDefault();
+            var DocTypeIdSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "DocTypeId" select H).FirstOrDefault();
+            var SiteSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "Site" select H).FirstOrDefault();
+            var DivisionSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "Division" select H).FirstOrDefault();
+            var FromDateSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "FromDate" select H).FirstOrDefault();
+            var ToDateSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "ToDate" select H).FirstOrDefault();
+            var BuyerSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "Buyer" select H).FirstOrDefault();
+            var SaleOrderHeaderIdSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "SaleOrderHeaderId" select H).FirstOrDefault();
+            var ProductSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "Product" select H).FirstOrDefault();
+            var ProductCategorySetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "ProductCategory" select H).FirstOrDefault();
+            var ProductQualitySetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "ProductQuality" select H).FirstOrDefault();
+            var ProductGroupSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "ProductGroup" select H).FirstOrDefault();
+            var ProductSizeSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "ProductSize" select H).FirstOrDefault();
+            var ReportTypeSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "ReportType" select H).FirstOrDefault();
+            var ReportForSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "ReportFor" select H).FirstOrDefault();
+            var NextFormatSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "NextFormat" select H).FirstOrDefault();
+            var BuyerDesignSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "BuyerDesign" select H).FirstOrDefault();
+            var TextHiddenSetting = (from H in Settings.SaleOrderInventoryStatusDisplayFilterParameters where H.ParameterName == "TextHidden" select H).FirstOrDefault();
+
+
+
+            string StatusOnDate = StatusOnDateSetting.Value;
+            string DocTypeId = DocTypeIdSetting.Value;
+            //string Site = SiteSetting.Value;
+            //string Division = DivisionSetting.Value;
+            string Site = "1";
+            string Division = "1";
+            string FromDate = FromDateSetting.Value;
+            string ToDate = ToDateSetting.Value;
+            string Buyer = BuyerSetting.Value;
+            string SaleOrderHeaderId = SaleOrderHeaderIdSetting.Value;
+            string Product = ProductSetting.Value;
+            string ProductCategory = ProductCategorySetting.Value;
+            string ProductQuality = ProductQualitySetting.Value;
+            string ProductGroup = ProductGroupSetting.Value;
+            string ProductSize = ProductSizeSetting.Value;
+            string ReportType = ReportTypeSetting.Value;
+            string ReportFor = ReportForSetting.Value;
+            string NextFormat = NextFormatSetting.Value;
+            string BuyerDesign = BuyerDesignSetting.Value;
+            string TextHidden = TextHiddenSetting.Value;
+
+
+            string mQry;
+
+
+            SqlParameter SqlParameterStatusOnDate = new SqlParameter("@StatusOnDate", !string.IsNullOrEmpty(StatusOnDate) ? StatusOnDate : (object)DBNull.Value);
+            SqlParameter SqlParameterDocTypeId = new SqlParameter("@DocTypeId", !string.IsNullOrEmpty(DocTypeId) ? DocTypeId : (object)DBNull.Value);
+            SqlParameter SqlParameterSite = new SqlParameter("@Site", !string.IsNullOrEmpty(Site) ? Site : (object)DBNull.Value);
+            SqlParameter SqlParameterDivision = new SqlParameter("@Division", !string.IsNullOrEmpty(Division) ? Division : (object)DBNull.Value);
+            SqlParameter SqlParameterFromDate = new SqlParameter("@FromDate", !string.IsNullOrEmpty(FromDate) ? FromDate : (object)DBNull.Value);
+            SqlParameter SqlParameterToDate = new SqlParameter("@ToDate", !string.IsNullOrEmpty(ToDate) ? ToDate : (object)DBNull.Value);
+            SqlParameter SqlParameterBuyer = new SqlParameter("@Buyer", !string.IsNullOrEmpty(Buyer) ? Buyer : (object)DBNull.Value);
+            SqlParameter SqlParameterSaleOrderHeaderId = new SqlParameter("@SaleOrderHeaderId", !string.IsNullOrEmpty(SaleOrderHeaderId) ? SaleOrderHeaderId : (object)DBNull.Value);
+            SqlParameter SqlParameterProduct = new SqlParameter("@Product", !string.IsNullOrEmpty(Product) ? Product : (object)DBNull.Value);
+            SqlParameter SqlParameterProductCategory = new SqlParameter("@ProductCategory", !string.IsNullOrEmpty(ProductCategory) ? ProductCategory : (object)DBNull.Value);
+            SqlParameter SqlParameterProductQuality = new SqlParameter("@ProductQuality", !string.IsNullOrEmpty(ProductQuality) ? ProductQuality : (object)DBNull.Value);
+            SqlParameter SqlParameterProductGroup = new SqlParameter("@ProductGroup", !string.IsNullOrEmpty(ProductGroup) ? ProductGroup : (object)DBNull.Value);
+            SqlParameter SqlParameterProductSize = new SqlParameter("@ProductSize", !string.IsNullOrEmpty(ProductSize) ? ProductSize : (object)DBNull.Value);
+            SqlParameter SqlParameterReportType = new SqlParameter("@ReportType", !string.IsNullOrEmpty(ReportType) ? ReportType : (object)DBNull.Value);
+            SqlParameter SqlParameterReportFor = new SqlParameter("@ReportFor", !string.IsNullOrEmpty(ReportFor) ? ReportFor : (object)DBNull.Value);
+            SqlParameter SqlParameterNextFormat = new SqlParameter("@NextFormat", !string.IsNullOrEmpty(NextFormat) ? NextFormat : (object)DBNull.Value);
+            SqlParameter SqlParameterBuyerDesign = new SqlParameter("@BuyerDesign", !string.IsNullOrEmpty(BuyerDesign) ? BuyerDesign : (object)DBNull.Value);
+            SqlParameter SqlParameterTextHidden = new SqlParameter("@TextHidden", !string.IsNullOrEmpty(TextHidden) ? TextHidden : (object)DBNull.Value);
+
+
+            mQry = @"SELECT PU.ProductUidName AS CarpetNo, Convert(NVARCHAR,H.DocDate,103) AS Date,  PC.ProductCategoryName AS Type,
+                    PQ.ProductQualityName AS Quality, PG.ProductGroupName AS Design, C.ColourName AS Colour, VRS.ManufaturingSizeName AS Size, PL.Qty, B.Name AS Buyer  
+                    FROM web.SaleInvoiceHeaders H WITH (Nolock)
+                    LEFT JOIN web.SaleInvoiceLines L WITH (Nolock) ON L.SaleInvoiceHeaderId = H.SaleInvoiceHeaderId 
+                    LEFT JOIN web.SaleDispatchLines SDL WITH (Nolock) ON SDL.SaleDispatchLineId = L.SaleDispatchLineId 
+                    LEFT JOIN web.PackingLines PL WITH (Nolock) ON PL.PackingLineId = SDL.PackingLineId
+                    LEFT JOIN web.ProductUids PU ON PU.ProductUIDId = PL.ProductUIDId OR PU.ProductUidName = PL.LotNo 
+                    LEFT JOIN web.Products P WITH (Nolock) ON P.ProductId = PL.ProductId 
+                    LEFT JOIN web.ProductGroups PG WITH (Nolock) ON PG.ProductGroupId = P.ProductGroupId
+                    LEFT JOIN web.FinishedProduct FP WITH (Nolock) ON FP.ProductId = P.ProductId 
+                    LEFT JOIN web.Colours C WITH (Nolock) ON C.ColourId = FP.ColourId 
+                    LEFT JOIN web.ViewRugSize VRS WITH (Nolock) ON VRS.ProductId = P.ProductId 
+                    LEFT JOIN web.ProductCategories PC WITH (Nolock) ON PC.ProductCategoryId = P.ProductCategoryId 
+                    LEFT JOIN web.ProductQualities PQ WITH (Nolock) ON PQ.ProductQualityId = FP.ProductQualityId 
+                    LEFT JOIN web.SaleOrderLines SOL WITH (Nolock) ON SOL.SaleOrderLineId = PL.SaleOrderLineId
+                    LEFT JOIN web.SaleOrderHeaders SOH WITH (Nolock) ON SOH.SaleOrderHeaderId = SOL.SaleOrderHeaderId
+                    LEFT JOIN web.SaleOrderLines SOL1 WITH (Nolock) ON SOL1.SaleOrderLineId = PU.SaleOrderLineId
+                    LEFT JOIN web.SaleOrderHeaders SOH1 WITH (Nolock) ON SOH1.SaleOrderHeaderId = SOL1.SaleOrderHeaderId
+                    LEFT JOIN web.People B WITH (Nolock) ON SOH1.SaleToBuyerId = B.PersonID
+                    Where 1=1 " +
+                    (DocTypeId != null ? " AND SOH.DocTypeId IN (SELECT Items FROM[dbo].[Split](@DocTypeId, ','))" : "") +
+                      (Product != null ? " AND P.ProductId IN (SELECT Items FROM [dbo].[Split] (@Product, ','))" : "") +
+                      (ProductQuality != null ? " AND Fp.ProductQualityId IN (SELECT Items FROM  Web.[Split] (@ProductQuality, ','))" : "") +
+                      (ProductCategory != null ? " AND P.ProductCategoryId  IN (SELECT Items FROM  Web.[Split] (@ProductCategory, ','))" : "") +
+                      (ProductGroup != null ? " AND P.ProductGroupId IN (SELECT Items FROM  Web.[Split] (@ProductGroup, ','))" : "") +
+                      (SaleOrderHeaderId != null ? " AND SOH.SaleOrderHeaderId IN (SELECT Items FROM [dbo].[Split] (@SaleOrderHeaderId, ','))" : "") +
+                      (Buyer != null ? " AND SOH.SaleToBuyerId  IN (SELECT Items FROM [dbo].[Split] (@Buyer, ','))" : "");
+
+
+            if (ReportTypeSetting.Value == "Summary")
+                mQry = mQry + " AND P.ProductId = @TextHidden ";
+            else
+                mQry = mQry + " AND PL.SaleOrderLineId = @TextHidden ";
+
+            IEnumerable<SaleOrderInventoryStatus_OXViewModel> SaleOrderInventoryStatusList = db.Database.SqlQuery<SaleOrderInventoryStatus_OXViewModel>(mQry, SqlParameterTextHidden, SqlParameterStatusOnDate, SqlParameterDocTypeId, SqlParameterSite, SqlParameterDivision, SqlParameterFromDate, SqlParameterToDate, SqlParameterBuyer, SqlParameterSaleOrderHeaderId, SqlParameterProduct, SqlParameterProductCategory, SqlParameterProductQuality, SqlParameterProductGroup, SqlParameterProductSize, SqlParameterReportFor, SqlParameterBuyerDesign).ToList();
+
+
+            return SaleOrderInventoryStatusList;
+
+        }
+
         public void Dispose()
         {
         }
@@ -546,6 +1030,7 @@ namespace Service
     public class SaleOrderInventoryStatusViewModel
     {
         public int SaleOrderLineId { get; set; }
+        public int ProductId { get; set; }
         public string Buyer { get; set; }
         public string Order_No { get; set; }
         public string Order_Date { get; set; }
@@ -558,6 +1043,7 @@ namespace Service
         public decimal? ORD { get; set; }
         public decimal? O_C { get; set; }
         public decimal? SLP { get; set; }
+        public decimal? UX { get; set; }
         public decimal? LOOM { get; set; }
         public decimal? STK { get; set; }
         public decimal? SHP { get; set; }
@@ -589,7 +1075,7 @@ namespace Service
     public class SaleOrderInventoryStatus_StockViewModel
     {
         public string CarpetNo { get; set; }
-        public DateTime Date { get; set; }
+        public string Date { get; set; }
         public string Type { get; set; }
         public string Quality { get; set; }
         public string Design { get; set; }
@@ -610,6 +1096,65 @@ namespace Service
         public string Colour { get; set; }
         public string Size { get; set; }
         public decimal? LoomQty { get; set; }
+
+    }
+
+    public class SaleOrderInventoryStatus_ShipViewModel
+    {
+        public string Invoice_No { get; set; }
+        public string Date { get; set; }
+        public string Roll_No { get; set; }
+        public string Remark { get; set; }
+        public string CarpetNo { get; set; }
+        public string Type { get; set; }
+        public string Quality { get; set; }
+        public string Design { get; set; }
+        public string Colour { get; set; }
+        public string Size { get; set; }
+        public decimal? Qty { get; set; }
+
+    }
+
+    public class SaleOrderInventoryStatus_ToBeIssueViewModel
+    {
+        public string Branch { get; set; }
+        public string Slip_Date { get; set; }
+        public string Quality { get; set; }
+        public string Design { get; set; }
+        public string Colour { get; set; }
+        public string Size { get; set; }
+        public decimal? Qty { get; set; }
+        public decimal? Iss { get; set; }
+        public decimal? UX { get; set; }
+
+    }
+
+    public class SaleOrderInventoryStatus_DOViewModel
+    {
+        public string Order_No { get; set; }
+        public string CarpetNo { get; set; }
+        public string Date { get; set; }
+        public string Type { get; set; }
+        public string Quality { get; set; }
+        public string Design { get; set; }
+        public string Colour { get; set; }
+        public string Size { get; set; }
+        public decimal? Qty { get; set; }
+        public string Buyer { get; set; }
+
+    }
+
+    public class SaleOrderInventoryStatus_OXViewModel
+    {
+        public string CarpetNo { get; set; }
+        public string Date { get; set; }
+        public string Type { get; set; }
+        public string Quality { get; set; }
+        public string Design { get; set; }
+        public string Colour { get; set; }
+        public string Size { get; set; }
+        public decimal? Qty { get; set; }
+        public string Buyer { get; set; }
 
     }
 

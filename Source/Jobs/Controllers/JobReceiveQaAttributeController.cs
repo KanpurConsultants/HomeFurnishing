@@ -320,12 +320,12 @@ namespace Jobs.Controllers
         }
 
 
-        public JsonResult GetUnitConversionMultiplier(int ProductId, Decimal Length, Decimal Width, Decimal? Height, string ToUnitId)
+        public JsonResult GetUnitConversionMultiplier(int DocumentTypeId, int ProductId, Decimal Length, Decimal Width, Decimal? Height, string ToUnitId)
         {
             ProductViewModel product = new ProductService(_unitOfWork).GetProduct(ProductId);
 
             Decimal UnitConversionMultiplier = 0;
-            UnitConversionMultiplier = new ProductService(_unitOfWork).GetUnitConversionMultiplier(1, product.UnitId, Length, Width, Height, ToUnitId,db);
+            UnitConversionMultiplier = new ProductService(_unitOfWork).GetUnitConversionMultiplier(1, product.UnitId, Length, Width, Height, ToUnitId,db, DocumentTypeId);
 
             return Json(UnitConversionMultiplier);
         }

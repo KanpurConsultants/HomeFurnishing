@@ -36,6 +36,7 @@ function MainCtrl($scope, $http, uiGridConstants) {
           { name: 'BuyerSpecification1', displayName: BuyerSpecification1Caption, width: 120, cellClass: 'cell-text ', headerCellClass: 'header-text', enableCellEdit: false },
           { name: 'BuyerSpecification2', displayName: BuyerSpecification2Caption, width: 120, cellClass: 'cell-text ', headerCellClass: 'header-text', enableCellEdit: false },
           { name: 'BuyerSpecification3', displayName: BuyerSpecification3Caption, width: 120, cellClass: 'cell-text ', headerCellClass: 'header-text', enableCellEdit: false },
+          { name: 'TempRemark', displayName: "Remark", width: 70, cellClass: 'cell-text ', headerCellClass: 'header-text', enableCellEdit: false },
           {
               name: 'Product', cellClass: 'cell-text ', headerCellClass: 'header-text',
               editableCellTemplate: 'uiSelect',

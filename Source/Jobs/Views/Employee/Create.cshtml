@@ -269,7 +269,7 @@
                                         <div class="form-group">
                                             @Html.LabelFor(model => model.TdsCategoryId, "Tds Category", new { @class = "control-label col-md-4 col-sm-2" })
                                             <div class="col-md-7 col-sm-10">
-                                                @Html.DropDownListFor(m => m.TdsCategoryId, new SelectList(ViewBag.TdsCategoryList as System.Collections.IEnumerable, "TdsCategoryId", "TdsCategoryName"), new { @class = "form-control col-xs-6 height" })
+                                                @Html.DropDownListFor(m => m.TdsCategoryId, new SelectList(ViewBag.TdsCategoryList as System.Collections.IEnumerable, "TdsCategoryId", "TdsCategoryName"), " ", new { @class = "form-control col-xs-6 height" })
                                                 @Html.ValidationMessageFor(model => model.TdsCategoryId)
                                             </div>
                                         </div>
@@ -279,7 +279,7 @@
                                         <div class="form-group">
                                             @Html.LabelFor(model => model.TdsGroupId, "Tds Group", new { @class = "control-label col-md-4 col-sm-2" })
                                             <div class="col-md-7 col-sm-10">
-                                                @Html.DropDownListFor(m => m.TdsGroupId, new SelectList(ViewBag.TdsGroupList as System.Collections.IEnumerable, "TdsGroupId", "TdsGroupName"), new { @class = "form-control col-xs-6 height" })
+                                                @Html.DropDownListFor(m => m.TdsGroupId, new SelectList(ViewBag.TdsGroupList as System.Collections.IEnumerable, "TdsGroupId", "TdsGroupName"), " ", new { @class = "form-control col-xs-6 height" })
                                                 @Html.ValidationMessageFor(model => model.TdsGroupId)
                                             </div>
                                         </div>
@@ -292,7 +292,7 @@
                                         <div class="form-group">
                                             @Html.LabelFor(model => model.DepartmentId, "Department", new { @class = "control-label col-md-4 col-sm-2" })
                                             <div class="col-md-7 col-sm-10">
-                                                @Html.DropDownListFor(m => m.DepartmentId, new SelectList(ViewBag.DepartmentList as System.Collections.IEnumerable, "DepartmentId", "DepartmentName"), new { @class = "form-control col-xs-6 height" })
+                                                @Html.DropDownListFor(m => m.DepartmentId, new SelectList(ViewBag.DepartmentList as System.Collections.IEnumerable, "DepartmentId", "DepartmentName"), " ", new { @class = "form-control col-xs-6 height" })
                                                 @Html.ValidationMessageFor(model => model.DepartmentId)
                                             </div>
                                         </div>
@@ -302,7 +302,7 @@
                                         <div class="form-group">
                                             @Html.LabelFor(model => model.DesignationId, "Designation", new { @class = "control-label col-md-4 col-sm-2" })
                                             <div class="col-md-7 col-sm-10">
-                                                @Html.DropDownListFor(m => m.DesignationId, new SelectList(ViewBag.DesignationList as System.Collections.IEnumerable, "DesignationId", "DesignationName"), new { @class = "form-control col-xs-6 height" })
+                                                @Html.DropDownListFor(m => m.DesignationId, new SelectList(ViewBag.DesignationList as System.Collections.IEnumerable, "DesignationId", "DesignationName"), " ", new { @class = "form-control col-xs-6 height" })
                                                 @Html.ValidationMessageFor(model => model.DesignationId)
                                             </div>
                                         </div>
@@ -388,7 +388,7 @@
 
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            @Html.LabelFor(model => model.SalesTaxGroupPartyId, "Sales Tax Party", new { @class = "control-label col-md-4 col-sm-2" })
+                                            @Html.LabelFor(model => model.SalesTaxGroupPartyId, "Sales Tax Group Person", new { @class = "control-label col-md-4 col-sm-2" })
                                             <div class="col-md-7 col-sm-10">
                                                 @Html.TextBoxFor(m => m.SalesTaxGroupPartyId, new { @class = "form-control col-xs-6 height" })
                                                 @Html.ValidationMessageFor(model => model.SalesTaxGroupPartyId)
@@ -405,6 +405,48 @@
                                             </div>
                                         </div>
                                     </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.DateOfJoining, "Date Of Joining", new { @class = "control-label col-md-4 col-sm-2" })
+                                            <div class="col-md-7 col-sm-10">
+                                                @Html.TextBoxFor(m => m.DateOfJoining, "{0:dd/MMMM/yyyy}", new { @class = "datepicker form-control required" })
+                                                @Html.ValidationMessageFor(model => model.DateOfJoining)
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.DateOfRelieving, "Date Of Relieving", new { @class = "control-label col-md-4 col-sm-2" })
+                                            <div class="col-md-7 col-sm-10">
+                                                @Html.TextBoxFor(m => m.DateOfRelieving, "{0:dd/MMMM/yyyy}", new { @class = "datepicker form-control required" })
+                                                @Html.ValidationMessageFor(model => model.DateOfRelieving)
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.WagesPayType, "Wages Pay Type", new { @class = "control-label col-md-4 col-sm-2" })
+                                            <div class="col-md-7 col-sm-10">
+                                                @Html.DropDownListFor(m => m.WagesPayType, new SelectList(ViewBag.WagesPayTypeList as System.Collections.IEnumerable, "Value", "Text"), " ", new { @class = "form-control height" })
+                                                @Html.ValidationMessageFor(model => model.WagesPayType)
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.PaymentType, "Payment Type", new { @class = "control-label col-md-4 col-sm-2" })
+                                            <div class="col-md-7 col-sm-10">
+                                                @Html.DropDownListFor(m => m.PaymentType, new SelectList(ViewBag.PaymentTypeList as System.Collections.IEnumerable, "Value", "Text"), " ", new { @class = "form-control height" })
+                                                @Html.ValidationMessageFor(model => model.PaymentType)
+                                            </div>
+                                        </div>
+                                    </div>
+
+
                                 </div>
                             </div>
                         </div>

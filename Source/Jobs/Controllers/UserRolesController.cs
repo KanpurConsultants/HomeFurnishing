@@ -60,6 +60,10 @@ namespace Jobs.Controllers
             {
                 try
                 {
+                    vm.CreatedDate = DateTime.Now;
+                    vm.CreatedBy = User.Identity.Name;
+                    vm.ModifiedDate = DateTime.Now;
+                    vm.ModifiedBy = User.Identity.Name;                    
                     _userRolesService.UpdateUserRoles(vm);
                 }
                 catch (Exception ex)

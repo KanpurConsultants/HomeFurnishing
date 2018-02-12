@@ -58,7 +58,7 @@ namespace Model.Models
         public bool? isPostedInStockProcess { get; set; }
         public bool? isPostedInStockVirtual { get; set; }
 
-
+        public bool isVisibleLineUnitConversionFor { get; set; }
 
         public bool? isVisibleStockIn { get; set; }
         public bool? IsMandatoryStockIn { get; set; }
@@ -126,6 +126,8 @@ namespace Model.Models
         public string filterContraSites { get; set; }
         public string filterContraDivisions { get; set; }
         public string filterPersonRoles { get; set; }
+
+        public string filterUnitConversionFors { get; set; }
 
         [ForeignKey("UnitConversionFor")]
         [Display(Name = "Unit Conversion For")]

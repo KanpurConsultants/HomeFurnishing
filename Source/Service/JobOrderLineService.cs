@@ -48,6 +48,7 @@ namespace Service
 
         IEnumerable<ComboBoxResult> GetPendingProdOrderForProductUid(int JobOrderHeaderId, int ProductUidId, string term);
         IEnumerable<ComboBoxResult> FGetProductUidHelpList(int Id, string term);
+        IEnumerable<ComboBoxResult> FGetUnitConversionForHelpList(int Id, string term);
 
         IEnumerable<ComboBoxResult> GetPendingStockInForIssue(int id, int? ProductId, int? Dimension1Id, int? Dimension2Id, int? Dimension3Id, int? Dimension4Id, string term);
         IEnumerable<ComboBoxResult> GetPendingStockInHeaderForIssue(int StockHeaderId, string term);
@@ -127,6 +128,8 @@ namespace Service
                             NonCountedQty = p.NonCountedQty,
                             UnitId = p.UnitId,
                             UnitName = p.Unit.UnitName,
+                            UnitConversionForId=p.UnitConversionForId,
+                            UnitConversionForName=p.UnitConversionFor.UnitconversionForName,
                             UnitConversionMultiplier = p.UnitConversionMultiplier,
                             UnitDecimalPlaces = p.Unit.DecimalPlaces,
                             DealUnitDecimalPlaces = p.DealUnit.DecimalPlaces,
@@ -1476,6 +1479,34 @@ namespace Service
                             AProp2 = p.Dimension3.Dimension3Name + (string.IsNullOrEmpty(p.Dimension3.Dimension3Name) ? "" : ",") + p.Dimension4.Dimension4Name,
                         });
             return list;
+        }
+
+
+      public IEnumerable<ComboBoxResult> FGetUnitConversionForHelpList(int Id, string term)
+        {
+            var JobOrderHeader = new JobOrderHeaderService(_unitOfWork).Find(Id);
+
+            var settings = new JobOrderSettingsService(_unitOfWork).GetJobOrderSettingsForDocument(JobOrderHeader.DocTypeId, JobOrderHeader.DivisionId, JobOrderHeader.SiteId);
+
+
+            string[] FilterUnitConversonFor = null;
+            if (!string.IsNullOrEmpty(settings.filterUnitConversionFors)) { FilterUnitConversonFor = settings.filterUnitConversionFors.Split(",".ToCharArray()); }
+            else { FilterUnitConversonFor = new string[] { "NA" }; }
+
+            var temp = (from P in db.UnitConversonFor
+                        where 1==1
+                        && (string.IsNullOrEmpty(term) ? 1 == 1 : P.UnitconversionForName.ToLower().Contains(term.ToLower())
+                        && (string.IsNullOrEmpty(settings.filterUnitConversionFors) ? 1==1 : FilterUnitConversonFor.Contains(P.UnitconversionForId.ToString()))
+                        )
+                        select new ComboBoxResult
+                        {
+                            id = P.UnitconversionForId.ToString(),
+                            text = P.UnitconversionForName,
+                            TextProp1 = P.UnitconversionForName,
+                            TextProp2 = P.UnitconversionForName
+                        });
+
+            return temp;
         }
 
         public IEnumerable<ComboBoxResult> FGetProductUidHelpList(int Id, string term)

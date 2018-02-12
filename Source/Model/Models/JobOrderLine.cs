@@ -91,6 +91,11 @@ namespace Model.Models
         [Display(Name = "Unit Conversion Multiplier"), Required]
         public Decimal UnitConversionMultiplier { get; set; }
 
+        [ForeignKey("UnitConversionFor")]
+        [Display(Name = "Unit Conversion For")]
+        public byte? UnitConversionForId { get; set; }
+        public virtual UnitConversionFor UnitConversionFor { get; set; }
+
         [Display(Name = "Non Counted Qty")]
         public decimal NonCountedQty { get; set; }
 

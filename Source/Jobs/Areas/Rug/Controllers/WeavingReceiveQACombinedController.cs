@@ -34,6 +34,7 @@ namespace Jobs.Areas.Rug.Controllers
         List<string> UserRoles = new List<string>();
         ActiivtyLogViewModel LogVm = new ActiivtyLogViewModel();
         int MainBranchId = 1;
+        int MainDivisionId = 1;
 
         private bool EventException = false;
 
@@ -438,12 +439,12 @@ namespace Jobs.Areas.Rug.Controllers
         }
 
 
-        public JsonResult GetUnitConversionMultiplier(int ProductId, Decimal Length, Decimal Width, Decimal? Height, string ToUnitId)
+        public JsonResult GetUnitConversionMultiplier(int DocumentTypeId, int ProductId, Decimal Length, Decimal Width, Decimal? Height, string ToUnitId)
         {
             ProductViewModel product = new ProductService(_unitOfWork).GetProduct(ProductId);
 
             Decimal UnitConversionMultiplier = 0;
-            UnitConversionMultiplier = new ProductService(_unitOfWork).GetUnitConversionMultiplier(1, product.UnitId, Length, Width, Height, ToUnitId,db);
+            UnitConversionMultiplier = new ProductService(_unitOfWork).GetUnitConversionMultiplier(1, product.UnitId, Length, Width, Height, ToUnitId,db, DocumentTypeId);
 
             return Json(UnitConversionMultiplier);
         }
@@ -1518,6 +1519,7 @@ namespace Jobs.Areas.Rug.Controllers
         {
             JobOrderLine JOL = new JobOrderLineService(_unitOfWork).Find (JobOrderLineId);
 
+			JobOrderHeader JOH = new JobOrderHeaderService(_unitOfWork).Find(JOL.JobOrderHeaderId);
             var ProductUIDName = GetNewProductUid(JOL.ProductId);
 
             var temp = (from L in db.ViewJobOrderBalance
@@ -1577,7 +1579,7 @@ namespace Jobs.Areas.Rug.Controllers
                 }
 
                 Decimal UnitConversionMultiplier = 0;
-                UnitConversionMultiplier = new ProductService(_unitOfWork).GetUnitConversionMultiplier(1, temp.UnitId, (decimal) temp.Length, (decimal) temp.Width, temp.Height, temp.DealUnitId, db);
+                UnitConversionMultiplier = new ProductService(_unitOfWork).GetUnitConversionMultiplier(1, temp.UnitId, (decimal) temp.Length, (decimal) temp.Width, temp.Height, temp.DealUnitId, db, JOH.DocTypeId);
 
                 temp.UnitConversionMultiplier = UnitConversionMultiplier;
                 return Json(temp);
@@ -1701,6 +1703,8 @@ namespace Jobs.Areas.Rug.Controllers
 
             JobOrderLine JOL = new JobOrderLineService(_unitOfWork).Find((int)PUS.GenLineId);
 
+            JobOrderHeader JOH = new JobOrderHeaderService(_unitOfWork).Find(JOL.JobOrderHeaderId);
+
             var ProductUIDName = ProductUidName;
 
             var temp = (from L in db.ViewJobOrderBalance
@@ -1762,7 +1766,7 @@ namespace Jobs.Areas.Rug.Controllers
                 }
 
                 Decimal UnitConversionMultiplier = 0;
-                UnitConversionMultiplier = new ProductService(_unitOfWork).GetUnitConversionMultiplier(1, temp.UnitId, (decimal)temp.Length, (decimal)temp.Width, temp.Height, temp.DealUnitId, db);
+                UnitConversionMultiplier = new ProductService(_unitOfWork).GetUnitConversionMultiplier(1, temp.UnitId, (decimal)temp.Length, (decimal)temp.Width, temp.Height, temp.DealUnitId, db, JOH.DocTypeId);
 
                 temp.UnitConversionMultiplier = UnitConversionMultiplier;
                 return Json(temp);

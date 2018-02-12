@@ -236,7 +236,231 @@ namespace Service
 
 
 
+        public byte[] ReportGenerateDirect(List<DataTable> DataTableList, out string mimeType, string ReportFormatType = "PDF", List<string> ParaList = null,  string BaseDirectoryPath = null, string UserName = null)
+        {
+            DataTable Dt = new DataTable();
+            Dt = DataTableList[0];
+            ReportDataSource reportdatasource = new ReportDataSource("DsMain", Dt);
+            ReportViewer reportViewer = new ReportViewer();
+            mimeType = "";
+            byte[] Bytes;
+            string SubReportName;
 
+            List<string> SubReportNameList = new List<string>();
+            PrintedBy = UserName;
+            ListSubReportData = DataTableList;
+            FileType = ReportFormatType;
+
+           
+            if (Dt.Columns.Contains("ReportName"))
+            {
+                ReportName = Dt.Rows[0]["ReportName"].ToString();
+            }
+            else
+            {
+                ReportName = "";
+                Bytes = new byte[1];
+                Bytes[0] = 0;
+                return Bytes;
+
+            }
+
+            if (Dt.Columns.Contains("ReportTitle"))
+            {
+                ReportTitle = Dt.Rows[0]["ReportTitle"].ToString();
+            }
+            else
+            {
+                ReportTitle = "";
+                Bytes = new byte[2];
+                Bytes[0] = 0;
+                return Bytes;
+
+            }
+
+
+            if (DataTableList != null)
+            {
+                if (DataTableList.Count > 0)
+                {
+                    foreach (DataTable Datatable in DataTableList)
+                    {
+                        if (Datatable.Columns.Contains("ReportName"))
+                        {
+                            SubReportName = Datatable.Rows[0]["ReportName"].ToString();
+                            SubReportNameList.Add(SubReportName);
+                        }
+                        else
+                        {
+                            ReportName = "";
+                            Bytes = new byte[1];
+                            Bytes[0] = 0;
+                            return Bytes;
+
+                        }
+                    }
+                }
+            }
+
+
+
+            if ((Dt.Columns.Contains("SiteName")) && (Dt.Columns.Contains("DivisionName")) && (Dt.Columns.Contains("CompanyName")) && (Dt.Columns.Contains("CompanyAddress")) && (Dt.Columns.Contains("CompanyCity")))
+            {
+                SiteName = Dt.Rows[0]["SiteName"].ToString();
+                DivisionName = Dt.Rows[0]["DivisionName"].ToString();
+                CompanyName = Dt.Rows[0]["CompanyName"].ToString();
+                CompanyAddress = Dt.Rows[0]["CompanyAddress"].ToString();
+                CompanyCity = Dt.Rows[0]["CompanyCity"].ToString();
+
+
+            }
+            if (Dt.Columns.Contains("SiteId"))
+            {
+                String queryCompanyDetail = "";
+                // For Company Detail SubReports
+                //string connectionString = new SqlConnection(ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString.ToString());
+                //SqlConnection Con = new SqlConnection((string)System.Web.HttpContext.Current.Session["DefaultConnectionString"]);
+
+                //SqlConnection Con = new SqlConnection(ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString.ToString());
+                //SqlConnection Con = new SqlConnection((string)System.Web.HttpContext.Current.Session["DefaultConnectionString"]);
+
+                SqlConnection Con = new SqlConnection((string)System.Web.HttpContext.Current.Session["DefaultConnectionString"]);
+
+
+                if (Dt.Columns.Contains("DivisionId"))
+                {
+
+                    if (Dt.Rows[0]["DivisionId"].ToString() == "" && Dt.Rows[0]["SiteId"].ToString() == "")
+                        queryCompanyDetail = "Web.ProcCompanyDetail '" + (int)System.Web.HttpContext.Current.Session[SessionNameConstants.LoginSiteId] + "'";
+                    else if (Dt.Rows[0]["DivisionId"].ToString() != "" && Dt.Rows[0]["SiteId"].ToString() == "")
+                        if (Dt.Columns.Contains("DocDate"))
+                        {
+                            queryCompanyDetail = "Web.ProcCompanyDetail NULL , '" + Dt.Rows[0]["DivisionId"].ToString() + "', '" + Dt.Rows[0]["DocDate"].ToString() + "'";
+                        }
+                        else
+                        {
+                            queryCompanyDetail = "Web.ProcCompanyDetail NULL , '" + Dt.Rows[0]["DivisionId"].ToString() + "'";
+                        }
+                    else
+                        if (Dt.Columns.Contains("DocDate"))
+                    {
+                        queryCompanyDetail = "Web.ProcCompanyDetail '" + Dt.Rows[0]["SiteId"].ToString() + "', '" + Dt.Rows[0]["DivisionId"].ToString() + "', '" + Dt.Rows[0]["DocDate"].ToString() + "'";
+                    }
+                    else
+                    {
+                        queryCompanyDetail = "Web.ProcCompanyDetail '" + Dt.Rows[0]["SiteId"].ToString() + "', '" + Dt.Rows[0]["DivisionId"].ToString() + "'";
+                    }
+
+                }
+                else
+                {
+                    queryCompanyDetail = "Web.ProcCompanyDetail '" + Dt.Rows[0]["SiteId"].ToString() + "'";
+                }
+
+                DataTable CompanyDetailData = new DataTable();
+
+
+                SqlDataAdapter CompanyDetailAapter = new SqlDataAdapter(queryCompanyDetail.ToString(), Con);
+                CompanyDetailAapter.Fill(CompanyDetailData);
+
+
+                DataTableList.Add(CompanyDetailData);
+                SubReportNameList.Add("CompanyDetail");
+
+
+                SiteName = CompanyDetailData.Rows[0]["SiteName"].ToString();
+                DivisionName = CompanyDetailData.Rows[0]["DivisionName"].ToString();
+                CompanyName = CompanyDetailData.Rows[0]["CompanyName"].ToString();
+                CompanyAddress = CompanyDetailData.Rows[0]["CompanyAddress"].ToString();
+                CompanyCity = CompanyDetailData.Rows[0]["CompanyCity"].ToString();
+
+                CompanyDetailData = null;
+            }
+            else
+            {
+                ReportTitle = "";
+                Bytes = new byte[2];
+                Bytes[0] = 0;
+                return Bytes;
+
+            }
+
+            ListSubReportName = SubReportNameList;
+
+
+
+            string path = "";
+
+            if (ReportName.Contains("."))
+                path = ConfigurationManager.AppSettings["PhysicalRDLCPath"] + ConfigurationManager.AppSettings["ReportsPathFromService"] + ReportName;
+            else
+                path = ConfigurationManager.AppSettings["PhysicalRDLCPath"] + ConfigurationManager.AppSettings["ReportsPathFromService"] + ReportName + ".rdlc";
+
+
+            if (BaseDirectoryPath != null)
+            {
+                if (ReportName.Contains("."))
+                    path = BaseDirectoryPath + ConfigurationManager.AppSettings["ReportsPathFromService"] + ReportName;
+                else
+                    path = BaseDirectoryPath + ConfigurationManager.AppSettings["ReportsPathFromService"] + ReportName + ".rdlc";
+            }
+
+
+
+            reportViewer.LocalReport.ReportPath = path;
+
+            SetReportAttibutes(reportViewer, reportdatasource);
+
+
+
+
+
+            reportViewer.LocalReport.SubreportProcessing += new SubreportProcessingEventHandler(MySubreportEventHandler);
+
+
+
+
+            string FilterStr = "FilterStr";
+            int i = 1;
+
+            if (ParaList != null)
+            {
+                if (ParaList.Count > 0)
+                {
+                    foreach (var item in ParaList)
+                    {
+                        reportViewer.LocalReport.SetParameters(new ReportParameter(FilterStr + i.ToString(), item));
+                        i++;
+                    }
+                }
+            }
+
+
+            string encoding;
+            string fileNameExtension;
+
+            string deviceinfo =
+                "<DeviceInfo>" +
+                "   <OutputFormat>" + ReportFormatType + "</OutputFormat>" +
+                "</DeviceInfo>";
+
+            Warning[] warnings;
+            string[] streams;
+
+
+            Bytes = reportViewer.LocalReport.Render(
+                    ReportFormatType,
+                    deviceinfo,
+                    out mimeType,
+                    out encoding,
+                    out fileNameExtension,
+                    out streams,
+                    out warnings);
+
+
+
+            return Bytes;
+        }
 
 
 
@@ -295,9 +519,6 @@ namespace Service
 
             return Bytes;
         }
-
-
-
 
 
 

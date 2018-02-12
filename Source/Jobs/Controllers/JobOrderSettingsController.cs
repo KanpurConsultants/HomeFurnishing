@@ -201,8 +201,8 @@ namespace Jobs.Controllers
                     temp.isVisibleUnitConversionFor = pt.isVisibleUnitConversionFor;
                     temp.isVisibleSpecification = pt.isVisibleSpecification;
                     temp.isVisibleCreditDays = pt.isVisibleCreditDays;
-
-
+                    temp.filterUnitConversionFors = pt.filterUnitConversionFors;
+                    temp.isVisibleLineUnitConversionFor = pt.isVisibleLineUnitConversionFor;
                     temp.CalculateDiscountOnRate = pt.CalculateDiscountOnRate;
 
 

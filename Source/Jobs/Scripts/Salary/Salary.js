@@ -1,7 +1,7 @@
-var app = angular.module('app', ['ngTouch', 'ui.grid', 'ui.grid.resizeColumns', 'ui.grid.grouping', 'ui.grid.moveColumns',
-    'ui.grid.selection', 'ui.grid.exporter', 'ui.grid.cellNav', 'ui.grid.pinning']);
+var Salary = angular.module('Salary', ['ngTouch', 'ui.grid', 'ui.grid.resizeColumns', 'ui.grid.grouping', 'ui.grid.moveColumns',
+    'ui.grid.selection', 'ui.grid.exporter', 'ui.grid.cellNav', 'ui.grid.pinning', 'ui.grid.edit']);
 
-app.controller('MainCtrl', ['$scope', '$log', '$http', 'uiGridConstants', 'uiGridExporterConstants', 'uiGridExporterService',
+Salary.controller('MainCtrl', ['$scope', '$log', '$http', 'uiGridConstants', 'uiGridExporterConstants', 'uiGridExporterService',
 
   function ($scope, $log, $http, uiGridConstants, uiGridExporterConstants, uiGridExporterService) {
 
@@ -65,95 +65,58 @@ app.controller('MainCtrl', ['$scope', '$log', '$http', 'uiGridConstants', 'uiGri
       };
 
 
-      function GetColumnWidth(results,j) {
-          var ColWidth = 130;
-          if (results.Data[0][j]["Value"] != null) {
-              if ((results.Data[0][j]["Value"].length * 10).toString() != "NaN") {
-                  ColWidth = results.Data[0][j]["Value"].length * 10;
+
+      $scope.Post = function (SaleEnquiryLineId, ProductName) {
+          var i = 0;
+          var Rows = [];          
+          $scope.gridApi.core.getVisibleRows($scope.gridApi.grid).some(function (rowItem) {              
+              Rows[i] = rowItem.entity;
+              i++;
+          });
+
+          console.log(Rows);
+
+          $.ajax({
+              url: "/SalaryWizard/Post/",
+              data: { SalaryDataList: Rows },
+              type: "POST",
+              success: function (data) {
+                  //Do something:
+                  window.location.href = data;
+
+                  //window.open(data);
               }
-              else {
-                  ColWidth = results.Data[0][j]["Key"].length * 10
-              }
-          }
-          else {
-              ColWidth = results.Data[0][j]["Key"].length * 10
-          }
+          })
+      };
 
-          if (ColWidth < 90)
-              ColWidth = 90;
-
-          if (ColWidth > 300)
-              ColWidth = 300;
-
-          return ColWidth;
-      }
 
 
       $scope.BindData = function ()
       {
           $.ajax({
-              url: '/GridReport/GridReportFill/' + $(this).serialize(),
+              url: '/SalaryWizard/SalaryWizardFill/' + $(this).serialize(),
               type: "POST",
               data: $("#registerSubmit").serialize(),
               success: function (result) {
                   Lock = false;
                   if (result.Success == true) {
-                      var results = result;
-                      if (results.Data.length > 0) {
-                          var columnsIn = results.Data[results.Data.length - 1];
-                          var j = 0;
-                          var ColumnCount = 0;
-
-                          $scope.gridOptions.columnDefs = new Array();
-
-                          $.each(columnsIn, function (key, value) {
-                              if (columnsIn[j]["Key"] != "SysParamType") {
-                                  var ColWidth = GetColumnWidth(results, j);
-
-                                  $scope.gridOptions.columnDefs.push({
-                                      field: columnsIn[j]["Key"], aggregationType: columnsIn[j]["Value"],
-                                      cellClass: (columnsIn[j]["Value"] == null ? 'cell-text' : 'text-right cell-text'),
-                                      aggregationHideLabel: true,
-                                      headerCellClass: (columnsIn[j]["Value"] == null ? 'header-text' : 'text-right header-text'),
-                                      footerCellClass: (columnsIn[j]["Value"] == null ? '' : 'text-right '),
-                                      width: ColWidth,
-                                      enablePinning: true,
-                                      visible: (columnsIn[j]["Key"] == "DocId" || columnsIn[j]["Key"] == "DocTypeId" ? false : true)
-                                  });
-                                }
-                              ColumnCount++;
-                              j++;
-                              
-                              
-                          });
-
-
-                          var rowDataSet = [];
-                          var i = 0;
-                          $.each(results.Data, function (key, value) {
-                                var rowData = [];
-                                var j = 0   
-                                var columnsIn = results.Data[i];
-                                if (columnsIn[ColumnCount - 1]["Value"] == null)
-                                {
-                                    $.each(columnsIn, function (key, value) {
-                                        rowData[columnsIn[j]["Key"]] = columnsIn[j]["Value"];
-                                        j++;
-                                    });
-                                }
-                                rowDataSet[i] = rowData;
-                                i++;
-                          });
-
-                          $scope.gridOptions.data = rowDataSet;
-
-                          $scope.gridApi.grid.refresh();
-
-                      }
+                      $scope.gridOptions.enableCellEditOnFocus = true;
+                      $scope.gridOptions.columnDefs = new Array();
+                      $scope.gridOptions.columnDefs.push({ field: 'EmployeeId', width: 100, visible: false });
+                      $scope.gridOptions.columnDefs.push({ field: 'DocTypeId', width: 100, visible: false });
+                      $scope.gridOptions.columnDefs.push({ field: 'DocDate', width: 100, visible: false });
+                      $scope.gridOptions.columnDefs.push({ field: 'EmployeeName', width: 570, cellClass: 'cell-text ', headerCellClass: 'header-text', enableCellEdit: false });
+                      $scope.gridOptions.columnDefs.push({ field: 'Days', width: 100, cellClass: 'text-right cell-text ', headerCellClass: 'text-right header-text', enableCellEdit: true });
+                      $scope.gridOptions.columnDefs.push({ field: 'Additions', width: 150, cellClass: 'text-right cell-text ', headerCellClass: 'text-right header-text', enableCellEdit: true });
+                      $scope.gridOptions.columnDefs.push({ field: 'Deductions', width: 150, cellClass: 'text-right cell-text ', headerCellClass: 'text-right header-text', enableCellEdit: true });
+                      $scope.gridOptions.columnDefs.push({ field: 'LoanEMI', width: 150, cellClass: 'text-right cell-text ', headerCellClass: 'text-right header-text', enableCellEdit: true });
+                      $scope.gridOptions.data = result.Data;
+                      $scope.gridApi.grid.refresh();
                   }
                   else if (!result.Success) {
                       alert('Something went wrong');
                   }
+
               },
               error: function () {
                   Lock: false;

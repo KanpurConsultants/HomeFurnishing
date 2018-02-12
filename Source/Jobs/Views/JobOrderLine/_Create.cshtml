@@ -274,6 +274,17 @@
 
 
 
+                    <div class="col-md-6" style="display:@(Model.JobOrderSettings.isVisibleLineUnitConversionFor ? "" : "none")">
+                        @Html.HiddenFor(m => m.JobOrderSettings.isVisibleLineUnitConversionFor)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.UnitConversionForId, "Unit Conversion For", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.UnitConversionForId, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.UnitConversionForId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
 
 
                     <div class="col-md-6" style="display:@(Model.JobOrderSettings.isVisibleDealUnit?"":"none")">
@@ -456,6 +467,8 @@ else
         CustomSelectFunction($("#FromProcessId"), '/ComboHelpList/GetProcess', '/ComboHelpList/SetSingleProcess', ' ', false, 0);
         CustomSelectFunction($("#SalesTaxGroupProductId"), '/ComboHelpList/GetSalesTaxGroupProduct', '/ComboHelpList/SetSingleSalesTaxGroupProduct', ' ', false, 0);
         CustomSelectFunctionForStockIn($("#StockInId"), '/JobOrderLine/GetStockInForProduct', '/ComboHelpList/SetSingleStockIn', ' ', false, 0,$('#JobOrderHeaderId','.modal-body').val(),$("#ProductId").val(),$("#Dimension1Id").val(),$("#Dimension2Id").val(),$("#Dimension3Id").val(),$("#Dimension4Id").val());
+
+        CustomSelectFunction($("#UnitConversionForId"), '/JobOrderLine/GetUnitConversionForHelpList', '/JobOrderLine/SetSingleUnitConversionFor', ' ', false, 0, $('#JobOrderHeaderId', '.modal-body').val());
 
         if ($('#JobOrderSettings_SqlProcProductUidHelpList', '.modal-body').val() != null && $('#JobOrderSettings_SqlProcProductUidHelpList', '.modal-body').val() != "")
         {
@@ -765,6 +778,7 @@ else
 
             $("#DealQty,#Rate,#Amount,#Qty,#UnitConversionMultiplier,#DiscountPer,#DiscountAmount").keyup(Calculation);
             $("#DealUnitId").change(GetUnitConversionMultiplier);
+            $("#UnitConversionForId").change( GetUnitConversionMultiplier);
             $("#ProductId").change(GetProductDetail);
             $('#SalesTaxGroupProductId').change(function(){
                 Validate_SalesTaxGroupProductId();
@@ -842,6 +856,16 @@ else
 
 
         function GetUnitConversionMultiplier() {
+
+            //alert($('#UnitConversionForId').val());
+            //alert($('#UnitConversionForId').val());
+
+            //var UnitConversionForIdVal = $('#UnitConversionForId').val() =="" ? $('#UnitConversionForId').val() : $('#UnitConversionForId').val();
+
+            //$("#UnitConversionForId").val(UnitConversionForIdVal);
+
+            //alert(UnitConversionForIdVal);
+            //alert($('#UnitConversionForId').val());
 
             if ($("#UnitId").val() == $("#DealUnitId").val()) {
                 $("#UnitConversionMultiplier").val(1);

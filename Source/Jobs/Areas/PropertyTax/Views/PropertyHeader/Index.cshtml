@@ -39,7 +39,8 @@
                 @Html.ActionLink(" ", "GenerateInvoicePrints", "PropertyHeader", null, new { @class = "cbtn btn-circle glyphicon glyphicon-list-alt toolbar", @title = "Bill Print", @data_toggle = "tooltip", @id = "PrintRecordI", target = "_blank" })
                 @*@Html.ActionLink(" ", "AttachDocument", "DocumentAttachment", null, new { @class = "cbtn btn-circle glyphicon glyphicon-paperclip toolbar", @title = "Attach", @data_toggle = "tooltip", @id = "AttachDocument", @data_modaltrigger = "DocumentAttachment" })*@
                 @*@Html.ActionLink(" ", "GenerateGatePass", "PropertyHeader", null, new { @class = "cbtn btn-circle glyphicon glyphicon glyphicon-log-out toolbar", @title = "GatePass", @data_toggle = "tooltip", @id = "GenGatePassI" })*@
-                @Html.ActionLink(" ", "Remove", "PropertyHeader", null, new { @class = "cbtn btn-circle glyphicon glyphicon-trash toolbar", @title = "Delete", @data_toggle = "tooltip", @id = "DeleteRecord", @data_modal = "", onclick = "" })
+                @Html.ActionLink(" ", "Remove", "PropertyHeader", null, new { @class = "cbtn btn-circle glyphicon glyphicon-trash toolbar", @title = "Delete", @data_toggle = "tooltip", @id = "DeleteRecord", @data_modalDelete = "", onclick = "" })
+                @*@Html.ActionLink(" ", "Remove", "JobOrderHeader", null, new { @class = "cbtn btn-circle glyphicon glyphicon-trash hidden-xs", @title = "Delete", @data_toggle = "tooltip", @id = "DeleteRecord", @data_modalDelete = "", onclick = "" })*@
             </div>
             <div class="btn-group">
                 <a class="cbtn btn-circle glyphicon glyphicon-option-horizontal dropdown-toggle" aria-expanded="false" style="padding-top: 6px;padding-bottom: 6px;" href="#" data-toggle="dropdown" id="dropdownMenu1">
@@ -84,3 +85,13 @@
            }).WithPaging(25).EmptyText("No records found.")
     </div>
 </div>
+
+
+<script type="text/javascript">
+
+
+    $(document).ready(function () {
+        enableModalTransitions();
+    })
+
+</script>

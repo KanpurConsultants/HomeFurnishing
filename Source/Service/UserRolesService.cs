@@ -143,7 +143,13 @@ namespace Service
                 {
                     UserRole pt = new UserRole();
                     pt.UserId = vm.UserId;
+                    pt.CreatedBy = vm.CreatedBy;
+                    pt.CreatedDate = vm.CreatedDate;
+                    pt.ModifiedBy = vm.ModifiedBy;
+                    pt.ModifiedDate = vm.ModifiedDate;
                     pt.RoleId = item;
+                    pt.SiteId = 1;
+                    pt.DivisionId = 1;
                     pt.ObjectState = Model.ObjectState.Added;
                     ((ApplicationDbContext)_context).UserRole.Add(pt);
 

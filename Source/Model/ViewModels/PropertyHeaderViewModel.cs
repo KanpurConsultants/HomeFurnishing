@@ -105,4 +105,12 @@ namespace Model.ViewModels
         public JobOrderSettingsViewModel JobOrderSettings { get; set; }
     }
 
+    public class WardIndexViewModel
+    {
+        public int GodownId { get; set; }
+        public string GodownCode { get; set; }
+        public string GodownName { get; set; }
+        public int PropertyCount { get; set; }
+    }
+
 }

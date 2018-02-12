@@ -134,6 +134,10 @@ namespace Service
             if (!string.IsNullOrEmpty(vm.ProductGroupId)) { ProductGroupIdArr = vm.ProductGroupId.Split(",".ToCharArray()); }
             else { ProductGroupIdArr = new string[] { "NA" }; }
 
+            string[] ProductCategoryIdArr = null;
+            if (!string.IsNullOrEmpty(vm.ProductCategoryId)) { ProductCategoryIdArr = vm.ProductCategoryId.Split(",".ToCharArray()); }
+            else { ProductCategoryIdArr = new string[] { "NA" }; }
+
             var query = (from p in db.ViewJobReceiveBalanceForInvoice
                          join t in db.JobReceiveHeader on p.JobReceiveHeaderId equals t.JobReceiveHeaderId into table
                          from tab in table.DefaultIfEmpty()
@@ -166,7 +170,7 @@ namespace Service
                              DocTypeId = p.DocTypeId,
                              DocDate = tab.DocDate,
                              ProductTypeId = tab2.ProductGroup.ProductTypeId,
-
+                             ProductCategoryId = tab2.ProductCategoryId,
                              //Data Projections
                              Dimension1Name = tab4.Dimension1.Dimension1Name,
                              Dimension2Name = tab4.Dimension2.Dimension2Name,
@@ -224,8 +228,14 @@ namespace Service
             if (!string.IsNullOrEmpty(settings.filterContraDocTypes))
                 query = query.Where(m => ContraDocTypes.Contains(m.DocTypeId.ToString()));
 
-            if (vm.ReceiveAsOnDate.HasValue)
-                query = query.Where(m => m.DocDate <= vm.ReceiveAsOnDate.Value);
+            if (vm.ReceiveFromDate.HasValue)
+                query = query.Where(m => m.DocDate >= vm.ReceiveFromDate.Value);
+
+            if (vm.ReceiveToDate.HasValue)
+                query = query.Where(m => m.DocDate <= vm.ReceiveToDate.Value);
+
+            if (!string.IsNullOrEmpty(vm.ProductCategoryId))
+                query = query.Where(m => ProductCategoryIdArr.Contains(m.ProductCategoryId.ToString()));
 
 
             return (from p in query
@@ -287,9 +297,9 @@ namespace Service
             if (!string.IsNullOrEmpty(vm.ProductId)) { ProductIdArr = vm.ProductId.Split(",".ToCharArray()); }
             else { ProductIdArr = new string[] { "NA" }; }
 
-            string[] SaleOrderIdArr = null;
-            if (!string.IsNullOrEmpty(vm.JobOrderHeaderId)) { SaleOrderIdArr = vm.JobOrderHeaderId.Split(",".ToCharArray()); }
-            else { SaleOrderIdArr = new string[] { "NA" }; }
+            string[] JobOrderIdArr = null;
+            if (!string.IsNullOrEmpty(vm.JobOrderHeaderId)) { JobOrderIdArr = vm.JobOrderHeaderId.Split(",".ToCharArray()); }
+            else { JobOrderIdArr = new string[] { "NA" }; }
 
             string[] JobWorkerIdArr = null;
             if (!string.IsNullOrEmpty(vm.JobWorkerIds)) { JobWorkerIdArr = vm.JobWorkerIds.Split(",".ToCharArray()); }
@@ -330,6 +340,7 @@ namespace Service
                          {
 
                              //Filter Projections
+                             JobOrderHeaderId = tabl2.JobOrderHeaderId,
                              JobReceiveHeaderId = p.JobReceiveHeaderId,
                              ProductGroupId = tab2.ProductGroupId,
                              SiteId = p.SiteId,
@@ -371,8 +382,8 @@ namespace Service
             if (!string.IsNullOrEmpty(vm.ProductId))
                 query = query.Where(m => ProductIdArr.Contains(m.ProductId.ToString()));
 
-            if (!string.IsNullOrEmpty(vm.JobReceiveHeaderId))
-                query = query.Where(m => SaleOrderIdArr.Contains(m.JobReceiveHeaderId.ToString()));
+            //if (!string.IsNullOrEmpty(vm.JobReceiveHeaderId))
+            //    query = query.Where(m => SaleOrderIdArr.Contains(m.JobReceiveHeaderId.ToString()));
 
             if (JobInvoice.JobWorkerId.HasValue && settings.isVisibleHeaderJobWorker == true)
                 query = query.Where(m => m.JobWorkerId == JobInvoice.JobWorkerId);
@@ -390,6 +401,9 @@ namespace Service
             else
                 query = query.Where(m => m.SiteId == JobInvoice.SiteId);
 
+            if (!string.IsNullOrEmpty(vm.JobOrderHeaderId))
+                query = query.Where(m => JobOrderIdArr.Contains(m.JobOrderHeaderId.ToString()));
+
             if (!string.IsNullOrEmpty(settings.filterContraDivisions))
                 query = query.Where(m => ContraDivisions.Contains(m.DivisionId.ToString()));
             else
@@ -398,8 +412,11 @@ namespace Service
             if (!string.IsNullOrEmpty(settings.filterContraDocTypes))
                 query = query.Where(m => ContraDocTypes.Contains(m.DocTypeId.ToString()));
 
-            if (vm.ReceiveAsOnDate.HasValue)
-                query = query.Where(m => m.DocDate <= vm.ReceiveAsOnDate.Value);
+            if (vm.ReceiveFromDate.HasValue)
+                query = query.Where(m => m.DocDate >= vm.ReceiveFromDate.Value);
+
+            if (vm.ReceiveToDate.HasValue)
+                query = query.Where(m => m.DocDate <= vm.ReceiveToDate.Value);
 
 
             return (from p in query
@@ -484,7 +501,8 @@ namespace Service
                             && (string.IsNullOrEmpty(settings.filterContraSites) ? VJRBal.SiteId == JobInvoice.SiteId : ContraSites.Contains(VJRBal.SiteId.ToString()))
                             && (string.IsNullOrEmpty(settings.filterContraDivisions) ? VJRBal.DivisionId == JobInvoice.DivisionId : ContraDivisions.Contains(VJRBal.DivisionId.ToString()))
                             && (JobInvoice.JobWorkerId == null ? 1 == 1 : VJRBal.JobWorkerId == vm.JobWorkerId)
-                            && (vm.ReceiveAsOnDate == null ? 1 == 1 : JobReceiveHeaderTab.DocDate <= vm.ReceiveAsOnDate)
+                            && (vm.ReceiveFromDate == null ? 1 == 1 : JobReceiveHeaderTab.DocDate >= vm.ReceiveFromDate)
+                            && (vm.ReceiveToDate == null ? 1 == 1 : JobReceiveHeaderTab.DocDate <= vm.ReceiveToDate)
                             && JobReceiveLineTab.ProductUidHeaderId == null
                             && VJRBal.BalanceQty > 0
                             orderby JobReceiveHeaderTab.DocDate, JobReceiveHeaderTab.DocNo, JobReceiveLineTab.Sr
@@ -939,11 +957,12 @@ namespace Service
             if (!string.IsNullOrEmpty(settings.filterContraDivisions)) { ContraDivisions = settings.filterContraDivisions.Split(",".ToCharArray()); }
             else { ContraDivisions = new string[] { "NA" }; }
 
-
             return (from p in db.ViewJobReceiveBalanceForInvoice
                     join t in db.JobOrderHeader on p.JobOrderHeaderId equals t.JobOrderHeaderId into ProdTable
                     from ProTab in ProdTable.DefaultIfEmpty()
                     where p.BalanceQty > 0 && ProTab.DocNo.ToLower().Contains(term.ToLower()) && p.JobWorkerId == JobInvoice.JobWorkerId
+                    && (JobInvoice.JobWorkerId.HasValue ? p.JobWorkerId == JobInvoice.JobWorkerId : 1 == 1)
+                    && ((int?)settings.ProcessId !=null ? ProTab.ProcessId == JobInvoice.ProcessId : 1 == 1)
                     && (string.IsNullOrEmpty(settings.filterContraSites) ? p.SiteId == JobInvoice.SiteId : ContraSites.Contains(p.SiteId.ToString()))
                     && (string.IsNullOrEmpty(settings.filterContraDivisions) ? p.DivisionId == JobInvoice.DivisionId : ContraDivisions.Contains(p.DivisionId.ToString()))
                     group new { p, ProTab } by p.JobOrderHeaderId into g

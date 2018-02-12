@@ -274,7 +274,9 @@ namespace Model.ViewModel
         public string ProductGroupId { get; set; }
         [Display(Name = "Product Category")]
         public string ProductCategoryId { get; set; }
-        public DateTime ? ReceiveAsOnDate { get; set; }
+        public DateTime? ReceiveFromDate { get; set; }
+        public DateTime? ReceiveToDate { get; set; }
+
         public string JobWorkerIds { get; set; }
         public JobInvoiceSettingsViewModel JobInvoiceSettings { get; set; }
         public DocumentTypeSettingsViewModel DocumentTypeSettings { get; set; }

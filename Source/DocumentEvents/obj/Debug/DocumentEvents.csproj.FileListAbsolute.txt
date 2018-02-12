@@ -140,3 +140,26 @@ D:\Sample_New\HomeFurnishing\Source\DocumentEvents\bin\Debug\log4net.xml
 D:\Sample_New\HomeFurnishing\Source\DocumentEvents\obj\Debug\DocumentEvents.csprojResolveAssemblyReference.cache
 D:\Sample_New\HomeFurnishing\Source\DocumentEvents\obj\Debug\DocumentEvents.dll
 D:\Sample_New\HomeFurnishing\Source\DocumentEvents\obj\Debug\DocumentEvents.pdb
+D:\Kanpur Consultants\HomeFurnishing\Source\DocumentEvents\bin\Debug\DocumentEvents.dll.config
+D:\Kanpur Consultants\HomeFurnishing\Source\DocumentEvents\bin\Debug\DocumentEvents.dll
+D:\Kanpur Consultants\HomeFurnishing\Source\DocumentEvents\bin\Debug\DocumentEvents.pdb
+D:\Kanpur Consultants\HomeFurnishing\Source\DocumentEvents\bin\Debug\Data.dll
+D:\Kanpur Consultants\HomeFurnishing\Source\DocumentEvents\bin\Debug\EntityFramework.dll
+D:\Kanpur Consultants\HomeFurnishing\Source\DocumentEvents\bin\Debug\EntityFramework.SqlServer.dll
+D:\Kanpur Consultants\HomeFurnishing\Source\DocumentEvents\bin\Debug\Microsoft.AspNet.Identity.Core.dll
+D:\Kanpur Consultants\HomeFurnishing\Source\DocumentEvents\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.dll
+D:\Kanpur Consultants\HomeFurnishing\Source\DocumentEvents\bin\Debug\Model.dll
+D:\Kanpur Consultants\HomeFurnishing\Source\DocumentEvents\bin\Debug\Core.dll
+D:\Kanpur Consultants\HomeFurnishing\Source\DocumentEvents\bin\Debug\log4net.dll
+D:\Kanpur Consultants\HomeFurnishing\Source\DocumentEvents\bin\Debug\Remotion.Data.Linq.dll
+D:\Kanpur Consultants\HomeFurnishing\Source\DocumentEvents\bin\Debug\Data.pdb
+D:\Kanpur Consultants\HomeFurnishing\Source\DocumentEvents\bin\Debug\Model.pdb
+D:\Kanpur Consultants\HomeFurnishing\Source\DocumentEvents\bin\Debug\EntityFramework.xml
+D:\Kanpur Consultants\HomeFurnishing\Source\DocumentEvents\bin\Debug\EntityFramework.SqlServer.xml
+D:\Kanpur Consultants\HomeFurnishing\Source\DocumentEvents\bin\Debug\Microsoft.AspNet.Identity.Core.xml
+D:\Kanpur Consultants\HomeFurnishing\Source\DocumentEvents\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.xml
+D:\Kanpur Consultants\HomeFurnishing\Source\DocumentEvents\bin\Debug\Core.pdb
+D:\Kanpur Consultants\HomeFurnishing\Source\DocumentEvents\bin\Debug\log4net.xml
+D:\Kanpur Consultants\HomeFurnishing\Source\DocumentEvents\obj\Debug\DocumentEvents.csprojResolveAssemblyReference.cache
+D:\Kanpur Consultants\HomeFurnishing\Source\DocumentEvents\obj\Debug\DocumentEvents.dll
+D:\Kanpur Consultants\HomeFurnishing\Source\DocumentEvents\obj\Debug\DocumentEvents.pdb

@@ -26,7 +26,7 @@ namespace Model.Models
         public decimal Days { get; set; }
         public decimal? OtherAddition { get; set; }
         public decimal? OtherDeduction { get; set; }
-        public decimal? LoadEMI { get; set; }
+        public decimal? LoanEMI { get; set; }
         public decimal NetSalary { get; set; }
 
 

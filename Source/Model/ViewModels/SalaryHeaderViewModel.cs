@@ -88,4 +88,16 @@ namespace Model.ViewModels
         public List<SalaryLineViewModel> SalaryLineViewModel { get; set; }
         public DocumentTypeSettingsViewModel DocumentTypeSettings { get; set; }
     }
+
+
+
+    public class SalaryWizardViewModel
+    {
+        public DateTime DocDate { get; set; }
+        public int DocTypeId { get; set; }
+        public int? DepartmentId { get; set; }
+        public string DepartmentName { get; set; }
+
+
+    }
 }

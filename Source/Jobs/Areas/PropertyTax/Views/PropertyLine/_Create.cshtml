@@ -214,6 +214,22 @@
                         </div>
                     </div>
 
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.WaterTaxAmount, "Water Tax Amount", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-4" style="padding-right:0px;">
+                                @Html.TextBoxFor(model => model.WaterTaxAmount, new { @class = "form-control col-xs-3 required cusrightnormal number", @readonly = "true" })
+                                @Html.ValidationMessageFor(model => model.WaterTaxPercentage, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="col-xs-1" style="padding-left:0px;">
+                                @Html.LabelFor(model => model.WaterTaxPercentage, "@", new { @class = "control-label col-xs-4" })
+                            </div>
+                            <div class="col-xs-2" style="padding-left:0px">
+                                @Html.TextBoxFor(m => m.WaterTaxPercentage, new { @class = "form-control col-xs-2 cusleftnormal", @readonly = "true" })
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="col-md-6" >
                         <div class="form-group">
                             @Html.LabelFor(model => model.TenantName, "Tenant Name", new { @class = "control-label col-xs-4 " })
@@ -433,7 +449,7 @@
                         data: { Ward: $("#GodownId").val(), RoadType: $("#PersonRateGroupId").val(), ConstructionType: $("#ProductId").val(), 
                             PropertyType: $("#Dimension1Id").val(), DiscountType: $("#DiscountTypeId").val(), CoveredArea: $("#CoveredArea").val(),
                             BalconyArea: $("#BalconyArea").val(), GarageArea: $("#GarageArea").val(), 
-                            IsRented: $("#IsRented").val(), DateOfConstruction: $("#DateOfConsutruction").val(),WEF: $("#WEF").val()},
+                            IsRented: $("#IsRented").prop('checked'), DateOfConstruction: $("#DateOfConsutruction").val(),WEF: $("#WEF").val()},
                     success: function (data) {
                         if (data != null)
                         {
@@ -456,6 +472,7 @@
         }
 
             $("#CoveredArea,#GarageArea,#BalconyArea").keyup(Calculation);
+            $("#ProductId,#Dimension1Id,#IsRented").change(Calculation);
 
 
             function Calculation() {

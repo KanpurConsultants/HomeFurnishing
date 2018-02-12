@@ -222,3 +222,35 @@ D:\Sample_New\HomeFurnishing\Source\Model\bin\Debug\log4net.xml
 D:\Sample_New\HomeFurnishing\Source\Model\obj\Debug\Model.csprojResolveAssemblyReference.cache
 D:\Sample_New\HomeFurnishing\Source\Model\obj\Debug\Model.dll
 D:\Sample_New\HomeFurnishing\Source\Model\obj\Debug\Model.pdb
+D:\Kanpur Consultants\HomeFurnishing\Source\Model\bin\Debug\Model.dll.config
+D:\Kanpur Consultants\HomeFurnishing\Source\Model\bin\Debug\Model.dll
+D:\Kanpur Consultants\HomeFurnishing\Source\Model\bin\Debug\Model.pdb
+D:\Kanpur Consultants\HomeFurnishing\Source\Model\bin\Debug\Core.dll
+D:\Kanpur Consultants\HomeFurnishing\Source\Model\bin\Debug\EntityFramework.dll
+D:\Kanpur Consultants\HomeFurnishing\Source\Model\bin\Debug\EntityFramework.SqlServer.dll
+D:\Kanpur Consultants\HomeFurnishing\Source\Model\bin\Debug\Microsoft.AspNet.Identity.Core.dll
+D:\Kanpur Consultants\HomeFurnishing\Source\Model\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.dll
+D:\Kanpur Consultants\HomeFurnishing\Source\Model\bin\Debug\Microsoft.AspNet.Identity.Owin.dll
+D:\Kanpur Consultants\HomeFurnishing\Source\Model\bin\Debug\Microsoft.Owin.dll
+D:\Kanpur Consultants\HomeFurnishing\Source\Model\bin\Debug\Microsoft.Owin.Security.Cookies.dll
+D:\Kanpur Consultants\HomeFurnishing\Source\Model\bin\Debug\Microsoft.Owin.Security.dll
+D:\Kanpur Consultants\HomeFurnishing\Source\Model\bin\Debug\Microsoft.Owin.Security.OAuth.dll
+D:\Kanpur Consultants\HomeFurnishing\Source\Model\bin\Debug\Newtonsoft.Json.dll
+D:\Kanpur Consultants\HomeFurnishing\Source\Model\bin\Debug\Owin.dll
+D:\Kanpur Consultants\HomeFurnishing\Source\Model\bin\Debug\log4net.dll
+D:\Kanpur Consultants\HomeFurnishing\Source\Model\bin\Debug\Remotion.Data.Linq.dll
+D:\Kanpur Consultants\HomeFurnishing\Source\Model\bin\Debug\Core.pdb
+D:\Kanpur Consultants\HomeFurnishing\Source\Model\bin\Debug\EntityFramework.xml
+D:\Kanpur Consultants\HomeFurnishing\Source\Model\bin\Debug\EntityFramework.SqlServer.xml
+D:\Kanpur Consultants\HomeFurnishing\Source\Model\bin\Debug\Microsoft.AspNet.Identity.Core.xml
+D:\Kanpur Consultants\HomeFurnishing\Source\Model\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.xml
+D:\Kanpur Consultants\HomeFurnishing\Source\Model\bin\Debug\Microsoft.AspNet.Identity.Owin.xml
+D:\Kanpur Consultants\HomeFurnishing\Source\Model\bin\Debug\Microsoft.Owin.xml
+D:\Kanpur Consultants\HomeFurnishing\Source\Model\bin\Debug\Microsoft.Owin.Security.xml
+D:\Kanpur Consultants\HomeFurnishing\Source\Model\bin\Debug\Microsoft.Owin.Security.Cookies.xml
+D:\Kanpur Consultants\HomeFurnishing\Source\Model\bin\Debug\Microsoft.Owin.Security.OAuth.xml
+D:\Kanpur Consultants\HomeFurnishing\Source\Model\bin\Debug\Newtonsoft.Json.xml
+D:\Kanpur Consultants\HomeFurnishing\Source\Model\bin\Debug\log4net.xml
+D:\Kanpur Consultants\HomeFurnishing\Source\Model\obj\Debug\Model.csprojResolveAssemblyReference.cache
+D:\Kanpur Consultants\HomeFurnishing\Source\Model\obj\Debug\Model.dll
+D:\Kanpur Consultants\HomeFurnishing\Source\Model\obj\Debug\Model.pdb

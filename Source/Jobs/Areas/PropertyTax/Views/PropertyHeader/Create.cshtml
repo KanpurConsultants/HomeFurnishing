@@ -347,7 +347,7 @@
 
 
                                                 <div class="col-md-6 col-sm-10">
-                                                    @Html.DropDownListFor(m => Model.DocumentTypeAttributes[i].DefaultValue, new SelectList(tem as System.Collections.IEnumerable, "Value", "Text", Model.DocumentTypeAttributes[i].DefaultValue), new { @class = "form-control col-xs-6 height" })
+                                                    @Html.DropDownListFor(m => Model.DocumentTypeAttributes[i].DefaultValue, new SelectList(tem as System.Collections.IEnumerable, "Value", "Text", Model.DocumentTypeAttributes[i].DefaultValue), " ", new { @class = "form-control col-xs-6 height" })
                                                     @*<input type="text" name="@(item.Name)s" value=@item.DefaultValue class="form-control col-xs-6" />*@
                                                 </div>
                                             }

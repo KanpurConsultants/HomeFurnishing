@@ -108,6 +108,7 @@ namespace Service
         IEnumerable<ComboBoxList> GetMachineHelpList();
         //IEnumerable<ComboBoxList> GetCityHelpList();
         IQueryable<ComboBoxResult> GetCityHelpList(string term);
+        IQueryable<ComboBoxResult> GetBuyerSpecificationHelpList(string term);
         IEnumerable<ComboBoxList> GetStateHelpList();
         IEnumerable<ComboBoxList> GetCountryHelpList();
         //IEnumerable<ComboBoxList> GetPersonHelpList();
@@ -180,7 +181,7 @@ namespace Service
         IQueryable<ComboBoxResult> GetSalesTaxGroupParty(string term);
         IQueryable<ComboBoxResult> GetProductHelpListWithProductNatureFilter(int ProductNatureId, string term);
         IQueryable<ComboBoxResult> GetPersonRoles(string term);
-
+        IQueryable<ComboBoxResult> GetUnitConversionFors(string term);
         IQueryable<ComboBoxResult> GetLedgerAccount(string term);
         
         IQueryable<ComboBoxResult> GetDeliveryTerms(string term);
@@ -258,6 +259,24 @@ namespace Service
                 PropFirst = m.GodownName
             });
             return Sitelist;
+        }
+
+        public IQueryable<ComboBoxResult> GetBuyerSpecificationHelpList(string term)
+        {
+            var list = (from P in db.ProductBuyer
+                        where 1 == 1
+                        && P.BuyerSpecification !=null
+                         && (string.IsNullOrEmpty(term) ? 1 == 1 : P.BuyerSpecification.ToLower().Contains(term.ToLower()))
+                        orderby P.BuyerSpecification
+                        group new { P } by new { P.BuyerSpecification } into Result                       
+                        select new ComboBoxResult
+                        {
+                            id = Result.Key.BuyerSpecification.ToString(),
+                            text = Result.Key.BuyerSpecification
+                        }
+                      );
+
+            return list;
         }
 
         public IEnumerable<ComboBoxList> GetGateHelpList()
@@ -2735,7 +2754,21 @@ namespace Service
             return list;
         }
 
+        public IQueryable<ComboBoxResult> GetUnitConversionFors(string term)
+        {
+            var list = (from D in db.UnitConversonFor
+                        where 1==1
+                        && (string.IsNullOrEmpty(term) ? 1 == 1 : (D.UnitconversionForName.ToLower().Contains(term.ToLower())))
+                        orderby D.UnitconversionForName
+                        select new ComboBoxResult
+                        {
+                            id = D.UnitconversionForId.ToString(),
+                            text = D.UnitconversionForName
+                        }
+              );
 
+            return list;
+        }
 
         public IQueryable<ComboBoxResult> GetDeliveryTerms(string term)
         {

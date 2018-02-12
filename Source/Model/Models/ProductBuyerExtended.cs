@@ -30,5 +30,7 @@ namespace Model.PropertyTax.Models
         public DateTime WEF { get; set; }
         public Decimal? TaxAmount { get; set; }
         public Decimal? TaxPercentage { get; set; }
+        public Decimal? WaterTaxAmount { get; set; }
+        public Decimal? WaterTaxPercentage { get; set; }
     }
 }

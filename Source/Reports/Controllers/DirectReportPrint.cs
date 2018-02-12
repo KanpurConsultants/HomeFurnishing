@@ -26,6 +26,55 @@ namespace Reports.Reports
 
         protected dsReport dsRep = new dsReport();
 
+        public byte[] DocumentPrint(List<string> QueryList, string UserName, string ReportFileType = ReportFileTypeConstants.PDF)
+        {
+            var DataTableList = new List<DataTable>();
+            DataTable Dt = new DataTable();
+            
+            SqlConnection Con = new SqlConnection((string)System.Web.HttpContext.Current.Session["DefaultConnectionString"]);
+
+            foreach ( string mQry in QueryList )
+            {
+
+
+                if (mQry != "")
+                {
+
+                    SqlDataAdapter sqlDataAapter1 = new SqlDataAdapter(mQry, Con);
+                    dsRep.EnforceConstraints = false;
+                    Dt.Reset();
+
+                    sqlDataAapter1.Fill(Dt);
+
+                    DataTable SubDataTable = new DataTable();
+                    SubDataTable = Dt.Copy();
+
+
+                    if (Dt.Rows.Count > 0)
+                    {
+                        DataTableList.Add(SubDataTable);
+                    }
+                    SubDataTable.Dispose();
+
+                }
+                else
+                {
+                    break;
+                }
+
+            }
+
+
+
+            string mimtype;
+            ReportGenerateService c = new ReportGenerateService();
+
+
+            string mimetype = "";
+            return c.ReportGenerateDirect(DataTableList, out mimtype, ReportFileTypeConstants.PDF, null,null, UserName);
+
+        }
+
         public byte[] DirectDocumentPrint(String queryString, string UserName, int DocumentId = 0, string ReportFileType = ReportFileTypeConstants.PDF)
         {
             var SubReportDataList = new List<DataTable>();
