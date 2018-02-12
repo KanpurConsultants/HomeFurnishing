@@ -130,7 +130,7 @@ namespace Jobs.Controllers
                         LineCharge.IncludedInBase = EmployeeCharge.IncludedInBase;
                         LineCharge.ParentChargeId = EmployeeCharge.ParentChargeId;
                         LineCharge.Rate = EmployeeCharge.Rate;
-                        LineCharge.Amount = EmployeeCharge.Amount * Line.Days/30;
+                        LineCharge.Amount = (EmployeeCharge.Amount * Line.Days/30);
                         LineCharge.DealQty = 0;
                         LineCharge.IsVisible = EmployeeCharge.IsVisible;
                         LineCharge.IncludedCharges = EmployeeCharge.IncludedCharges;
@@ -145,7 +145,7 @@ namespace Jobs.Controllers
 
                         Charge NetSalaryCharge = (from C in db.Charge where C.ChargeName == "Net Salary" select C).FirstOrDefault();
                         if (NetSalaryCharge != null)
-                            Line.NetSalary = LineCharge.Amount ?? 0;
+                            Line.NetSalary = (LineCharge.Amount ?? 0) + (Line.OtherAddition ?? 0) - (Line.OtherDeduction ?? 0) - (Line.LoanEMI ?? 0);
                     }
 
 
@@ -211,9 +211,11 @@ namespace Jobs.Controllers
                                                NetSalary = L.NetSalary
                                            }).ToList();
 
-                foreach(var LedgerLine_Temp in LedgerLineList_Temp)
+                int LedgerLineId_Running = 0, LedgerId_Running = 0;
+                foreach (var LedgerLine_Temp in LedgerLineList_Temp)
                 {
                     LedgerLine LedgerLine = new LedgerLine();
+                    LedgerLine.LedgerLineId = LedgerLineId_Running -- ;
                     LedgerLine.LedgerHeaderId = LedgerHeader.LedgerHeaderId;
                     LedgerLine.LedgerAccountId = LedgerLine_Temp.LedgerAccountId;
                     LedgerLine.Amount = LedgerLine_Temp.NetSalary;
@@ -235,6 +237,44 @@ namespace Jobs.Controllers
                     LedgerLine.ModifiedBy = User.Identity.Name;
                     LedgerLine.ObjectState = Model.ObjectState.Added;
                     db.LedgerLine.Add(LedgerLine);
+
+
+
+                    #region LedgerSave
+                    Ledger Ledger = new Ledger();
+                    Ledger.LedgerId = LedgerId_Running--;
+                    Ledger.AmtDr = 0;
+                    Ledger.AmtCr = LedgerLine.Amount;
+                    Ledger.ChqNo = LedgerLine.ChqNo;
+                    Ledger.ChqDate = LedgerLine.ChqDate;
+                    Ledger.ContraLedgerAccountId = LedgerHeader.LedgerAccountId;
+                    Ledger.CostCenterId = LedgerLine.CostCenterId;
+                    Ledger.DueDate = LedgerLine.ChqDate;
+                    Ledger.LedgerAccountId = LedgerLine.LedgerAccountId;
+                    Ledger.LedgerHeaderId = LedgerLine.LedgerHeaderId;
+                    Ledger.LedgerLineId = LedgerLine.LedgerLineId;
+                    Ledger.ProductUidId = LedgerLine.ProductUidId;
+                    Ledger.Narration = LedgerHeader.Narration + LedgerLine.Remark;
+                    Ledger.ObjectState = Model.ObjectState.Added;
+                    db.Ledger.Add(Ledger);
+                    #endregion
+
+
+                    #region ContraLedgerSave
+                    Ledger ContraLedger = new Ledger();
+                    ContraLedger.LedgerId = LedgerId_Running--;
+                    ContraLedger.AmtDr = LedgerLine.Amount;
+                    ContraLedger.AmtCr = 0;
+                    ContraLedger.LedgerHeaderId = LedgerHeader.LedgerHeaderId;
+                    ContraLedger.CostCenterId = LedgerHeader.CostCenterId;
+                    ContraLedger.LedgerLineId = LedgerLine.LedgerLineId;
+                    ContraLedger.LedgerAccountId = LedgerHeader.LedgerAccountId.Value;
+                    ContraLedger.ContraLedgerAccountId = LedgerLine.LedgerAccountId;
+                    ContraLedger.ChqNo = LedgerLine.ChqNo;
+                    ContraLedger.ChqDate = LedgerLine.ChqDate;
+                    ContraLedger.ObjectState = Model.ObjectState.Added;
+                    db.Ledger.Add(ContraLedger);
+                    #endregion
                 }
 
 

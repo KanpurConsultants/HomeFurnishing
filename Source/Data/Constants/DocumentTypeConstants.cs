@@ -703,11 +703,21 @@ namespace Jobs.Constants.DocumentType
             public const string Nature = null;
             public const string PrintTitle = null;
         }
+        public static class LoansAndAdvances
+        {
+            public const int DocumentTypeId = 690;
+            public const string DocumentTypeShortName = "LNADV";
+            public const string DocumentTypeName = "Loans and Advances";
+            public const int DocumentCategoryId = DocumentCategoryConstants.PaymentVoucher.DocumentCategoryId;
+            public const int DocumentNatureId = DocumentNatureConstants.PaymentVoucher.DocumentNatureId;
+            public const string Nature = null;
+            public const string PrintTitle = null;
+        }
         #endregion
         #region "Masters"
         public static class JobWorker
         {
-            public const int DocumentTypeId = 690;
+            public const int DocumentTypeId = 700;
             public const string DocumentTypeShortName = "JWORK";
             public const string DocumentTypeName = "Job Worker";
             public const int DocumentCategoryId = DocumentCategoryConstants.Person.DocumentCategoryId;
@@ -717,7 +727,7 @@ namespace Jobs.Constants.DocumentType
         }
         public static class Customer
         {
-            public const int DocumentTypeId = 700;
+            public const int DocumentTypeId = 710;
             public const string DocumentTypeShortName = "CSTMR";
             public const string DocumentTypeName = "Customer";
             public const int DocumentCategoryId = DocumentCategoryConstants.Person.DocumentCategoryId;
@@ -727,7 +737,7 @@ namespace Jobs.Constants.DocumentType
         }
         public static class Supplier
         {
-            public const int DocumentTypeId = 710;
+            public const int DocumentTypeId = 720;
             public const string DocumentTypeShortName = "SUPPR";
             public const string DocumentTypeName = "Supplier";
             public const int DocumentCategoryId = DocumentCategoryConstants.Person.DocumentCategoryId;

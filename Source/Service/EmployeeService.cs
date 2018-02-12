@@ -217,6 +217,10 @@ namespace Service
                                        SiteIds = BusinessEntityTab.SiteIds,
                                        Tags = PersonTab.Tags,
                                        BasicSalary = b.BasicSalary,
+                                       DateOfJoining = b.DateOfJoining,
+                                       DateOfRelieving = b.DateOfRelieving,
+                                       WagesPayType = b.WagesPayType,
+                                       PaymentType = b.PaymentType,
                                        ImageFileName = PersonTab.ImageFileName,
                                        ImageFolderName = PersonTab.ImageFolderName
                                    }

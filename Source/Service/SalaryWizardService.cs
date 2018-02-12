@@ -36,11 +36,45 @@ namespace Service
             SqlParameter SqlParameterDocDate = new SqlParameter("@DocDate", vm.DocDate.ToString());
             SqlParameter SqlParameterDocTypeId = new SqlParameter("@DocTypeId", vm.DocTypeId);
 
-            mQry = @"SELECT E.EmployeeId, P.Name AS EmployeeName, 30.00 AS Days, 0.00 AS Additions, 0.00 AS Deductions, 0.00 AS LoanEMI, 
-                    @DocDate As DocDate, 
+            //mQry = @"SELECT E.EmployeeId, P.Name AS EmployeeName, 30.00 AS Days, 0.00 AS Additions, 0.00 AS Deductions, 0.00 AS LoanEMI, 
+            //        @DocDate As DocDate, 
+            //        @DocTypeId As DocTypeId
+            //        FROM Web.Employees E
+            //        LEFT JOIN Web.People P ON E.PersonID = P.PersonID  ";
+
+
+            mQry = @"SELECT E.EmployeeId, P.Name AS EmployeeName, 30.00 AS Days, 0.00 AS Additions, 0.00 AS Deductions, 
+                    IsNull(VAdvance.LoanEMI,0) AS LoanEMI, @DocDate As DocDate, 
                     @DocTypeId As DocTypeId
                     FROM Web.Employees E
-                    LEFT JOIN Web.People P ON E.PersonID = P.PersonID  ";
+                    LEFT JOIN Web.People P ON E.PersonID = P.PersonID
+                    LEFT JOIN (
+                        SELECT L.EmployeeId
+                        FROM Web.SalaryLines L 
+                        LEFT JOIN Web.SalaryHeaders H ON L.SalaryHeaderId = H.SalaryHeaderId
+                        WHERE H.DocDate = '12/Feb/2018'
+                    ) AS VSalaryLine ON E.EmployeeId = VSalaryLine.EmployeeId
+                    LEFT JOIN (
+	                    SELECT E.EmployeeId, Sum(CASE WHEN IsNull(L.AmtDr,0) - IsNull(VAdj.AdjustedAmount,0) < LL.BaseRate
+	                    THEN IsNull(L.AmtDr,0) - IsNull(VAdj.AdjustedAmount,0)
+	                    ELSE LL.BaseRate END) AS LoanEMI
+	                    FROM Web.Employees E
+	                    LEFT JOIN Web.LedgerAccounts A ON E.PersonID = A.PersonId
+	                    LEFT JOIN Web.Ledgers L ON A.LedgerAccountId = L.LedgerAccountId
+	                    LEFT JOIN Web.LedgerLines LL ON L.LedgerLineId = LL.LedgerLineId
+	                    LEFT JOIN Web.LedgerHeaders H ON L.LedgerHeaderId = H.LedgerHeaderId
+	                    LEFT JOIN Web.DocumentTypes D ON H.DocTypeId = D.DocumentTypeId
+	                    LEFT JOIN (
+		                    SELECT La.DrLedgerId, Sum(La.Amount) AS AdjustedAmount
+		                    FROM Web.LedgerAdjs La
+		                    GROUP BY La.DrLedgerId
+	                    ) AS VAdj ON L.LedgerId = VAdj.DrLedgerId
+	                    WHERE D.DocumentTypeName = '" + Jobs.Constants.DocumentType.DocumentTypeConstants.LoansAndAdvances.DocumentTypeName + "'" + @"
+                        AND IsNull(L.AmtDr,0) - IsNull(VAdj.AdjustedAmount,0) > 0
+	                    GROUP BY E.EmployeeId
+                    ) AS VAdvance ON E.EmployeeId = VAdvance.EmployeeId
+                    WHERE E.DateOfJoining <= @DocDate AND E.DateOfRelieving IS NULL
+                    AND VSalaryLine.EmployeeId IS NULL ";
 
             //mQry = mQry + "UNION ALL " + mQry;
             //mQry = mQry + "UNION ALL " + mQry;

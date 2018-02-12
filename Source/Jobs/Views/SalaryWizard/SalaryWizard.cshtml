@@ -158,11 +158,7 @@
         //    return false;
         //})
 
-        $("#datepicker").datepicker({
-            format: "mm-yyyy",
-            startView: "months",
-            minViewMode: "months"
-        });
+
 
         $('#Fill').click(function(){
             //$('#ReportFilters').toggle();
@@ -183,6 +179,12 @@
 
         $(document).ready(function(){
             //angular.element(document.querySelector('#Fill')).click();
+
+            $("#datepicker").datepicker({
+                format: "mm/yyyy",
+                startView: "year",
+                minViewMode: "year"
+            });
         });
 
 

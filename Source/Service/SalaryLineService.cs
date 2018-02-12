@@ -94,6 +94,8 @@ namespace Service
                        orderby p.Sr
                        select new SalaryLineViewModel
                        {
+                           EmployeeName = p.Employee.Person.Name,
+                           NetSalary = p.NetSalary,
                            Remark = p.Remark,
                            SalaryHeaderId = p.SalaryHeaderId,
                            SalaryLineId = p.SalaryLineId,

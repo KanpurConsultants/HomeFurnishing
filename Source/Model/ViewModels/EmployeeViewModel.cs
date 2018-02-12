@@ -68,10 +68,10 @@ namespace Model.ViewModels
         public Boolean IsSisterConcern { get; set; }
 
         [Display(Name = "Date Of Joining"), DisplayFormat(DataFormatString = "{0:dd/MMM/yyyy}")]
-        public DateTime DateOfJoining { get; set; }
+        public DateTime? DateOfJoining { get; set; }
 
         [Display(Name = "Date Of Relieving"), DisplayFormat(DataFormatString = "{0:dd/MMM/yyyy}")]
-        public DateTime DateOfRelieving { get; set; }
+        public DateTime? DateOfRelieving { get; set; }
 
         [MaxLength(10)]
         public string WagesPayType { get; set; }
