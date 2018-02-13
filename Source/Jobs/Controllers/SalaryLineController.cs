@@ -638,12 +638,40 @@ namespace Jobs.Controllers
                 });
 
 
+                LedgerLine LedgerLine = (from L in db.LedgerLine
+                                   join H in db.LedgerHeader on L.LedgerHeaderId equals H.LedgerHeaderId into LedgerHeaderTable
+                                   from LedgerHeaderTab in LedgerHeaderTable.DefaultIfEmpty()
+                                   where L.ReferenceDocLineId == SalaryLine.SalaryLineId && L.ReferenceDocTypeId == header.DocTypeId
+                                   select L).FirstOrDefault();
+
+                LedgerLine.ObjectState = Model.ObjectState.Deleted;
+                db.LedgerLine.Remove(LedgerLine);
+
+                IEnumerable<Ledger> LedgerList = (from L in db.Ledger where L.LedgerLineId == LedgerLine.LedgerLineId select L).ToList();
+                foreach(Ledger Ledger in LedgerList)
+                {
+                    IEnumerable<LedgerAdj> LedgerAdjList = (from L in db.LedgerAdj where L.CrLedgerId == Ledger.LedgerId select L).ToList();
+
+                    foreach(LedgerAdj LedgerAdj in LedgerAdjList)
+                    {
+                        LedgerAdj.ObjectState = Model.ObjectState.Deleted;
+                        db.LedgerAdj.Remove(LedgerAdj);
+                    }
+
+                    Ledger.ObjectState = Model.ObjectState.Deleted;
+                    db.Ledger.Remove(Ledger);
+                }
+
+
 
                 //_SalaryLineService.Delete(SalaryLine);
                 SalaryLine.ObjectState = Model.ObjectState.Deleted;
                 db.SalaryLine.Remove(SalaryLine);
 
 
+
+
+                
 
 
                 if (header.Status != (int)StatusConstants.Drafted && header.Status != (int)StatusConstants.Import)

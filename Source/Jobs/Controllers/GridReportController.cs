@@ -207,6 +207,7 @@ namespace Jobs.Controllers
             }
 
 
+
             ReportData.Columns.Add("SysParamType");
 
 
@@ -218,6 +219,9 @@ namespace Jobs.Controllers
 
             foreach (DataColumn column in ReportData.Columns)
             {
+                if (column.ColumnName.Contains("."))
+                    column.ColumnName = column.ColumnName.Replace(".", "-");
+
                 DataRow[] NullValueColumn = ReportData.Select("[" + column.ColumnName + "] is not null ");
 
                 if (NullValueColumn.Length == 0)
@@ -256,6 +260,8 @@ namespace Jobs.Controllers
                             break;
                         }
                 }
+
+                
             }
 
             foreach (string ColumnName in RemoveColumnList)

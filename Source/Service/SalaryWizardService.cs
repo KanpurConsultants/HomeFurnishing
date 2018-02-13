@@ -19,6 +19,7 @@ namespace Service
     public interface ISalaryWizardService : IDisposable
     {
         IEnumerable<SalaryWizardResultViewModel> GetSalaryDetail(SalaryWizardViewModel vm);
+        IEnumerable<LoanLedgerIdList> GetLoanList(int LedgerAccountId);
     }
 
     public class SalaryWizardService : ISalaryWizardService
@@ -52,12 +53,12 @@ namespace Service
                         SELECT L.EmployeeId
                         FROM Web.SalaryLines L 
                         LEFT JOIN Web.SalaryHeaders H ON L.SalaryHeaderId = H.SalaryHeaderId
-                        WHERE H.DocDate = '12/Feb/2018'
+                        WHERE H.DocDate = @DocDate
                     ) AS VSalaryLine ON E.EmployeeId = VSalaryLine.EmployeeId
                     LEFT JOIN (
 	                    SELECT E.EmployeeId, Sum(CASE WHEN IsNull(L.AmtDr,0) - IsNull(VAdj.AdjustedAmount,0) < LL.BaseRate
 	                    THEN IsNull(L.AmtDr,0) - IsNull(VAdj.AdjustedAmount,0)
-	                    ELSE LL.BaseRate END) AS LoanEMI
+	                    ELSE LL.BaseRate END) AS LoanEMI, Min(L.LedgerId) As LoanLedgerId
 	                    FROM Web.Employees E
 	                    LEFT JOIN Web.LedgerAccounts A ON E.PersonID = A.PersonId
 	                    LEFT JOIN Web.Ledgers L ON A.LedgerAccountId = L.LedgerAccountId
@@ -85,6 +86,33 @@ namespace Service
 
         }
 
+
+
+        public IEnumerable<LoanLedgerIdList> GetLoanList(int LedgerAccountId)
+        {
+            SqlParameter SqlParameterLedgerAccountId = new SqlParameter("@LedgerAccountId", LedgerAccountId);
+
+            mQry = @"SELECT L.LedgerId, IsNull(L.AmtDr,0) - IsNull(VAdj.AdjustedAmount,0) As Amount
+	                    FROM Web.Ledgers L 
+	                    LEFT JOIN Web.LedgerLines LL ON L.LedgerLineId = LL.LedgerLineId
+	                    LEFT JOIN Web.LedgerHeaders H ON L.LedgerHeaderId = H.LedgerHeaderId
+	                    LEFT JOIN Web.DocumentTypes D ON H.DocTypeId = D.DocumentTypeId
+	                    LEFT JOIN (
+		                    SELECT La.DrLedgerId, Sum(La.Amount) AS AdjustedAmount
+		                    FROM Web.LedgerAdjs La
+		                    GROUP BY La.DrLedgerId
+	                    ) AS VAdj ON L.LedgerId = VAdj.DrLedgerId
+	                    WHERE L.LedgerAccountId = @LedgerAccountId
+                        And D.DocumentTypeName = '" + Jobs.Constants.DocumentType.DocumentTypeConstants.LoansAndAdvances.DocumentTypeName + "'" + @"
+                        AND IsNull(L.AmtDr,0) - IsNull(VAdj.AdjustedAmount,0) > 0 ";
+
+            IEnumerable<LoanLedgerIdList> SalaryWizardResultViewModel = db.Database.SqlQuery<LoanLedgerIdList>(mQry, SqlParameterLedgerAccountId).ToList();
+
+            return SalaryWizardResultViewModel;
+        }
+
+
+
         public void Dispose()
         {
         }
@@ -101,5 +129,11 @@ namespace Service
         public Decimal Additions { get; set; }
         public Decimal Deductions { get; set; }
         public Decimal LoanEMI { get; set; }
+    }
+
+    public class LoanLedgerIdList
+    {
+        public int LedgerId { get; set; }
+        public Decimal Amount { get; set; }
     }
 }

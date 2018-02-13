@@ -202,13 +202,14 @@ namespace Jobs.Controllers
                                            from EmployeeTab in EmployeeTable.DefaultIfEmpty()
                                            join A in db.LedgerAccount on EmployeeTab.PersonID equals A.PersonId into LedgerAccountTable
                                            from LedgerAccountTab in LedgerAccountTable.DefaultIfEmpty()
-                                           where L.SalaryHeaderId == Header.SalaryHeaderId
+                                           where L.SalaryHeaderId == Header.SalaryHeaderId && L.NetSalary > 0
                                            select new
                                            {
                                                SalaryLineId = L.SalaryLineId,
                                                DocTypeId = L.SalaryHeader.DocTypeId,
                                                LedgerAccountId = LedgerAccountTab.LedgerAccountId,
-                                               NetSalary = L.NetSalary
+                                               LoanEMI = L.LoanEMI,
+                                               NetSalary = L.NetSalary,
                                            }).ToList();
 
                 int LedgerLineId_Running = 0, LedgerId_Running = 0;
@@ -258,6 +259,37 @@ namespace Jobs.Controllers
                     Ledger.ObjectState = Model.ObjectState.Added;
                     db.Ledger.Add(Ledger);
                     #endregion
+
+
+                    if ((LedgerLine_Temp.LoanEMI ?? 0) > 0)
+                    {
+                        Decimal LoanEMI_RunningBalance = LedgerLine_Temp.LoanEMI ?? 0;
+                        IEnumerable<LoanLedgerIdList> LoanList = _SalaryWizardService.GetLoanList(LedgerLine.LedgerAccountId);
+                        foreach (var LoanLedger in LoanList)
+                        {
+                            if (LoanEMI_RunningBalance > 0)
+                            {
+                                LedgerAdj LedgerAdj = new LedgerAdj();
+                                LedgerAdj.CrLedgerId = Ledger.LedgerId;
+                                LedgerAdj.DrLedgerId = LoanLedger.LedgerId;
+
+                                if (LoanLedger.Amount >= LoanEMI_RunningBalance)
+                                    LedgerAdj.Amount = LoanEMI_RunningBalance;
+                                else
+                                    LedgerAdj.Amount = LoanLedger.Amount;
+
+                                LedgerAdj.SiteId = LedgerHeader.SiteId;
+                                LedgerAdj.CreatedDate = DateTime.Now;
+                                LedgerAdj.ModifiedDate = DateTime.Now;
+                                LedgerAdj.CreatedBy = User.Identity.Name;
+                                LedgerAdj.ModifiedBy = User.Identity.Name;
+                                LedgerAdj.ObjectState = Model.ObjectState.Added;
+                                db.LedgerAdj.Add(LedgerAdj);
+
+                                LoanEMI_RunningBalance = LoanEMI_RunningBalance - LedgerAdj.Amount;
+                            }
+                        }
+                    }
 
 
                     #region ContraLedgerSave
