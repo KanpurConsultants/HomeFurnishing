@@ -73,6 +73,7 @@ namespace Service
                         {
                             Remark = p.Remark,
                             SalaryLineId = p.SalaryLineId,
+                            SalaryHeaderId=p.SalaryHeaderId,
                             LockReason = p.LockReason,
                         }).FirstOrDefault();
 
@@ -95,6 +96,7 @@ namespace Service
                        select new SalaryLineViewModel
                        {
                            EmployeeName = p.Employee.Person.Name,
+                           Days=p.Days,
                            NetSalary = p.NetSalary,
                            Remark = p.Remark,
                            SalaryHeaderId = p.SalaryHeaderId,

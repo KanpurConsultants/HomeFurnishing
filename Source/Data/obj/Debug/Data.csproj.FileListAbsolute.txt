@@ -278,8 +278,6 @@ D:\Active Projects\Web\HomeFurnishing\Source\Data\bin\Debug\Newtonsoft.Json.xml
 D:\Active Projects\Web\HomeFurnishing\Source\Data\bin\Debug\System.Web.Mvc.xml
 D:\Active Projects\Web\HomeFurnishing\Source\Data\bin\Debug\log4net.xml
 D:\Active Projects\Web\HomeFurnishing\Source\Data\obj\Debug\Data.csprojResolveAssemblyReference.cache
-D:\Active Projects\Web\HomeFurnishing\Source\Data\obj\Debug\Data.Migrations.JobOrderBomMaterialIssue.resources
-D:\Active Projects\Web\HomeFurnishing\Source\Data\obj\Debug\Data.Migrations.DivisionSetting.resources
 D:\Active Projects\Web\HomeFurnishing\Source\Data\obj\Debug\Data.csproj.GenerateResource.Cache
 D:\Active Projects\Web\HomeFurnishing\Source\Data\obj\Debug\Data.dll
 D:\Active Projects\Web\HomeFurnishing\Source\Data\obj\Debug\Data.pdb
@@ -411,3 +409,4 @@ D:\Kanpur Consultants\HomeFurnishing\Source\Data\obj\Debug\Data.dll
 D:\Kanpur Consultants\HomeFurnishing\Source\Data\obj\Debug\Data.pdb
 D:\Kanpur Consultants\HomeFurnishing\Source\Data\obj\Debug\Data.Migrations.PropertyTax.resources
 D:\Kanpur Consultants\HomeFurnishing\Source\Data\obj\Debug\Data.csproj.GenerateResource.Cache
+D:\Active Projects\Web\HomeFurnishing\Source\Data\obj\Debug\Data.Migrations.PropertyTax.resources

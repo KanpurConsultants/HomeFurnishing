@@ -388,3 +388,5 @@ D:\Kanpur Consultants\HomeFurnishing\Source\Service\obj\Debug\Service.Properties
 D:\Kanpur Consultants\HomeFurnishing\Source\Service\obj\Debug\Service.csproj.GenerateResource.Cache
 D:\Kanpur Consultants\HomeFurnishing\Source\Service\obj\Debug\Service.dll
 D:\Kanpur Consultants\HomeFurnishing\Source\Service\obj\Debug\Service.pdb
+D:\Active Projects\Web\HomeFurnishing\Source\Service\bin\Debug\Components.dll
+D:\Active Projects\Web\HomeFurnishing\Source\Service\bin\Debug\Components.pdb

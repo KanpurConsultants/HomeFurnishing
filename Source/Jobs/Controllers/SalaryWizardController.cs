@@ -144,7 +144,7 @@ namespace Jobs.Controllers
 
 
                         Charge NetSalaryCharge = (from C in db.Charge where C.ChargeName == "Net Salary" select C).FirstOrDefault();
-                        if (NetSalaryCharge != null)
+                        if (NetSalaryCharge != null && EmployeeCharge.ChargeId == NetSalaryCharge.ChargeId)
                             Line.NetSalary = (LineCharge.Amount ?? 0) + (Line.OtherAddition ?? 0) - (Line.OtherDeduction ?? 0) - (Line.LoanEMI ?? 0);
                     }
 

@@ -3,8 +3,8 @@
   <State>$base64$PFNvdXJjZUNvbnRyb2xJbmZvIHhtbG5zOnhzZD0iaHR0cDovL3d3dy53My5vcmcvMjAwMS9YTUxTY2hlbWEiIHhtbG5zOnhzaT0iaHR0cDovL3d3dy53My5vcmcvMjAwMS9YTUxTY2hlbWEtaW5zdGFuY2UiIHhtbG5zOmRkbDI9Imh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vYW5hbHlzaXNzZXJ2aWNlcy8yMDAzL2VuZ2luZS8yIiB4bWxuczpkZGwyXzI9Imh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vYW5hbHlzaXNzZXJ2aWNlcy8yMDAzL2VuZ2luZS8yLzIiIHhtbG5zOmRkbDEwMF8xMDA9Imh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vYW5hbHlzaXNzZXJ2aWNlcy8yMDA4L2VuZ2luZS8xMDAvMTAwIiB4bWxuczpkZGwyMDA9Imh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vYW5hbHlzaXNzZXJ2aWNlcy8yMDEwL2VuZ2luZS8yMDAiIHhtbG5zOmRkbDIwMF8yMDA9Imh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vYW5hbHlzaXNzZXJ2aWNlcy8yMDEwL2VuZ2luZS8yMDAvMjAwIiB4bWxuczpkZGwzMDA9Imh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vYW5hbHlzaXNzZXJ2aWNlcy8yMDExL2VuZ2luZS8zMDAiIHhtbG5zOmRkbDMwMF8zMDA9Imh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vYW5hbHlzaXNzZXJ2aWNlcy8yMDExL2VuZ2luZS8zMDAvMzAwIiB4bWxuczpkd2Q9Imh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vRGF0YVdhcmVob3VzZS9EZXNpZ25lci8xLjAiPg0KICA8RW5hYmxlZD5mYWxzZTwvRW5hYmxlZD4NCiAgPFByb2plY3ROYW1lPjwvUHJvamVjdE5hbWU+DQogIDxBdXhQYXRoPjwvQXV4UGF0aD4NCiAgPExvY2FsUGF0aD48L0xvY2FsUGF0aD4NCiAgPFByb3ZpZGVyPjwvUHJvdmlkZXI+DQo8L1NvdXJjZUNvbnRyb2xJbmZvPg==</State>
   <DataSources>
     <ProjectItem>
-      <Name>DataSourceMain.rds</Name>
-      <FullPath>DataSourceMain.rds</FullPath>
+      <Name>DSBC.rds</Name>
+      <FullPath>DSBC.rds</FullPath>
     </ProjectItem>
   </DataSources>
   <DataSets>
@@ -3269,6 +3269,10 @@
       <FullPath>Rug_HisabOfPurja_Bhadohi.rdl</FullPath>
     </ProjectItem>
     <ProjectItem>
+      <Name>Rug_HisabOfPurja_Order.rdl</Name>
+      <FullPath>Rug_HisabOfPurja_Order.rdl</FullPath>
+    </ProjectItem>
+    <ProjectItem>
       <Name>Rug_HisabOfPurja1.rdl</Name>
       <FullPath>Rug_HisabOfPurja1.rdl</FullPath>
     </ProjectItem>
@@ -5232,8 +5236,8 @@
       <FullPath>YearlyListOfPurja.rdl</FullPath>
     </ProjectItem>
     <ProjectItem>
-      <Name>Rug_HisabOfPurja_Order.rdl</Name>
-      <FullPath>Rug_HisabOfPurja_Order.rdl</FullPath>
+      <Name>SalaryPrint.rdl</Name>
+      <FullPath>SalaryPrint.rdl</FullPath>
     </ProjectItem>
   </Reports>
   <Configurations>

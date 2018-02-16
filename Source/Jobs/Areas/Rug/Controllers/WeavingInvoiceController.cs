@@ -335,7 +335,8 @@ namespace Jobs.Areas.Rug.Controllers
                         TdsLedgerLine.CostCenterId = item.CostCenterId;
                     }                    
                     TdsLedgerLine.ProductUidId = item.ProductUidId;
-                    TdsLedgerLine.BaseValue = item.TdsAdjusted * 100 / TdsRate.Percentage;
+                    //TdsLedgerLine.BaseValue = item.TdsAdjusted * 100 / TdsRate.Percentage;
+                    TdsLedgerLine.BaseValue = item.InvoiceAmount;
                     TdsLedgerLine.Amount = item.TdsAdjusted;
                     TdsLedgerLine.CreatedDate = DateTime.Now;
                     TdsLedgerLine.ModifiedDate = DateTime.Now;

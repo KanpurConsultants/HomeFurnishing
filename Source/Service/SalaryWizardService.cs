@@ -75,6 +75,7 @@ namespace Service
 	                    GROUP BY E.EmployeeId
                     ) AS VAdvance ON E.EmployeeId = VAdvance.EmployeeId
                     WHERE E.DateOfJoining <= @DocDate AND E.DateOfRelieving IS NULL
+                    AND E.BasicSalary > 0
                     AND VSalaryLine.EmployeeId IS NULL ";
 
             //mQry = mQry + "UNION ALL " + mQry;

@@ -298,3 +298,4 @@ D:\Kanpur Consultants\HomeFurnishing\Source\Mail\bin\Debug\AutoMapper.xml
 D:\Kanpur Consultants\HomeFurnishing\Source\Mail\obj\Debug\EmailContents.csprojResolveAssemblyReference.cache
 D:\Kanpur Consultants\HomeFurnishing\Source\Mail\obj\Debug\EMailContents.dll
 D:\Kanpur Consultants\HomeFurnishing\Source\Mail\obj\Debug\EMailContents.pdb
+D:\Active Projects\Web\HomeFurnishing\Source\Mail\bin\Debug\Components.pdb
