@@ -51,6 +51,11 @@ namespace Jobs.Controllers
             vm.DocDate = DateTime.Now;
             vm.DocTypeId = id;
 
+            List<SelectListItem> WagesPayTypeList = new List<SelectListItem>();
+            WagesPayTypeList.Add(new SelectListItem { Text = "Daily", Value = "Daily" });
+            WagesPayTypeList.Add(new SelectListItem { Text = "Monthly", Value = "Monthly" });
+            ViewBag.WagesPayTypeList = WagesPayTypeList;
+
             return View(vm);
         }
 

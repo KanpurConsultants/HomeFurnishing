@@ -97,7 +97,6 @@ namespace Model.ViewModels
         public int DocTypeId { get; set; }
         public int? DepartmentId { get; set; }
         public string DepartmentName { get; set; }
-
-
+        public string WagesPayType { get; set; }
     }
 }

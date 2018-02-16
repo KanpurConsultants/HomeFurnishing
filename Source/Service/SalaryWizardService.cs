@@ -36,6 +36,8 @@ namespace Service
         {
             SqlParameter SqlParameterDocDate = new SqlParameter("@DocDate", vm.DocDate.ToString());
             SqlParameter SqlParameterDocTypeId = new SqlParameter("@DocTypeId", vm.DocTypeId);
+            SqlParameter SqlParameterDepartmentId = new SqlParameter("@DepartmentId", (vm.DepartmentId == null) ? DBNull.Value : (object)vm.DepartmentId);
+            SqlParameter SqlParameterWagesPayType = new SqlParameter("@WagesPayType", (vm.WagesPayType == null) ? DBNull.Value : (object)vm.WagesPayType);
 
             //mQry = @"SELECT E.EmployeeId, P.Name AS EmployeeName, 30.00 AS Days, 0.00 AS Additions, 0.00 AS Deductions, 0.00 AS LoanEMI, 
             //        @DocDate As DocDate, 
@@ -74,13 +76,15 @@ namespace Service
                         AND IsNull(L.AmtDr,0) - IsNull(VAdj.AdjustedAmount,0) > 0
 	                    GROUP BY E.EmployeeId
                     ) AS VAdvance ON E.EmployeeId = VAdvance.EmployeeId
-                    WHERE E.DateOfJoining <= @DocDate AND E.DateOfRelieving IS NULL
-                    AND VSalaryLine.EmployeeId IS NULL ";
+                    WHERE E.DateOfJoining <= @DocDate AND E.DateOfRelieving IS NULL " +
+                    (vm.DepartmentId != null ? " AND E.DepartmentId = @DepartmentId" : "") +
+                    (vm.WagesPayType != null ? " AND E.WagesPayType = @WagesPayType" : "") +
+                    " AND VSalaryLine.EmployeeId IS NULL ";
 
             //mQry = mQry + "UNION ALL " + mQry;
             //mQry = mQry + "UNION ALL " + mQry;
 
-            IEnumerable<SalaryWizardResultViewModel> SalaryWizardResultViewModel = db.Database.SqlQuery<SalaryWizardResultViewModel>(mQry, SqlParameterDocDate, SqlParameterDocTypeId).ToList();
+            IEnumerable<SalaryWizardResultViewModel> SalaryWizardResultViewModel = db.Database.SqlQuery<SalaryWizardResultViewModel>(mQry, SqlParameterDocDate, SqlParameterDocTypeId, SqlParameterDepartmentId, SqlParameterWagesPayType).ToList();
 
             return SalaryWizardResultViewModel;
 
