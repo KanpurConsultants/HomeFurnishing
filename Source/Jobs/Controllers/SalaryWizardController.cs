@@ -51,6 +51,11 @@ namespace Jobs.Controllers
             vm.DocDate = DateTime.Now;
             vm.DocTypeId = id;
 
+            List<SelectListItem> WagesPayTypeList = new List<SelectListItem>();
+            WagesPayTypeList.Add(new SelectListItem { Text = "Daily", Value = "Daily" });
+            WagesPayTypeList.Add(new SelectListItem { Text = "Monthly", Value = "Monthly" });
+            ViewBag.WagesPayTypeList = WagesPayTypeList;
+
             return View(vm);
         }
 
@@ -73,6 +78,7 @@ namespace Jobs.Controllers
                 DateTime DocDate  = Convert.ToDateTime(SalaryDataList.FirstOrDefault().DocDate);
                 int DocTypeId = SalaryDataList.FirstOrDefault().DocTypeId;
                 string DocNo = new DocumentTypeService(_unitOfWork).FGetNewDocNo("DocNo", ConfigurationManager.AppSettings["DataBaseSchema"] + ".SalaryHeaders", DocTypeId, DocDate, DivisionId, SiteId);
+                string Remark = SalaryDataList.FirstOrDefault().HeaderRemark;
 
                 SalaryHeader Header = new SalaryHeader();
                 Header.DocDate = DocDate;
@@ -80,7 +86,7 @@ namespace Jobs.Controllers
                 Header.DocNo = DocNo;
                 Header.DivisionId = DivisionId;
                 Header.SiteId = SiteId;
-                Header.Remark = null;
+                Header.Remark = Remark;
                 Header.CreatedDate = DateTime.Now;
                 Header.CreatedBy = User.Identity.Name;
                 Header.ModifiedDate = DateTime.Now;
@@ -144,7 +150,7 @@ namespace Jobs.Controllers
 
 
                         Charge NetSalaryCharge = (from C in db.Charge where C.ChargeName == "Net Salary" select C).FirstOrDefault();
-                        if (NetSalaryCharge != null && EmployeeCharge.ChargeId == NetSalaryCharge.ChargeId)
+                        if (NetSalaryCharge != null && LineCharge.ChargeId == NetSalaryCharge.ChargeId)
                             Line.NetSalary = (LineCharge.Amount ?? 0) + (Line.OtherAddition ?? 0) - (Line.OtherDeduction ?? 0) - (Line.LoanEMI ?? 0);
                     }
 

@@ -149,8 +149,35 @@
                     </div>
                 </div>
 
+
+                @{
+                    var count = Model.StockIssueForProductsFilterViewModel.Where(m => m.IsBomPosted == false).Count();
+                    string message;
+                    if (count > 0)
+                    {
+                        message = count + " records dont have consumption";
+                    }
+                    else
+                    {
+                        message = "";
+                    }
+                }
+                @if (count > 0)
+                {
+                    <div id="alertzone" class="alert alert-danger" style="font-weight:bold"> &hellip; @message</div>
+                }
+
+
+
                 <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                    @if (count > 0)
+                    {
+                        <button class="btn custom" name="Command:Edit" type="submit" id="submit1" disabled="disabled"><h2 style="margin:0px" title="Proceed"><span class="glyphicon glyphicon-arrow-right black"></span> </h2></button>
+                    }
+                    else
+                    {
                         <button class="btn custom" name="Command:Edit" type="submit" id="submit1"><h2 style="margin:0px" title="Proceed"><span class="glyphicon glyphicon-arrow-right black"></span> </h2></button>
+                    }
                 </div>
 
             </div>

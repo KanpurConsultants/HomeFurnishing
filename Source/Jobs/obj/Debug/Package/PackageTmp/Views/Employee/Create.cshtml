@@ -420,7 +420,7 @@
                                         <div class="form-group">
                                             @Html.LabelFor(model => model.DateOfRelieving, "Date Of Relieving", new { @class = "control-label col-md-4 col-sm-2" })
                                             <div class="col-md-7 col-sm-10">
-                                                @Html.TextBoxFor(m => m.DateOfRelieving, "{0:dd/MMMM/yyyy}", new { @class = "datepicker form-control required" })
+                                                @Html.TextBoxFor(m => m.DateOfRelieving, "{0:dd/MMMM/yyyy}", new { @class = "datepicker form-control " })
                                                 @Html.ValidationMessageFor(model => model.DateOfRelieving)
                                             </div>
                                         </div>
