@@ -13,7 +13,7 @@
     <div>
         @Html.ValidationLog((string)TempData["CSEXC"])
 
-        @using (Html.BeginForm("DeleteConfirmed", "SaleQuotationHeader", FormMethod.Post, new { @class = "modal-form RDeleteModal", id = "modform", data_pageReload = "true" }))
+        @using (Html.BeginForm("DeleteConfirmed", "SalaryHeader", FormMethod.Post, new { @class = "modal-form RDeleteModal", id = "modform", data_pageReload = "true" }))
         {
             @Html.AntiForgeryToken()
             @Html.HiddenFor(m => m.id)

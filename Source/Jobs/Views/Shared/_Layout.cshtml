@@ -15,6 +15,18 @@
 
     <link href="~/Content/AdminLTE.css" rel="stylesheet" />
 
+
+
+
+
+
+
+
+
+
+
+
+
     <script src="~/signalr/hubs"></script>
     @Scripts.Render("~/bundles/libs")
     @Scripts.Render("~/bundles/jqueryval")
@@ -36,7 +48,7 @@
 </head>
 <body style="background-color:white" class="sidebar-collapse">
     <div class="main-header">
-        <nav class="navbar navbar-fixed-top navbar-inverse">
+        <nav class="navbar navbar-fixed-top navbar-inverse" style="margin-left:0px">
             <div class="container">
                 <div class="navbar-menu">
                     <ul class="nav navbar-nav">
@@ -389,5 +401,6 @@
 
     </script>
     @RenderSection("scripts", required: false)
+    @RenderSection("menu", required: false)
 </body>
 </html>

@@ -8,6 +8,7 @@ namespace Mailer.Model
         public virtual string Subject { get; set; }
         public virtual string CC { get; set; }
         public virtual string BCC { get; set; }
+        public virtual string  Attachment { get; set; }
 
     }
 }

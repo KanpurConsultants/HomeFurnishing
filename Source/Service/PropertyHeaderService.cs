@@ -31,7 +31,8 @@ namespace Services.PropertyTax
         PropertyHeaderViewModel GetPropertyHeader(int id);
         Person Find(int id);
         IQueryable<PropertyHeaderViewModel> GetPropertyHeaderList(int DocumentTypeId, string Uname);
-        IQueryable<PropertyHeaderViewModel> GetPropertyHeaderList(int DocumentTypeId, int GodownId, string Uname);
+        //IQueryable<PropertyHeaderViewModel> GetPropertyHeaderList(int DocumentTypeId, int GodownId, string Uname);
+        IEnumerable<PropertyHeaderViewModel> GetPropertyHeaderList(int DocumentTypeId, int GodownId, string Uname);
         IQueryable<PropertyHeaderViewModel> GetPropertyHeaderListPendingToSubmit(int DocumentTypeId, int GodownId, string Uname);
         IQueryable<PropertyHeaderViewModel> GetPropertyHeaderListPendingToReview(int DocumentTypeId, int GodownId, string Uname);
         void Update(Person s);
@@ -169,18 +170,52 @@ namespace Services.PropertyTax
         }
 
 
-        public IQueryable<PropertyHeaderViewModel> GetPropertyHeaderList(int DocumentTypeId, int GodownId, string Uname)
+        //public IQueryable<PropertyHeaderViewModel> GetPropertyHeaderList(int DocumentTypeId, int GodownId, string Uname)
+        //{
+
+        //    var DivisionId = (int)System.Web.HttpContext.Current.Session["DivisionId"];
+        //    var SiteId = (int)System.Web.HttpContext.Current.Session["SiteId"];
+        //    List<string> UserRoles = (List<string>)System.Web.HttpContext.Current.Session["Roles"];
+
+        //    return (from p in _PropertyRepository.Instance
+        //            join dt in _unitOfWork.Repository<DocumentType>().Instance on p.DocTypeId equals dt.DocumentTypeId
+        //            join pe in _unitOfWork.Repository<PersonExtended>().Instance on p.PersonID equals pe.PersonId into PersonExtendedTable from PersonExtendedTab in PersonExtendedTable.DefaultIfEmpty()
+        //            orderby PersonExtendedTab.HouseNo
+        //            where p.DocTypeId == DocumentTypeId  && PersonExtendedTab.GodownId == GodownId
+        //            select new PropertyHeaderViewModel
+        //            {
+        //                DocTypeName = dt.DocumentTypeName,
+        //                PersonID = p.PersonID,
+        //                Code = p.Code,
+        //                Name = p.Name,
+        //                FatherName = PersonExtendedTab.FatherName,
+        //                GodownName = PersonExtendedTab.Godown.GodownName,
+        //                BinLocationName = PersonExtendedTab.BinLocation.BinLocationName,
+        //                HouseNo = PersonExtendedTab.HouseNo,
+        //                AreaName = PersonExtendedTab.Area.AreaName,
+        //                AadharNo = PersonExtendedTab.AadharNo,
+        //                OldHouseNo = PersonExtendedTab.OldHouseNo,
+        //                Status = p.Status ?? 0,
+        //                ModifiedBy = p.ModifiedBy,
+        //                ReviewCount = p.ReviewCount,
+        //                ReviewBy = p.ReviewBy,
+        //                Reviewed = (SqlFunctions.CharIndex(Uname, p.ReviewBy) > 0),
+        //            });
+        //}
+
+        public IEnumerable<PropertyHeaderViewModel> GetPropertyHeaderList(int DocumentTypeId, int GodownId, string Uname)
         {
 
             var DivisionId = (int)System.Web.HttpContext.Current.Session["DivisionId"];
             var SiteId = (int)System.Web.HttpContext.Current.Session["SiteId"];
             List<string> UserRoles = (List<string>)System.Web.HttpContext.Current.Session["Roles"];
 
-            return (from p in _PropertyRepository.Instance
+            var PropertyList_Temp = (from p in _PropertyRepository.Instance
                     join dt in _unitOfWork.Repository<DocumentType>().Instance on p.DocTypeId equals dt.DocumentTypeId
-                    join pe in _unitOfWork.Repository<PersonExtended>().Instance on p.PersonID equals pe.PersonId into PersonExtendedTable from PersonExtendedTab in PersonExtendedTable.DefaultIfEmpty()
+                    join pe in _unitOfWork.Repository<PersonExtended>().Instance on p.PersonID equals pe.PersonId into PersonExtendedTable
+                    from PersonExtendedTab in PersonExtendedTable.DefaultIfEmpty()
                     orderby PersonExtendedTab.HouseNo
-                    where p.DocTypeId == DocumentTypeId  && PersonExtendedTab.GodownId == GodownId
+                    where p.DocTypeId == DocumentTypeId && PersonExtendedTab.GodownId == GodownId
                     select new PropertyHeaderViewModel
                     {
                         DocTypeName = dt.DocumentTypeName,
@@ -199,7 +234,12 @@ namespace Services.PropertyTax
                         ReviewCount = p.ReviewCount,
                         ReviewBy = p.ReviewBy,
                         Reviewed = (SqlFunctions.CharIndex(Uname, p.ReviewBy) > 0),
-                    });
+                    }).ToList();
+
+            double x = 0;
+            var PropertyList = PropertyList_Temp.OrderBy(sx => double.TryParse(sx.HouseNo.Replace("-C","").Replace("-","."), out x) ? x : 0);
+
+            return PropertyList;
         }
 
         public PropertyHeaderViewModel GetPropertyHeader(int id)
@@ -273,7 +313,7 @@ namespace Services.PropertyTax
             var Person = GetPropertyHeaderList(id, GodownId, Uname).AsQueryable();
 
             var PendingToReview = from p in Person
-                                  where p.Status == (int)StatusConstants.Submitted && (SqlFunctions.CharIndex(Uname, (p.ReviewBy ?? "")) == 0)
+                                  where p.Status == (int)StatusConstants.Submitted && p.ReviewBy == null
                                   select p;
             return PendingToReview;
 

@@ -91,6 +91,8 @@
                 <li role="separator" class="divider"></li>
                 <li><a id="DocHistoryI" href="@Url.Action("GetHistory", "LogHistory", new {  })"><span class="glyphicon glyphicon-user"> </span> History</a></li>
                 <li><a target="_blank" href="@Url.Action("Report", "JobOrderHeader", new { @ViewBag.id })"><span class="glyphicon glyphicon-stats"> </span> Report</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a target="_blank" id="EMail" href="@Url.Action("EMail", "JobOrderHeader", new { @ViewBag.id })"><span class="glyphicon glyphicon-envelope"> </span> EMail</a></li>
                 </ul>
             </div>
 
@@ -146,3 +148,15 @@
         }
     </div>
 </div>
+
+<script type="text/javascript">
+    $('a#EMail').click(function (e) {
+
+        var editiiid = $('table.grid-table .grid-row.grid-row-selected').find('[data-name="JobOrderHeaderId"]').text();
+
+
+        var url = '/JobOrderHeader/EMail/' + editiiid;
+        $(this).attr('href', url);
+
+    });
+</script>

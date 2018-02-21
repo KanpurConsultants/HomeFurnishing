@@ -28,6 +28,8 @@ namespace Model.ViewModel
         public string filterContraSites { get; set; }
         public string filterContraDivisions { get; set; }
 
+        public int? CalculationId { get; set; }
+
         public string DocumentPrint { get; set; }
         public int? NoOfPrintCopies { get; set; }
 

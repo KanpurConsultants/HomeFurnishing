@@ -790,4 +790,3 @@ D:\Kanpur Consultants\HomeFurnishing\Modules\Login\Source\Web.Login\bin\Model.pd
 D:\Kanpur Consultants\HomeFurnishing\Modules\Login\Source\Web.Login\obj\Debug\Web.Login.csprojResolveAssemblyReference.cache
 D:\Kanpur Consultants\HomeFurnishing\Modules\Login\Source\Web.Login\obj\Debug\Login.dll
 D:\Kanpur Consultants\HomeFurnishing\Modules\Login\Source\Web.Login\obj\Debug\Login.pdb
-D:\Kanpur Consultants\HomeFurnishing\Modules\Login\Source\Web.Login\bin\Microsoft.QualityTools.Testing.Fakes.dll

@@ -71,8 +71,16 @@ namespace Service
                         where p.SalaryLineId == id
                         select new SalaryLineViewModel
                         {
-                            Remark = p.Remark,
                             SalaryLineId = p.SalaryLineId,
+                            SalaryHeaderId = p.SalaryHeaderId,
+                            EmployeeId = p.EmployeeId,
+                            EmployeeName = p.Employee.Person.Name,
+                            Days = p.Days,
+                            OtherAddition = p.OtherAddition,
+                            OtherDeduction = p.OtherDeduction,
+                            LoanEMI = p.LoanEMI,
+                            NetSalary = p.NetSalary,
+                            Remark = p.Remark,
                             LockReason = p.LockReason,
                         }).FirstOrDefault();
 
@@ -95,6 +103,10 @@ namespace Service
                        select new SalaryLineViewModel
                        {
                            EmployeeName = p.Employee.Person.Name,
+                           Days = p.Days,
+                           OtherAddition = p.OtherAddition,
+                           OtherDeduction = p.OtherDeduction,
+                           LoanEMI = p.LoanEMI,
                            NetSalary = p.NetSalary,
                            Remark = p.Remark,
                            SalaryHeaderId = p.SalaryHeaderId,

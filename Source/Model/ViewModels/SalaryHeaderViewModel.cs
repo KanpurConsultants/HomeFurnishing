@@ -98,5 +98,6 @@ namespace Model.ViewModels
         public int? DepartmentId { get; set; }
         public string DepartmentName { get; set; }
         public string WagesPayType { get; set; }
+        public string Remark { get; set; }
     }
 }

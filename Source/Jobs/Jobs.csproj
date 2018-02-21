@@ -426,6 +426,7 @@
     <Compile Include="Areas\Rug\Controllers\PackingSettingsController.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Controllers\MailboxController.cs" />
     <Compile Include="Controllers\SalaryWizardController.cs" />
     <Compile Include="Controllers\LedgerAccountMergingController.cs" />
     <Compile Include="Areas\Rug\Controllers\PersonMerging.cs">
@@ -1090,10 +1091,6 @@
     <Content Include="AdminLTE\plugins\bootstrap-slider\css\slider.css" />
     <Content Include="AdminLTE\plugins\bootstrap-slider\js\bootstrap-slider.js" />
     <Content Include="AdminLTE\plugins\bootstrap-slider\slider.css" />
-    <Content Include="AdminLTE\plugins\bootstrap-wysihtml5\bootstrap3-wysihtml5.all.js" />
-    <Content Include="AdminLTE\plugins\bootstrap-wysihtml5\bootstrap3-wysihtml5.all.min.js" />
-    <Content Include="AdminLTE\plugins\bootstrap-wysihtml5\bootstrap3-wysihtml5.css" />
-    <Content Include="AdminLTE\plugins\bootstrap-wysihtml5\bootstrap3-wysihtml5.min.css" />
     <Content Include="AdminLTE\plugins\bootstrap-wysihtml5\css\bootstrap3-wysihtml5.css" />
     <Content Include="AdminLTE\plugins\bootstrap-wysihtml5\css\bootstrap3-wysihtml5.min.css" />
     <Content Include="AdminLTE\plugins\bootstrap-wysihtml5\js\bootstrap3-wysihtml5.all.js" />
@@ -3131,6 +3128,8 @@
     <Content Include="Content\DataTables\images\sort_desc.png" />
     <Content Include="Content\DataTables\images\sort_desc_disabled.png" />
     <Content Include="Content\DataTables\swf\flashExport.swf" />
+    <Content Include="Content\font-awesome.css" />
+    <Content Include="Content\font-awesome.min.css" />
     <Content Include="Content\Gridmvc.css" />
     <Content Include="Content\gridmvc.datepicker.css" />
     <Content Include="Content\IconCss.css" />
@@ -3197,6 +3196,7 @@
     <Content Include="Content\themes\base\tooltip.css" />
     <Content Include="Content\ui-grid.css" />
     <Content Include="Content\ui-grid.min.css" />
+    <Content Include="fonts\fontawesome-webfont.svg" />
     <Content Include="Scripts\angular-animate.js" />
     <Content Include="Scripts\angular-animate.min.js" />
     <Content Include="Scripts\angular-mocks.js" />
@@ -3209,6 +3209,11 @@
     <Content Include="Scripts\DashboardV2.js" />
     <Content Include="Scripts\DisplayJobInvoiceSummary\DisplayJobInvoiceSummary.js" />
     <Content Include="Scripts\DisplaySaleOrderInventoryStatus\DisplaySaleOrderInventoryStatus.js" />
+    <Content Include="Scripts\Mailbox\Compose-menu.js" />
+    <Content Include="Scripts\Mailbox\Compose.js" />
+    <Content Include="Scripts\Mailbox\Inbox-menu.js" />
+    <Content Include="Scripts\Mailbox\Inbox.js" />
+    <Content Include="Scripts\Mailbox\Read-menu.js" />
     <Content Include="Scripts\Salary\Salary.js" />
     <Content Include="Scripts\SaleEnquiryProductMappingWithGrid\SaleEnquiryProductMappingWithGrid.js" />
     <Content Include="Scripts\RolePermission\RolePermission.js" />
@@ -3241,6 +3246,12 @@
     <Content Include="Scripts\Slick\slick.rowselectionmodel.js" />
     <Content Include="Scripts\Slick\slickgrid-print-plugin.js" />
     <Content Include="Scripts\Slick\slickgrid-print-plugin.min.js" />
+    <Content Include="Scripts\summernote\plugin\summernote-ext-hello.js" />
+    <Content Include="Scripts\summernote\plugin\summernote-ext-hint.js" />
+    <Content Include="Scripts\summernote\plugin\summernote-ext-video.js" />
+    <Content Include="Scripts\summernote\summernote.css" />
+    <Content Include="Scripts\summernote\summernote.js" />
+    <Content Include="Scripts\summernote\summernote.min.js" />
     <Content Include="Scripts\ui-grid.js" />
     <Content Include="Scripts\ui-grid.min.js" />
     <Content Include="Views\favicon.ico" />
@@ -3635,6 +3646,10 @@
     <Content Include="Areas\PropertyTax\Views\PaymentMode\Create.cshtml" />
     <Content Include="Areas\PropertyTax\Views\PaymentMode\Index.cshtml" />
     <Content Include="Areas\PropertyTax\Views\PaymentMode\_Reason.cshtml" />
+    <Content Include="fonts\FontAwesome.otf" />
+    <Content Include="fonts\fontawesome-webfont.woff" />
+    <Content Include="fonts\fontawesome-webfont.ttf" />
+    <Content Include="fonts\fontawesome-webfont.eot" />
     <None Include="Properties\PublishProfiles\Jobs.kanpurconsultants.com - Web Deploy.pubxml" />
     <None Include="Properties\PublishProfiles\Jobs.pubxml" />
     <None Include="Properties\PublishProfiles\Purchase.pubxml" />
@@ -5337,6 +5352,9 @@
     <Content Include="Views\SalaryLine\_Create.cshtml" />
     <Content Include="Views\SalaryLine\_Index.cshtml" />
     <Content Include="Views\SalaryWizard\SalaryWizard.cshtml" />
+    <Content Include="Views\Mailbox\Compose.cshtml" />
+    <Content Include="Views\Mailbox\Inbox.cshtml" />
+    <Content Include="Views\Mailbox\Read.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

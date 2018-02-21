@@ -62,18 +62,24 @@ namespace Mailer
         }
 
 
-        public static void SendEmailMsgWithAttachment(EmailMessage message,string FilePath)
+        public static void SendEmailMsgWithAttachment(EmailMessage message, string FilePath)
         {
 
             // Create the email object first, then add the properties.
             SendGridMessage myMessage = new SendGridMessage();
             myMessage.AddTo(message.To.Split(',').ToList());
 
-            foreach(var item in message.CC.Split(','))
-            myMessage.AddCc(item);
+            if (message.CC != null)
+            {
+                foreach (var item in message.CC.Split(','))
+                    myMessage.AddCc(item);
+            }
 
-            foreach (var item in message.BCC.Split(','))
-                myMessage.AddBcc(item);
+            if (message.BCC != null)
+            { 
+                foreach (var item in message.BCC.Split(','))
+                    myMessage.AddBcc(item);
+            }
 
             myMessage.Subject = message.Subject;
             myMessage.Html = message.Body;

@@ -108,7 +108,8 @@ namespace Jobs.Areas.PropertyTax.Controllers
             {
                 return RedirectToAction("Index_PendingToReview", new { id = id, GodownId = GodownId });
             }
-            IQueryable<PropertyHeaderViewModel> p = _PropertyHeaderService.GetPropertyHeaderList(id, GodownId, User.Identity.Name);
+            //IQueryable<PropertyHeaderViewModel> p = _PropertyHeaderService.GetPropertyHeaderList(id, GodownId, User.Identity.Name);
+            IEnumerable<PropertyHeaderViewModel> p = _PropertyHeaderService.GetPropertyHeaderList(id, GodownId, User.Identity.Name);
             ViewBag.Name = _documentTypeService.Find(id).DocumentTypeName;
             PrepareViewBag(id);
             ViewBag.PendingToSubmit = PendingToSubmitCount(id, GodownId);

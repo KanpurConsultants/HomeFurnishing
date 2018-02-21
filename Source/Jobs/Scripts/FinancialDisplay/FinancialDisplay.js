@@ -87,10 +87,10 @@ FinancialDisplay.controller('MainCtrl', ['$scope', '$log', '$http', 'uiGridConst
 
           if ($("#ReportType").val() != "") {
               if (rowCol.row.entity.LedgerAccountName != null && rowCol.row.entity.LedgerAccountName != "") {
-                  $("#HeaderInfo").text('[' + rowCol.row.entity.LedgerAccountName.replace('<Strong>', '').replace('</Strong>', '') + ']');
+                  $("#HeaderInfo").text('[' + rowCol.row.entity.LedgerAccountName.replace(/&nbsp;/g, '').replace('<Strong>', '').replace('</Strong>', '') + ']');
               }
               else if (rowCol.row.entity.LedgerAccountGroupName != null && rowCol.row.entity.LedgerAccountGroupName != "") {
-                  $("#HeaderInfo").text('[' + rowCol.row.entity.LedgerAccountGroupName.replace('<Strong>', '').replace('</Strong>', '') + ']');
+                  $("#HeaderInfo").text('[' + rowCol.row.entity.LedgerAccountGroupName.replace(/&nbsp;/g, '').replace('<Strong>', '').replace('</Strong>', '') + ']');
               }
               else {
                   $("#HeaderInfo").text("");

@@ -128,6 +128,16 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Remark, "Remark", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.Remark, new { @class = "form-control col-xs-6 height" })
+                                        @Html.ValidationMessageFor(model => model.Remark, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="form-group">

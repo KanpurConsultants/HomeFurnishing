@@ -78,6 +78,7 @@ namespace Jobs.Controllers
                 DateTime DocDate  = Convert.ToDateTime(SalaryDataList.FirstOrDefault().DocDate);
                 int DocTypeId = SalaryDataList.FirstOrDefault().DocTypeId;
                 string DocNo = new DocumentTypeService(_unitOfWork).FGetNewDocNo("DocNo", ConfigurationManager.AppSettings["DataBaseSchema"] + ".SalaryHeaders", DocTypeId, DocDate, DivisionId, SiteId);
+                string Remark = SalaryDataList.FirstOrDefault().HeaderRemark;
 
                 SalaryHeader Header = new SalaryHeader();
                 Header.DocDate = DocDate;
@@ -85,7 +86,7 @@ namespace Jobs.Controllers
                 Header.DocNo = DocNo;
                 Header.DivisionId = DivisionId;
                 Header.SiteId = SiteId;
-                Header.Remark = null;
+                Header.Remark = Remark;
                 Header.CreatedDate = DateTime.Now;
                 Header.CreatedBy = User.Identity.Name;
                 Header.ModifiedDate = DateTime.Now;
@@ -113,6 +114,8 @@ namespace Jobs.Controllers
                     
 
                     var EmployeeChargesList = (from H in db.EmployeeCharge where H.HeaderTableId == Line.EmployeeId select H).ToList();
+                    string WagesPayType = (from E in db.Employee where E.EmployeeId == Line.EmployeeId select E).FirstOrDefault().WagesPayType;
+
                     int j = 0, Sr = 0;
                     foreach(var EmployeeCharge in EmployeeChargesList)
                     {
@@ -120,7 +123,7 @@ namespace Jobs.Controllers
                         LineCharge.Id = j--;
                         LineCharge.HeaderTableId = Header.SalaryHeaderId;
                         LineCharge.LineTableId = Line.SalaryLineId;
-                        LineCharge.Sr = Sr + 1;
+                        LineCharge.Sr = Sr ++;
                         LineCharge.ChargeId = EmployeeCharge.ChargeId;
                         LineCharge.AddDeduct = EmployeeCharge.AddDeduct;
                         LineCharge.AffectCost = EmployeeCharge.AffectCost;
@@ -135,7 +138,12 @@ namespace Jobs.Controllers
                         LineCharge.IncludedInBase = EmployeeCharge.IncludedInBase;
                         LineCharge.ParentChargeId = EmployeeCharge.ParentChargeId;
                         LineCharge.Rate = EmployeeCharge.Rate;
-                        LineCharge.Amount = (EmployeeCharge.Amount * Line.Days/30);
+
+                        if (WagesPayType == "Daily")
+                            LineCharge.Amount = EmployeeCharge.Amount * Line.Days;
+                        else
+                            LineCharge.Amount = (EmployeeCharge.Amount * Line.Days / SalaryData.MonthDays);
+
                         LineCharge.DealQty = 0;
                         LineCharge.IsVisible = EmployeeCharge.IsVisible;
                         LineCharge.IncludedCharges = EmployeeCharge.IncludedCharges;
@@ -149,7 +157,7 @@ namespace Jobs.Controllers
 
 
                         Charge NetSalaryCharge = (from C in db.Charge where C.ChargeName == "Net Salary" select C).FirstOrDefault();
-                        if (NetSalaryCharge != null)
+                        if (NetSalaryCharge != null && LineCharge.ChargeId == NetSalaryCharge.ChargeId)
                             Line.NetSalary = (LineCharge.Amount ?? 0) + (Line.OtherAddition ?? 0) - (Line.OtherDeduction ?? 0) - (Line.LoanEMI ?? 0);
                     }
 
@@ -327,7 +335,7 @@ namespace Jobs.Controllers
                 }
 
                 //return Json(new { success = true, Url = "/LedgerHeader/Submit/" + LedgerHeader.LedgerHeaderId });
-                return (string)System.Configuration.ConfigurationManager.AppSettings["JobsDomain"] + "/LedgerHeader/Detail/" + LedgerHeader.LedgerHeaderId;
+                return (string)System.Configuration.ConfigurationManager.AppSettings["JobsDomain"] + "/SalaryHeader/Detail/" + Header.SalaryHeaderId;
             }
             return null;
         }

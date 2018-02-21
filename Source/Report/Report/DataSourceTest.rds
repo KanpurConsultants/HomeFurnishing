@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RptDataSource xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="DataSourceTest">
+  <ConnectionProperties>
+    <Extension>SQL</Extension>
+    <ConnectString>Data Source=192.168.2.22;Initial Catalog=Rugauto;Integrated Security=False;User Id=sa; pwd=</ConnectString>
+  </ConnectionProperties>
+  <DataSourceID>8f8dd555-a69f-42a2-828c-e824aa211aef</DataSourceID>
+</RptDataSource>

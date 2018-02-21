@@ -729,6 +729,33 @@ namespace Jobs.Controllers
                     ExObj = Mapper.Map<SalaryHeader>(SalaryHeader),
                 });
 
+                var LedgerHeader = (from H in db.LedgerHeader where H.ReferenceDocId == SalaryHeader.SalaryHeaderId && H.ReferenceDocTypeId == SalaryHeader.DocTypeId select H).FirstOrDefault();
+                if (LedgerHeader != null)
+                {
+                    var LedgerList = (from L in db.Ledger where L.LedgerHeaderId == LedgerHeader.LedgerHeaderId select L).ToList();
+                    foreach(var ledger in LedgerList)
+                    {
+                        var LedgerAdjList = (from L in db.LedgerAdj where L.CrLedgerId == ledger.LedgerId select L).ToList();
+                        foreach(var ledgeradj in LedgerAdjList)
+                        {
+                            ledgeradj.ObjectState = Model.ObjectState.Deleted;
+                            db.LedgerAdj.Remove(ledgeradj);
+                        }
+                        ledger.ObjectState = Model.ObjectState.Deleted;
+                        db.Ledger.Remove(ledger);
+                    }
+
+                    var LedgerLineList = (from L in db.LedgerLine where L.LedgerHeaderId == LedgerHeader.LedgerHeaderId select L).ToList();
+                    foreach (var ledgerline in LedgerLineList)
+                    {
+                        ledgerline.ObjectState = Model.ObjectState.Deleted;
+                        db.LedgerLine.Remove(ledgerline);
+                    }
+
+                    LedgerHeader.ObjectState = Model.ObjectState.Deleted;
+                    db.LedgerHeader.Remove(LedgerHeader);
+                }
+
 
                 //Then find all the Purchase Order Header Line associated with the above ProductType.
                 //var SalaryLine = new SalaryLineService(_unitOfWork).GetSalaryLineforDelete(vm.id);

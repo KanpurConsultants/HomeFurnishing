@@ -1257,7 +1257,23 @@ namespace Jobs.Controllers
         }
 
 
+        public JsonResult SetSingleEmployee_New(int Ids)
+        {
+            ComboBoxResult EmployeeJson = new ComboBoxResult();
 
+            var employee = (from b in db.Employee
+                                      where b.EmployeeId == Ids
+                                      select new 
+                                      {
+                                          EmployeeId = b.EmployeeId,
+                                          Name = b.Person.Name
+                                      }).FirstOrDefault();
+
+            EmployeeJson.id = employee.EmployeeId.ToString();
+            EmployeeJson.text = employee.Name;
+
+            return Json(EmployeeJson);
+        }
 
 
 

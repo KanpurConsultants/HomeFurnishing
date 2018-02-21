@@ -36,6 +36,7 @@ namespace Service
         {
             SqlParameter SqlParameterDocDate = new SqlParameter("@DocDate", vm.DocDate.ToString());
             SqlParameter SqlParameterDocTypeId = new SqlParameter("@DocTypeId", vm.DocTypeId);
+            SqlParameter SqlParameterRemark = new SqlParameter("@Remark", (vm.Remark == null) ? DBNull.Value : (object)vm.Remark);
             SqlParameter SqlParameterDepartmentId = new SqlParameter("@DepartmentId", (vm.DepartmentId == null) ? DBNull.Value : (object)vm.DepartmentId);
             SqlParameter SqlParameterWagesPayType = new SqlParameter("@WagesPayType", (vm.WagesPayType == null) ? DBNull.Value : (object)vm.WagesPayType);
 
@@ -46,9 +47,9 @@ namespace Service
             //        LEFT JOIN Web.People P ON E.PersonID = P.PersonID  ";
 
 
-            mQry = @"SELECT E.EmployeeId, P.Name AS EmployeeName, 30.00 AS Days, 0.00 AS Additions, 0.00 AS Deductions, 
+            mQry = @"SELECT E.EmployeeId, P.Name AS EmployeeName, Convert(Decimal(18,4),DAY(EOMONTH(@DocDate))) AS Days, 0.00 AS Additions, 0.00 AS Deductions, 
                     IsNull(VAdvance.LoanEMI,0) AS LoanEMI, @DocDate As DocDate, 
-                    @DocTypeId As DocTypeId
+                    @DocTypeId As DocTypeId, @Remark As HeaderRemark, Convert(Decimal(18,4),DAY(EOMONTH(@DocDate))) AS MonthDays
                     FROM Web.Employees E
                     LEFT JOIN Web.People P ON E.PersonID = P.PersonID
                     LEFT JOIN (
@@ -79,12 +80,12 @@ namespace Service
                     WHERE E.DateOfJoining <= @DocDate AND E.DateOfRelieving IS NULL " +
                     (vm.DepartmentId != null ? " AND E.DepartmentId = @DepartmentId" : "") +
                     (vm.WagesPayType != null ? " AND E.WagesPayType = @WagesPayType" : "") +
-                    " AND VSalaryLine.EmployeeId IS NULL ";
+                    " AND VSalaryLine.EmployeeId IS NULL AND IsNull(E.BasicSalary,0) > 0 ";
 
             //mQry = mQry + "UNION ALL " + mQry;
             //mQry = mQry + "UNION ALL " + mQry;
 
-            IEnumerable<SalaryWizardResultViewModel> SalaryWizardResultViewModel = db.Database.SqlQuery<SalaryWizardResultViewModel>(mQry, SqlParameterDocDate, SqlParameterDocTypeId, SqlParameterDepartmentId, SqlParameterWagesPayType).ToList();
+            IEnumerable<SalaryWizardResultViewModel> SalaryWizardResultViewModel = db.Database.SqlQuery<SalaryWizardResultViewModel>(mQry, SqlParameterDocDate, SqlParameterDocTypeId, SqlParameterRemark, SqlParameterDepartmentId, SqlParameterWagesPayType).ToList();
 
             return SalaryWizardResultViewModel;
 
@@ -129,10 +130,12 @@ namespace Service
         public string EmployeeName { get; set; }
         public int DocTypeId { get; set; }
         public string DocDate { get; set; }
+        public Decimal MonthDays { get; set; }
         public Decimal Days { get; set; }
         public Decimal Additions { get; set; }
         public Decimal Deductions { get; set; }
         public Decimal LoanEMI { get; set; }
+        public string HeaderRemark { get; set; }
     }
 
     public class LoanLedgerIdList
