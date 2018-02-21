@@ -49,6 +49,13 @@ namespace Model.Models
         public string filterLedgerAccountGroups { get; set; }
         public string filterLedgerAccounts { get; set; }
 
+        public bool? isVisibleHeaderJobWorker { get; set; }
+        public bool? isVisibleBaleNoPattern { get; set; }
+        public bool? isVisibleGrossWeight { get; set; }
+        public bool? isVisibleNetWeight { get; set; }
+        public bool? isVisibleProductInvoiceGroup { get; set; }
+        public bool? isVisibleSaleDeliveryOrder { get; set; }
+
         [ForeignKey("Process")]
         public int? ProcessId { get; set; }
         public virtual Process Process { get; set; }

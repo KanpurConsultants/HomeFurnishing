@@ -89,8 +89,8 @@ namespace Jobs.Areas.Rug.Controllers
                         from tabJRQP in tableJRQP.DefaultIfEmpty()
                         join R in db.Reason on tabJRQP.ReasonId equals R.ReasonId into tableR
                         from tabR in tableR.DefaultIfEmpty()
-                        where H.DocTypeId == Fvm.DocumentTypeId && H.SiteId == SiteId && H.DivisionId == DivisionId && tabJIL.JobInvoiceLineId == null
-                            && ((bool?)tabJW.IsSisterConcern ?? false) == false
+                        where H.DocTypeId == Fvm.DocumentTypeId && H.SiteId == SiteId && H.DivisionId == DivisionId && ((int?)tabJIL.JobInvoiceLineId ?? 0) == 0
+                            && ((bool?)tabJW.IsSisterConcern ?? false) == false && H.CreatedBy != "System"
                         orderby H.DocDate, H.DocNo
                         select new JobRatePenaltyUpdateViewModel
                         {
@@ -101,13 +101,13 @@ namespace Jobs.Areas.Rug.Controllers
                             DocNo = H.DocNo,
                             OrderNo = tabODT.DocumentTypeShortName + "-" + tabJOH.DocNo,
                             DocDate = H.DocDate,
-                            JobWorkerName = tabJW.Name ,
+                            JobWorkerName = tabJW.Name,
                             PenaltyResion = tabR.ReasonName,
                             PenaltyRemark = tabJRQP.Remark,
-                            ProductName =tabP.ProductName,
+                            ProductName = tabP.ProductName,
                             DealQty = tabL.DealQty,
                             Rate = tabJOL.Rate,
-                            PenaltyAmount =tabJRQP.Amount,
+                            PenaltyAmount = tabJRQP.Amount,
                         }).ToList();
 
             var temp = list.Select(m => new

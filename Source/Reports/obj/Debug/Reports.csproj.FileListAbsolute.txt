@@ -1078,3 +1078,4 @@ D:\Kanpur Consultants\HomeFurnishing\Source\Reports\bin\Debug\Mailer.pdb
 D:\Kanpur Consultants\HomeFurnishing\Source\Reports\obj\Debug\Reports.csprojResolveAssemblyReference.cache
 D:\Kanpur Consultants\HomeFurnishing\Source\Reports\obj\Debug\Reports.dll
 D:\Kanpur Consultants\HomeFurnishing\Source\Reports\obj\Debug\Reports.pdb
+D:\Active Projects\Web\HomeFurnishing\Source\Reports\bin\Debug\Components.pdb

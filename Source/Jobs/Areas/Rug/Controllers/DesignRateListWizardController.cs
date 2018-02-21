@@ -126,27 +126,63 @@ namespace Jobs.Areas.Rug.Controllers
 
 
             List<ProductViewModel> list = new List<ProductViewModel>();
+            //IQueryable<ProductViewModel> _data = (from p in db.ProductProcess
+            //                                      join rh in db.RateListHeader on p.ProcessId equals rh.ProcessId
+            //                                      join fp in db.FinishedProduct on p.ProductId equals fp.ProductId
+            //                                      join pcol in db.ProductCollections on fp.ProductCollectionId equals pcol.ProductCollectionId
+            //                                      join pcat in db.ProductCategory on fp.ProductCategoryId equals pcat.ProductCategoryId
+            //                                      join pg in db.ProductGroups on fp.ProductGroupId equals pg.ProductGroupId
+            //                                      join pd in db.ProductDesigns on fp.ProductDesignId equals pd.ProductDesignId
+            //                                      join rll in db.RateListLine on new { x = p.ProductId, y = rh.RateListHeaderId }
+            //                                      equals new { x = rll.ProductId ?? 0, y = rll.RateListHeaderId } into rlltable
+            //                                      from rlltab in rlltable.DefaultIfEmpty()
+            //                                      where rh.RateListHeaderId == Fvm.RateListHeaderId && (Pending ? rlltab == null : 1 == 1) && (All ? 1==1: fp.IsSample == Sample)
+            //                                      && (string.IsNullOrEmpty(Fvm.ProductCollection) ? 1 == 1 : Collections.Contains(fp.ProductCollectionId.ToString()))
+            //                                      && (string.IsNullOrEmpty(Fvm.ProductCategory) ? 1 == 1 : Category.Contains(fp.ProductCategoryId.ToString()))
+            //                                      && rh.DivisionId == fp.DivisionId && fp.IsActive == true
+            //                                      && (Fvm.DisContinued == "All" ? 1 == 1 : fp.DiscontinuedDate == null)
+            //                                      group new { pg, fp, rlltab, pcol, pcat, pd } by pg.ProductGroupId into g
+            //                                      select new ProductViewModel
+            //                                      {
+            //                                          ProductGroupId = g.Key,
+            //                                          ProductGroupName = g.Max(m => m.pg.ProductGroupName),
+            //                                          ProductDesignName = g.Max(m => m.pd.ProductDesignName),
+            //                                          ImageFileName = g.Max(m => m.pg.ImageFileName),
+            //                                          ImageFolderName = g.Max(m => m.pg.ImageFolderName),
+            //                                          SampleName = g.Max(m => m.fp.IsSample.ToString() == "True" ? "Sample" : "Design"),
+            //                                          Rate = g.Max(m => m.rlltab.Rate),
+            //                                          Incentive = g.Max(m => m.rlltab.Incentive),
+            //                                          Discount = g.Max(m => m.rlltab.Discount),
+            //                                          Loss = g.Max(m => m.rlltab.Loss),
+            //                                          ProductCollectionName = g.Max(m => m.pcol.ProductCollectionName),
+            //                                          ProductCategoryName = g.Max(m => m.pcat.ProductCategoryName),
+            //                                      });
+
+
             IQueryable<ProductViewModel> _data = (from p in db.ProductProcess
                                                   join rh in db.RateListHeader on p.ProcessId equals rh.ProcessId
                                                   join fp in db.FinishedProduct on p.ProductId equals fp.ProductId
                                                   join pcol in db.ProductCollections on fp.ProductCollectionId equals pcol.ProductCollectionId
+                                                  join PQ in db.ProductQuality on fp.ProductQualityId equals PQ.ProductQualityId
                                                   join pcat in db.ProductCategory on fp.ProductCategoryId equals pcat.ProductCategoryId
                                                   join pg in db.ProductGroups on fp.ProductGroupId equals pg.ProductGroupId
                                                   join pd in db.ProductDesigns on fp.ProductDesignId equals pd.ProductDesignId
-                                                  join rll in db.RateListLine on new { x = p.ProductId, y = rh.RateListHeaderId }
-                                                  equals new { x = rll.ProductId ?? 0, y = rll.RateListHeaderId } into rlltable
+                                                  join rll in db.RateListLine.Where(i => i.ProductId != null) on new { x = p.ProductId, y = rh.RateListHeaderId }
+                                                 equals new { x = (int)rll.ProductId, y = rll.RateListHeaderId } into rlltable
                                                   from rlltab in rlltable.DefaultIfEmpty()
-                                                  where rh.RateListHeaderId == Fvm.RateListHeaderId && (Pending ? rlltab == null : 1 == 1) && (All ? 1==1: fp.IsSample == Sample)
+                                                  where rh.RateListHeaderId == Fvm.RateListHeaderId && (Pending ? rlltab == null : 1 == 1) && (All ? 1 == 1 : fp.IsSample == Sample)
+                                                  where rh.RateListHeaderId == Fvm.RateListHeaderId && (Pending ? rlltab == null : 1 == 1) && (All ? 1 == 1 : fp.IsSample == Sample)
                                                   && (string.IsNullOrEmpty(Fvm.ProductCollection) ? 1 == 1 : Collections.Contains(fp.ProductCollectionId.ToString()))
                                                   && (string.IsNullOrEmpty(Fvm.ProductCategory) ? 1 == 1 : Category.Contains(fp.ProductCategoryId.ToString()))
                                                   && rh.DivisionId == fp.DivisionId && fp.IsActive == true
-                                                  && (Fvm.DisContinued == "All" ? 1 == 1 : fp.DiscontinuedDate == null)
-                                                  group new { pg, fp, rlltab, pcol, pcat, pd } by pg.ProductGroupId into g
+                                                   && (Fvm.DisContinued == "All" ? 1 == 1 : fp.DiscontinuedDate == null)
+                                                  group new { pg, fp, rlltab, pcol, pcat, pd, PQ } by pg.ProductGroupId into g
                                                   select new ProductViewModel
                                                   {
                                                       ProductGroupId = g.Key,
                                                       ProductGroupName = g.Max(m => m.pg.ProductGroupName),
                                                       ProductDesignName = g.Max(m => m.pd.ProductDesignName),
+                                                      ProductQualityName = g.Max(m => m.PQ.ProductQualityName),
                                                       ImageFileName = g.Max(m => m.pg.ImageFileName),
                                                       ImageFolderName = g.Max(m => m.pg.ImageFolderName),
                                                       SampleName = g.Max(m => m.fp.IsSample.ToString() == "True" ? "Sample" : "Design"),
@@ -157,8 +193,6 @@ namespace Jobs.Areas.Rug.Controllers
                                                       ProductCollectionName = g.Max(m => m.pcol.ProductCollectionName),
                                                       ProductCategoryName = g.Max(m => m.pcat.ProductCategoryName),
                                                   });
-
-
             recordTotal = _data.Count();
 
             if (string.IsNullOrEmpty(search))
@@ -188,6 +222,7 @@ namespace Jobs.Areas.Rug.Controllers
                 ProductGroupId = m.ProductGroupId,
                 ProductGroupName = m.ProductGroupName,
                 ProductDesignName = m.ProductDesignName,
+                ProductQualityName = m.ProductQualityName,
                 ImageFileName = m.ImageFileName,
                 ImageFolderName = m.ImageFolderName,
                 SampleName = m.SampleName,

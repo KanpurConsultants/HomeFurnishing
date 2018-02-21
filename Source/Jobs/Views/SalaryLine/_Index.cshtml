@@ -10,6 +10,7 @@
             </div>
             <div class="block" style="width: 90%;">
                 <div class="row">
+<<<<<<< HEAD
                     <div class="block" style="width:25%; ">
                         Employee
                     </div>
@@ -27,6 +28,19 @@
                     </div>
                     <div class="text-right block" style="width: 15%;">
                         Net Salary
+=======
+                    <div class="block" style="width:15%; ">
+                        Employee
+                    </div>
+                    <div class="block" style="width:10%; ">
+                        Days
+                    </div>
+                    <div class="block" style="width: 15%;">
+                        Net Salary
+                    </div>
+                    <div class="block" style="width: 20%;">
+                        Remark
+>>>>>>> 32b26a1a83f53a5b8fde7efbecfc7a6e5ccfc161
                     </div>
                 </div>
             </div>
@@ -40,7 +54,7 @@
     </div>
 
     @{
-                var SelectedRecord = ViewBag.DocLineId;
+        var SelectedRecord = ViewBag.DocLineId;
         var DomainName = System.Configuration.ConfigurationManager.AppSettings["AdminSetupDomain"];
         var groupId = ViewBag.SalaryHeaderId;
         int status = ViewBag.Status;
@@ -83,9 +97,16 @@
                 <div class='row-index block' style='width:5%'>@srno<input type='hidden' class='id' value='@item.SalaryLineId' /></div>
                 <div class='block navbody' style='width:90%'>
                     <div class='row'>                     
+<<<<<<< HEAD
                             <div class="block"style='width:25%' >
+=======
+                            <div class="block  style='width:15%'" >
+>>>>>>> 32b26a1a83f53a5b8fde7efbecfc7a6e5ccfc161
                                 <strong> @item.EmployeeName </strong>
                             </div>
+                        <div class='text-right block' style='width:10%'>
+                            @item.Days
+                        </div>
                             <div class='text-right block' style='width:15%'>
                                 @Math.Round(item.Days, 0)
                             </div>
@@ -95,11 +116,16 @@
                             <div class='text-right block' style='width:15%'>
                                 @Math.Round(item.OtherDeduction ?? 0, 2) 
                             </div>
+<<<<<<< HEAD
                             <div class='text-right block' style='width:15%'>
                                 @Math.Round(item.LoanEMI ?? 0, 2) 
                             </div>
                             <div class='text-right block' style='width:15%'>
                                 @Math.Round(item.NetSalary, 2) 
+=======
+                            <div class='block' style='width:20%'>
+                                @item.Remark
+>>>>>>> 32b26a1a83f53a5b8fde7efbecfc7a6e5ccfc161
                             </div>
                         </div>
                 </div>

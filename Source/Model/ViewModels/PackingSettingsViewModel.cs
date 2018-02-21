@@ -34,6 +34,13 @@ namespace Model.ViewModel
         public bool isVisibleDealUnit { get; set; }
         public bool isVisibleShipMethod { get; set; }
 
+        public bool isVisibleHeaderJobWorker { get; set; }
+        public bool isVisibleBaleNoPattern { get; set; }
+        public bool isVisibleGrossWeight { get; set; }
+        public bool isVisibleNetWeight { get; set; }
+        public bool isVisibleProductInvoiceGroup { get; set; }
+        public bool isVisibleSaleDeliveryOrder { get; set; }
+
         public string filterProductTypes { get; set; }
         public string filterProductGroups { get; set; }
         public string filterProducts { get; set; }

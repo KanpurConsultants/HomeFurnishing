@@ -81,6 +81,7 @@ namespace Service
                             LoanEMI = p.LoanEMI,
                             NetSalary = p.NetSalary,
                             Remark = p.Remark,
+                            SalaryHeaderId=p.SalaryHeaderId,
                             LockReason = p.LockReason,
                         }).FirstOrDefault();
 
@@ -107,6 +108,7 @@ namespace Service
                            OtherAddition = p.OtherAddition,
                            OtherDeduction = p.OtherDeduction,
                            LoanEMI = p.LoanEMI,
+                           Days=p.Days,
                            NetSalary = p.NetSalary,
                            Remark = p.Remark,
                            SalaryHeaderId = p.SalaryHeaderId,

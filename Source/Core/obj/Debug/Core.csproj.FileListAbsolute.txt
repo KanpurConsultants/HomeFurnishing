@@ -51,4 +51,8 @@ D:\Kanpur Consultants\HomeFurnishing\Source\Core\bin\Debug\log4net.dll
 D:\Kanpur Consultants\HomeFurnishing\Source\Core\bin\Debug\log4net.xml
 D:\Kanpur Consultants\HomeFurnishing\Source\Core\obj\Debug\Core.dll
 D:\Kanpur Consultants\HomeFurnishing\Source\Core\obj\Debug\Core.pdb
+<<<<<<< HEAD
 D:\Kanpur Consultants\HomeFurnishing\Source\Core\obj\Debug\Core.csprojResolveAssemblyReference.cache
+=======
+D:\Active Projects\Web\HomeFurnishing\Source\Core\obj\Debug\Core.csprojResolveAssemblyReference.cache
+>>>>>>> 32b26a1a83f53a5b8fde7efbecfc7a6e5ccfc161

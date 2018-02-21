@@ -905,6 +905,9 @@ namespace Module
 
             AddFields("JobInvoiceSettings", "IsVisibleCreditDays", "Bit");
 
+            AddFields("ProductBuyers", "Dimension1Id", "Int", "Dimension1");
+            AddFields("ProductBuyers", "Dimension2Id", "Int", "Dimension2");
+
             try
             {
                 if ((int)ExecuteScaler("SELECT Count(*) AS Cnt FROM INFORMATION_SCHEMA.Tables WHERE TABLE_NAME = 'ChargeGroupSettings'") == 0)
