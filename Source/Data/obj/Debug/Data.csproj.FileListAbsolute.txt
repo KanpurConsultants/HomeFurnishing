@@ -371,6 +371,7 @@ D:\Sample\HomeFurnishing\Source\Data\obj\Debug\Data.Migrations.EmployeeChargesCo
 D:\Sample\HomeFurnishing\Source\Data\obj\Debug\Data.Migrations.EmployeeLineCharge.resources
 D:\Sample\HomeFurnishing\Source\Data\obj\Debug\Data.Migrations.Salary.resources
 D:\Sample\HomeFurnishing\Source\Data\obj\Debug\Data.Migrations.Salary1.resources
+D:\Active Projects\Web\HomeFurnishing\Source\Data\obj\Debug\Data.Migrations.PropertyTax.resources
 D:\Kanpur Consultants\HomeFurnishing\Source\Data\bin\Debug\Data.dll.config
 D:\Kanpur Consultants\HomeFurnishing\Source\Data\bin\Debug\Data.dll
 D:\Kanpur Consultants\HomeFurnishing\Source\Data\bin\Debug\Data.pdb
@@ -405,8 +406,7 @@ D:\Kanpur Consultants\HomeFurnishing\Source\Data\bin\Debug\Newtonsoft.Json.xml
 D:\Kanpur Consultants\HomeFurnishing\Source\Data\bin\Debug\System.Web.Mvc.xml
 D:\Kanpur Consultants\HomeFurnishing\Source\Data\bin\Debug\log4net.xml
 D:\Kanpur Consultants\HomeFurnishing\Source\Data\obj\Debug\Data.csprojResolveAssemblyReference.cache
-D:\Kanpur Consultants\HomeFurnishing\Source\Data\obj\Debug\Data.dll
-D:\Kanpur Consultants\HomeFurnishing\Source\Data\obj\Debug\Data.pdb
 D:\Kanpur Consultants\HomeFurnishing\Source\Data\obj\Debug\Data.Migrations.PropertyTax.resources
 D:\Kanpur Consultants\HomeFurnishing\Source\Data\obj\Debug\Data.csproj.GenerateResource.Cache
-D:\Active Projects\Web\HomeFurnishing\Source\Data\obj\Debug\Data.Migrations.PropertyTax.resources
+D:\Kanpur Consultants\HomeFurnishing\Source\Data\obj\Debug\Data.dll
+D:\Kanpur Consultants\HomeFurnishing\Source\Data\obj\Debug\Data.pdb
