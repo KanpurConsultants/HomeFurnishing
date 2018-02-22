@@ -116,6 +116,7 @@ namespace Jobs.Controllers
                     var EmployeeChargesList = (from H in db.EmployeeCharge where H.HeaderTableId == Line.EmployeeId select H).ToList();
                     string WagesPayType = (from E in db.Employee where E.EmployeeId == Line.EmployeeId select E).FirstOrDefault().WagesPayType;
 
+                    Decimal TotalAmount = 0;
                     int j = 0, Sr = 0;
                     foreach(var EmployeeCharge in EmployeeChargesList)
                     {
@@ -139,10 +140,25 @@ namespace Jobs.Controllers
                         LineCharge.ParentChargeId = EmployeeCharge.ParentChargeId;
                         LineCharge.Rate = EmployeeCharge.Rate;
 
-                        if (WagesPayType == "Daily")
-                            LineCharge.Amount = EmployeeCharge.Amount * Line.Days;
+                        string ChargeName = db.Charge.Find(EmployeeCharge.ChargeId).ChargeName;
+
+                        if (ChargeName == "Basic Salary")
+                        {
+                            if (WagesPayType == "Daily")
+                                LineCharge.Amount = EmployeeCharge.Amount * Line.Days;
+                            else
+                                LineCharge.Amount = (EmployeeCharge.Amount * Line.Days / SalaryData.MonthDays);
+                        }
+                        else if (ChargeName == "Net Salary")
+                        {
+                            LineCharge.Amount = TotalAmount;
+                        }
                         else
-                            LineCharge.Amount = (EmployeeCharge.Amount * Line.Days / SalaryData.MonthDays);
+                        {
+                            LineCharge.Amount = EmployeeCharge.Amount;
+                        }
+                        TotalAmount = TotalAmount + LineCharge.Amount ?? 0;
+
 
                         LineCharge.DealQty = 0;
                         LineCharge.IsVisible = EmployeeCharge.IsVisible;
@@ -335,7 +351,7 @@ namespace Jobs.Controllers
                 }
 
                 //return Json(new { success = true, Url = "/LedgerHeader/Submit/" + LedgerHeader.LedgerHeaderId });
-                return (string)System.Configuration.ConfigurationManager.AppSettings["JobsDomain"] + "/SalaryHeader/Detail/" + Header.SalaryHeaderId;
+                return (string)System.Configuration.ConfigurationManager.AppSettings["JobsDomain"] + "/SalaryHeader/Modify/" + Header.SalaryHeaderId;
             }
             return null;
         }

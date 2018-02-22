@@ -3042,7 +3042,7 @@ namespace Jobs.Controllers
                         <td style='border: 1px solid black;border-collapse: collapse;padding: 15px;'>" + (++Sr).ToString() + @"</td>
                         <td style='border: 1px solid black;border-collapse: collapse;padding: 15px;'>" + item.ProductName + @"</td>
                         <td style='border: 1px solid black;border-collapse: collapse;padding: 15px;'>" + item.ProductGroupName + @"</td>
-                        <td style='border: 1px solid black;border-collapse: collapse;padding: 15px;'>" + item.Qty + @"</td>
+                        <td style='border: 1px solid black;border-collapse: collapse;padding: 15px;'>" + Math.Round(item.Qty,0) + @"</td>
                         <td style='border: 1px solid black;border-collapse: collapse;padding: 15px;'>0001339800</td>
                         </tr>";
             }
@@ -3051,7 +3051,7 @@ namespace Jobs.Controllers
                         <td style='border: 1px solid black;border-collapse: collapse;padding: 15px;'></td>
                         <td style='border: 1px solid black;border-collapse: collapse;padding: 15px;'></td>
                         <td style='border: 1px solid black;border-collapse: collapse;padding: 15px;'>Total</td>
-                        <td style='border: 1px solid black;border-collapse: collapse;padding: 15px;'>" + JobOrderLine.Sum(i => i.Qty).ToString() + @"</td>
+                        <td style='border: 1px solid black;border-collapse: collapse;padding: 15px;'>" + Math.Round(JobOrderLine.Sum(i => i.Qty),0).ToString() + @"</td>
                         <td style='border: 1px solid black;border-collapse: collapse;padding: 15px;'></td>
                         </tr>";
 

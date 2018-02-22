@@ -173,7 +173,7 @@ namespace Jobs.Controllers
             p.Code = new PersonService(_unitOfWork).GetMaxCode();
             p.LedgerAccountGroupId = settings.LedgerAccountGroupId;
             p.DateOfJoining = DateTime.Now;
-            p.DateOfRelieving = DateTime.Now;
+            //p.DateOfRelieving = DateTime.Now;
             PrepareViewBag();
             return View("Create", p);
         }
@@ -189,6 +189,29 @@ namespace Jobs.Controllers
                 return View(EmployeeVm).Danger("Account Group field is required");
             }
 
+            if (EmployeeVm.TdsCategoryId == 0 || EmployeeVm.TdsCategoryId == null)
+            {
+                PrepareViewBag();
+                return View(EmployeeVm).Danger("Tds Category field is required");
+            }
+
+            if (EmployeeVm.TdsGroupId == 0 || EmployeeVm.TdsGroupId == null)
+            {
+                PrepareViewBag();
+                return View(EmployeeVm).Danger("Tds Group field is required");
+            }
+
+            if (EmployeeVm.DepartmentId == 0 || EmployeeVm.DepartmentId == null)
+            {
+                PrepareViewBag();
+                return View(EmployeeVm).Danger("Department field is required");
+            }
+
+            if (EmployeeVm.DesignationId == 0 || EmployeeVm.DesignationId == null)
+            {
+                PrepareViewBag();
+                return View(EmployeeVm).Danger("Designatio field is required");
+            }
             //if (_PersonService.CheckDuplicate(EmployeeVm.Name, EmployeeVm.Suffix, EmployeeVm.PersonId) == true)
             //{
             //    PrepareViewBag();
@@ -822,9 +845,9 @@ namespace Jobs.Controllers
 
             if(ModelState.IsValid)
             {
-                Person person = new PersonService(_unitOfWork).Find(vm.id);
-                BusinessEntity businessentiry = _BusinessEntityService.Find(vm.id);
-                Employee Employee = _EmployeeService.Find(vm.id);
+                Employee employee = new EmployeeService(_unitOfWork).Find(vm.id);
+                Person person = new PersonService(_unitOfWork).Find(employee.PersonID);
+                BusinessEntity businessentiry = _BusinessEntityService.Find(employee.PersonID);
 
                 ActivityLog al = new ActivityLog()
                 {
@@ -841,22 +864,22 @@ namespace Jobs.Controllers
                 new ActivityLogService(_unitOfWork).Create(al);
 
                 //Then find Ledger Account associated with the above Person.
-                LedgerAccount ledgeraccount = _AccountService.GetLedgerAccountFromPersonId(vm.id);
+                LedgerAccount ledgeraccount = _AccountService.GetLedgerAccountFromPersonId(person.PersonID);
                 _AccountService.Delete(ledgeraccount.LedgerAccountId);
 
                 //Then find all the Person Address associated with the above Person.
-                PersonAddress personaddress = _PersonAddressService.GetShipAddressByPersonId(vm.id);
+                PersonAddress personaddress = _PersonAddressService.GetShipAddressByPersonId(person.PersonID);
                 _PersonAddressService.Delete(personaddress.PersonAddressID);
 
 
-                IEnumerable<PersonContact> personcontact = new PersonContactService(_unitOfWork).GetPersonContactIdListByPersonId(vm.id);
+                IEnumerable<PersonContact> personcontact = new PersonContactService(_unitOfWork).GetPersonContactIdListByPersonId(person.PersonID);
                 //Mark ObjectState.Delete to all the Person Contact For Above Person. 
                 foreach (PersonContact item in personcontact)
                 {
                     new PersonContactService(_unitOfWork).Delete(item.PersonContactID);
                 }
 
-                IEnumerable<PersonBankAccount> personbankaccount = new PersonBankAccountService(_unitOfWork).GetPersonBankAccountIdListByPersonId(vm.id);
+                IEnumerable<PersonBankAccount> personbankaccount = new PersonBankAccountService(_unitOfWork).GetPersonBankAccountIdListByPersonId(person.PersonID);
                 //Mark ObjectState.Delete to all the Person Contact For Above Person. 
                 foreach (PersonBankAccount item in personbankaccount)
                 {
@@ -880,8 +903,21 @@ namespace Jobs.Controllers
                 }
 
 
+                IEnumerable<EmployeeLineCharge> EmployeeLineChargeList = (from L in db.EmployeeLineCharge where L.LineTableId == employee.EmployeeId select L).ToList();
+                foreach (var EmployeeLineCharge in EmployeeLineChargeList)
+                {
+                    new EmployeeLineChargeService(_unitOfWork).Delete(EmployeeLineCharge.Id);
+                }
+
+                IEnumerable<EmployeeCharge> EmployeeChargeList = (from L in db.EmployeeCharge where L.HeaderTableId == employee.EmployeeId select L).ToList();
+                foreach(var EmployeeCharge in EmployeeChargeList)
+                {
+                    new EmployeeChargeService(_unitOfWork).Delete(EmployeeCharge.Id);
+                }
+
+
             // Now delete the Parent Employee
-                _EmployeeService.Delete(Employee);
+                _EmployeeService.Delete(employee);
                 _BusinessEntityService.Delete(businessentiry);
                 new PersonService(_unitOfWork).Delete(person);
 

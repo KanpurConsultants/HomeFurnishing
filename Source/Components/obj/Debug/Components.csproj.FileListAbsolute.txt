@@ -134,6 +134,5 @@ D:\Kanpur Consultants\HomeFurnishing\Source\Components\bin\Debug\EntityFramework
 D:\Kanpur Consultants\HomeFurnishing\Source\Components\bin\Debug\Microsoft.AspNet.Identity.Core.xml
 D:\Kanpur Consultants\HomeFurnishing\Source\Components\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.xml
 D:\Kanpur Consultants\HomeFurnishing\Source\Components\bin\Debug\log4net.xml
-D:\Kanpur Consultants\HomeFurnishing\Source\Components\obj\Debug\Components.csprojResolveAssemblyReference.cache
 D:\Kanpur Consultants\HomeFurnishing\Source\Components\obj\Debug\Components.dll
 D:\Kanpur Consultants\HomeFurnishing\Source\Components\obj\Debug\Components.pdb

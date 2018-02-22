@@ -40,16 +40,9 @@ namespace Service
             SqlParameter SqlParameterDepartmentId = new SqlParameter("@DepartmentId", (vm.DepartmentId == null) ? DBNull.Value : (object)vm.DepartmentId);
             SqlParameter SqlParameterWagesPayType = new SqlParameter("@WagesPayType", (vm.WagesPayType == null) ? DBNull.Value : (object)vm.WagesPayType);
 
-            //mQry = @"SELECT E.EmployeeId, P.Name AS EmployeeName, 30.00 AS Days, 0.00 AS Additions, 0.00 AS Deductions, 0.00 AS LoanEMI, 
-            //        @DocDate As DocDate, 
-            //        @DocTypeId As DocTypeId
-            //        FROM Web.Employees E
-            //        LEFT JOIN Web.People P ON E.PersonID = P.PersonID  ";
-
-
-            mQry = @"SELECT E.EmployeeId, P.Name AS EmployeeName, Convert(Decimal(18,4),DAY(EOMONTH(@DocDate))) AS Days, 0.00 AS Additions, 0.00 AS Deductions, 
+            mQry = @"SELECT E.EmployeeId, P.Name AS EmployeeName, Convert(Decimal(18,4),DAY(EOMONTH(@DocDate))) - IsNull(VSunday.NoOfSundays,0) AS Days, 0.00 AS Additions, 0.00 AS Deductions, 
                     IsNull(VAdvance.LoanEMI,0) AS LoanEMI, @DocDate As DocDate, 
-                    @DocTypeId As DocTypeId, @Remark As HeaderRemark, Convert(Decimal(18,4),DAY(EOMONTH(@DocDate))) AS MonthDays
+                    @DocTypeId As DocTypeId, @Remark As HeaderRemark, Convert(Decimal(18,4),DAY(EOMONTH(@DocDate))) - IsNull(VSunday.NoOfSundays,0) AS MonthDays
                     FROM Web.Employees E
                     LEFT JOIN Web.People P ON E.PersonID = P.PersonID
                     LEFT JOIN (
@@ -58,6 +51,12 @@ namespace Service
                         LEFT JOIN Web.SalaryHeaders H ON L.SalaryHeaderId = H.SalaryHeaderId
                         WHERE H.DocDate = @DocDate
                     ) AS VSalaryLine ON E.EmployeeId = VSalaryLine.EmployeeId
+                    LEFT JOIN (
+                        SELECT Count(*) AS NoOfSundays
+                        FROM master..spt_values 
+                        WHERE TYPE ='p' AND DATEDIFF(d, Convert(DATETIME,DATEADD(DAY,1,EOMONTH(@DocDate,-1))),Convert(DATETIME,EOMONTH(@DocDate))) >= number 
+                        AND DATENAME(w,Convert(DATETIME,DATEADD(DAY,1,EOMONTH(@DocDate,-1)))+number) = 'Sunday'
+                    ) As VSunday On 1 = 1
                     LEFT JOIN (
 	                    SELECT E.EmployeeId, Sum(CASE WHEN IsNull(L.AmtDr,0) - IsNull(VAdj.AdjustedAmount,0) < LL.BaseRate
 	                    THEN IsNull(L.AmtDr,0) - IsNull(VAdj.AdjustedAmount,0)
@@ -81,9 +80,6 @@ namespace Service
                     (vm.DepartmentId != null ? " AND E.DepartmentId = @DepartmentId" : "") +
                     (vm.WagesPayType != null ? " AND E.WagesPayType = @WagesPayType" : "") +
                     " AND VSalaryLine.EmployeeId IS NULL AND IsNull(E.BasicSalary,0) > 0 ";
-
-            //mQry = mQry + "UNION ALL " + mQry;
-            //mQry = mQry + "UNION ALL " + mQry;
 
             IEnumerable<SalaryWizardResultViewModel> SalaryWizardResultViewModel = db.Database.SqlQuery<SalaryWizardResultViewModel>(mQry, SqlParameterDocDate, SqlParameterDocTypeId, SqlParameterRemark, SqlParameterDepartmentId, SqlParameterWagesPayType).ToList();
 
