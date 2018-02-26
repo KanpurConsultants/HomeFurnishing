@@ -857,7 +857,7 @@ namespace Jobs.Controllers
                     DocId = vm.id,
                     UserRemark = vm.Reason,
                     Narration = "Employee is deleted with Name:" + person.Name,
-                    DocTypeId = new DocumentTypeService(_unitOfWork).FindByName(TransactionDocCategoryConstants.SaleOrder).DocumentTypeId,
+                    DocTypeId = new DocumentTypeService(_unitOfWork).FindByName(MasterDocTypeConstants.Employee).DocumentTypeId,
                     UploadDate = DateTime.Now,
 
                 };
@@ -887,7 +887,7 @@ namespace Jobs.Controllers
                 }
 
 
-                IEnumerable<PersonProcess> personProcess = new PersonProcessService(_unitOfWork).GetPersonProcessIdListByPersonId(vm.id);
+                IEnumerable<PersonProcess> personProcess = new PersonProcessService(_unitOfWork).GetPersonProcessIdListByPersonId(employee.PersonID);
                 //Mark ObjectState.Delete to all the Person Process For Above Person. 
                 foreach (PersonProcess item in personProcess)
                 {
@@ -895,7 +895,7 @@ namespace Jobs.Controllers
                 }
 
 
-                IEnumerable<PersonRegistration> personregistration = new PersonRegistrationService(_unitOfWork).GetPersonRegistrationIdListByPersonId(vm.id);
+                IEnumerable<PersonRegistration> personregistration = new PersonRegistrationService(_unitOfWork).GetPersonRegistrationIdListByPersonId(employee.PersonID);
                 //Mark ObjectState.Delete to all the Person Registration For Above Person. 
                 foreach (PersonRegistration item in personregistration)
                 {

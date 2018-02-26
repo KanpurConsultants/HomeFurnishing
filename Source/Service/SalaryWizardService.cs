@@ -40,7 +40,7 @@ namespace Service
             SqlParameter SqlParameterDepartmentId = new SqlParameter("@DepartmentId", (vm.DepartmentId == null) ? DBNull.Value : (object)vm.DepartmentId);
             SqlParameter SqlParameterWagesPayType = new SqlParameter("@WagesPayType", (vm.WagesPayType == null) ? DBNull.Value : (object)vm.WagesPayType);
 
-            mQry = @"SELECT E.EmployeeId, P.Name AS EmployeeName, Convert(Decimal(18,4),DAY(EOMONTH(@DocDate))) - IsNull(VSunday.NoOfSundays,0) AS Days, 0.00 AS Additions, 0.00 AS Deductions, 
+            mQry = @"SELECT E.EmployeeId, P.Name+','+P.Suffix AS EmployeeName, Convert(int,P.Code) AS Code, Convert(Decimal(18,4),DAY(EOMONTH(@DocDate))) - IsNull(VSunday.NoOfSundays,0) AS Days, 0.00 AS Additions, 0.00 AS Deductions, 
                     IsNull(VAdvance.LoanEMI,0) AS LoanEMI, @DocDate As DocDate, 
                     @DocTypeId As DocTypeId, @Remark As HeaderRemark, Convert(Decimal(18,4),DAY(EOMONTH(@DocDate))) - IsNull(VSunday.NoOfSundays,0) AS MonthDays
                     FROM Web.Employees E
@@ -79,7 +79,7 @@ namespace Service
                     WHERE E.DateOfJoining <= @DocDate AND E.DateOfRelieving IS NULL " +
                     (vm.DepartmentId != null ? " AND E.DepartmentId = @DepartmentId" : "") +
                     (vm.WagesPayType != null ? " AND E.WagesPayType = @WagesPayType" : "") +
-                    " AND VSalaryLine.EmployeeId IS NULL AND IsNull(E.BasicSalary,0) > 0 ";
+                    " AND VSalaryLine.EmployeeId IS NULL AND IsNull(E.BasicSalary,0) > 0 Order By P.Name+','+P.Suffix ";
 
             IEnumerable<SalaryWizardResultViewModel> SalaryWizardResultViewModel = db.Database.SqlQuery<SalaryWizardResultViewModel>(mQry, SqlParameterDocDate, SqlParameterDocTypeId, SqlParameterRemark, SqlParameterDepartmentId, SqlParameterWagesPayType).ToList();
 
@@ -124,6 +124,7 @@ namespace Service
     {
         public int EmployeeId { get; set; }
         public string EmployeeName { get; set; }
+        public int Code { get; set; }
         public int DocTypeId { get; set; }
         public string DocDate { get; set; }
         public Decimal MonthDays { get; set; }

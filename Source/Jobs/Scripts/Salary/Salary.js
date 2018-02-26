@@ -105,7 +105,8 @@ Salary.controller('MainCtrl', ['$scope', '$log', '$http', 'uiGridConstants', 'ui
                       $scope.gridOptions.columnDefs.push({ field: 'DocTypeId', width: 100, visible: false });
                       $scope.gridOptions.columnDefs.push({ field: 'DocDate', width: 100, visible: false });
                       $scope.gridOptions.columnDefs.push({ field: 'MonthDays', width: 100, visible: false });
-                      $scope.gridOptions.columnDefs.push({ field: 'EmployeeName', width: 570, cellClass: 'cell-text ', headerCellClass: 'header-text', enableCellEdit: false });
+                      $scope.gridOptions.columnDefs.push({ field: 'EmployeeName', width: 500, cellClass: 'cell-text ', headerCellClass: 'header-text', enableCellEdit: false });
+                      $scope.gridOptions.columnDefs.push({ field: 'Code', width: 70, cellClass: 'cell-text ', headerCellClass: 'header-text', enableCellEdit: false });
                       $scope.gridOptions.columnDefs.push({ field: 'Days', width: 100, cellClass: 'text-right cell-text ', headerCellClass: 'text-right header-text', enableCellEdit: true });
                       $scope.gridOptions.columnDefs.push({ field: 'Additions', width: 150, cellClass: 'text-right cell-text ', headerCellClass: 'text-right header-text', enableCellEdit: true });
                       $scope.gridOptions.columnDefs.push({ field: 'Deductions', width: 150, cellClass: 'text-right cell-text ', headerCellClass: 'text-right header-text', enableCellEdit: true });

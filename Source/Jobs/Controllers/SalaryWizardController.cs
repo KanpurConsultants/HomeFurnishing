@@ -113,7 +113,7 @@ namespace Jobs.Controllers
                     Line.ObjectState = Model.ObjectState.Added;
                     
 
-                    var EmployeeChargesList = (from H in db.EmployeeCharge where H.HeaderTableId == Line.EmployeeId select H).ToList();
+                    var EmployeeChargesList = (from H in db.EmployeeCharge where H.HeaderTableId == Line.EmployeeId select H).OrderBy(m=>m.Sr).ToList();
                     string WagesPayType = (from E in db.Employee where E.EmployeeId == Line.EmployeeId select E).FirstOrDefault().WagesPayType;
 
                     Decimal TotalAmount = 0;
@@ -157,7 +157,10 @@ namespace Jobs.Controllers
                         {
                             LineCharge.Amount = EmployeeCharge.Amount;
                         }
-                        TotalAmount = TotalAmount + LineCharge.Amount ?? 0;
+                        if (LineCharge.AddDeduct==0)
+                            TotalAmount = TotalAmount - LineCharge.Amount ?? 0;
+                        else if (LineCharge.AddDeduct == 1)
+                            TotalAmount = TotalAmount + LineCharge.Amount ?? 0;
 
 
                         LineCharge.DealQty = 0;

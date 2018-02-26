@@ -454,55 +454,55 @@ namespace Service
         public JobInvoiceLineViewModel GetJobInvoiceLineBalance(int id)
         {
             var temp = (from VJIB in db.ViewJobInvoiceBalance
-                    join Jil in db.JobInvoiceLine on VJIB.JobInvoiceLineId equals Jil.JobInvoiceLineId into JobInvoiceLineTable
+                        join Jil in db.JobInvoiceLine on VJIB.JobInvoiceLineId equals Jil.JobInvoiceLineId into JobInvoiceLineTable
                         from JobInvoiceLineTab in JobInvoiceLineTable.DefaultIfEmpty()
                         join Jrl in db.JobReceiveLine on JobInvoiceLineTab.JobReceiveLineId equals Jrl.JobReceiveLineId into JobReceiveLineTable
-                    from JobReceiveLineTab in JobReceiveLineTable.DefaultIfEmpty()
+                        from JobReceiveLineTab in JobReceiveLineTable.DefaultIfEmpty()
                         join Jih in db.JobInvoiceHeader on JobInvoiceLineTab.JobInvoiceHeaderId equals Jih.JobInvoiceHeaderId into JobInvoiceHeaderTable
-                    from JobInvoiceHeaderTab in JobInvoiceHeaderTable.DefaultIfEmpty()
-                    join Jrh in db.JobReceiveHeader on JobReceiveLineTab.JobReceiveHeaderId equals Jrh.JobReceiveHeaderId into JobReceiveHeaderTable
-                    from JobReceiveHeaderTab in JobReceiveHeaderTable.DefaultIfEmpty()
+                        from JobInvoiceHeaderTab in JobInvoiceHeaderTable.DefaultIfEmpty()
+                        join Jrh in db.JobReceiveHeader on JobReceiveLineTab.JobReceiveHeaderId equals Jrh.JobReceiveHeaderId into JobReceiveHeaderTable
+                        from JobReceiveHeaderTab in JobReceiveHeaderTable.DefaultIfEmpty()
                         where JobInvoiceLineTab.JobInvoiceLineId == id
-                    select new JobInvoiceLineViewModel
-                    {
+                        select new JobInvoiceLineViewModel
+                        {
 
-                        JobWorkerId = JobInvoiceHeaderTab.JobWorkerId.Value,
-                        Amount = JobInvoiceLineTab.Amount,
-                        ProductId = JobReceiveLineTab.ProductId,
-                        ProductName = JobReceiveLineTab.Product.ProductName,
-                        JobReceiveLineId = JobInvoiceLineTab.JobReceiveLineId,
-                        JobReceiveDocNo = JobReceiveHeaderTab.DocNo,
-                        JobInvoiceHeaderId = JobInvoiceLineTab.JobInvoiceHeaderId,
-                        JobInvoiceLineId = JobInvoiceLineTab.JobInvoiceLineId,
-                        InvoiceDocNo = JobInvoiceLineTab.JobInvoiceHeader.DocNo,
-                        Qty = VJIB.BalanceQty,
-                        Rate = JobInvoiceLineTab.Rate,
-                        Remark = JobInvoiceLineTab.Remark,
-                        UnitConversionMultiplier = JobInvoiceLineTab.UnitConversionMultiplier,
-                        DealUnitId = JobInvoiceLineTab.DealUnitId,
-                        DealQty = JobInvoiceLineTab.DealQty,
-                        UnitId = JobReceiveLineTab.Product.UnitId,
-                        Dimension1Id = JobReceiveLineTab.Dimension1Id,
-                        Dimension1Name = JobReceiveLineTab.Dimension1.Dimension1Name,
-                        Dimension2Id = JobReceiveLineTab.Dimension2Id,
-                        Dimension2Name = JobReceiveLineTab.Dimension2.Dimension2Name,
-                        Dimension3Id = JobReceiveLineTab.Dimension3Id,
-                        Dimension3Name = JobReceiveLineTab.Dimension3.Dimension3Name,
-                        Dimension4Id = JobReceiveLineTab.Dimension4Id,
-                        Dimension4Name = JobReceiveLineTab.Dimension4.Dimension4Name,
-                        Specification = JobReceiveLineTab.Specification,
-                        LotNo = JobReceiveLineTab.LotNo,
-                        SalesTaxGroupPersonId = JobInvoiceLineTab.JobInvoiceHeader.SalesTaxGroupPersonId,
-                        SalesTaxGroupProductId = JobInvoiceLineTab.SalesTaxGroupProductId,
-                        CostCenterId = JobInvoiceLineTab.CostCenterId,
-                        CostCenterName = JobInvoiceLineTab.CostCenter.CostCenterName,
-                        //DiscountPer = p.DiscountPer
-                        Weight = JobReceiveLineTab.Qty == 0 ? 0 : (JobReceiveLineTab.Weight / JobReceiveLineTab.Qty) * VJIB.BalanceQty,
-                    }).FirstOrDefault();
+                            JobWorkerId = JobInvoiceHeaderTab.JobWorkerId.Value,
+                            Amount = JobInvoiceLineTab.Amount,
+                            ProductId = JobReceiveLineTab.ProductId,
+                            ProductName = JobReceiveLineTab.Product.ProductName,
+                            JobReceiveLineId = JobInvoiceLineTab.JobReceiveLineId,
+                            JobReceiveDocNo = JobReceiveHeaderTab.DocNo,
+                            JobInvoiceHeaderId = JobInvoiceLineTab.JobInvoiceHeaderId,
+                            JobInvoiceLineId = JobInvoiceLineTab.JobInvoiceLineId,
+                            InvoiceDocNo = JobInvoiceLineTab.JobInvoiceHeader.DocNo,
+                            Qty = VJIB.BalanceQty,
+                            Rate = JobInvoiceLineTab.Rate,
+                            Remark = JobInvoiceLineTab.Remark,
+                            UnitConversionMultiplier = JobInvoiceLineTab.UnitConversionMultiplier,
+                            DealUnitId = JobInvoiceLineTab.DealUnitId,
+                            DealQty = JobInvoiceLineTab.DealQty,
+                            UnitId = JobReceiveLineTab.Product.UnitId,
+                            Dimension1Id = JobReceiveLineTab.Dimension1Id,
+                            Dimension1Name = JobReceiveLineTab.Dimension1.Dimension1Name,
+                            Dimension2Id = JobReceiveLineTab.Dimension2Id,
+                            Dimension2Name = JobReceiveLineTab.Dimension2.Dimension2Name,
+                            Dimension3Id = JobReceiveLineTab.Dimension3Id,
+                            Dimension3Name = JobReceiveLineTab.Dimension3.Dimension3Name,
+                            Dimension4Id = JobReceiveLineTab.Dimension4Id,
+                            Dimension4Name = JobReceiveLineTab.Dimension4.Dimension4Name,
+                            Specification = JobReceiveLineTab.Specification,
+                            LotNo = JobReceiveLineTab.LotNo,
+                            SalesTaxGroupPersonId = JobInvoiceLineTab.JobInvoiceHeader.SalesTaxGroupPersonId,
+                            SalesTaxGroupProductId = JobInvoiceLineTab.SalesTaxGroupProductId,
+                            CostCenterId = JobInvoiceLineTab.CostCenterId,
+                            CostCenterName = JobInvoiceLineTab.CostCenter.CostCenterName,
+                            //DiscountPer = p.DiscountPer
+                            Weight = JobReceiveLineTab.Qty == 0 ? 0 : (JobReceiveLineTab.Weight / JobReceiveLineTab.Qty) * VJIB.BalanceQty,
+                        }).FirstOrDefault();
 
             var JobInvoiceLineId = (from p in db.JobInvoiceLine
-                                  where p.JobInvoiceLineId == temp.JobInvoiceLineId
-                                  select new { LineId = p.JobInvoiceLineId, HeaderId = p.JobInvoiceHeaderId }).FirstOrDefault();
+                                    where p.JobInvoiceLineId == temp.JobInvoiceLineId
+                                    select new { LineId = p.JobInvoiceLineId, HeaderId = p.JobInvoiceHeaderId }).FirstOrDefault();
 
 
             var Charges = (from p in db.JobInvoiceLineCharge
@@ -622,10 +622,12 @@ namespace Service
 
         public IEnumerable<ComboBoxResult> GetJobInvoiceHelpListForProduct(int Id, string term)
         {
-            var JobInvoiceHeader = new JobInvoiceReturnHeaderService(db).Find(Id);
+            var JobInvoiceReturnHeader = new JobInvoiceReturnHeaderService(db).Find(Id);
+
+            string Nature = db.DocumentType.Find(JobInvoiceReturnHeader.DocTypeId).Nature;
 
             var settings = db.JobInvoiceSettings
-            .Where(m => m.DocTypeId == JobInvoiceHeader.DocTypeId && m.DivisionId == JobInvoiceHeader.DivisionId && m.SiteId == JobInvoiceHeader.SiteId).FirstOrDefault();
+            .Where(m => m.DocTypeId == JobInvoiceReturnHeader.DocTypeId && m.DivisionId == JobInvoiceReturnHeader.DivisionId && m.SiteId == JobInvoiceReturnHeader.SiteId).FirstOrDefault();
 
 
             string[] contraSites = null;
@@ -643,7 +645,7 @@ namespace Service
             return (from VB in db.ViewJobInvoiceBalance
                     join L in db.JobInvoiceLine on VB.JobInvoiceLineId equals L.JobInvoiceLineId into JobInvoiceLineTable
                     from JobInvoiceLineTab in JobInvoiceLineTable.DefaultIfEmpty()
-                    where JobInvoiceLineTab.JobInvoiceHeader.JobWorkerId == JobInvoiceHeader.JobWorkerId
+                    where JobInvoiceLineTab.JobInvoiceHeader.JobWorkerId == JobInvoiceReturnHeader.JobWorkerId
                     && (string.IsNullOrEmpty(settings.filterContraSites) ? VB.SiteId == CurrentSiteId : contraSites.Contains(VB.SiteId.ToString()))
                     && (string.IsNullOrEmpty(settings.filterContraDivisions) ? VB.DivisionId == CurrentDivisionId : contraDivisions.Contains(VB.DivisionId.ToString()))
                     && (string.IsNullOrEmpty(term) ? 1 == 1 : JobInvoiceLineTab.JobInvoiceHeader.DocNo.ToLower().Contains(term.ToLower())
