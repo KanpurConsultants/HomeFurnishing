@@ -3671,6 +3671,8 @@ namespace Module
             AddFields("Employees", "WagesPayType", "nvarchar(10)");
             AddFields("Employees", "PaymentType", "nvarchar(10)");
 
+            AddFields("SalaryLines", "Advance", "Decimal(18,4)");
+
 
             ReCreateProcedures();
             DataCorrection();

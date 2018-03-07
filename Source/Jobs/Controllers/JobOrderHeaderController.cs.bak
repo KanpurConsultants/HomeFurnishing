@@ -24,9 +24,7 @@ using JobOrderDocumentEvents;
 using Reports.Reports;
 using Reports.Controllers;
 using Model.ViewModels;
-
-
-
+using Mailer.Model;
 
 namespace Jobs.Controllers
 {
@@ -2663,9 +2661,10 @@ namespace Jobs.Controllers
 
                                     if (Settings.SqlProcDocumentPrint == null || Settings.SqlProcDocumentPrint == "")
                                     {
-                                        List<string> QueryList = new List<string>();
-                                        QueryList = DocumentPrintData(item);
-                                        Pdf = drp.DocumentPrint(QueryList, User.Identity.Name);
+                                        //List<string> QueryList = new List<string>();
+                                        //QueryList = DocumentPrintData(item);
+                                        //Pdf = drp.DocumentPrint(QueryList, User.Identity.Name);
+                                        Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint, User.Identity.Name, item);
                                     }
                                     else
                                     Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint, User.Identity.Name, item);
@@ -2676,9 +2675,10 @@ namespace Jobs.Controllers
                                 {
                                     if (Settings.SqlProcDocumentPrint_AfterSubmit == null || Settings.SqlProcDocumentPrint_AfterSubmit == "")
                                     {
-                                        List<string> QueryList = new List<string>();
-                                        QueryList = DocumentPrintData(item);
-                                        Pdf = drp.DocumentPrint(QueryList, User.Identity.Name);
+                                        //List<string> QueryList = new List<string>();
+                                        //QueryList = DocumentPrintData(item);
+                                        //Pdf = drp.DocumentPrint(QueryList, User.Identity.Name);
+                                        Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint_AfterSubmit, User.Identity.Name, item);
                                     }
                                     else
                                         Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint_AfterSubmit, User.Identity.Name, item);
@@ -2689,9 +2689,10 @@ namespace Jobs.Controllers
                                 {
                                     if (Settings.SqlProcDocumentPrint_AfterApprove == null || Settings.SqlProcDocumentPrint_AfterApprove == "")
                                     {
-                                        List<string> QueryList = new List<string>();
-                                        QueryList = DocumentPrintData(item);
-                                        Pdf = drp.DocumentPrint(QueryList, User.Identity.Name);
+                                        //List<string> QueryList = new List<string>();
+                                        //QueryList = DocumentPrintData(item);
+                                        //Pdf = drp.DocumentPrint(QueryList, User.Identity.Name);
+                                        Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint_AfterApprove, User.Identity.Name, item);
                                     }
                                     else
                                         Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint_AfterApprove, User.Identity.Name, item);
@@ -2755,7 +2756,8 @@ namespace Jobs.Controllers
 
 
 
-        private List<string> DocumentPrintData(int item)
+        
+		private List<string> DocumentPrintData(int item)
         {
             List<string> DocumentPrintData = new List<string>();
             String mQry;
@@ -2883,8 +2885,6 @@ namespace Jobs.Controllers
         }
 
 
-
-
         protected string GetIPAddress()
         {
             System.Web.HttpContext context = System.Web.HttpContext.Current;
@@ -2966,5 +2966,254 @@ namespace Jobs.Controllers
             return Json(temp);
         }
 
+        [HttpGet]
+        public ActionResult EMail(int id)
+        {
+            var  Header = (from H in context.JobOrderHeader
+                           where H.JobOrderHeaderId == id
+                         select new
+                         {
+                             JobOrderHeaderId = H.JobOrderHeaderId,
+                             DocTypeId = H.DocTypeId,
+                             Subject = H.DocType.DocumentTypeName,
+                             EMail = H.JobWorker.Person.Email,
+                             DocDate = H.DocDate,
+                             DocNo = H.DocNo
+                         }).FirstOrDefault();
+
+            string ToEMail = "";
+            string Subject = "";
+            string Body = "";
+
+            if (Header != null)
+            {
+                ToEMail = Header.EMail;
+                Subject = Header.Subject;
+            }
+
+            Body = @"Dear Sir,
+
+                    Please find attachment.";
+
+
+            //For Vehicle Purchase Order
+            Subject = "Requisition of Vehicles";
+            Body = @" <p> Dear Sir,</p>
+
+                <p>Please find attachment and arrange for billing of Vehicles</p>
+
+                <p>Dt:- " + Header.DocDate.ToString("dd/MMM/yyyy") + @"</p>
+
+                                                               
+
+                <p>Requisition No- " + Header.DocNo + @"</p>
+
+                <p>Sub.: -Requisition of Vehicles</p>
+
+ 
+
+                <p>Dear Sir,</p>
+
+                <p>We request you to kindly book the following vehicle details of which are mentioned below:-</p>";
+
+
+
+            var JobOrderLine = (from L in context.JobOrderLine
+                                where L.JobOrderHeaderId == id
+                                select new
+                                {
+                                    ProductName = L.Product.ProductName,
+                                    ProductGroupName = L.Product.ProductGroup.ProductGroupName,
+                                    Qty = L.Qty
+                                }).ToList();
+
+
+
+            Body = Body  + @"<table style='width: 100 %;border: 1px solid black;border-collapse: collapse'>
+                        <tr>
+                            <th style='border: 1px solid black;border-collapse: collapse'>SL.NO</th>
+                            <th style='border: 1px solid black;border-collapse: collapse'>V C NO</th>
+                            <th style='border: 1px solid black;border-collapse: collapse'>MODEL</th>
+                            <th style='border: 1px solid black;border-collapse: collapse'>QUANTITY</th>
+                            <th style='border: 1px solid black;border-collapse: collapse'>PAYER CODE</th>
+                        </tr> ";
+
+            int Sr = 0;
+            foreach (var item in JobOrderLine)
+            {
+                Body = Body + @"<tr>
+                        <td style='border: 1px solid black;border-collapse: collapse;padding: 15px;'>" + (++Sr).ToString() + @"</td>
+                        <td style='border: 1px solid black;border-collapse: collapse;padding: 15px;'>" + item.ProductName + @"</td>
+                        <td style='border: 1px solid black;border-collapse: collapse;padding: 15px;'>" + item.ProductGroupName + @"</td>
+                        <td style='border: 1px solid black;border-collapse: collapse;padding: 15px;'>" + Math.Round(item.Qty,0) + @"</td>
+                        <td style='border: 1px solid black;border-collapse: collapse;padding: 15px;'>0001339800</td>
+                        </tr>";
+            }
+
+            Body = Body + @"<tr>
+                        <td style='border: 1px solid black;border-collapse: collapse;padding: 15px;'></td>
+                        <td style='border: 1px solid black;border-collapse: collapse;padding: 15px;'></td>
+                        <td style='border: 1px solid black;border-collapse: collapse;padding: 15px;'>Total</td>
+                        <td style='border: 1px solid black;border-collapse: collapse;padding: 15px;'>" + Math.Round(JobOrderLine.Sum(i => i.Qty),0).ToString() + @"</td>
+                        <td style='border: 1px solid black;border-collapse: collapse;padding: 15px;'></td>
+                        </tr>";
+
+
+            Body = Body + "</table>";
+
+
+            //End Vehicle Purchase Order
+
+
+
+            byte[] filedata = GetPrintData(Header.JobOrderHeaderId.ToString(), Header.DocTypeId);
+            string attachment = Request.MapPath(ConfigurationManager.AppSettings["ExcelFilePath"]) + Header.JobOrderHeaderId.ToString() + ".pdf";
+
+
+            
+
+            System.IO.File.WriteAllBytes(attachment, filedata);
+
+            EmailMessage vm = new EmailMessage();
+            vm.To = ToEMail;
+            vm.Subject = Subject;
+            vm.Body = Body;
+            vm.Attachment = attachment;
+
+
+            return View("~/Views/Mailbox/Compose.cshtml", vm);
+
+            //return RedirectToAction("Compose", "Mailbox", new { ToEMail = ToEMail, Subject = Subject, Body = Body, attachment = attachment });
+        }
+
+
+        public byte[] GetPrintData(string Ids, int DocTypeId)
+        {
+            if (!string.IsNullOrEmpty(Ids))
+            {
+                int SiteId = (int)System.Web.HttpContext.Current.Session["SiteId"];
+                int DivisionId = (int)System.Web.HttpContext.Current.Session["DivisionId"];
+
+                var Settings = new JobOrderSettingsService(_unitOfWork).GetJobOrderSettingsForDocument(DocTypeId, DivisionId, SiteId);
+
+                string ReportSql = "";
+
+                if (!string.IsNullOrEmpty(Settings.DocumentPrint))
+                    ReportSql = context.ReportHeader.Where((m) => m.ReportName == Settings.DocumentPrint).FirstOrDefault().ReportSQL;
+
+                try
+                {
+                    List<byte[]> PdfStream = new List<byte[]>();
+                    foreach (var item in Ids.Split(',').Select(Int32.Parse))
+                    {
+                        int Copies = 1;
+                        int AdditionalCopies = Settings.NoOfPrintCopies ?? 0;
+                        bool UpdateGatePassPrint = true;
+
+                        DirectReportPrint drp = new DirectReportPrint();
+
+                        var pd = context.JobOrderHeader.Find(item);
+
+                        LogActivity.LogActivityDetail(LogVm.Map(new ActiivtyLogViewModel
+                        {
+                            DocTypeId = pd.DocTypeId,
+                            DocId = pd.JobOrderHeaderId,
+                            ActivityType = (int)ActivityTypeContants.Print,
+                            DocNo = pd.DocNo,
+                            DocDate = pd.DocDate,
+                            DocStatus = pd.Status,
+                        }));
+
+                        do
+                        {
+                            byte[] Pdf;
+
+                            if (!string.IsNullOrEmpty(ReportSql))
+                            {
+                                Pdf = drp.rsDirectDocumentPrint(ReportSql, User.Identity.Name, item);
+                                PdfStream.Add(Pdf);
+                            }
+                            else
+                            {
+                                if (pd.Status == (int)StatusConstants.Drafted || pd.Status == (int)StatusConstants.Import || pd.Status == (int)StatusConstants.Modified)
+                                {
+
+                                    if (Settings.SqlProcDocumentPrint == null || Settings.SqlProcDocumentPrint == "")
+                                    {
+                                        //List<string> QueryList = new List<string>();
+                                        //QueryList = DocumentPrintData(item);
+                                        //Pdf = drp.DocumentPrint(QueryList, User.Identity.Name);
+                                        Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint, User.Identity.Name, item);
+                                    }
+                                    else
+                                        Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint, User.Identity.Name, item);
+
+                                    PdfStream.Add(Pdf);
+                                }
+                                else if (pd.Status == (int)StatusConstants.Submitted || pd.Status == (int)StatusConstants.ModificationSubmitted)
+                                {
+                                    if (Settings.SqlProcDocumentPrint_AfterSubmit == null || Settings.SqlProcDocumentPrint_AfterSubmit == "")
+                                    {
+                                        List<string> QueryList = new List<string>();
+                                        QueryList = DocumentPrintData(item);
+                                        Pdf = drp.DocumentPrint(QueryList, User.Identity.Name);
+                                    }
+                                    else
+                                        Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint_AfterSubmit, User.Identity.Name, item);
+
+                                    PdfStream.Add(Pdf);
+                                }
+                                else
+                                {
+                                    if (Settings.SqlProcDocumentPrint_AfterApprove == null || Settings.SqlProcDocumentPrint_AfterApprove == "")
+                                    {
+                                        //List<string> QueryList = new List<string>();
+                                        //QueryList = DocumentPrintData(item);
+                                        //Pdf = drp.DocumentPrint(QueryList, User.Identity.Name);
+                                        Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint_AfterApprove, User.Identity.Name, item);
+                                    }
+                                    else
+                                        Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint_AfterApprove, User.Identity.Name, item);
+                                    PdfStream.Add(Pdf);
+                                }
+                            }
+
+                            if (UpdateGatePassPrint && !(pd.IsGatePassPrinted ?? false))
+                            {
+                                if (pd.GatePassHeaderId.HasValue)
+                                {
+                                    pd.IsGatePassPrinted = true;
+                                    pd.ObjectState = Model.ObjectState.Modified;
+                                    context.JobOrderHeader.Add(pd);
+                                    context.SaveChanges();
+
+                                    UpdateGatePassPrint = false;
+                                    Copies = AdditionalCopies;
+                                    if (Copies > 0)
+                                        continue;
+                                }
+                            }
+
+                            Copies--;
+
+                        } while (Copies > 0);
+
+                    }
+
+                    PdfMerger pm = new PdfMerger();
+
+                    byte[] Merge = pm.MergeFiles(PdfStream);
+
+                    return Merge;
+                }
+
+                catch (Exception ex)
+                {
+                    string message = _exception.HandleException(ex);
+                    return null;
+                }
+            }
+            return null;
+        }
     }
 }

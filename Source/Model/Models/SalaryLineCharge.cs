@@ -13,5 +13,10 @@ namespace Model.Models
         [ForeignKey("SalaryLine")]
         public int LineTableId { get; set; }
         public virtual SalaryLine SalaryLine { get; set; }
+
+
+        [ForeignKey("SalaryHeader")]
+        public int HeaderTableId { get; set; }
+        public virtual SalaryHeader SalaryHeader { get; set; }
     }
 }

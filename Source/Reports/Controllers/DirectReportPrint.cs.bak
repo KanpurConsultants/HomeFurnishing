@@ -26,6 +26,57 @@ namespace Reports.Reports
 
         protected dsReport dsRep = new dsReport();
 
+        public byte[] DocumentPrint_New(List<ListofQuery> QueryList, string UserName, string ReportFileType = ReportFileTypeConstants.PDF)
+        {
+            List<ListofDataTable> DataTableList = new List<ListofDataTable>();
+            DataTable Dt = new DataTable();
+
+            SqlConnection Con = new SqlConnection((string)System.Web.HttpContext.Current.Session["DefaultConnectionString"]);
+
+            foreach (ListofQuery mQry in QueryList)
+            {
+
+
+                if (mQry.Query != "")
+                {
+                    ListofDataTable DataTableL = new ListofDataTable();
+                    SqlDataAdapter sqlDataAapter1 = new SqlDataAdapter(mQry.Query, Con);
+                    dsRep.EnforceConstraints = false;
+                    Dt.Reset();
+
+                    sqlDataAapter1.Fill(Dt);
+                    string s = nameof(mQry);
+                    DataTable SubDataTable = new DataTable();
+                    SubDataTable = Dt.Copy();
+
+
+                    if (Dt.Rows.Count > 0)
+                    {
+                        DataTableL.DataTable = SubDataTable;
+                        DataTableL.DataTableName = mQry.QueryName;
+                        DataTableList.Add(DataTableL);
+                    }
+                    SubDataTable.Dispose();
+
+                }
+                else
+                {
+                    break;
+                }
+
+            }
+
+
+
+            string mimtype;
+            ReportGenerateService_New c = new ReportGenerateService_New();
+
+
+            string mimetype = "";
+            return c.ReportGenerateDirect(DataTableList, out mimtype, ReportFileTypeConstants.PDF, null,null, UserName);
+
+        }
+
         public byte[] DirectDocumentPrint(String queryString, string UserName, int DocumentId = 0, string ReportFileType = ReportFileTypeConstants.PDF)
         {
             var SubReportDataList = new List<DataTable>();
@@ -307,7 +358,11 @@ namespace Reports.Reports
 
     }
 
-
+    public class ListofQuery
+    {
+        public string Query;
+        public string QueryName;
+    }
     public class PdfMerger
     {
         /// <summary>

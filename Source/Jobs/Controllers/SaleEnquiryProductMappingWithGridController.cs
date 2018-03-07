@@ -136,6 +136,7 @@ namespace Jobs.Controllers
                     where (string.IsNullOrEmpty(settings.filterProductTypes) ? 1 == 1 : ProductTypes.Contains(Pt.ProductGroup.ProductTypeId.ToString()))
                     && (string.IsNullOrEmpty(settings.filterProducts) ? 1 == 1 : Products.Contains(Pt.ProductId.ToString()))
                     && (string.IsNullOrEmpty(settings.filterProductGroups) ? 1 == 1 : ProductGroups.Contains(Pt.ProductGroupId.ToString()))
+                    && Pt.IsActive ==true 
                     orderby Pt.ProductName
                     select new ComboBoxResult
                     {

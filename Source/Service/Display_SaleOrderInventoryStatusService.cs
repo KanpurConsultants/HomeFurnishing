@@ -319,7 +319,7 @@ namespace Service
             if (ReportType == "Detail")
             {
                 mQry += @" SELECT H.SaleOrderLineId,
-                            H.Buyer, H.OrderNo AS Order_No, Convert(NVARCHAR,H.Order_Date,103) AS Order_Date , Convert(NVARCHAR,H.DueDate,103) AS Delivery_Date,
+                            H.Buyer, H.OrderNo AS Order_No, Replace( Convert(NVARCHAR,H.Order_Date,106),' ','/') AS Order_Date , Replace(Convert(NVARCHAR,H.DueDate,106),' ','/') AS Delivery_Date,
                             '`'+H.BuyerSpecification3 Quality, H.BuyerSpecification AS Design, H.BuyerSpecification1 Size, H.BuyerSpecification2 Colour, 
                             H.ProductName, H.Order_Qty AS ORD, H.Cancel_Qty AS O_C,
                             H.Slip_Qty AS SLP, H.To_Be_IssueInBranch AS UX, H.Loom_Qty AS LOOM, H.Stock_Qty AS STK, H.Ship_Qty AS SHP, H.Bal_Qty AS BAL,H.O_D, H.O_B AS D_B, H.O_X 
@@ -409,7 +409,7 @@ namespace Service
             SqlParameter SqlParameterBuyerDesign = new SqlParameter("@BuyerDesign", !string.IsNullOrEmpty(BuyerDesign) ? BuyerDesign : (object)DBNull.Value);
             SqlParameter SqlParameterTextHidden = new SqlParameter("@TextHidden", !string.IsNullOrEmpty(TextHidden) ? TextHidden : (object)DBNull.Value);
 
-            mQry = @"SELECT PU.ProductUidName AS CarpetNo, Convert(NVARCHAR,H.DocDate,103) AS Date,PC.ProductCategoryName AS Type, PQ.ProductQualityName AS Quality, PG.ProductGroupName AS Design, C.ColourName AS Colour, VRS.ManufaturingSizeName AS Size, H.Qty  
+            mQry = @"SELECT PU.ProductUidName AS CarpetNo, Replace(Convert(NVARCHAR,H.DocDate,106),' ','/') AS Date,PC.ProductCategoryName AS Type, PQ.ProductQualityName AS Quality, PG.ProductGroupName AS Design, C.ColourName AS Colour, VRS.ManufaturingSizeName AS Size, H.Qty  
                     FROM Web.FJobReceive_OneProcess (@StatusOnDate,@Site,@Division,@FromDate,@ToDate,43) H
                     LEFT JOIN web.ProductUids PU WITH (Nolock) ON PU.ProductUIDId = H.ProductUIDId OR PU.ProductUidName = H.LotNo
                     LEFT JOIN web.Products P WITH (Nolock) ON P.ProductId = H.ProductId 
@@ -510,7 +510,7 @@ namespace Service
             SqlParameter SqlParameterTextHidden = new SqlParameter("@TextHidden", !string.IsNullOrEmpty(TextHidden) ? TextHidden : (object)DBNull.Value);
 
 
-            mQry = @"SELECT S.SiteName AS Branch,CC.CostCenterName AS Purza_No,   Convert(NVARCHAR,JOH.DocDate,103) AS Date,  J.Name AS Weaver,
+            mQry = @"SELECT S.SiteName AS Branch,CC.CostCenterName AS Purza_No,  Replace( Convert(NVARCHAR,JOH.DocDate,106),' ','/') AS Date,  J.Name AS Weaver,
                     PQ.ProductQualityName AS Quality, PG.ProductGroupName AS Design, C.ColourName AS Colour, VRS.ManufaturingSizeName AS Size,
                      isnull(H.BalanceQty,0) AS LoomQty
                     FROM [Web].[FWeavingOrderStatus_OneProcess] (Getdate(),NULL ,NULL,'01/Apr/2017',Getdate(),43) H
@@ -623,7 +623,7 @@ namespace Service
             SqlParameter SqlParameterTextHidden = new SqlParameter("@TextHidden", !string.IsNullOrEmpty(TextHidden) ? TextHidden : (object)DBNull.Value);
 
 
-            mQry = @"SELECT H.DocNo AS Invoice_No, Convert(NVARCHAR,H.DocDate,103) AS Date, PL.BaleNo AS Roll_No, PL.Remark, PU.ProductUidName AS CarpetNo, PC.ProductCategoryName AS Type,
+            mQry = @"SELECT H.DocNo AS Invoice_No, Replace(Convert(NVARCHAR,H.DocDate,106),' ','/') AS Date, PL.BaleNo AS Roll_No, PL.Remark, PU.ProductUidName AS CarpetNo, PC.ProductCategoryName AS Type,
                     PQ.ProductQualityName AS Quality, PG.ProductGroupName AS Design, C.ColourName AS Colour, VRS.ManufaturingSizeName AS Size, PL.Qty  
                     FROM web.SaleInvoiceHeaders H WITH (Nolock)
                     LEFT JOIN web.SaleInvoiceLines L WITH (Nolock) ON L.SaleInvoiceHeaderId = H.SaleInvoiceHeaderId 
@@ -729,7 +729,7 @@ namespace Service
             SqlParameter SqlParameterTextHidden = new SqlParameter("@TextHidden", !string.IsNullOrEmpty(TextHidden) ? TextHidden : (object)DBNull.Value);
 
 
-            mQry = @"SELECT S.SiteName AS Branch, convert(NVARCHAR,POH.DocDate,103) AS Slip_Date, PQ.ProductQualityName AS Quality, PG.ProductGroupName AS Design, C.ColourName AS Colour, VRS.ManufaturingSizeName AS Size,
+            mQry = @"SELECT S.SiteName AS Branch, Replace(convert(NVARCHAR,POH.DocDate,106),' ','/') AS Slip_Date, PQ.ProductQualityName AS Quality, PG.ProductGroupName AS Design, C.ColourName AS Colour, VRS.ManufaturingSizeName AS Size,
                     H.Qty, H.ORdQty AS Iss,isnull((H.BalanceQty),0) AS UX
                     FROM Web.FProdOrderBalance_OneDocumentType_InBrabch(getdate(),273) H
                     LEFT JOIN web.Sites S ON S.SiteId = H.SiteId
@@ -837,7 +837,7 @@ namespace Service
             SqlParameter SqlParameterTextHidden = new SqlParameter("@TextHidden", !string.IsNullOrEmpty(TextHidden) ? TextHidden : (object)DBNull.Value);
 
 
-            mQry = @"SELECT SOH.DocNo AS Order_No, PU.ProductUidName AS CarpetNo, Convert(NVARCHAR,H.DocDate,103) AS Date,  PC.ProductCategoryName AS Type,
+            mQry = @"SELECT SOH.DocNo AS Order_No, PU.ProductUidName AS CarpetNo, Replace(Convert(NVARCHAR,H.DocDate,106),' ','/') AS Date,  PC.ProductCategoryName AS Type,
                     PQ.ProductQualityName AS Quality, PG.ProductGroupName AS Design, C.ColourName AS Colour, VRS.ManufaturingSizeName AS Size, PL.Qty , B.Name AS Buyer 
                     FROM web.SaleInvoiceHeaders H WITH (Nolock)
                     LEFT JOIN web.SaleInvoiceLines L WITH (Nolock) ON L.SaleInvoiceHeaderId = H.SaleInvoiceHeaderId 
@@ -944,7 +944,7 @@ namespace Service
             SqlParameter SqlParameterTextHidden = new SqlParameter("@TextHidden", !string.IsNullOrEmpty(TextHidden) ? TextHidden : (object)DBNull.Value);
 
 
-            mQry = @"SELECT PU.ProductUidName AS CarpetNo, Convert(NVARCHAR,H.DocDate,103) AS Date,  PC.ProductCategoryName AS Type,
+            mQry = @"SELECT PU.ProductUidName AS CarpetNo, Replace(Convert(NVARCHAR,H.DocDate,106),' ','/') AS Date,  PC.ProductCategoryName AS Type,
                     PQ.ProductQualityName AS Quality, PG.ProductGroupName AS Design, C.ColourName AS Colour, VRS.ManufaturingSizeName AS Size, PL.Qty, B.Name AS Buyer  
                     FROM web.SaleInvoiceHeaders H WITH (Nolock)
                     LEFT JOIN web.SaleInvoiceLines L WITH (Nolock) ON L.SaleInvoiceHeaderId = H.SaleInvoiceHeaderId 

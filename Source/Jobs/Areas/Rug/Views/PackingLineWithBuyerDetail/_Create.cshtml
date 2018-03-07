@@ -54,7 +54,7 @@
             @Html.HiddenFor(m => m.PartyProductUid)
             @Html.HiddenFor(m => m.DimensionUnitDecimalPlaces)
             @Html.HiddenFor(m => m.DimensionUnitDecimalPlaces)
-
+            @Html.HiddenFor(m => m.PackingSettings.isAllowtoUpdateBuyerSpecification)
 
             <div class="form-horizontal modal-body">
 
@@ -518,7 +518,10 @@
             $("#Qty").prop('readonly', true);
             $('#ProductInvoiceGroupId').prop('readonly', true);
             $('#StockInId').attr('readonly','true');
-            $("#BaleNo").focus() ;
+            if ("#isAllowtoUpdateBuyerSpecification".val()=true)
+                $("#BaleNo").focus() ;
+            else 
+                $("#Length").focus() ;
         }
     })
 
@@ -754,7 +757,11 @@
                             Validate_Product();
 
                             $('#ProductId').prop('readonly', true);
-                            $("#BaleNo").focus();
+                            //$("#BaleNo").focus();
+                            if ("#isAllowtoUpdateBuyerSpecification".val()=true)
+                                $("#BaleNo").focus() ;
+                            else 
+                                $("#Length").focus() ;
                             //$("#Length").select();
                         }
                     }

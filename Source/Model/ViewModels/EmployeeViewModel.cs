@@ -121,6 +121,10 @@ namespace Model.ViewModels
         public string SiteIds { get; set; }
         public string ProcessIds { get; set; }
 
+        //Login Site Id and Login Division Id
+        public int DivisionId { get; set; }
+        public int SiteId { get; set; }
+
         public int PersonRegistrationPanNoID { get; set; }
 
         public Decimal? BasicSalary { get; set; }

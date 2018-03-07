@@ -350,7 +350,7 @@ namespace Jobs.Controllers
         public string SaleEnquiryHeaderDocDate { get; set; }
         public int ProgressPerc { get; set; }
         public int unitDecimalPlaces { get; set; }
-
+		public string TempRemark { get; set; }
 
     }
 }

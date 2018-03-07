@@ -1102,7 +1102,7 @@ namespace Jobs.Controllers
                             CancelLine.ProductUidCurrentGodownId = Uid.CurrenctGodownId;
 
 
-                            if (temp.JobWorkerId == Uid.LastTransactionPersonId || temp.SiteId == 17)
+                            if (temp.JobWorkerId == Uid.LastTransactionPersonId || temp.SiteId == 1)
                             {
 
                                 Uid.LastTransactionDocId = temp.JobOrderCancelHeaderId;
@@ -1164,7 +1164,7 @@ namespace Jobs.Controllers
                             CancelLine.ProductUidCurrentGodownId = Uid.CurrenctGodownId;
 
 
-                            if (temp.JobWorkerId == Uid.LastTransactionPersonId || temp.SiteId == 17)
+                            if (temp.JobWorkerId == Uid.LastTransactionPersonId || temp.SiteId == 1)
                             {
 
                                 Uid.LastTransactionDocId = temp.JobOrderCancelHeaderId;

@@ -165,7 +165,8 @@ namespace Jobs.Controllers
                 return View("~/Views/Shared/InValidSettings.cshtml");
             }
 
-
+            var DivisionId = (int)System.Web.HttpContext.Current.Session["DivisionId"];
+            var SiteId = (int)System.Web.HttpContext.Current.Session["SiteId"];
 
             EmployeeViewModel p = new EmployeeViewModel();
             p.CalculationId = settings.CalculationId;
@@ -173,6 +174,10 @@ namespace Jobs.Controllers
             p.Code = new PersonService(_unitOfWork).GetMaxCode();
             p.LedgerAccountGroupId = settings.LedgerAccountGroupId;
             p.DateOfJoining = DateTime.Now;
+
+            p.DivisionId = DivisionId;
+            p.SiteId = SiteId;
+            p.DocTypeId = DocTypeId;
             //p.DateOfRelieving = DateTime.Now;
             PrepareViewBag();
             return View("Create", p);

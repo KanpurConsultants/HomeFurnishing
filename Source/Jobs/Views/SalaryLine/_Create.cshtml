@@ -89,6 +89,16 @@
 
                     <div class="col-md-6">
                         <div class="form-group">
+                            @Html.LabelFor(model => model.Advance, "Advance", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Advance, new { @class = "form-control col-xs-7 text-right required" })
+                                @Html.ValidationMessageFor(model => model.Advance, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
                             @Html.LabelFor(model => model.NetSalary, "Net Salary", new { @class = "control-label col-md-4 col-sm-2" })
                             <div class="col-md-7 col-sm-10">
                                 @Html.TextBoxFor(model => model.NetSalary, new { @class = "form-control col-xs-7 text-right required", @id = "Amount" })

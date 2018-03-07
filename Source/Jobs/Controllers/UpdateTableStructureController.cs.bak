@@ -178,7 +178,7 @@ namespace Module
             AddFields("JobInvoiceSettings", "isVisibleMfgDate", "BIT");
             AddFields("JobInvoiceSettings", "isVisibleFinancier", "BIT");
             AddFields("JobInvoiceSettings", "isVisibleRateDiscountPer", "BIT");
-            AddFields("JobInvoiceSettings", "isAllowedDuplicatePrint", "BIT","","true");
+            AddFields("JobInvoiceSettings", "isAllowedDuplicatePrint", "BIT NOT NULL DEFAULT(1)");
 
             AddFields("JobOrderSettings", "isVisibleFinancier", "BIT");
             AddFields("JobOrderSettings", "isVisibleSalesExecutive", "BIT");
@@ -905,6 +905,8 @@ namespace Module
 
             AddFields("JobInvoiceSettings", "IsVisibleCreditDays", "Bit");
 
+            AddFields("ProductBuyers", "Dimension1Id", "Int", "Dimension1");
+            AddFields("ProductBuyers", "Dimension2Id", "Int", "Dimension2");
             try
             {
                 if ((int)ExecuteScaler("SELECT Count(*) AS Cnt FROM INFORMATION_SCHEMA.Tables WHERE TABLE_NAME = 'ChargeGroupSettings'") == 0)
@@ -1516,7 +1518,7 @@ namespace Module
             AddFields("PackingSettings", "isVisibleProductUID", "BIT");
             AddFields("PackingSettings", "isVisibleShipMethod", "BIT");
             AddFields("PackingSettings", "filterProductDivision", "nvarchar(Max)");
-
+            AddFields("PackingSettings", "isAllowtoUpdateBuyerSpecification", "BIT");
 
             try
             {
@@ -1957,7 +1959,7 @@ namespace Module
             }
 
 
-            AddFields ("JobOrderSettings", "isVisibleLineUnitConversionFor", "BIT",null,"False");
+            AddFields ("JobOrderSettings", "isVisibleLineUnitConversionFor", "BIT NOT NULL DEFAULT(0)");
 
             AddFields("CalculationLineLedgerAccounts", "IsVisibleLedgerAccountDr", "BIT");
             AddFields("CalculationLineLedgerAccounts", "IsVisibleLedgerAccountCr", "BIT");
@@ -2844,6 +2846,7 @@ namespace Module
 	                        TaxPercentage       DECIMAL (18, 4),
 	                        WEF                 DATETIME NOT NULL,
 	                        Description         NVARCHAR (50),
+                            LedgerHeaderId      Int,
 	                        CONSTRAINT [PK_Web.ProductBuyerExtendeds] PRIMARY KEY (ProductBuyerId)
 	                        WITH (FILLFACTOR = 90),
 	                        CONSTRAINT [FK_Web.ProductBuyerExtendeds_Web.ProductBuyers_ProductBuyerId] FOREIGN KEY (ProductBuyerId) REFERENCES Web.ProductBuyers (ProductBuyerId),
@@ -3660,6 +3663,13 @@ namespace Module
             {
                 RecordError(ex);
             }
+
+
+            AddFields("Employees", "DateOfJoining", "DATETIME");
+            AddFields("Employees", "DateOfRelieving", "DATETIME");
+
+            AddFields("Employees", "WagesPayType", "nvarchar(10)");
+            AddFields("Employees", "PaymentType", "nvarchar(10)");
 
 
             ReCreateProcedures();

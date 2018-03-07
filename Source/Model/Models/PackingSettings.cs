@@ -37,6 +37,7 @@ namespace Model.Models
         public bool? isVisibleBaleNo { get; set; }
         public bool? isVisibleDealUnit { get; set; }
 
+        public bool? isAllowtoUpdateBuyerSpecification { get; set; }
         public bool? IsMandatoryStockIn { get; set; }
         public string filterProductTypes { get; set; }
         public string filterProductGroups { get; set; }

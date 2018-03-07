@@ -26,33 +26,35 @@ namespace Reports.Reports
 
         protected dsReport dsRep = new dsReport();
 
-        public byte[] DocumentPrint(List<string> QueryList, string UserName, string ReportFileType = ReportFileTypeConstants.PDF)
+        public byte[] DocumentPrint_New(List<ListofQuery> QueryList, string UserName, string ReportFileType = ReportFileTypeConstants.PDF)
         {
-            var DataTableList = new List<DataTable>();
+            List<ListofDataTable> DataTableList = new List<ListofDataTable>();
             DataTable Dt = new DataTable();
-            
+
             SqlConnection Con = new SqlConnection((string)System.Web.HttpContext.Current.Session["DefaultConnectionString"]);
 
-            foreach ( string mQry in QueryList )
+            foreach (ListofQuery mQry in QueryList)
             {
 
 
-                if (mQry != "")
+                if (mQry.Query != "")
                 {
-
-                    SqlDataAdapter sqlDataAapter1 = new SqlDataAdapter(mQry, Con);
+                    ListofDataTable DataTableL = new ListofDataTable();
+                    SqlDataAdapter sqlDataAapter1 = new SqlDataAdapter(mQry.Query, Con);
                     dsRep.EnforceConstraints = false;
                     Dt.Reset();
 
                     sqlDataAapter1.Fill(Dt);
-
+                    string s = nameof(mQry);
                     DataTable SubDataTable = new DataTable();
                     SubDataTable = Dt.Copy();
 
 
                     if (Dt.Rows.Count > 0)
                     {
-                        DataTableList.Add(SubDataTable);
+                        DataTableL.DataTable = SubDataTable;
+                        DataTableL.DataTableName = mQry.QueryName;
+                        DataTableList.Add(DataTableL);
                     }
                     SubDataTable.Dispose();
 
@@ -67,11 +69,11 @@ namespace Reports.Reports
 
 
             string mimtype;
-            ReportGenerateService c = new ReportGenerateService();
+            ReportGenerateService_New c = new ReportGenerateService_New();
 
 
             string mimetype = "";
-            return c.ReportGenerateDirect(DataTableList, out mimtype, ReportFileTypeConstants.PDF, null,null, UserName);
+            return c.ReportGenerateNew(DataTableList, out mimtype, ReportFileTypeConstants.PDF, null, null, UserName);
 
         }
 
@@ -356,7 +358,11 @@ namespace Reports.Reports
 
     }
 
-
+    public class ListofQuery
+    {
+        public string Query;
+        public string QueryName;
+    }
     public class PdfMerger
     {
         /// <summary>

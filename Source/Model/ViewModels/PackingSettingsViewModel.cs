@@ -41,6 +41,8 @@ namespace Model.ViewModel
         public bool isVisibleProductInvoiceGroup { get; set; }
         public bool isVisibleSaleDeliveryOrder { get; set; }
 
+        public bool isAllowtoUpdateBuyerSpecification { get; set; }
+
         public string filterProductTypes { get; set; }
         public string filterProductGroups { get; set; }
         public string filterProducts { get; set; }

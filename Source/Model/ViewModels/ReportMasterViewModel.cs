@@ -29,7 +29,9 @@ namespace Model.ViewModels
         public string UnitColumnCaption { get; set; }
         public string DealQtyColumnCaption { get; set; }
         public string DealUnitColumnCaption { get; set; }
-        
+
+        public string SiteName { get; set; }
+        public string DivisionName { get; set; }
 
     }
 

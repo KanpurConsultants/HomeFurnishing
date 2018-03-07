@@ -10,22 +10,25 @@
             </div>
             <div class="block" style="width: 90%;">
                 <div class="row">
-                    <div class="block" style="width:25%; ">
+                    <div class="block" style="width:18%; ">
                         Employee
                     </div>
-                    <div class="text-right block" style="width: 15%;">
+                    <div class="text-right block" style="width: 12%;">
                         Days
                     </div>
-                    <div class="text-right block" style="width: 15%;">
+                    <div class="text-right block" style="width: 12%;">
                         Additions
                     </div>
-                    <div class="text-right block" style="width: 15%;">
+                    <div class="text-right block" style="width: 12%;">
                         Deductions
                     </div>
-                    <div class="text-right block" style="width: 15%;">
+                    <div class="text-right block" style="width: 12%;">
                         Loan EMI
                     </div>
-                    <div class="text-right block" style="width: 15%;">
+                    <div class="text-right block" style="width: 12%;">
+                        Advance
+                    </div>
+                    <div class="text-right block" style="width: 12%;">
                         Net Salary
                     </div>
                 </div>
@@ -83,22 +86,25 @@
                 <div class='row-index block' style='width:5%'>@srno<input type='hidden' class='id' value='@item.SalaryLineId' /></div>
                 <div class='block navbody' style='width:90%'>
                     <div class='row'>
-                        <div class="block" style='width:25%'>
+                        <div class="block" style='width:18%'>
                             <strong> @item.EmployeeName </strong>
                         </div>
-                        <div class='text-right block' style='width:15%'>
+                        <div class='text-right block' style='width:12%'>
                             @Math.Round(item.Days, 0)
                         </div>
-                        <div class='text-right block' style='width:15%'>
+                        <div class='text-right block' style='width:12%'>
                             @Math.Round(item.OtherAddition ?? 0, 2)
                         </div>
-                        <div class='text-right block' style='width:15%'>
+                        <div class='text-right block' style='width:12%'>
                             @Math.Round(item.OtherDeduction ?? 0, 2)
                         </div>
-                        <div class='text-right block' style='width:15%'>
+                        <div class='text-right block' style='width:12%'>
                             @Math.Round(item.LoanEMI ?? 0, 2)
                         </div>
-                        <div class='text-right block' style='width:15%'>
+                        <div class='text-right block' style='width:12%'>
+                            @Math.Round(item.Advance ?? 0, 2)
+                        </div>
+                        <div class='text-right block' style='width:12%'>
                             @Math.Round(item.NetSalary, 2)
                         </div>
                     </div>

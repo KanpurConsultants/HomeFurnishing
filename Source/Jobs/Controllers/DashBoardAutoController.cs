@@ -36,13 +36,6 @@ namespace Module
             JsonResult json = Json(new { Success = true, Data = VehicleProfit }, JsonRequestBehavior.AllowGet);
             return json;
         }
-        public JsonResult GetVehicleOutstanding()
-        {
-            IEnumerable<DashBoardOutstanding> VehicleOutstanding = _DashBoardAutoService.GetVehicleOutstanding();
-
-            JsonResult json = Json(new { Success = true, Data = VehicleOutstanding }, JsonRequestBehavior.AllowGet);
-            return json;
-        }
         public JsonResult GetVehicleStock()
         {
             IEnumerable<DashBoardStock> VehicleStock = _DashBoardAutoService.GetVehicleStock();
@@ -53,62 +46,92 @@ namespace Module
 
 
 
-        public JsonResult GetSpareSale()
+        public JsonResult GetExpense()
         {
-            IEnumerable<DashBoardSale> SpareSale = _DashBoardAutoService.GetSpareSale();
+            IEnumerable<DashBoardExpense> Expense = _DashBoardAutoService.GetExpense();
 
-            JsonResult json = Json(new { Success = true, Data = SpareSale }, JsonRequestBehavior.AllowGet);
-            return json;
-        }
-        public JsonResult GetSpareProfit()
-        {
-            IEnumerable<DashBoardProfit> SpareProfit = _DashBoardAutoService.GetSpareProfit();
-
-            JsonResult json = Json(new { Success = true, Data = SpareProfit }, JsonRequestBehavior.AllowGet);
-            return json;
-        }
-        public JsonResult GetSpareOutstanding()
-        {
-            IEnumerable<DashBoardOutstanding> SpareOutstanding = _DashBoardAutoService.GetSpareOutstanding();
-
-            JsonResult json = Json(new { Success = true, Data = SpareOutstanding }, JsonRequestBehavior.AllowGet);
-            return json;
-        }
-        public JsonResult GetSpareStock()
-        {
-            IEnumerable<DashBoardStock> SpareStock = _DashBoardAutoService.GetSpareStock();
-
-            JsonResult json = Json(new { Success = true, Data = SpareStock }, JsonRequestBehavior.AllowGet);
+            JsonResult json = Json(new { Success = true, Data = Expense }, JsonRequestBehavior.AllowGet);
             return json;
         }
 
-
-        public JsonResult GetChartData()
+        public JsonResult GetDebtors()
         {
-            IEnumerable<DashBoardChartData> ChartData = _DashBoardAutoService.GetChartData();
+            IEnumerable<DashBoardDebtors> Debtors = _DashBoardAutoService.GetDebtors();
 
-            JsonResult json = Json(new { Success = true, Data = ChartData }, JsonRequestBehavior.AllowGet);
+            JsonResult json = Json(new { Success = true, Data = Debtors }, JsonRequestBehavior.AllowGet);
             return json;
         }
 
-        public JsonResult GetPieChartData()
+        public JsonResult GetCreditors()
         {
-            IEnumerable<DashBoardPieChartData> PieChartData = _DashBoardAutoService.GetPieChartData();
+            IEnumerable<DashBoardCreditors> Creditors = _DashBoardAutoService.GetCreditors();
 
-            JsonResult json = Json(new { Success = true, Data = PieChartData }, JsonRequestBehavior.AllowGet);
+            JsonResult json = Json(new { Success = true, Data = Creditors }, JsonRequestBehavior.AllowGet);
+            return json;
+        }
+
+        public JsonResult GetBankBalance()
+        {
+            IEnumerable<DashBoardBankBalance> BankBalance = _DashBoardAutoService.GetBankBalance();
+
+            JsonResult json = Json(new { Success = true, Data = BankBalance }, JsonRequestBehavior.AllowGet);
+            return json;
+        }
+
+        public JsonResult GetCashBalance()
+        {
+            IEnumerable<DashBoardCashBalance> CashBalance = _DashBoardAutoService.GetCashBalance();
+
+            JsonResult json = Json(new { Success = true, Data = CashBalance }, JsonRequestBehavior.AllowGet);
+            return json;
+        }
+
+
+
+
+
+
+
+
+        public JsonResult GetVehicleSalePieChartData()
+        {
+            IEnumerable<DashBoardPieChartData> VehiclePieChartData = _DashBoardAutoService.GetVehicleSalePieChartData();
+
+            JsonResult json = Json(new { Success = true, Data = VehiclePieChartData }, JsonRequestBehavior.AllowGet);
             return json;
         }
 
         public JsonResult GetVehicleSaleChartData()
         {
-            IEnumerable<DashBoardVehicleSaleChartData> VehicleSaleChartData = _DashBoardAutoService.GetVehicleSaleChartData();
+            IEnumerable<DashBoardSaleBarChartData> VehicleSaleChartData = _DashBoardAutoService.GetVehicleSaleBarChartData();
 
             JsonResult json = Json(new { Success = true, Data = VehicleSaleChartData }, JsonRequestBehavior.AllowGet);
             return json;
         }
+        public JsonResult GetSpareSalePieChartData()
+        {
+            IEnumerable<DashBoardPieChartData> SparePieChartData = _DashBoardAutoService.GetSpareSalePieChartData();
+
+            JsonResult json = Json(new { Success = true, Data = SparePieChartData }, JsonRequestBehavior.AllowGet);
+            return json;
+        }
+        public JsonResult GetSpareSaleChartData()
+        {
+            IEnumerable<DashBoardSaleBarChartData> SpareSaleChartData = _DashBoardAutoService.GetSpareSaleBarChartData();
+
+            JsonResult json = Json(new { Success = true, Data = SpareSaleChartData }, JsonRequestBehavior.AllowGet);
+            return json;
+        }
 
 
+
+
+        public JsonResult GetVehicleSaleDetailFinancierWise()
+        {
+            IEnumerable<DashBoardSaleDetailFinancierWise> DashBoardSaleDetailFinancierWise = _DashBoardAutoService.GetVehicleSaleDetailFinancierWise();
+
+            JsonResult json = Json(new { Success = true, Data = DashBoardSaleDetailFinancierWise }, JsonRequestBehavior.AllowGet);
+            return json;
+        }
     }   
-
-
 }

@@ -2661,9 +2661,10 @@ namespace Jobs.Controllers
 
                                     if (Settings.SqlProcDocumentPrint == null || Settings.SqlProcDocumentPrint == "")
                                     {
-                                        List<string> QueryList = new List<string>();
-                                        QueryList = DocumentPrintData(item);
-                                        Pdf = drp.DocumentPrint(QueryList, User.Identity.Name);
+                                        //List<string> QueryList = new List<string>();
+                                        //QueryList = DocumentPrintData(item);
+                                        //Pdf = drp.DocumentPrint(QueryList, User.Identity.Name);
+                                        Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint, User.Identity.Name, item);
                                     }
                                     else
                                     Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint, User.Identity.Name, item);
@@ -2674,9 +2675,10 @@ namespace Jobs.Controllers
                                 {
                                     if (Settings.SqlProcDocumentPrint_AfterSubmit == null || Settings.SqlProcDocumentPrint_AfterSubmit == "")
                                     {
-                                        List<string> QueryList = new List<string>();
-                                        QueryList = DocumentPrintData(item);
-                                        Pdf = drp.DocumentPrint(QueryList, User.Identity.Name);
+                                        //List<string> QueryList = new List<string>();
+                                        //QueryList = DocumentPrintData(item);
+                                        //Pdf = drp.DocumentPrint(QueryList, User.Identity.Name);
+                                        Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint_AfterSubmit, User.Identity.Name, item);
                                     }
                                     else
                                         Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint_AfterSubmit, User.Identity.Name, item);
@@ -2687,9 +2689,10 @@ namespace Jobs.Controllers
                                 {
                                     if (Settings.SqlProcDocumentPrint_AfterApprove == null || Settings.SqlProcDocumentPrint_AfterApprove == "")
                                     {
-                                        List<string> QueryList = new List<string>();
-                                        QueryList = DocumentPrintData(item);
-                                        Pdf = drp.DocumentPrint(QueryList, User.Identity.Name);
+                                        //List<string> QueryList = new List<string>();
+                                        //QueryList = DocumentPrintData(item);
+                                        //Pdf = drp.DocumentPrint(QueryList, User.Identity.Name);
+                                        Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint_AfterApprove, User.Identity.Name, item);
                                     }
                                     else
                                         Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint_AfterApprove, User.Identity.Name, item);
@@ -3137,9 +3140,10 @@ namespace Jobs.Controllers
 
                                     if (Settings.SqlProcDocumentPrint == null || Settings.SqlProcDocumentPrint == "")
                                     {
-                                        List<string> QueryList = new List<string>();
-                                        QueryList = DocumentPrintData(item);
-                                        Pdf = drp.DocumentPrint(QueryList, User.Identity.Name);
+                                        //List<string> QueryList = new List<string>();
+                                        //QueryList = DocumentPrintData(item);
+                                        //Pdf = drp.DocumentPrint(QueryList, User.Identity.Name);
+                                        Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint, User.Identity.Name, item);
                                     }
                                     else
                                         Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint, User.Identity.Name, item);
@@ -3150,9 +3154,10 @@ namespace Jobs.Controllers
                                 {
                                     if (Settings.SqlProcDocumentPrint_AfterSubmit == null || Settings.SqlProcDocumentPrint_AfterSubmit == "")
                                     {
-                                        List<string> QueryList = new List<string>();
-                                        QueryList = DocumentPrintData(item);
-                                        Pdf = drp.DocumentPrint(QueryList, User.Identity.Name);
+                                        //List<string> QueryList = new List<string>();
+                                        //QueryList = DocumentPrintData(item);
+                                        //Pdf = drp.DocumentPrint(QueryList, User.Identity.Name);
+                                        Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint_AfterSubmit, User.Identity.Name, item);
                                     }
                                     else
                                         Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint_AfterSubmit, User.Identity.Name, item);
@@ -3163,9 +3168,10 @@ namespace Jobs.Controllers
                                 {
                                     if (Settings.SqlProcDocumentPrint_AfterApprove == null || Settings.SqlProcDocumentPrint_AfterApprove == "")
                                     {
-                                        List<string> QueryList = new List<string>();
-                                        QueryList = DocumentPrintData(item);
-                                        Pdf = drp.DocumentPrint(QueryList, User.Identity.Name);
+                                        //List<string> QueryList = new List<string>();
+                                        //QueryList = DocumentPrintData(item);
+                                        //Pdf = drp.DocumentPrint(QueryList, User.Identity.Name);
+                                        Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint_AfterApprove, User.Identity.Name, item);
                                     }
                                     else
                                         Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint_AfterApprove, User.Identity.Name, item);

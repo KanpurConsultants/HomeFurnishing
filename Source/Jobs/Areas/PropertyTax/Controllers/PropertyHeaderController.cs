@@ -800,9 +800,7 @@ namespace Jobs.Areas.PropertyTax.Controllers
 
         public ActionResult GIS()
         {
-            return Redirect("http://localhost:1779/Default.aspx");
-
-            //return View();
+            return Redirect(System.Configuration.ConfigurationManager.AppSettings["PropertyTaxGISURL"]);
         }
 
         [HttpPost]

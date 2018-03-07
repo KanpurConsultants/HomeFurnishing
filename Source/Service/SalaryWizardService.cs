@@ -20,6 +20,7 @@ namespace Service
     {
         IEnumerable<SalaryWizardResultViewModel> GetSalaryDetail(SalaryWizardViewModel vm);
         IEnumerable<LoanLedgerIdList> GetLoanList(int LedgerAccountId);
+        IEnumerable<AdvanceLedgerIdList> GetAdvanceList(int LedgerAccountId);
     }
 
     public class SalaryWizardService : ISalaryWizardService
@@ -41,7 +42,7 @@ namespace Service
             SqlParameter SqlParameterWagesPayType = new SqlParameter("@WagesPayType", (vm.WagesPayType == null) ? DBNull.Value : (object)vm.WagesPayType);
 
             mQry = @"SELECT E.EmployeeId, P.Name+','+P.Suffix AS EmployeeName, Convert(int,P.Code) AS Code, Convert(Decimal(18,4),DAY(EOMONTH(@DocDate))) - IsNull(VSunday.NoOfSundays,0) AS Days, 0.00 AS Additions, 0.00 AS Deductions, 
-                    IsNull(VAdvance.LoanEMI,0) AS LoanEMI, @DocDate As DocDate, 
+                    IsNull(VLoan.LoanEMI,0) AS LoanEMI, IsNull(VAdvance.Advance,0) AS Advance, @DocDate As DocDate, 
                     @DocTypeId As DocTypeId, @Remark As HeaderRemark, Convert(Decimal(18,4),DAY(EOMONTH(@DocDate))) - IsNull(VSunday.NoOfSundays,0) AS MonthDays
                     FROM Web.Employees E
                     LEFT JOIN Web.People P ON E.PersonID = P.PersonID
@@ -72,7 +73,24 @@ namespace Service
 		                    FROM Web.LedgerAdjs La
 		                    GROUP BY La.DrLedgerId
 	                    ) AS VAdj ON L.LedgerId = VAdj.DrLedgerId
-	                    WHERE D.DocumentTypeName = '" + Jobs.Constants.DocumentType.DocumentTypeConstants.LoansAndAdvances.DocumentTypeName + "'" + @"
+	                    WHERE D.DocumentTypeName = '" + Jobs.Constants.DocumentType.DocumentTypeConstants.Loans.DocumentTypeName + "'" + @"
+                        AND IsNull(L.AmtDr,0) - IsNull(VAdj.AdjustedAmount,0) > 0
+	                    GROUP BY E.EmployeeId
+                    ) AS VLoan ON E.EmployeeId = VLoan.EmployeeId
+                    LEFT JOIN (
+	                    SELECT E.EmployeeId, Sum(IsNull(L.AmtDr,0) - IsNull(VAdj.AdjustedAmount,0)) AS Advance, Min(L.LedgerId) As LoanLedgerId
+	                    FROM Web.Employees E
+	                    LEFT JOIN Web.LedgerAccounts A ON E.PersonID = A.PersonId
+	                    LEFT JOIN Web.Ledgers L ON A.LedgerAccountId = L.LedgerAccountId
+	                    LEFT JOIN Web.LedgerLines LL ON L.LedgerLineId = LL.LedgerLineId
+	                    LEFT JOIN Web.LedgerHeaders H ON L.LedgerHeaderId = H.LedgerHeaderId
+	                    LEFT JOIN Web.DocumentTypes D ON H.DocTypeId = D.DocumentTypeId
+	                    LEFT JOIN (
+		                    SELECT La.DrLedgerId, Sum(La.Amount) AS AdjustedAmount
+		                    FROM Web.LedgerAdjs La
+		                    GROUP BY La.DrLedgerId
+	                    ) AS VAdj ON L.LedgerId = VAdj.DrLedgerId
+	                    WHERE D.DocumentTypeName = '" + Jobs.Constants.DocumentType.DocumentTypeConstants.Advances.DocumentTypeName + "'" + @"
                         AND IsNull(L.AmtDr,0) - IsNull(VAdj.AdjustedAmount,0) > 0
 	                    GROUP BY E.EmployeeId
                     ) AS VAdvance ON E.EmployeeId = VAdvance.EmployeeId
@@ -104,7 +122,7 @@ namespace Service
 		                    GROUP BY La.DrLedgerId
 	                    ) AS VAdj ON L.LedgerId = VAdj.DrLedgerId
 	                    WHERE L.LedgerAccountId = @LedgerAccountId
-                        And D.DocumentTypeName = '" + Jobs.Constants.DocumentType.DocumentTypeConstants.LoansAndAdvances.DocumentTypeName + "'" + @"
+                        And D.DocumentTypeName = '" + Jobs.Constants.DocumentType.DocumentTypeConstants.Loans.DocumentTypeName + "'" + @"
                         AND IsNull(L.AmtDr,0) - IsNull(VAdj.AdjustedAmount,0) > 0 ";
 
             IEnumerable<LoanLedgerIdList> SalaryWizardResultViewModel = db.Database.SqlQuery<LoanLedgerIdList>(mQry, SqlParameterLedgerAccountId).ToList();
@@ -113,6 +131,29 @@ namespace Service
         }
 
 
+
+        public IEnumerable<AdvanceLedgerIdList> GetAdvanceList(int LedgerAccountId)
+        {
+            SqlParameter SqlParameterLedgerAccountId = new SqlParameter("@LedgerAccountId", LedgerAccountId);
+
+            mQry = @"SELECT L.LedgerId, IsNull(L.AmtDr,0) - IsNull(VAdj.AdjustedAmount,0) As Amount
+	                    FROM Web.Ledgers L 
+	                    LEFT JOIN Web.LedgerLines LL ON L.LedgerLineId = LL.LedgerLineId
+	                    LEFT JOIN Web.LedgerHeaders H ON L.LedgerHeaderId = H.LedgerHeaderId
+	                    LEFT JOIN Web.DocumentTypes D ON H.DocTypeId = D.DocumentTypeId
+	                    LEFT JOIN (
+		                    SELECT La.DrLedgerId, Sum(La.Amount) AS AdjustedAmount
+		                    FROM Web.LedgerAdjs La
+		                    GROUP BY La.DrLedgerId
+	                    ) AS VAdj ON L.LedgerId = VAdj.DrLedgerId
+	                    WHERE L.LedgerAccountId = @LedgerAccountId
+                        And D.DocumentTypeName = '" + Jobs.Constants.DocumentType.DocumentTypeConstants.Advances.DocumentTypeName + "'" + @"
+                        AND IsNull(L.AmtDr,0) - IsNull(VAdj.AdjustedAmount,0) > 0 ";
+
+            IEnumerable<AdvanceLedgerIdList> SalaryWizardResultViewModel = db.Database.SqlQuery<AdvanceLedgerIdList>(mQry, SqlParameterLedgerAccountId).ToList();
+
+            return SalaryWizardResultViewModel;
+        }
 
         public void Dispose()
         {
@@ -132,10 +173,17 @@ namespace Service
         public Decimal Additions { get; set; }
         public Decimal Deductions { get; set; }
         public Decimal LoanEMI { get; set; }
+        public Decimal Advance { get; set; }
         public string HeaderRemark { get; set; }
     }
 
     public class LoanLedgerIdList
+    {
+        public int LedgerId { get; set; }
+        public Decimal Amount { get; set; }
+    }
+
+    public class AdvanceLedgerIdList
     {
         public int LedgerId { get; set; }
         public Decimal Amount { get; set; }

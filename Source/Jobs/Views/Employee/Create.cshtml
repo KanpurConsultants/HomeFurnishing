@@ -28,6 +28,8 @@
     @Html.HiddenFor(m=>m.CreatedBy)
     @Html.HiddenFor(m=>m.CreatedDate)
     @Html.HiddenFor(m=>m.DocTypeId)
+    @Html.HiddenFor(m => m.SiteId)
+    @Html.HiddenFor(m => m.DivisionId)
     @Html.HiddenFor(m=>m.CalculationId)
     @Html.HiddenFor(m=>m.ImageFileName)
     @Html.HiddenFor(m=>m.ImageFolderName)
@@ -571,7 +573,7 @@
     if(id==null||id==0)
     {
         $(function(){
-            AddCalculationFields(parseInt($('#EmployeeId').val()), false, '@Model.CalculationId', "Web.EmployeeCharges", "Web.EmployeeLineCharges", 0,0, 0,0);
+            AddCalculationFields(parseInt($('#EmployeeId').val()), false, '@Model.CalculationId', "Web.EmployeeCharges", "Web.EmployeeLineCharges", 0,$("#DocTypeId").val(), $("#SiteId").val(),$("#DivisionId").val());
         })
     }
     else{

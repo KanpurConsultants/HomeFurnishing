@@ -757,7 +757,7 @@ namespace Jobs.Controllers
                 }
 
 
-                //Then find all the Purchase Order Header Line associated with the above ProductType.
+                
                 //var SalaryLine = new SalaryLineService(_unitOfWork).GetSalaryLineforDelete(vm.id);
                 var SalaryLine = (from p in db.SalaryLine
                                     where p.SalaryHeaderId == vm.id

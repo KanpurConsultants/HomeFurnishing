@@ -105,6 +105,12 @@ namespace Jobs.Controllers
 
             vm.ReportHeaderCompanyDetail = new GridReportService().GetReportHeaderCompanyDetail();
 
+            var DivisionId = (int)System.Web.HttpContext.Current.Session["DivisionId"];
+            var SiteId = (int)System.Web.HttpContext.Current.Session["SiteId"];
+
+            vm.SiteName = db.Site.Find(SiteId).SiteName;
+            vm.DivisionName = db.Divisions.Find(DivisionId).DivisionName;
+
             return View(vm);
         }
 
