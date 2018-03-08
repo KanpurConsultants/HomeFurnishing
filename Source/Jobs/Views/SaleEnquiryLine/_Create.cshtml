@@ -16,6 +16,7 @@
 
             @Html.HiddenFor(model => model.SaleEnquiryHeaderId)
             @Html.HiddenFor(m => m.SaleEnquiryLineId)
+            @Html.HiddenFor(m => m.GeneratedSaleOrderLineId)
             @Html.HiddenFor(m => m.LockReason)
 
             @Html.AntiForgeryToken()
@@ -301,6 +302,16 @@
 
 
 
+
+        var GeneratedSaleOrderLineId=@Model.GeneratedSaleOrderLineId;
+        if(GeneratedSaleOrderLineId>0)
+        {
+            $('#ProductId').attr('readonly','true');
+            $('#Qty').attr('readonly','true');
+            $('#DealQty').attr('readonly','true');
+            $('#DealUnitId').attr('readonly','true');
+            $('#UnitConversionMultiplier').attr('readonly','true');
+        }
 
         var id=@Model.SaleEnquiryLineId;
         $('#delete','.modal-content').click(function (e) {

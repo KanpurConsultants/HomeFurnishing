@@ -66,40 +66,51 @@
 
 <div class="row">
     <div class="col-md-6" id="VehicleSaleDetail" style="display:none">
-        <div class="nav-tabs-custom">
-            <ul class="nav nav-tabs pull-right">
-                <li class="active"><a href="#VehicleSaleDetailFinancierWise" data-toggle="tab">Financier Wise</a></li>
-                <li><a href="#VehicleSaleDetailAgentWise" data-toggle="tab">Agent Wise</a></li>
+        <div class="nav-tabs-custom ">
+            <ul class="nav nav-tabs pull-right ">
                 <li class="pull-left header"><i class="fa fa-inbox"></i> Vehicle Sale Detail</li>
+                <li class="pull-right header"><button type="button" id="VehicleSaleDetailClose" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button></li>
+                <li class="active"><a href="#VehicleSaleDetailFinancierWise" data-toggle="tab">Financier</a></li>
+                <li><a href="#VehicleSaleDetailSalesManWise" data-toggle="tab">Sales Man</a></li>
+                <li><a href="#VehicleSaleDetailProductTypeWise" data-toggle="tab">Type</a></li>
             </ul>
             <div class="tab-content no-padding">
                 <div class="chart tab-pane active" id="VehicleSaleDetailFinancierWise" style="position: relative; height: 300px;"></div>
-                <div class="chart tab-pane" id="VehicleSaleDetailAgentWise" style="position: relative; height: 300px;"></div>
+                <div class="chart tab-pane" id="VehicleSaleDetailSalesManWise" style="position: relative; height: 300px;"></div>
+                <div class="chart tab-pane" id="VehicleSaleDetailProductTypeWise" style="position: relative; height: 300px;"></div>
             </div>
         </div>
     </div>
-
-    <div class="col-md-6" id="BankBalanceDetail" style="display:none">
-        <div class="box box-default">
-            <div class="box-header with-border">
-                <h3 class="box-title">Bank Balance Detail<span style="font-size:x-small">  [In Crore]</span></h3>
-                <div class="box-tools pull-right">
-                    <button type="button" class="btn btn-box-tool" data-widget="collapse">
-                        <i class="fa fa-minus"></i>
-                    </button>
-                    <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-                </div>
+    <div class="col-md-6" id="VehicleProfitDetail" style="display:none">
+        <div class="nav-tabs-custom">
+            <ul class="nav nav-tabs pull-right">
+                <li class="pull-left header"><i class="fa fa-inbox"></i> Vehicle Profit Detail</li>
+                <li><button type="button" id="VehicleProfitDetailClose" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button></li>
+            </ul>
+            <div class="tab-content no-padding">
+                <div class="chart tab-pane active" id="VehicleProfitDetailTable" style="position: relative; height: 300px;"></div>
             </div>
-            <div class="box-body">
-                <div class="row">
-                    @*<div class="col-md-8">
-                        <div class="chart-responsive">
-                            <canvas id="pieChart" height="150"></canvas>
-                        </div>
-                    </div>
-                    <div class="col-md-4" id="PieChartHint">
-                    </div>*@
-                </div>
+        </div>
+    </div>
+    <div class="col-md-6" id="DebtorsDetail" style="display:none">
+        <div class="nav-tabs-custom">
+            <ul class="nav nav-tabs pull-right">
+                <li class="pull-left header"><i class="fa fa-inbox"></i> Debtors Detail</li>
+                <li><button type="button" id="DebtorsDetailClose" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button></li>
+            </ul>
+            <div class="tab-content no-padding">
+                <div class="chart tab-pane active" id="DebtorsDetailTable" style="position: relative; height: 300px;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6" id="BankBalanceDetail" style="display:none">
+        <div class="nav-tabs-custom">
+            <ul class="nav nav-tabs pull-right">
+                <li class="pull-left header"><i class="fa fa-inbox"></i> Bank Balance Detail</li>
+                <li><button type="button" id="BankBalanceDetailClose" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button></li>
+            </ul>
+            <div class="tab-content no-padding">
+                <div class="chart tab-pane active" id="BankBalanceDetailTable" style="position: relative; height: 300px;"></div>
             </div>
         </div>
     </div>
@@ -115,7 +126,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-3 col-sm-6 col-xs-12" id="ExpenseSummary" >
+    <div class="col-md-3 col-sm-6 col-xs-12" id="ExpenseSummary">
         <div class="info-box">
             <span class="info-box-icon bg-red"><i class="fa fa-google-plus"></i></span>
             <div class="info-box-content">
@@ -125,7 +136,7 @@
         </div>
     </div>
     <div class="clearfix visible-sm-block"></div>
-    <div class="col-md-3 col-sm-6 col-xs-12" id="CreditorsSummary" >
+    <div class="col-md-3 col-sm-6 col-xs-12" id="CreditorsSummary">
         <div class="info-box">
             <span class="info-box-icon bg-green"><i class="ion ion-ios-cart-outline"></i></span>
             <div class="info-box-content">
@@ -134,7 +145,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-3 col-sm-6 col-xs-12" id="CashBalanceSummary" >
+    <div class="col-md-3 col-sm-6 col-xs-12" id="CashBalanceSummary">
         <div class="info-box">
             <span class="info-box-icon bg-yellow"><i class="ion ion-ios-people-outline"></i></span>
             <div class="info-box-content">
@@ -144,6 +155,56 @@
         </div>
     </div>
 </div>
+
+
+
+<div class="row">
+    <div class="col-md-6" id="VehicleStockDetail" style="display:none">
+        <div class="nav-tabs-custom">
+            <ul class="nav nav-tabs pull-right">
+                <li class="pull-left header"><i class="fa fa-inbox"></i> Vehicle Stock Detail</li>
+                <li><button type="button" id="VehicleStockDetailClose" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button></li>
+            </ul>
+            <div class="tab-content no-padding">
+                <div class="chart tab-pane active" id="VehicleStockDetailTable" style="position: relative; height: 300px;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6" id="ExpenseDetail" style="display:none">
+        <div class="nav-tabs-custom">
+            <ul class="nav nav-tabs pull-right">
+                <li class="pull-left header"><i class="fa fa-inbox"></i> Expense Detail</li>
+                <li><button type="button" id="ExpenseDetailClose" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button></li>
+            </ul>
+            <div class="tab-content no-padding">
+                <div class="chart tab-pane active" id="ExpenseDetailTable" style="position: relative; height: 300px;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6" id="CreditorsDetail" style="display:none">
+        <div class="nav-tabs-custom">
+            <ul class="nav nav-tabs pull-right">
+                <li class="pull-left header"><i class="fa fa-inbox"></i> Creditors Detail</li>
+                <li><button type="button" id="CreditorsDetailClose" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button></li>
+            </ul>
+            <div class="tab-content no-padding">
+                <div class="chart tab-pane active" id="CreditorsDetailTable" style="position: relative; height: 300px;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6" id="CashBalanceDetail" style="display:none">
+        <div class="nav-tabs-custom">
+            <ul class="nav nav-tabs pull-right">
+                <li class="pull-left header"><i class="fa fa-inbox"></i> Cash Balance Detail</li>
+                <li><button type="button" id="CashBalanceDetailClose" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button></li>
+            </ul>
+            <div class="tab-content no-padding">
+                <div class="chart tab-pane active" id="CashBalanceDetailTable" style="position: relative; height: 300px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <div class="row">
     <div class="col-md-6">
@@ -289,13 +350,38 @@
     <script src="~/AdminLTE/plugins/flot/js/jquery.flot.image.js"></script>*@
 
 <script type="text/javascript">
-    $('#VehicleSaleSummary').click(function () {
+    function Expand_Detail(Summary_DivId, Detail_DivId) {
+        $(Summary_DivId).click(function () {
+            var IsVisibleDiv = $(Detail_DivId).is(":visible");
+            $(Detail_DivId).slideToggle();
 
-        $('#VehicleSaleDetail').slideToggle();
+            if (IsVisibleDiv == false)
+            {
+                $('html, body').animate({
+                    scrollTop: $(Detail_DivId).offset().top
+                }, 1000);
+            }
+        });
+    }
 
-        $('html, body').animate({
-            scrollTop: $("#VehicleSaleDetail").offset().top
-        }, 1000);
-    });
+    Expand_Detail('#VehicleSaleSummary', "#VehicleSaleDetail")
+    Expand_Detail('#VehicleProfitSummary', "#VehicleProfitDetail")
+    Expand_Detail('#DebtorsSummary', "#DebtorsDetail")
+    Expand_Detail('#BankBalanceSummary', "#BankBalanceDetail")
+
+    Expand_Detail('#VehicleStockSummary', "#VehicleStockDetail")
+    Expand_Detail('#ExpenseSummary', "#ExpenseDetail")
+    Expand_Detail('#CreditorsSummary', "#CreditorsDetail")
+    Expand_Detail('#CashBalanceSummary', "#CashBalanceDetail")
+
+    Expand_Detail('#VehicleSaleDetailClose', "#VehicleSaleDetail")
+    Expand_Detail('#VehicleProfitDetailClose', "#VehicleProfitDetail")
+    Expand_Detail('#DebtorsDetailClose', "#DebtorsDetail")
+    Expand_Detail('#BankBalanceDetailClose', "#BankBalanceDetail")
+
+    Expand_Detail('#VehicleStockDetailClose', "#VehicleStockDetail")
+    Expand_Detail('#ExpenseDetailClose', "#ExpenseDetail")
+    Expand_Detail('#CreditorsDetailClose', "#CreditorsDetail")
+    Expand_Detail('#CashBalanceDetailClose', "#CashBalanceDetail")
 </script>
 

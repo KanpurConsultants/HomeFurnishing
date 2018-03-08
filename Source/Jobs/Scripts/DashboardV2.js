@@ -321,17 +321,16 @@
 
 });
 
+//----------------------Set Single Value------------------------------------------------
 
-
-function GetVehicleSale()
-{
+function SetSingleValue(functionname, Div_Id) {
     $.ajax({
         async: false,
         cache: false,
         type: "POST",
-        url: '/DashBoardAuto/GetVehicleSale',
+        url: '/DashBoardAuto/' + functionname,
         success: function (result) {
-            $('#VehicleSaleAmount').text(result.Data[0].SaleAmount);
+            $(Div_Id).text(result.Data[0].Value);
         },
         error: function (xhr, ajaxOptions, thrownError) {
             alert('Failed to retrieve product details.' + thrownError);
@@ -339,131 +338,29 @@ function GetVehicleSale()
     });
 }
 
-function GetVehicleProfit() {
-    $.ajax({
-        async: false,
-        cache: false,
-        type: "POST",
-        url: '/DashBoardAuto/GetVehicleProfit',
-        success: function (result) {
-            $('#VehicleProfitAmount').text(result.Data[0].ProfitAmount);
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-            alert('Failed to retrieve product details.' + thrownError);
-        }
-    });
-}
+//-----------------------------End Single Value Function---------------------------------------------------------
 
-function GetVehicleStock() {
-    $.ajax({
-        async: false,
-        cache: false,
-        type: "POST",
-        url: '/DashBoardAuto/GetVehicleStock',
-        success: function (result) {
-            $('#VehicleStockAmount').text(result.Data[0].StockAmount);
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-            alert('Failed to retrieve product details.' + thrownError);
-        }
-    });
-}
+//----------------------Start For Readymande Table Design-------------------------------
 
-function GetExpense() {
-    $.ajax({
-        async: false,
-        cache: false,
-        type: "POST",
-        url: '/DashBoardAuto/GetExpense',
-        success: function (result) {
-            $('#ExpenseAmount').text(result.Data[0].ExpenseAmount);
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-            alert('Failed to retrieve product details.' + thrownError);
-        }
-    });
-}
 
-function GetDebtors() {
-    $.ajax({
-        async: false,
-        cache: false,
-        type: "POST",
-        url: '/DashBoardAuto/GetDebtors',
-        success: function (result) {
-            $('#DebtorsAmount').text(result.Data[0].DebtorsAmount);
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-            alert('Failed to retrieve product details.' + thrownError);
-        }
-    });
-}
-
-function GetCreditors() {
-    $.ajax({
-        async: false,
-        cache: false,
-        type: "POST",
-        url: '/DashBoardAuto/GetCreditors',
-        success: function (result) {
-            $('#CreditorsAmount').text(result.Data[0].CreditorsAmount);
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-            alert('Failed to retrieve product details.' + thrownError);
-        }
-    });
-}
-
-function GetBankBalance() {
-    $.ajax({
-        async: false,
-        cache: false,
-        type: "POST",
-        url: '/DashBoardAuto/GetBankBalance',
-        success: function (result) {
-            $('#BankBalanceAmount').text(result.Data[0].BankBalanceAmount);
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-            alert('Failed to retrieve product details.' + thrownError);
-        }
-    });
-}
-
-function GetCashBalance() {
-    $.ajax({
-        async: false,
-        cache: false,
-        type: "POST",
-        url: '/DashBoardAuto/GetCashBalance',
-        success: function (result) {
-            $('#CashBalanceAmount').text(result.Data[0].CashBalanceAmount);
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-            alert('Failed to retrieve product details.' + thrownError);
-        }
-    });
-}
-
-var VehicleSalePieChartHint = '<div class="box-body" style="overflow-y:auto; height: 400px;"> ' +
+function DesignTable(functionname, Head_Caption, Value_Caption, Div_Id) {
+    var TableHTML = '<div class="box-body" style="overflow-y:auto; height: 400px;"> ' +
                                 ' <table class="table table-bordered"> '
-VehicleSalePieChartHint = VehicleSalePieChartHint + '<tr> ' +
-                                                        '<th style="width: 200px">Financier</th> ' +
-                                                        '<th style="width: 100px">Amount</th> ' +
-                                                    '</tr>'
+    TableHTML = TableHTML + '<tr> ' +
+                                '<th style="width: 200px">' + Head_Caption + '</th> ' +
+                                '<th style="width: 100px">' + Value_Caption + '</th> ' +
+                            '</tr>'
 
-
-function GetSpareSalePieChartData() {
     $.ajax({
         async: false,
         cache: false,
         type: "POST",
-        url: '/DashBoardAuto/GetVehicleSaleDetailFinancierWise',
+        url: '/DashBoardAuto/' + functionname,
         success: function (result) {
             result.Data.forEach(function (value) {
-                //VehicleSalePieChartHint = VehicleSalePieChartHint + '<li><i class="fa fa-circle-o" style="color:' + value.color + '"></i> ' + value.label + '</li>'
-                VehicleSalePieChartHint = VehicleSalePieChartHint + '<tr> ' +
-                        ' <td style="width: 200px">' + value.FinancierName + '</td> ' +
-                        ' <td style="width: 100px">' + value.Amount + '</td> ' +
+                TableHTML = TableHTML + '<tr> ' +
+                        ' <td style="width: 200px">' + value.Head + '</td> ' +
+                        ' <td style="width: 100px">' + value.Value + '</td> ' +
                         ' </tr>'
             });
         },
@@ -471,24 +368,38 @@ function GetSpareSalePieChartData() {
             alert('Failed to retrieve product details.' + thrownError);
         }
     });
-    VehicleSalePieChartHint = VehicleSalePieChartHint + '</table></div>'
-    $('#VehicleSaleDetailFinancierWise').html(VehicleSalePieChartHint)
+    TableHTML = TableHTML + '</table></div>'
+    console.log(TableHTML);
+    console.log(Div_Id);
+    $(Div_Id).html(TableHTML)
 }
+//----------------------End For Readymande Table Design-------------------------------
 
 
 
 
 $(document).ready(function () {
-    GetVehicleSale();
-    GetVehicleProfit();
-    GetVehicleStock();
+    SetSingleValue('GetVehicleSale', '#VehicleSaleAmount')
+    SetSingleValue('GetVehicleProfit', '#VehicleProfitAmount')
+    SetSingleValue('GetDebtors', '#DebtorsAmount')
+    SetSingleValue('GetBankBalance', '#BankBalanceAmount')
 
-    GetExpense();
-    GetDebtors();
-    GetCreditors();
-    GetBankBalance();
-    GetCashBalance();
+    SetSingleValue('GetVehicleStock', '#VehicleStockAmount')
+    SetSingleValue('GetExpense', '#ExpenseAmount')
+    SetSingleValue('GetCreditors', '#CreditorsAmount')
+    SetSingleValue('GetCashBalance', '#CashBalanceAmount')
 
-    GetSpareSalePieChartData();
+    DesignTable('GetVehicleSaleDetailFinancierWise', 'Bank Account', 'Amount', '#VehicleSaleDetailFinancierWise');
+    DesignTable('GetVehicleSaleDetailSalesManWise', 'Bank Account', 'Amount', '#VehicleSaleDetailSalesManWise');
+    DesignTable('GetVehicleSaleDetailProductTypeWise', 'Bank Account', 'Amount', '#VehicleSaleDetailProductTypeWise');
+
+    DesignTable('GetVehicleProfitDetail', 'Bank Account', 'Amount', '#VehicleProfitDetailTable');
+    DesignTable('GetDebtorsDetail', 'Bank Account', 'Amount', '#DebtorsDetailTable');
+    DesignTable('GetBankBalanceDetail', 'Bank Account', 'Amount', '#BankBalanceDetailTable');
+
+    DesignTable('GetVehicleStockDetail', 'Bank Account', 'Amount', '#VehicleStockDetailTable');
+    DesignTable('GetExpenseDetail', 'Bank Account', 'Amount', '#ExpenseDetailTable');
+    DesignTable('GetCreditorsDetail', 'Bank Account', 'Amount', '#CreditorsDetailTable');
+    DesignTable('GetCashBalanceDetail', 'Bank Account', 'Amount', '#CashBalanceDetailTable');
 });
 

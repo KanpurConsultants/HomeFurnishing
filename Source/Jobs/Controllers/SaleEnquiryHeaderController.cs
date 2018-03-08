@@ -1072,7 +1072,7 @@ namespace Jobs.Controllers
 
                     new SaleOrderLineStatusService(_unitOfWork).CreateLineStatus(OrderLine.SaleOrderLineId);
 
-                    Line.LockReason = "Sale order is created for enquiry.Now you can't modify enquiry, changes can be done in sale order.";
+                    //Line.LockReason = "Sale order is created for enquiry.Now you can't modify enquiry, changes can be done in sale order.";
                     new SaleEnquiryLineService(_unitOfWork).Update(Line);
                 }
             }
@@ -1082,16 +1082,13 @@ namespace Jobs.Controllers
                 int i = 0;
                 foreach (SaleEnquiryLine Line in LineList)
                 {
-
-
                     SaleOrderLine SaleOrderLine = new SaleOrderLineService(_unitOfWork).Find_ByReferenceDocLineId(EnquiryHeader.DocTypeId, Line.SaleEnquiryLineId);
 
                     if (SaleOrderLine == null)
                     {
                         SaleOrderLine OrderLine = new SaleOrderLine();
                         OrderLine.SaleOrderHeaderId = EnquiSaleOrderHeaderryHeader.SaleOrderHeaderId;
-                        OrderLine.SaleOrderLineId = i;
-                        i = i - 1;
+                        OrderLine.SaleOrderLineId = i--;
                         OrderLine.DueDate = Line.DueDate;
                         OrderLine.ProductId = Line.ProductId ?? 0;
                         OrderLine.Specification = Line.Specification;
@@ -1114,7 +1111,7 @@ namespace Jobs.Controllers
 
                         new SaleOrderLineStatusService(_unitOfWork).CreateLineStatus(OrderLine.SaleOrderLineId);
 
-                        Line.LockReason = "Sale order is created for enquiry.Now you can't modify enquiry, changes can be done in sale order.";
+                        //Line.LockReason = "Sale order is created for enquiry.Now you can't modify enquiry, changes can be done in sale order.";
                         new SaleEnquiryLineService(_unitOfWork).Update(Line);
                     }
                 }

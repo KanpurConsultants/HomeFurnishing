@@ -507,6 +507,11 @@ namespace Jobs.Controllers
             s.BuyerSku = Extended.BuyerSku;
             s.BuyerUpcCode= Extended.BuyerUpcCode;
 
+            var SaleOrderLine = (from L in db.SaleOrderLine where L.ReferenceDocLineId == id && L.ReferenceDocTypeId == H.DocTypeId select L).FirstOrDefault();
+            if (SaleOrderLine != null)
+                s.GeneratedSaleOrderLineId = SaleOrderLine.SaleOrderLineId;
+            else
+                s.GeneratedSaleOrderLineId = 0;
 
             var settings = new SaleEnquirySettingsService(_unitOfWork).GetSaleEnquirySettingsForDucument(H.DocTypeId, H.DivisionId, H.SiteId);
             s.SaleEnquirySettings = Mapper.Map<SaleEnquirySettings, SaleEnquirySettingsViewModel>(settings);

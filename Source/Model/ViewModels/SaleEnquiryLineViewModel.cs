@@ -92,6 +92,8 @@ namespace Model.ViewModels
         public string BuyerSpecification1 { get; set; }
         public string BuyerSpecification2 { get; set; }
         public string BuyerSpecification3 { get; set; }
+
+        public int GeneratedSaleOrderLineId { get; set; }
         public string LockReason { get; set; }
     }
 

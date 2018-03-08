@@ -16,17 +16,17 @@ namespace Service
 {
     public interface IDashBoardAutoService : IDisposable
     {
-        IEnumerable<DashBoardSale> GetVehicleSale();
-        IEnumerable<DashBoardProfit> GetVehicleProfit();
-        IEnumerable<DashBoardStock> GetVehicleStock();
+        IEnumerable<DashBoardSingleValue> GetVehicleSale();
+        IEnumerable<DashBoardSingleValue> GetVehicleProfit();
+        IEnumerable<DashBoardSingleValue> GetVehicleStock();
 
 
 
-        IEnumerable<DashBoardExpense> GetExpense();
-        IEnumerable<DashBoardDebtors> GetDebtors();
-        IEnumerable<DashBoardCreditors> GetCreditors();
-        IEnumerable<DashBoardBankBalance> GetBankBalance();
-        IEnumerable<DashBoardCashBalance> GetCashBalance();
+        IEnumerable<DashBoardSingleValue> GetExpense();
+        IEnumerable<DashBoardSingleValue> GetDebtors();
+        IEnumerable<DashBoardSingleValue> GetCreditors();
+        IEnumerable<DashBoardSingleValue> GetBankBalance();
+        IEnumerable<DashBoardSingleValue> GetCashBalance();
 
         
 
@@ -38,8 +38,18 @@ namespace Service
 
 
 
-        IEnumerable<DashBoardSaleDetailFinancierWise> GetVehicleSaleDetailFinancierWise();
+        IEnumerable<DashBoardTabularData> GetVehicleSaleDetailFinancierWise();
+        IEnumerable<DashBoardTabularData> GetVehicleSaleDetailSalesManWise();
+        IEnumerable<DashBoardTabularData> GetVehicleSaleDetailProductTypeWise();
 
+
+        IEnumerable<DashBoardTabularData> GetVehicleProfitDetail();
+        IEnumerable<DashBoardTabularData> GetDebtorsDetail();
+        IEnumerable<DashBoardTabularData> GetBankBalanceDetail();
+        IEnumerable<DashBoardTabularData> GetVehicleStockDetail();
+        IEnumerable<DashBoardTabularData> GetExpenseDetail();
+        IEnumerable<DashBoardTabularData> GetCreditorsDetail();
+        IEnumerable<DashBoardTabularData> GetCashBalanceDetail();
     }
 
     public class DashBoardAutoService : IDashBoardAutoService
@@ -50,7 +60,7 @@ namespace Service
         {
         }
 
-        public IEnumerable<DashBoardSale> GetVehicleSale()
+        public IEnumerable<DashBoardSingleValue> GetVehicleSale()
         {
             mQry = @"DECLARE @Month INT 
                     DECLARE @Year INT
@@ -61,7 +71,7 @@ namespace Service
                     SELECT @FromDate = DATEADD(month,@Month-1,DATEADD(year,@Year-1900,0)), @ToDate = DATEADD(day,-1,DATEADD(month,@Month,DATEADD(year,@Year-1900,0))) 
 
 
-                    SELECT Convert(NVARCHAR,Convert(DECIMAL(18,2),Round(IsNull(Sum(Hc.Amount),0)/10000000,2))) + ' Crore' AS SaleAmount
+                    SELECT Convert(NVARCHAR,Convert(DECIMAL(18,2),Round(IsNull(Sum(Hc.Amount),0)/10000000,2))) + ' Crore' AS Value
                     FROM Web.SaleInvoiceHeaders H 
                     LEFT JOIN Web.SaleInvoiceHeaderCharges Hc ON H.SaleInvoiceHeaderId = Hc.HeaderTableId
                     LEFT JOIN Web.DocumentTypes D ON H.DocTypeId = D.DocumentTypeId
@@ -70,10 +80,10 @@ namespace Service
                     AND  H.DocDate BETWEEN @FromDate AND @ToDate
                     AND D.DocumentCategoryId = 464 ";
 
-            IEnumerable<DashBoardSale> VehicleSale = db.Database.SqlQuery<DashBoardSale>(mQry).ToList();
+            IEnumerable<DashBoardSingleValue> VehicleSale = db.Database.SqlQuery<DashBoardSingleValue>(mQry).ToList();
             return VehicleSale;
         }
-        public IEnumerable<DashBoardProfit> GetVehicleProfit()
+        public IEnumerable<DashBoardSingleValue> GetVehicleProfit()
         {
             mQry = @"DECLARE @Month INT 
                     DECLARE @Year INT
@@ -83,7 +93,7 @@ namespace Service
                     DECLARE @ToDate DATETIME
                     SELECT @FromDate = DATEADD(month,@Month-1,DATEADD(year,@Year-1900,0)), @ToDate = DATEADD(day,-1,DATEADD(month,@Month,DATEADD(year,@Year-1900,0))) 
 
-                    SELECT Convert(NVARCHAR,Convert(DECIMAL(18,2),Round((IsNull(Sum(VSale.SaleAmount),0) - IsNull(Sum(VPurchase.PurchaseAmount),0))/10000000,2))) + ' Crore' AS ProfitAmount
+                    SELECT Convert(NVARCHAR,Convert(DECIMAL(18,2),Round((IsNull(Sum(VSale.SaleAmount),0) - IsNull(Sum(VPurchase.PurchaseAmount),0))/10000000,2))) + ' Crore' AS Value
                     FROM (
 	                    SELECT VProductUid.ProductUidId, Sum(Hc.Amount) AS SaleAmount
 	                    FROM Web.SaleInvoiceHeaders H 
@@ -122,13 +132,13 @@ namespace Service
                     ) AS VPurchase ON VSale.ProductUidId = VPurchase.ProductUidId ";
 
 
-            IEnumerable<DashBoardProfit> VehicleProfit = db.Database.SqlQuery<DashBoardProfit>(mQry).ToList();
+            IEnumerable<DashBoardSingleValue> VehicleProfit = db.Database.SqlQuery<DashBoardSingleValue>(mQry).ToList();
             return VehicleProfit;
         }
-        public IEnumerable<DashBoardStock> GetVehicleStock()
+        public IEnumerable<DashBoardSingleValue> GetVehicleStock()
         {
             mQry = @"SELECT Convert(NVARCHAR,Convert(DECIMAL(18,0),IsNull(Sum(VStock.StockQty),0))) AS StockQty, 
-                        Convert(NVARCHAR,Convert(DECIMAL(18,2),Round(IsNull(Sum(VStock.StockAmount),0)/10000000,2))) + ' Crore'   AS StockAmount
+                        Convert(NVARCHAR,Convert(DECIMAL(18,2),Round(IsNull(Sum(VStock.StockAmount),0)/10000000,2))) + ' Crore'   AS Value
                         FROM (
 	                        SELECT L.Qty AS StockQty,
 	                        (SELECT hC.Amount FROM Web.JobInvoiceHeaderCharges hc WITH (Nolock) 
@@ -162,45 +172,45 @@ namespace Service
                         ) AS VStock ";
 
 
-            IEnumerable<DashBoardStock> VehicleStock = db.Database.SqlQuery<DashBoardStock>(mQry).ToList();
+            IEnumerable<DashBoardSingleValue> VehicleStock = db.Database.SqlQuery<DashBoardSingleValue>(mQry).ToList();
             return VehicleStock;
         }
 
 
 
-        public IEnumerable<DashBoardExpense> GetExpense()
+        public IEnumerable<DashBoardSingleValue> GetExpense()
         {
-            mQry = @" SELECT '10 Crore' AS ExpenseAmount ";
+            mQry = @" SELECT '10 Crore' AS Value ";
 
-            IEnumerable<DashBoardExpense> Expense = db.Database.SqlQuery<DashBoardExpense>(mQry).ToList();
+            IEnumerable<DashBoardSingleValue> Expense = db.Database.SqlQuery<DashBoardSingleValue>(mQry).ToList();
             return Expense;
         }
-        public IEnumerable<DashBoardDebtors> GetDebtors()
+        public IEnumerable<DashBoardSingleValue> GetDebtors()
         {
-            mQry = @" SELECT '11 Crore' AS DebtorsAmount ";
+            mQry = @" SELECT '11 Crore' AS Value ";
 
-            IEnumerable<DashBoardDebtors> Debtors = db.Database.SqlQuery<DashBoardDebtors>(mQry).ToList();
+            IEnumerable<DashBoardSingleValue> Debtors = db.Database.SqlQuery<DashBoardSingleValue>(mQry).ToList();
             return Debtors;
         }
-        public IEnumerable<DashBoardCreditors> GetCreditors()
+        public IEnumerable<DashBoardSingleValue> GetCreditors()
         {
-            mQry = @" SELECT '12 Crore' AS CreditorsAmount ";
+            mQry = @" SELECT '12 Crore' AS Value ";
 
-            IEnumerable<DashBoardCreditors> Creditors = db.Database.SqlQuery<DashBoardCreditors>(mQry).ToList();
+            IEnumerable<DashBoardSingleValue> Creditors = db.Database.SqlQuery<DashBoardSingleValue>(mQry).ToList();
             return Creditors;
         }
-        public IEnumerable<DashBoardBankBalance> GetBankBalance()
+        public IEnumerable<DashBoardSingleValue> GetBankBalance()
         {
-            mQry = @" SELECT '13 Crore' AS BankBalanceAmount ";
+            mQry = @" SELECT '13 Crore' AS Value ";
 
-            IEnumerable<DashBoardBankBalance> BankBalance = db.Database.SqlQuery<DashBoardBankBalance>(mQry).ToList();
+            IEnumerable<DashBoardSingleValue> BankBalance = db.Database.SqlQuery<DashBoardSingleValue>(mQry).ToList();
             return BankBalance;
         }
-        public IEnumerable<DashBoardCashBalance> GetCashBalance()
+        public IEnumerable<DashBoardSingleValue> GetCashBalance()
         {
-            mQry = @" SELECT '14 Crore' AS CashBalanceAmount ";
+            mQry = @" SELECT '14 Crore' AS Value ";
 
-            IEnumerable<DashBoardCashBalance> CashBalance = db.Database.SqlQuery<DashBoardCashBalance>(mQry).ToList();
+            IEnumerable<DashBoardSingleValue> CashBalance = db.Database.SqlQuery<DashBoardSingleValue>(mQry).ToList();
             return CashBalance;
         }
         public IEnumerable<DashBoardPieChartData> GetVehicleSalePieChartData()
@@ -302,9 +312,9 @@ namespace Service
 
 
 
-        public IEnumerable<DashBoardSaleDetailFinancierWise> GetVehicleSaleDetailFinancierWise()
+        public IEnumerable<DashBoardTabularData> GetVehicleSaleDetailFinancierWise()
         {
-            mQry = @"SELECT P.Name AS FinancierName, Convert(NVARCHAR,Convert(DECIMAL(18,2),Round(IsNull(Sum(VCharge.Amount),0)/10000000,2))) + ' Crore' AS Amount
+            mQry = @"SELECT P.Name AS Head, Convert(NVARCHAR,Convert(DECIMAL(18,2),Round(IsNull(Sum(VCharge.Amount),0)/10000000,2))) + ' Crore' AS Value
                     FROM Web.SaleInvoiceHeaders H 
                     LEFT JOIN Web.People P ON H.FinancierId = P.PersonID
                     LEFT JOIN 
@@ -316,15 +326,15 @@ namespace Service
                     GROUP BY P.Name
                     ORDER BY P.Name ";
 
-            IEnumerable<DashBoardSaleDetailFinancierWise> VehicleSaleDetailFinancierWise = db.Database.SqlQuery<DashBoardSaleDetailFinancierWise>(mQry).ToList();
-            return VehicleSaleDetailFinancierWise;
+            IEnumerable<DashBoardTabularData> DashBoardTabularData = db.Database.SqlQuery<DashBoardTabularData>(mQry).ToList();
+            return DashBoardTabularData;
         }
 
-        public IEnumerable<DashBoardSaleDetailAgentWise> GetVehicleSaleDetailAgentWise()
+        public IEnumerable<DashBoardTabularData> GetVehicleSaleDetailSalesManWise()
         {
-            mQry = @"SELECT P.Name AS FinancierName, Convert(NVARCHAR,Convert(DECIMAL(18,2),Round(IsNull(Sum(VCharge.Amount),0)/10000000,2))) + ' Crore' AS Amount
+            mQry = @"SELECT P.Name AS Head, Convert(NVARCHAR,Convert(DECIMAL(18,2),Round(IsNull(Sum(VCharge.Amount),0)/10000000,2))) + ' Crore' AS Value
                     FROM Web.SaleInvoiceHeaders H 
-                    LEFT JOIN Web.People P ON H.FinancierId = P.PersonID
+                    LEFT JOIN Web.People P ON H.SalesExecutiveId = P.PersonID
                     LEFT JOIN 
 	                    (SELECT Hc.HeaderTableId AS SaleInvoiceHeaderId, Hc.Amount 
 	                    FROM Web.SaleInvoiceHeaderCharges Hc
@@ -334,48 +344,117 @@ namespace Service
                     GROUP BY P.Name
                     ORDER BY P.Name ";
 
-            IEnumerable<DashBoardSaleDetailAgentWise> VehicleSaleDetailAgentWise = db.Database.SqlQuery<DashBoardSaleDetailAgentWise>(mQry).ToList();
-            return VehicleSaleDetailAgentWise;
+            IEnumerable<DashBoardTabularData> DashBoardTabularData = db.Database.SqlQuery<DashBoardTabularData>(mQry).ToList();
+            return DashBoardTabularData;
         }
+
+        public IEnumerable<DashBoardTabularData> GetVehicleSaleDetailProductTypeWise()
+        {
+            mQry = @"SELECT P.Name AS Head, Convert(NVARCHAR,Convert(DECIMAL(18,2),Round(IsNull(Sum(VCharge.Amount),0)/10000000,2))) + ' Crore' AS Value
+                    FROM Web.SaleInvoiceHeaders H 
+                    LEFT JOIN Web.People P ON H.SalesExecutiveId = P.PersonID
+                    LEFT JOIN 
+	                    (SELECT Hc.HeaderTableId AS SaleInvoiceHeaderId, Hc.Amount 
+	                    FROM Web.SaleInvoiceHeaderCharges Hc
+	                    LEFT JOIN Web.Charges C ON Hc.ChargeId = C.ChargeId
+	                    WHERE C.ChargeName = 'Net Amount') AS VCharge ON H.SaleInvoiceHeaderId = VCharge.SaleInvoiceHeaderId
+                    WHERE H.FinancierId IS NOT NULL
+                    GROUP BY P.Name
+                    ORDER BY P.Name ";
+
+            IEnumerable<DashBoardTabularData> DashBoardTabularData = db.Database.SqlQuery<DashBoardTabularData>(mQry).ToList();
+            return DashBoardTabularData;
+        }
+        public IEnumerable<DashBoardTabularData> GetVehicleProfitDetail()
+        {
+            mQry = @"SELECT A.LedgerAccountName AS Head, Convert(nvarchar,IsNull(Sum(L.AmtDr),0) - IsNull(Sum(L.AmtCr),0)) AS Value
+                        FROM Web.Ledgers L 
+                        LEFT JOIN Web.LedgerAccounts A ON L.LedgerAccountId = A.LedgerAccountId
+                        LEFT JOIN Web.LedgerAccountGroups Ag ON A.LedgerAccountGroupId = Ag.LedgerAccountGroupId
+                        WHERE Ag.LedgerAccountNature = 'Bank'
+                        GROUP BY A.LedgerAccountName ";
+
+            IEnumerable<DashBoardTabularData> DashBoardTabularData = db.Database.SqlQuery<DashBoardTabularData>(mQry).ToList();
+            return DashBoardTabularData;
+        }
+        public IEnumerable<DashBoardTabularData> GetDebtorsDetail()
+        {
+            mQry = @"SELECT A.LedgerAccountName AS Head, Convert(nvarchar,IsNull(Sum(L.AmtDr),0) - IsNull(Sum(L.AmtCr),0)) AS Value
+                        FROM Web.Ledgers L 
+                        LEFT JOIN Web.LedgerAccounts A ON L.LedgerAccountId = A.LedgerAccountId
+                        LEFT JOIN Web.LedgerAccountGroups Ag ON A.LedgerAccountGroupId = Ag.LedgerAccountGroupId
+                        WHERE Ag.LedgerAccountNature = 'Bank'
+                        GROUP BY A.LedgerAccountName ";
+
+            IEnumerable<DashBoardTabularData> DashBoardTabularData = db.Database.SqlQuery<DashBoardTabularData>(mQry).ToList();
+            return DashBoardTabularData;
+        }
+        public IEnumerable<DashBoardTabularData> GetBankBalanceDetail()
+        {
+            mQry = @"SELECT A.LedgerAccountName AS Head, Convert(nvarchar,IsNull(Sum(L.AmtDr),0) - IsNull(Sum(L.AmtCr),0)) AS Value
+                        FROM Web.Ledgers L 
+                        LEFT JOIN Web.LedgerAccounts A ON L.LedgerAccountId = A.LedgerAccountId
+                        LEFT JOIN Web.LedgerAccountGroups Ag ON A.LedgerAccountGroupId = Ag.LedgerAccountGroupId
+                        WHERE Ag.LedgerAccountNature = 'Bank'
+                        GROUP BY A.LedgerAccountName ";
+
+            IEnumerable<DashBoardTabularData> DashBoardTabularData = db.Database.SqlQuery<DashBoardTabularData>(mQry).ToList();
+            return DashBoardTabularData;
+        }
+        public IEnumerable<DashBoardTabularData> GetVehicleStockDetail()
+        {
+            mQry = @"SELECT A.LedgerAccountName AS Head, Convert(nvarchar,IsNull(Sum(L.AmtDr),0) - IsNull(Sum(L.AmtCr),0)) AS Value
+                        FROM Web.Ledgers L 
+                        LEFT JOIN Web.LedgerAccounts A ON L.LedgerAccountId = A.LedgerAccountId
+                        LEFT JOIN Web.LedgerAccountGroups Ag ON A.LedgerAccountGroupId = Ag.LedgerAccountGroupId
+                        WHERE Ag.LedgerAccountNature = 'Bank'
+                        GROUP BY A.LedgerAccountName ";
+
+            IEnumerable<DashBoardTabularData> DashBoardTabularData = db.Database.SqlQuery<DashBoardTabularData>(mQry).ToList();
+            return DashBoardTabularData;
+        }
+        public IEnumerable<DashBoardTabularData> GetExpenseDetail()
+        {
+            mQry = @"SELECT A.LedgerAccountName AS Head, Convert(nvarchar,IsNull(Sum(L.AmtDr),0) - IsNull(Sum(L.AmtCr),0)) AS Value
+                        FROM Web.Ledgers L 
+                        LEFT JOIN Web.LedgerAccounts A ON L.LedgerAccountId = A.LedgerAccountId
+                        LEFT JOIN Web.LedgerAccountGroups Ag ON A.LedgerAccountGroupId = Ag.LedgerAccountGroupId
+                        WHERE Ag.LedgerAccountNature = 'Bank'
+                        GROUP BY A.LedgerAccountName ";
+
+            IEnumerable<DashBoardTabularData> DashBoardTabularData = db.Database.SqlQuery<DashBoardTabularData>(mQry).ToList();
+            return DashBoardTabularData;
+        }
+        public IEnumerable<DashBoardTabularData> GetCreditorsDetail()
+        {
+            mQry = @"SELECT A.LedgerAccountName AS Head, Convert(nvarchar,IsNull(Sum(L.AmtDr),0) - IsNull(Sum(L.AmtCr),0)) AS Value
+                        FROM Web.Ledgers L 
+                        LEFT JOIN Web.LedgerAccounts A ON L.LedgerAccountId = A.LedgerAccountId
+                        LEFT JOIN Web.LedgerAccountGroups Ag ON A.LedgerAccountGroupId = Ag.LedgerAccountGroupId
+                        WHERE Ag.LedgerAccountNature = 'Bank'
+                        GROUP BY A.LedgerAccountName ";
+
+            IEnumerable<DashBoardTabularData> DashBoardTabularData = db.Database.SqlQuery<DashBoardTabularData>(mQry).ToList();
+            return DashBoardTabularData;
+        }
+        public IEnumerable<DashBoardTabularData> GetCashBalanceDetail()
+        {
+            mQry = @"SELECT A.LedgerAccountName AS Head, Convert(nvarchar,IsNull(Sum(L.AmtDr),0) - IsNull(Sum(L.AmtCr),0)) AS Value
+                        FROM Web.Ledgers L 
+                        LEFT JOIN Web.LedgerAccounts A ON L.LedgerAccountId = A.LedgerAccountId
+                        LEFT JOIN Web.LedgerAccountGroups Ag ON A.LedgerAccountGroupId = Ag.LedgerAccountGroupId
+                        WHERE Ag.LedgerAccountNature = 'Bank'
+                        GROUP BY A.LedgerAccountName ";
+
+            IEnumerable<DashBoardTabularData> DashBoardTabularData = db.Database.SqlQuery<DashBoardTabularData>(mQry).ToList();
+            return DashBoardTabularData;
+        }
+
 
 
         public void Dispose()
         {
         }
-    }
-
-    public class DashBoardSale
-    {
-        public string SaleAmount { get; set; }
-    }
-    public class DashBoardProfit
-    {
-        public string ProfitAmount { get; set; }
-    }
-    public class DashBoardStock
-    {
-        public string StockQty { get; set; }
-        public string StockAmount { get; set; }
-    }
-    public class DashBoardExpense
-    {
-        public string ExpenseAmount { get; set; }
-    }
-    public class DashBoardDebtors
-    {
-        public string DebtorsAmount { get; set; }
-    }
-    public class DashBoardCreditors
-    {
-        public string CreditorsAmount { get; set; }
-    }
-    public class DashBoardBankBalance
-    {
-        public string BankBalanceAmount { get; set; }
-    }
-    public class DashBoardCashBalance
-    {
-        public string CashBalanceAmount { get; set; }
     }
     public class DashBoardPieChartData
     {
@@ -390,18 +469,15 @@ namespace Service
         public Decimal Amount { get; set; }
     }
 
-
-
-    public class DashBoardSaleDetailFinancierWise
+    
+    public class DashBoardTabularData
     {
-        public string FinancierName { get; set; }
-        public string Amount { get; set; }
+        public string Head { get; set; }
+        public string Value { get; set; }
     }
-
-    public class DashBoardSaleDetailAgentWise
+    public class DashBoardSingleValue
     {
-        public string AgentName { get; set; }
-        public string Amount { get; set; }
+        public string Value { get; set; }
     }
 
 }

@@ -280,7 +280,7 @@ namespace Jobs.Controllers
 
                 new SaleOrderLineStatusService(_unitOfWork).CreateLineStatus(OrderLine.SaleOrderLineId);
 
-                Line.LockReason = "Sale order is created for enquiry.Now you can't modify enquiry, changes can be done in sale order.";
+                //Line.LockReason = "Sale order is created for enquiry.Now you can't modify enquiry, changes can be done in sale order.";
                 new SaleEnquiryLineService(_unitOfWork).Update(Line);
             }
         }
@@ -314,7 +314,7 @@ namespace Jobs.Controllers
 
             new SaleOrderLineStatusService(_unitOfWork).CreateLineStatus(OrderLine.SaleOrderLineId);
 
-            Line.LockReason = "Sale order is created for enquiry.Now you can't modify enquiry, changes can be done in sale order.";
+            //Line.LockReason = "Sale order is created for enquiry.Now you can't modify enquiry, changes can be done in sale order.";
             new SaleEnquiryLineService(_unitOfWork).Update(Line);
 
             var PersonProductUid = (from p in db.PersonProductUid
