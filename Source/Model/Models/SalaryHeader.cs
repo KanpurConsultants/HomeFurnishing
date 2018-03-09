@@ -31,6 +31,12 @@ namespace Model.Models
         public int SiteId { get; set; }
         public virtual Site Site { get; set; }
 
+        [Display(Name = "Ledger Header")]
+        [ForeignKey("LedgerHeader")]
+        public int? LedgerHeaderId { get; set; }
+        public virtual LedgerHeader LedgerHeader { get; set; }
+
+
         [Display(Name = "Remark")]
         public string Remark { get; set; }
 

@@ -49,6 +49,16 @@ Salary.controller('MainCtrl', ['$scope', '$log', '$http', 'uiGridConstants', 'ui
               }
           }
       });
+
+
+      $scope.init = function () {
+          if ($("#SalaryHeaderId").val() > 0)
+          {
+              $scope.BindData();
+          }
+      };
+
+
       
 
       $scope.ShowDetail = function () {
@@ -101,6 +111,7 @@ Salary.controller('MainCtrl', ['$scope', '$log', '$http', 'uiGridConstants', 'ui
                   if (result.Success == true) {
                       $scope.gridOptions.enableCellEditOnFocus = true;
                       $scope.gridOptions.columnDefs = new Array();
+                      $scope.gridOptions.columnDefs.push({ field: 'SalaryHeaderId', width: 100, visible: false });
                       $scope.gridOptions.columnDefs.push({ field: 'EmployeeId', width: 100, visible: false });
                       $scope.gridOptions.columnDefs.push({ field: 'DocTypeId', width: 100, visible: false });
                       $scope.gridOptions.columnDefs.push({ field: 'DocDate', width: 100, visible: false });

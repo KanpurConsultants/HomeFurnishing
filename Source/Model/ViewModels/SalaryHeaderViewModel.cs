@@ -35,6 +35,8 @@ namespace Model.ViewModels
         [Display(Name = "Remark")]
         public string Remark { get; set; }
 
+        public int? LedgerHeaderId { get; set; }
+
         public SalarySettingsViewModel SalarySettings { get; set; }
 
         public DocumentTypeSettingsViewModel DocumentTypeSettings { get; set; }
@@ -99,5 +101,7 @@ namespace Model.ViewModels
         public string DepartmentName { get; set; }
         public string WagesPayType { get; set; }
         public string Remark { get; set; }
+
+        public int SalaryHeaderId { get; set; }
     }
 }

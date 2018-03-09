@@ -32,6 +32,7 @@
     @Html.HiddenFor(m => m.SalaryHeaderId)
     @Html.HiddenFor(m => m.DocTypeId)
     @Html.HiddenFor(m => m.CreatedDate)
+    @Html.HiddenFor(m => m.LedgerHeaderId)
     @Html.HiddenFor(m => m.CalculationFooterChargeCount)
 
     <div class="panel panel-default">
@@ -94,9 +95,9 @@
             <div class="panel-info">
                 <div class="btn-group">
                     @Html.ActionLink(" ", "Create", "SalaryHeader", new { @id = @ViewBag.id }, new { @class = "cbtn btn-circle glyphicon glyphicon-plus", @title = "Add New", @data_toggle = "tooltip", target = "" })
-                    @if (Model.SalaryHeaderId > 0)
+                    @if (Model.SalaryHeaderId > 0 && Model.LedgerHeaderId == null)
                     {
-                    @Html.ActionLink(" ", EditAction, "SalaryHeader", new { @id = Model.SalaryHeaderId, IndexType = ViewBag.IndexStatus }, new { @class = "cbtn btn-circle glyphicon glyphicon-edit", @title = "Edit", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "SalaryWizard", "SalaryWizard", new { id = @ViewBag.id, SalaryHeaderId = Model.SalaryHeaderId }, new { @class = "cbtn btn-circle glyphicon glyphicon-edit", @title = "Edit", @data_toggle = "tooltip" })
                     }
                     @if (Model.SalaryHeaderId > 0)
                     {
@@ -193,7 +194,7 @@
                         else if (Model.Status == (int)StatusConstants.Submitted || Model.Status == (int)StatusConstants.Modified)
                         { Action = "CreateLineAfter_Submit"; }
                         }
-                        @Html.ActionLink("Add New Row ", Action, "SalaryLine", new { id = @Model.SalaryHeaderId, IsRefBased = false }, new { data_modal = "", id = "btnCreatePO", @class = "toolbar", @title = "Add New", @data_toggle = "tooltip", @data_detailDisabled = "true" })
+                        @*@Html.ActionLink("Add New Row ", Action, "SalaryLine", new { id = @Model.SalaryHeaderId, IsRefBased = false }, new { data_modal = "", id = "btnCreatePO", @class = "toolbar", @title = "Add New", @data_toggle = "tooltip", @data_detailDisabled = "true" })*@
                     </div>
                 </div>
 
@@ -364,6 +365,9 @@
         //Calling the function to load Consumption Details
 
         var id=@Model.SalaryHeaderId;
+
+
+
         var CalculationFooterChargeCount='@Model.CalculationFooterChargeCount';
         if (CalculationFooterChargeCount > 0)
         {

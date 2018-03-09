@@ -115,6 +115,7 @@ namespace Service
                         DocNo = H.DocNo,
                         Remark = H.Remark,
                         SalaryHeaderId = H.SalaryHeaderId,
+                        LedgerHeaderId = H.LedgerHeaderId,
                         Status = H.Status,
                         DocTypeId = H.DocTypeId,
                         DivisionId = H.DivisionId,

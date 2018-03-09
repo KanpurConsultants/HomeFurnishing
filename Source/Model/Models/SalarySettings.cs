@@ -30,6 +30,9 @@ namespace Model.Models
         public string filterContraDivisions { get; set; }
 
 
+
+
+
         [MaxLength(100)]
         public string DocumentPrint { get; set; }
         public int? NoOfPrintCopies { get; set; }

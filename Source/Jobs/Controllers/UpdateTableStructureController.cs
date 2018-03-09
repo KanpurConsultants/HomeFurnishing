@@ -3389,7 +3389,7 @@ namespace Module
 	                        OtherAddition  DECIMAL (18, 4),
 	                        OtherDeduction DECIMAL (18, 4),
 	                        LoadEMI        DECIMAL (18, 4),
-	                        NetSalary      DECIMAL (18, 4) NOT NULL,
+                            Advance        DECIMAL (18, 4),
 	                        Remark         NVARCHAR (max),
 	                        Sr             INT,
 	                        CreatedBy      NVARCHAR (max),
@@ -3672,6 +3672,8 @@ namespace Module
             AddFields("Employees", "PaymentType", "nvarchar(10)");
 
             AddFields("SalaryLines", "Advance", "Decimal(18,4)");
+
+            AddFields("SalaryHeaders", "LedgerHeaderId", "Int","LedgerHeaders");
 
 
             ReCreateProcedures();

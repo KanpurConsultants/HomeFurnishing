@@ -29,7 +29,6 @@ namespace Model.ViewModels
         public decimal? OtherDeduction { get; set; }
         public decimal? LoanEMI { get; set; }
         public decimal? Advance { get; set; }
-        public decimal NetSalary { get; set; }
 
         public SalarySettingsViewModel SalarySettings { get; set; }
         public DocumentTypeSettingsViewModel DocumentTypeSettings { get; set; }

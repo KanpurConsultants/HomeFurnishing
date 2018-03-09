@@ -35,13 +35,13 @@ namespace Service
             {
                 string message = "";
 
-                if (ex.InnerException != null && ex.InnerException.InnerException.Message.Contains("The DELETE statement conflicted with the REFERENCE constraint "))
+                if (ex.InnerException != null && ex.InnerException.Message.Contains("The DELETE statement conflicted with the REFERENCE constraint "))
                 {
                     message = ex.InnerException.InnerException.Message;// "Cannot delete this as this record is in use by other documents.";
                 }
                 else if (ex.InnerException != null)
                 {
-                    message = ex.InnerException.InnerException.Message;
+                    message = ex.InnerException.Message;
                 }
                 else
                 {

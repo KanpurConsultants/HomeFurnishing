@@ -76,7 +76,7 @@
 </head>
 <body>
 
-    <div ng-controller="MainCtrl">
+    <div ng-controller="MainCtrl" data-ng-init="init()">
         <div class="panel panel-default" style="margin-bottom:0px">
 
             <div class="panel-heading">
@@ -94,6 +94,7 @@
                 <div class="panel-info" style="padding-left:15px">
                     @Html.AntiForgeryToken()
                     @Html.HiddenFor(m => m.DocTypeId)
+                    @Html.HiddenFor(m => m.SalaryHeaderId)
 
 
                     <div class="form-horizontal" role="form" id="ReportFilters">
@@ -181,17 +182,24 @@
 
     <script type="text/javascript">
         //$('#submit').click(function () {
-        //    //GenerateDataTable();           
+        //    //GenerateDataTable();
         //    alert("Go");
         //    BindData();
         //    return false;
         //})
 
         //$('#submit').click(function () {
-        //    GenerateDataTable();           
+        //    GenerateDataTable();
         //    return false;
         //})
 
+        var id=@Model.SalaryHeaderId;
+        if (id>0)
+        {
+            $("#Fill").hide();
+            $("#ShowFilters").hide();
+            $("#ReportFilters").hide();
+        }
 
 
         $('#Fill').click(function(){

@@ -91,18 +91,8 @@
                         <div class="form-group">
                             @Html.LabelFor(model => model.Advance, "Advance", new { @class = "control-label col-md-4 col-sm-2" })
                             <div class="col-md-7 col-sm-10">
-                                @Html.TextBoxFor(model => model.Advance, new { @class = "form-control col-xs-7 text-right required" })
+                                @Html.TextBoxFor(model => model.Advance, new { @class = "form-control col-xs-7 text-right required", @id = "Amount" })
                                 @Html.ValidationMessageFor(model => model.Advance, "", new { @class = "text-danger" })
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            @Html.LabelFor(model => model.NetSalary, "Net Salary", new { @class = "control-label col-md-4 col-sm-2" })
-                            <div class="col-md-7 col-sm-10">
-                                @Html.TextBoxFor(model => model.NetSalary, new { @class = "form-control col-xs-7 text-right required", @id = "Amount" })
-                                @Html.ValidationMessageFor(model => model.NetSalary, "", new { @class = "text-danger" })
                             </div>
                         </div>
                     </div>
@@ -118,7 +108,7 @@
                     </div>
                 </div>
 
-                <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                @*<div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
                     @if (ViewBag.LineMode == "Edit" || ViewBag.LineMode == "Create")
                     {
                         <button class="btn custom left" name="Command:Edit" type="submit" id="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-floppy-disk black"></span> </h2></button>}
@@ -126,7 +116,7 @@
                     {
                         <button class="btn custom" name="Command:Delete" id="delete" type="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-trash black"></span> </h2></button>}
 
-                </div>
+                </div>*@
 
             </div>
 
