@@ -28,6 +28,7 @@ namespace Model.Models
         public decimal? OtherDeduction { get; set; }
         public decimal? LoanEMI { get; set; }
         public decimal? Advance { get; set; }
+        public decimal NetPayable { get; set; }
 
 
         [Display(Name = "Remark")]

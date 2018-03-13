@@ -3254,6 +3254,7 @@
     <Content Include="Scripts\summernote\summernote.min.js" />
     <Content Include="Scripts\ui-grid.js" />
     <Content Include="Scripts\ui-grid.min.js" />
+    <Content Include="Views\DashBoardAuto\DashBoardAuto.cshtml" />
     <Content Include="Views\favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
@@ -5322,7 +5323,6 @@
     <Content Include="Views\FinancialDisplay\FinancialDisplay.cshtml" />
     <Content Include="Views\Display_JobOrderBalance\Display_JobOrderBalance.cshtml" />
     <Content Include="Views\Display_PaymentAdivceWithInvoice\Display_PaymentAdvice.cshtml" />
-    <Content Include="Views\DashBoardAuto\DashBoardAuto.cshtml" />
     <Content Include="Views\Charts\ChartJs.cshtml" />
     <Content Include="Views\Charts\Flot.cshtml" />
     <Content Include="Views\Charts\Inline.cshtml" />

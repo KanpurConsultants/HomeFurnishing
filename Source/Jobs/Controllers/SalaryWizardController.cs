@@ -215,6 +215,10 @@ namespace Jobs.Controllers
                         LineCharge.OMSId = EmployeeCharge.OMSId;
                         LineCharge.ObjectState = Model.ObjectState.Added;
                         db.SalaryLineCharge.Add(LineCharge);
+
+                        Charge NetSalaryCharge = (from C in db.Charge where C.ChargeName == "Net Salary" select C).FirstOrDefault();
+                        if (NetSalaryCharge != null && LineCharge.ChargeId == NetSalaryCharge.ChargeId)
+                            Line.NetPayable = (LineCharge.Amount ?? 0) + (Line.OtherAddition ?? 0) - (Line.OtherDeduction ?? 0) - (Line.LoanEMI ?? 0) - (Line.Advance ?? 0);
                     }
 
                     db.SalaryLine.Add(Line);

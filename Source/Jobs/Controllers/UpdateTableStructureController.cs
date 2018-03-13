@@ -3672,6 +3672,7 @@ namespace Module
             AddFields("Employees", "PaymentType", "nvarchar(10)");
 
             AddFields("SalaryLines", "Advance", "Decimal(18,4)");
+            AddFields("SalaryLines", "NetPayable", "DECIMAL(18,4) NOT NULL DEFAULT((0))");
 
             AddFields("SalaryHeaders", "LedgerHeaderId", "Int","LedgerHeaders");
 

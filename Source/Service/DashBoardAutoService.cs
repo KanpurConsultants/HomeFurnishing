@@ -56,11 +56,27 @@ namespace Service
     {
         ApplicationDbContext db = new ApplicationDbContext();
         string mQry = "";
+        private readonly IUnitOfWorkForService _unitOfWork;
+
+        DateTime? MonthStartDate = null;
+        DateTime? MonthEndDate = null;
+        DateTime? YearStartDate = null;
+        DateTime? YearEndDate = null;
+        DateTime? SoftwareStartDate = null;
+        DateTime? TodayDate = null;
+
+
+        public DashBoardAutoService(IUnitOfWorkForService unitOfWork)
+        {
+            _unitOfWork = unitOfWork;
+            Init();
+        }
         public DashBoardAutoService()
         {
+            Init();
         }
 
-        public IEnumerable<DashBoardSingleValue> GetVehicleSale()
+        private void Init()
         {
             mQry = @"DECLARE @Month INT 
                     DECLARE @Year INT
@@ -68,10 +84,30 @@ namespace Service
                     SELECT @Year =  Datepart(YEAR,getdate())
                     DECLARE @FromDate DATETIME
                     DECLARE @ToDate DATETIME
-                    SELECT @FromDate = DATEADD(month,@Month-1,DATEADD(year,@Year-1900,0)), @ToDate = DATEADD(day,-1,DATEADD(month,@Month,DATEADD(year,@Year-1900,0))) 
+                    SELECT DATEADD(month,@Month-1,DATEADD(year,@Year-1900,0)) As MonthStartDate, 
+                    DATEADD(day,-1,DATEADD(month,@Month,DATEADD(year,@Year-1900,0))) As MonthEndDate,
+                    CASE WHEN DATEPART(MM,GETDATE()) < 4 THEN DATEADD(MONTH,-9,DATEADD(DD,-DATEPART(DY,GETDATE())+1,GETDATE()))
+                    ELSE DATEADD(MONTH,3,DATEADD(DD,-DATEPART(DY,GETDATE())+1,GETDATE())) END AS YearStartDate,
+                    CASE WHEN DATEPART(MM,GETDATE()) < 4 THEN DATEADD(MONTH,-9,DATEADD(DD,-1,DATEADD(YY,DATEDIFF(YY,0,GETDATE())+1,0)))
+                    ELSE DATEADD(MONTH,3,DATEADD(DD,-1,DATEADD(YY,DATEDIFF(YY,0,GETDATE())+1,0))) END AS YearEndDate,
+                    Convert(DATETIME,'01/Apr/2001') AS SoftwareStartDate,
+                    GETDATE() As TodayDate ";
+            SessnionValues SessnionValues = db.Database.SqlQuery<SessnionValues>(mQry).FirstOrDefault();
 
+            MonthStartDate = SessnionValues.MonthStartDate;
+            MonthEndDate = SessnionValues.MonthEndDate;
+            YearStartDate = SessnionValues.YearStartDate;
+            YearEndDate = SessnionValues.YearEndDate;
+            SoftwareStartDate = SessnionValues.SoftwareStartDate;
+            TodayDate = SessnionValues.TodayDate;
+        }
 
-                    SELECT Convert(NVARCHAR,Convert(DECIMAL(18,2),Round(IsNull(Sum(Hc.Amount),0)/10000000,2))) + ' Crore' AS Value
+        public IEnumerable<DashBoardSingleValue> GetVehicleSale()
+        {
+            SqlParameter SqlParameterFromDate = new SqlParameter("@FromDate", MonthStartDate);
+            SqlParameter SqlParameterToDate = new SqlParameter("@ToDate", MonthEndDate);
+
+            mQry = @" SELECT Convert(NVARCHAR,Convert(DECIMAL(18,2),Round(IsNull(Sum(Hc.Amount),0)/10000000,2))) + ' Crore' AS Value
                     FROM Web.SaleInvoiceHeaders H 
                     LEFT JOIN Web.SaleInvoiceHeaderCharges Hc ON H.SaleInvoiceHeaderId = Hc.HeaderTableId
                     LEFT JOIN Web.DocumentTypes D ON H.DocTypeId = D.DocumentTypeId
@@ -80,59 +116,47 @@ namespace Service
                     AND  H.DocDate BETWEEN @FromDate AND @ToDate
                     AND D.DocumentCategoryId = 464 ";
 
-            IEnumerable<DashBoardSingleValue> VehicleSale = db.Database.SqlQuery<DashBoardSingleValue>(mQry).ToList();
+            IEnumerable<DashBoardSingleValue> VehicleSale = db.Database.SqlQuery<DashBoardSingleValue>(mQry, SqlParameterFromDate, SqlParameterToDate).ToList();
             return VehicleSale;
         }
         public IEnumerable<DashBoardSingleValue> GetVehicleProfit()
         {
-            mQry = @"DECLARE @Month INT 
-                    DECLARE @Year INT
-                    SELECT @Month =  Datepart(MONTH,getdate())
-                    SELECT @Year =  Datepart(YEAR,getdate())
-                    DECLARE @FromDate DATETIME
-                    DECLARE @ToDate DATETIME
-                    SELECT @FromDate = DATEADD(month,@Month-1,DATEADD(year,@Year-1900,0)), @ToDate = DATEADD(day,-1,DATEADD(month,@Month,DATEADD(year,@Year-1900,0))) 
+            SqlParameter SqlParameterFromDate = new SqlParameter("@FromDate", MonthStartDate);
+            SqlParameter SqlParameterToDate = new SqlParameter("@ToDate", MonthEndDate);
 
-                    SELECT Convert(NVARCHAR,Convert(DECIMAL(18,2),Round((IsNull(Sum(VSale.SaleAmount),0) - IsNull(Sum(VPurchase.PurchaseAmount),0))/10000000,2))) + ' Crore' AS Value
-                    FROM (
-	                    SELECT VProductUid.ProductUidId, Sum(Hc.Amount) AS SaleAmount
-	                    FROM Web.SaleInvoiceHeaders H 
-	                    LEFT JOIN Web.SaleInvoiceHeaderCharges Hc ON H.SaleInvoiceHeaderId = Hc.HeaderTableId
-	                    LEFT JOIN (
-		                    SELECT Max(Pl.ProductUidId) AS ProductUidId, L.SaleInvoiceHeaderId
-		                    FROM Web.SaleInvoiceLines L 
-		                    LEFT JOIN Web.SaleDispatchLines Sdl ON L.SaleDispatchLineId = Sdl.SaleDispatchLineId
-		                    LEFT JOIN Web.PackingLines Pl ON Sdl.PackingLineId = Pl.PackingLineId
-		                    WHERE Pl.ProductUidId IS NOT NULL
-		                    GROUP BY L.SaleInvoiceHeaderId
-	                    ) AS VProductUid ON H.SaleInvoiceHeaderId = VProductUid.SaleInvoiceHeaderId
-	                    LEFT JOIN Web.DocumentTypes D ON H.DocTypeId = D.DocumentTypeId
-	                    LEFT JOIN Web.Charges C ON Hc.ChargeId = C.ChargeId
-	                    WHERE C.ChargeName = 'Net Amount'
-	                    AND  H.DocDate BETWEEN @FromDate AND @ToDate
-	                    AND D.DocumentCategoryId = 464
-	                    GROUP BY VProductUid.ProductUidId
-                    ) AS VSale
-                    LEFT JOIN (
-	                    SELECT VProductUid.ProductUidId, Sum(Hc.Amount) AS PurchaseAmount
-	                    FROM Web.JobInvoiceHeaders H 
-	                    LEFT JOIN Web.JobInvoiceHeaderCharges Hc ON H.JobInvoiceHeaderId = Hc.HeaderTableId
-	                    LEFT JOIN (
-		                    SELECT Max(Jrl.ProductUidId) AS ProductUidId, L.JobInvoiceHeaderId
-		                    FROM Web.JobInvoiceLines L 
-		                    LEFT JOIN Web.JobReceiveLines Jrl ON L.JobReceiveLineId = Jrl.JobReceiveLineId
-		                    WHERE Jrl.ProductUidId IS NOT NULL
-		                    GROUP BY L.JobInvoiceHeaderId
-	                    ) AS VProductUid ON H.JobInvoiceHeaderId = VProductUid.JobInvoiceHeaderId
-	                    LEFT JOIN Web.DocumentTypes D ON H.DocTypeId = D.DocumentTypeId
-	                    LEFT JOIN Web.Charges C ON Hc.ChargeId = C.ChargeId
-	                    WHERE C.ChargeName = 'Net Amount'
-	                    AND D.DocumentCategoryId = 461
-	                    GROUP BY VProductUid.ProductUidId
-                    ) AS VPurchase ON VSale.ProductUidId = VPurchase.ProductUidId ";
+            mQry = @" SELECT Convert(NVARCHAR,Convert(DECIMAL(18,2),Round(Sum(L.Amount - Purch.PurchaseAmount - IsNull(CreditNote.CreditNoteAmount,0) + IsNull(purch.RetensionTarget,0))/10000000,2))) + ' Crore' AS Value
+                        FROM Web.SaleInvoiceHeaders H
+                        LEFT JOIN web.SaleInvoiceLines L ON H.SaleInvoiceHeaderId = L.SaleInvoiceHeaderId 
+                        LEFT JOIN web.SaleDispatchLines DL ON L.SaleDispatchLineId = DL.SaleDispatchLineId 
+                        LEFT JOIN web.PackingLines PL ON DL.PackingLineId = PL.PackingLineId 
+                        LEFT JOIN web.SaleDispatchReturnLines DRL ON DL.SaleDispatchLineId = DRL.SaleDispatchLineId 
+                        LEFT JOIN web.People P ON H.BillToBuyerId = P.PersonID 
+                        LEFT JOIN web.Products Pr ON PL.ProductId = Pr.ProductId 
+                        LEFT JOIN web.ProductGroups Pg ON Pr.ProductGroupId = Pg.ProductGroupId 
+                        LEFT JOIN Web.ProductTypes Pt ON Pg.ProductTypeId = Pt.ProductTypeId
+                        LEFT JOIN web.ProductUids UID ON PL.ProductUidId = UID.ProductUIDId 
+                        LEFT JOIN (
+			                        SELECT L.SaleInvoiceLineId, Sum(L.Amount) AS CreditNoteAmount
+			                        FROM Web.SaleInvoiceReturnHeaders H
+			                        LEFT JOIN web.SaleInvoiceReturnLines L ON L.SaleInvoiceReturnHeaderId = H.SaleInvoiceReturnHeaderId 
+			                        WHERE H.Nature ='Credit Note'
+			                        GROUP BY L.SaleInvoiceLineId 
+		                          ) AS CreditNote ON CreditNote.SaleInvoiceLineId = L.SaleInvoiceLineId 
+                        LEFT JOIN (
+			                        SELECT L.JobInvoiceHeaderId, Max(H.DocNo) AS TmlInvoiceNo, Max(H.DocDate) AS TmlInvoiceDate, Max(RL.ProductUidId) AS ProductUidId, Sum(L.Amount) AS PurchaseAmount, Max(P.StandardCost) - Sum(L.Amount) AS PriceDiff,
+			                        (SELECT Sum(promo.FlatDiscount) FROM Web.PromoCodes promo WHERE max(h.DocDate) BETWEEN promo.FromDate AND promo.ToDate AND (promo.ProductId = max(p.ProductId) OR promo.ProductGroupId = max(p.ProductGroupId) OR IsNull(Max(p.ProductCategoryId),-1)=promo.ProductGroupId OR Max(pg.ProductTypeId) = promo.ProductTypeId OR IsNull(promo.ProductId,0)+IsNull(promo.ProductGroupId,0)+IsNull(promo.ProductCategoryId,0)+IsNull(promo.ProductTypeId,0) = 0)) AS RetensionTarget
+			                        FROM Web.JobInvoiceHeaders H
+			                        LEFT JOIN web.JobInvoiceLines L ON H.JobInvoiceHeaderId = L.JobInvoiceHeaderId 
+			                        LEFT JOIN web.JobReceiveLines RL ON L.JobReceiveLineId = RL.JobReceiveLineId 
+			                        LEFT JOIN web.Products P ON RL.ProductId = p.ProductId 
+			                        LEFT JOIN web.ProductGroups pg ON pg.ProductGroupId = p.ProductGroupId 
+			                        WHERE H.DocTypeId = 631
+			                        GROUP BY L.JobInvoiceHeaderId 
+		                          ) AS Purch ON PL.productUidId = Purch.ProductUidId
+                        WHERE DRL.SaleDispatchReturnLineId IS NULL AND H.DocDate BETWEEN @FromDate AND @ToDate
+                        AND PL.ProductUidId IS NOT NULL  ";
 
-
-            IEnumerable<DashBoardSingleValue> VehicleProfit = db.Database.SqlQuery<DashBoardSingleValue>(mQry).ToList();
+            IEnumerable<DashBoardSingleValue> VehicleProfit = db.Database.SqlQuery<DashBoardSingleValue>(mQry, SqlParameterFromDate, SqlParameterToDate).ToList();
             return VehicleProfit;
         }
         public IEnumerable<DashBoardSingleValue> GetVehicleStock()
@@ -180,56 +204,170 @@ namespace Service
 
         public IEnumerable<DashBoardSingleValue> GetExpense()
         {
-            mQry = @" SELECT '10 Crore' AS Value ";
+            mQry = "SELECT Convert(nvarchar,LedgerAccountGroupId) As Value FROM Web.LedgerAccountGroups WHERE LedgerAccountGroupName = '" + Jobs.Constants.LedgerAccountGroup.LedgerAccountGroupConstants.DirectExpenses.LedgerAccountGroupName + "'";
+            DashBoardSingleValue SundryDebtorsLedgerAccountGroup = db.Database.SqlQuery<DashBoardSingleValue>(mQry).FirstOrDefault();
 
-            IEnumerable<DashBoardSingleValue> Expense = db.Database.SqlQuery<DashBoardSingleValue>(mQry).ToList();
-            return Expense;
+            SqlParameter SqlParameterSiteId = new SqlParameter("@Site", (object)DBNull.Value);
+            SqlParameter SqlParameterDivisionId = new SqlParameter("@Division", (object)DBNull.Value);
+            SqlParameter SqlParameterFromDate = new SqlParameter("@FromDate", SoftwareStartDate);
+            SqlParameter SqlParameterToDate = new SqlParameter("@ToDate", TodayDate);
+            SqlParameter SqlParameterCostCenter = new SqlParameter("@CostCenter", (object)DBNull.Value);
+            SqlParameter SqlParameterLedgerAccountGroup = new SqlParameter("@LedgerAccountGroup", SundryDebtorsLedgerAccountGroup.Value);
+
+            mQry = new FinancialDisplayService(_unitOfWork).GetQryForTrialBalance(null, null, SoftwareStartDate.ToString(), TodayDate.ToString(), null, "False", "False", SundryDebtorsLedgerAccountGroup.Value) +
+                                        @" SELECT Convert(NVARCHAR,Convert(DECIMAL(18,2),Round((IsNull(Sum(VMain.Balance),0))/10000000,2))) + ' Crore' As Value
+                                        FROM
+                                        (
+                                            SELECT Sum(isnull(H.Balance,0)) AS Balance
+                                            FROM cteAcGroup H 
+                                            GROUP BY H.BaseLedgerAccountGroupId 
+
+                                            UNION ALL 
+                
+                                            SELECT isnull(H.Balance,0) AS Balance
+                                            FROM cteLedgerBalance H 
+                                         ) As VMain ";
+
+
+            IEnumerable<DashBoardSingleValue> DashBoardSingleValue = db.Database.SqlQuery<DashBoardSingleValue>(mQry, SqlParameterSiteId, SqlParameterDivisionId, SqlParameterFromDate, SqlParameterToDate, SqlParameterCostCenter, SqlParameterLedgerAccountGroup).ToList();
+            return DashBoardSingleValue;
         }
         public IEnumerable<DashBoardSingleValue> GetDebtors()
         {
-            mQry = @" SELECT '11 Crore' AS Value ";
+            mQry = "SELECT Convert(nvarchar,LedgerAccountGroupId) As Value FROM Web.LedgerAccountGroups WHERE LedgerAccountGroupName = '"+ Jobs.Constants.LedgerAccountGroup.LedgerAccountGroupConstants.SundryDebtors.LedgerAccountGroupName + "'";
+            DashBoardSingleValue SundryDebtorsLedgerAccountGroup = db.Database.SqlQuery<DashBoardSingleValue>(mQry).FirstOrDefault();
 
-            IEnumerable<DashBoardSingleValue> Debtors = db.Database.SqlQuery<DashBoardSingleValue>(mQry).ToList();
-            return Debtors;
+            SqlParameter SqlParameterSiteId = new SqlParameter("@Site", (object)DBNull.Value);
+            SqlParameter SqlParameterDivisionId = new SqlParameter("@Division", (object)DBNull.Value);
+            SqlParameter SqlParameterFromDate = new SqlParameter("@FromDate", SoftwareStartDate);
+            SqlParameter SqlParameterToDate = new SqlParameter("@ToDate", TodayDate);
+            SqlParameter SqlParameterCostCenter = new SqlParameter("@CostCenter", (object)DBNull.Value);
+            SqlParameter SqlParameterLedgerAccountGroup = new SqlParameter("@LedgerAccountGroup", SundryDebtorsLedgerAccountGroup.Value);
+
+            mQry = new FinancialDisplayService(_unitOfWork).GetQryForTrialBalance(null, null, SoftwareStartDate.ToString(), TodayDate.ToString(), null, "False", "False", SundryDebtorsLedgerAccountGroup.Value) +
+                                        @" SELECT Convert(NVARCHAR,Convert(DECIMAL(18,2),Round((IsNull(Sum(VMain.Balance),0))/10000000,2))) + ' Crore' As Value
+                                        FROM
+                                        (
+                                            SELECT Sum(isnull(H.Balance,0)) AS Balance
+                                            FROM cteAcGroup H 
+                                            GROUP BY H.BaseLedgerAccountGroupId 
+
+                                            UNION ALL 
+                
+                                            SELECT isnull(H.Balance,0) AS Balance
+                                            FROM cteLedgerBalance H 
+                                         ) As VMain ";
+
+
+            IEnumerable<DashBoardSingleValue> DashBoardSingleValue = db.Database.SqlQuery<DashBoardSingleValue>(mQry, SqlParameterSiteId, SqlParameterDivisionId, SqlParameterFromDate, SqlParameterToDate, SqlParameterCostCenter, SqlParameterLedgerAccountGroup).ToList();
+            return DashBoardSingleValue;
         }
         public IEnumerable<DashBoardSingleValue> GetCreditors()
         {
-            mQry = @" SELECT '12 Crore' AS Value ";
+            mQry = "SELECT Convert(nvarchar,LedgerAccountGroupId) As Value FROM Web.LedgerAccountGroups WHERE LedgerAccountGroupName = '" + Jobs.Constants.LedgerAccountGroup.LedgerAccountGroupConstants.SundryCreditors.LedgerAccountGroupName + "'";
+            DashBoardSingleValue SundryDebtorsLedgerAccountGroup = db.Database.SqlQuery<DashBoardSingleValue>(mQry).FirstOrDefault();
 
-            IEnumerable<DashBoardSingleValue> Creditors = db.Database.SqlQuery<DashBoardSingleValue>(mQry).ToList();
-            return Creditors;
+            SqlParameter SqlParameterSiteId = new SqlParameter("@Site", (object)DBNull.Value);
+            SqlParameter SqlParameterDivisionId = new SqlParameter("@Division", (object)DBNull.Value);
+            SqlParameter SqlParameterFromDate = new SqlParameter("@FromDate", SoftwareStartDate);
+            SqlParameter SqlParameterToDate = new SqlParameter("@ToDate", TodayDate);
+            SqlParameter SqlParameterCostCenter = new SqlParameter("@CostCenter", (object)DBNull.Value);
+            SqlParameter SqlParameterLedgerAccountGroup = new SqlParameter("@LedgerAccountGroup", SundryDebtorsLedgerAccountGroup.Value);
+
+            mQry = new FinancialDisplayService(_unitOfWork).GetQryForTrialBalance(null, null, SoftwareStartDate.ToString(), TodayDate.ToString(), null, "False", "False", SundryDebtorsLedgerAccountGroup.Value) +
+                                        @" SELECT Convert(NVARCHAR,Convert(DECIMAL(18,2),Round((IsNull(-Sum(VMain.Balance),0))/10000000,2))) + ' Crore' As Value
+                                        FROM
+                                        (
+                                            SELECT Sum(isnull(H.Balance,0)) AS Balance
+                                            FROM cteAcGroup H 
+                                            GROUP BY H.BaseLedgerAccountGroupId 
+
+                                            UNION ALL 
+                
+                                            SELECT isnull(H.Balance,0) AS Balance
+                                            FROM cteLedgerBalance H 
+                                         ) As VMain ";
+
+
+            IEnumerable<DashBoardSingleValue> DashBoardSingleValue = db.Database.SqlQuery<DashBoardSingleValue>(mQry, SqlParameterSiteId, SqlParameterDivisionId, SqlParameterFromDate, SqlParameterToDate, SqlParameterCostCenter, SqlParameterLedgerAccountGroup).ToList();
+
+            return DashBoardSingleValue;
         }
         public IEnumerable<DashBoardSingleValue> GetBankBalance()
         {
-            mQry = @" SELECT '13 Crore' AS Value ";
+            mQry = "SELECT Convert(nvarchar,LedgerAccountGroupId) As Value FROM Web.LedgerAccountGroups WHERE LedgerAccountGroupName = '" + Jobs.Constants.LedgerAccountGroup.LedgerAccountGroupConstants.BankAccounts.LedgerAccountGroupName + "'";
+            DashBoardSingleValue SundryDebtorsLedgerAccountGroup = db.Database.SqlQuery<DashBoardSingleValue>(mQry).FirstOrDefault();
 
-            IEnumerable<DashBoardSingleValue> BankBalance = db.Database.SqlQuery<DashBoardSingleValue>(mQry).ToList();
-            return BankBalance;
+            SqlParameter SqlParameterSiteId = new SqlParameter("@Site", (object)DBNull.Value);
+            SqlParameter SqlParameterDivisionId = new SqlParameter("@Division", (object)DBNull.Value);
+            SqlParameter SqlParameterFromDate = new SqlParameter("@FromDate", SoftwareStartDate);
+            SqlParameter SqlParameterToDate = new SqlParameter("@ToDate", TodayDate);
+            SqlParameter SqlParameterCostCenter = new SqlParameter("@CostCenter", (object)DBNull.Value);
+            SqlParameter SqlParameterLedgerAccountGroup = new SqlParameter("@LedgerAccountGroup", SundryDebtorsLedgerAccountGroup.Value);
+
+            mQry = new FinancialDisplayService(_unitOfWork).GetQryForTrialBalance(null, null, SoftwareStartDate.ToString(), TodayDate.ToString(), null, "False", "False", SundryDebtorsLedgerAccountGroup.Value) +
+                                        @" SELECT Convert(NVARCHAR,Convert(DECIMAL(18,2),Round((IsNull(Sum(VMain.Balance),0))/10000000,2))) + ' Crore' As Value
+                                        FROM
+                                        (
+                                            SELECT Sum(isnull(H.Balance,0)) AS Balance
+                                            FROM cteAcGroup H 
+                                            GROUP BY H.BaseLedgerAccountGroupId 
+
+                                            UNION ALL 
+                
+                                            SELECT isnull(H.Balance,0) AS Balance
+                                            FROM cteLedgerBalance H 
+                                         ) As VMain ";
+
+
+            IEnumerable<DashBoardSingleValue> DashBoardSingleValue = db.Database.SqlQuery<DashBoardSingleValue>(mQry, SqlParameterSiteId, SqlParameterDivisionId, SqlParameterFromDate, SqlParameterToDate, SqlParameterCostCenter, SqlParameterLedgerAccountGroup).ToList();
+            return DashBoardSingleValue;
         }
         public IEnumerable<DashBoardSingleValue> GetCashBalance()
         {
-            mQry = @" SELECT '14 Crore' AS Value ";
+            mQry = "SELECT Convert(nvarchar,LedgerAccountGroupId) As Value FROM Web.LedgerAccountGroups WHERE LedgerAccountGroupName = '" + Jobs.Constants.LedgerAccountGroup.LedgerAccountGroupConstants.CashinHand.LedgerAccountGroupName + "'";
+            DashBoardSingleValue SundryDebtorsLedgerAccountGroup = db.Database.SqlQuery<DashBoardSingleValue>(mQry).FirstOrDefault();
 
-            IEnumerable<DashBoardSingleValue> CashBalance = db.Database.SqlQuery<DashBoardSingleValue>(mQry).ToList();
-            return CashBalance;
+            SqlParameter SqlParameterSiteId = new SqlParameter("@Site", (object)DBNull.Value);
+            SqlParameter SqlParameterDivisionId = new SqlParameter("@Division", (object)DBNull.Value);
+            SqlParameter SqlParameterFromDate = new SqlParameter("@FromDate", SoftwareStartDate);
+            SqlParameter SqlParameterToDate = new SqlParameter("@ToDate", TodayDate);
+            SqlParameter SqlParameterCostCenter = new SqlParameter("@CostCenter", (object)DBNull.Value);
+            SqlParameter SqlParameterLedgerAccountGroup = new SqlParameter("@LedgerAccountGroup", SundryDebtorsLedgerAccountGroup.Value);
+
+            mQry = new FinancialDisplayService(_unitOfWork).GetQryForTrialBalance(null, null, SoftwareStartDate.ToString(), TodayDate.ToString(), null, "False", "False", SundryDebtorsLedgerAccountGroup.Value) +
+                                        @" SELECT Convert(NVARCHAR,Convert(DECIMAL(18,2),Round((IsNull(Sum(VMain.Balance),0))/100000,2))) + ' Lakh' As Value
+                                        FROM
+                                        (
+                                            SELECT Sum(isnull(H.Balance,0)) AS Balance
+                                            FROM cteAcGroup H 
+                                            GROUP BY H.BaseLedgerAccountGroupId 
+
+                                            UNION ALL 
+                
+                                            SELECT isnull(H.Balance,0) AS Balance
+                                            FROM cteLedgerBalance H 
+                                         ) As VMain ";
+
+
+            IEnumerable<DashBoardSingleValue> DashBoardSingleValue = db.Database.SqlQuery<DashBoardSingleValue>(mQry, SqlParameterSiteId, SqlParameterDivisionId, SqlParameterFromDate, SqlParameterToDate, SqlParameterCostCenter, SqlParameterLedgerAccountGroup).ToList();
+            return DashBoardSingleValue;
         }
         public IEnumerable<DashBoardPieChartData> GetVehicleSalePieChartData()
         {
-            mQry = @"DECLARE @Month INT 
-                    DECLARE @Year INT
-                    SELECT @Month =  Datepart(MONTH,getdate())
-                    SELECT @Year =  Datepart(YEAR,getdate())
-                    DECLARE @FromDate DATETIME
-                    DECLARE @ToDate DATETIME
-                    SELECT @FromDate = DATEADD(month,@Month-1,DATEADD(year,@Year-1900,0)), @ToDate = DATEADD(day,-1,DATEADD(month,@Month,DATEADD(year,@Year-1900,0))) 
+            SqlParameter SqlParameterFromDate = new SqlParameter("@FromDate", MonthStartDate);
+            SqlParameter SqlParameterToDate = new SqlParameter("@ToDate", MonthEndDate);
 
-                    SELECT S.SiteName As label, Sum(Hc.Amount) AS value,
+            mQry = @"SELECT S.SiteName As label, Round(Sum(Hc.Amount)/10000000,2) AS value,
                     CASE WHEN row_number() OVER (ORDER BY S.SiteName) = 1 THEN '#f56954'
 	                     WHEN row_number() OVER (ORDER BY S.SiteName) = 2 THEN '#00a65a'
 	                     WHEN row_number() OVER (ORDER BY S.SiteName) = 3 THEN '#f39c12'
 	                     WHEN row_number() OVER (ORDER BY S.SiteName) = 4 THEN '#00c0ef'
 	                     WHEN row_number() OVER (ORDER BY S.SiteName) = 5 THEN '#3c8dbc'
 	                     WHEN row_number() OVER (ORDER BY S.SiteName) = 6 THEN '#d2d6de'
+                         WHEN row_number() OVER (ORDER BY S.SiteName) = 7 THEN '#c685c3'
+                         WHEN row_number() OVER (ORDER BY S.SiteName) = 8 THEN '#b2d6ce'
+                         WHEN row_number() OVER (ORDER BY S.SiteName) = 9 THEN '#a2d6ce'
 	                     ELSE '#f56954'
                     END AS color 
                     FROM Web.SaleInvoiceHeaders H 
@@ -239,15 +377,19 @@ namespace Service
                     LEFT JOIN Web.Sites S ON h.SiteId = S.SiteId
                     WHERE C.ChargeName = 'Net Amount'
                     AND  H.DocDate BETWEEN @FromDate AND @ToDate
-                    AND D.DocumentCategoryId = 4012
+                    AND D.DocumentCategoryId = 464
                     GROUP BY S.SiteName ";
 
-            IEnumerable<DashBoardPieChartData> VehicleSalePieChartData = db.Database.SqlQuery<DashBoardPieChartData>(mQry).ToList();
+            IEnumerable<DashBoardPieChartData> VehicleSalePieChartData = db.Database.SqlQuery<DashBoardPieChartData>(mQry, SqlParameterFromDate, SqlParameterToDate).ToList();
             return VehicleSalePieChartData;
         }
         public IEnumerable<DashBoardSaleBarChartData> GetVehicleSaleBarChartData()
         {
-            mQry = @"SELECT DATENAME(month, H.DocDate) AS Month, 
+            SqlParameter SqlParameterFromDate = new SqlParameter("@FromDate", YearStartDate);
+            SqlParameter SqlParameterToDate = new SqlParameter("@ToDate", YearEndDate);
+
+
+            mQry = @"SELECT LEFT(DATENAME(month, H.DocDate),3) AS Month, 
                     Round(Sum(Hc.Amount)/10000000,2) AS Amount
                     FROM Web.SaleInvoiceHeaders H 
                     LEFT JOIN Web.SaleInvoiceHeaderCharges Hc ON H.SaleInvoiceHeaderId = Hc.HeaderTableId
@@ -255,23 +397,51 @@ namespace Service
                     LEFT JOIN Web.Charges C ON Hc.ChargeId = C.ChargeId
                     WHERE C.ChargeName = 'Net Amount'
                     AND D.DocumentCategoryId = 464
+                    AND  H.DocDate BETWEEN @FromDate AND @ToDate
                     GROUP BY DATENAME(month, H.DocDate)
-                    ORDER BY DatePart(month,Max(H.DocDate)) ";
+                    ORDER BY DatePart(Year,Max(H.DocDate)) + Convert(DECIMAL(18,2),DatePart(month,Max(H.DocDate))) / 100 ";
 
-            IEnumerable<DashBoardSaleBarChartData> ChartData = db.Database.SqlQuery<DashBoardSaleBarChartData>(mQry).ToList();
+            IEnumerable<DashBoardSaleBarChartData> ChartData = db.Database.SqlQuery<DashBoardSaleBarChartData>(mQry, SqlParameterFromDate, SqlParameterToDate).ToList();
             return ChartData;
         }
+        //public IEnumerable<DashBoardPieChartData> GetSpareSalePieChartData()
+        //{
+        //    mQry = @"DECLARE @Month INT 
+        //            DECLARE @Year INT
+        //            SELECT @Month =  Datepart(MONTH,getdate())
+        //            SELECT @Year =  Datepart(YEAR,getdate())
+        //            DECLARE @FromDate DATETIME
+        //            DECLARE @ToDate DATETIME
+        //            SELECT @FromDate = DATEADD(month,@Month-1,DATEADD(year,@Year-1900,0)), @ToDate = DATEADD(day,-1,DATEADD(month,@Month,DATEADD(year,@Year-1900,0))) 
+
+        //            SELECT S.SiteName As label, Sum(Hc.Amount) AS value,
+        //            CASE WHEN row_number() OVER (ORDER BY S.SiteName) = 1 THEN '#f56954'
+        //              WHEN row_number() OVER (ORDER BY S.SiteName) = 2 THEN '#00a65a'
+        //              WHEN row_number() OVER (ORDER BY S.SiteName) = 3 THEN '#f39c12'
+        //              WHEN row_number() OVER (ORDER BY S.SiteName) = 4 THEN '#00c0ef'
+        //              WHEN row_number() OVER (ORDER BY S.SiteName) = 5 THEN '#3c8dbc'
+        //              WHEN row_number() OVER (ORDER BY S.SiteName) = 6 THEN '#d2d6de'
+        //              ELSE '#f56954'
+        //            END AS color 
+        //            FROM Web.SaleInvoiceHeaders H 
+        //            LEFT JOIN Web.SaleInvoiceHeaderCharges Hc ON H.SaleInvoiceHeaderId = Hc.HeaderTableId
+        //            LEFT JOIN Web.DocumentTypes D ON H.DocTypeId = D.DocumentTypeId
+        //            LEFT JOIN Web.Charges C ON Hc.ChargeId = C.ChargeId
+        //            LEFT JOIN Web.Sites S ON h.SiteId = S.SiteId
+        //            WHERE C.ChargeName = 'Net Amount'
+        //            AND  H.DocDate BETWEEN @FromDate AND @ToDate
+        //            AND D.DocumentCategoryId = 4012
+        //            GROUP BY S.SiteName ";
+
+        //    IEnumerable<DashBoardPieChartData> SaleSalePieChartData = db.Database.SqlQuery<DashBoardPieChartData>(mQry).ToList();
+        //    return SaleSalePieChartData;
+        //}
         public IEnumerable<DashBoardPieChartData> GetSpareSalePieChartData()
         {
-            mQry = @"DECLARE @Month INT 
-                    DECLARE @Year INT
-                    SELECT @Month =  Datepart(MONTH,getdate())
-                    SELECT @Year =  Datepart(YEAR,getdate())
-                    DECLARE @FromDate DATETIME
-                    DECLARE @ToDate DATETIME
-                    SELECT @FromDate = DATEADD(month,@Month-1,DATEADD(year,@Year-1900,0)), @ToDate = DATEADD(day,-1,DATEADD(month,@Month,DATEADD(year,@Year-1900,0))) 
+            SqlParameter SqlParameterFromDate = new SqlParameter("@FromDate", MonthStartDate);
+            SqlParameter SqlParameterToDate = new SqlParameter("@ToDate", MonthEndDate);
 
-                    SELECT S.SiteName As label, Sum(Hc.Amount) AS value,
+            mQry = @"SELECT S.SiteName As label, Round(Sum(Hc.Amount)/100000,2) AS value,
                     CASE WHEN row_number() OVER (ORDER BY S.SiteName) = 1 THEN '#f56954'
 	                     WHEN row_number() OVER (ORDER BY S.SiteName) = 2 THEN '#00a65a'
 	                     WHEN row_number() OVER (ORDER BY S.SiteName) = 3 THEN '#f39c12'
@@ -290,23 +460,28 @@ namespace Service
                     AND D.DocumentCategoryId = 4012
                     GROUP BY S.SiteName ";
 
-            IEnumerable<DashBoardPieChartData> SaleSalePieChartData = db.Database.SqlQuery<DashBoardPieChartData>(mQry).ToList();
+            IEnumerable<DashBoardPieChartData> SaleSalePieChartData = db.Database.SqlQuery<DashBoardPieChartData>(mQry, SqlParameterFromDate, SqlParameterToDate).ToList();
             return SaleSalePieChartData;
         }
         public IEnumerable<DashBoardSaleBarChartData> GetSpareSaleBarChartData()
         {
-            mQry = @"SELECT DATENAME(month, H.DocDate) AS Month, 
-                    Round(Sum(Hc.Amount)/10000000,2) AS Amount
+            SqlParameter SqlParameterFromDate = new SqlParameter("@FromDate", YearStartDate);
+            SqlParameter SqlParameterToDate = new SqlParameter("@ToDate", YearEndDate);
+
+
+            mQry = @"SELECT LEFT(DATENAME(month, H.DocDate),3) AS Month, 
+                    Round(Sum(Hc.Amount)/100000,2) AS Amount
                     FROM Web.SaleInvoiceHeaders H 
                     LEFT JOIN Web.SaleInvoiceHeaderCharges Hc ON H.SaleInvoiceHeaderId = Hc.HeaderTableId
                     LEFT JOIN Web.DocumentTypes D ON H.DocTypeId = D.DocumentTypeId
                     LEFT JOIN Web.Charges C ON Hc.ChargeId = C.ChargeId
                     WHERE C.ChargeName = 'Net Amount'
-                    AND D.DocumentCategoryId = 464
+                    AND D.DocumentCategoryId = 4012
+                    AND  H.DocDate BETWEEN @FromDate AND @ToDate
                     GROUP BY DATENAME(month, H.DocDate)
-                    ORDER BY DatePart(month,Max(H.DocDate)) ";
+                    ORDER BY DatePart(Year,Max(H.DocDate)) + Convert(DECIMAL(18,2),DatePart(month,Max(H.DocDate))) / 100 ";
 
-            IEnumerable<DashBoardSaleBarChartData> ChartData = db.Database.SqlQuery<DashBoardSaleBarChartData>(mQry).ToList();
+            IEnumerable<DashBoardSaleBarChartData> ChartData = db.Database.SqlQuery<DashBoardSaleBarChartData>(mQry, SqlParameterFromDate, SqlParameterToDate).ToList();
             return ChartData;
         }
 
@@ -314,8 +489,12 @@ namespace Service
 
         public IEnumerable<DashBoardTabularData> GetVehicleSaleDetailFinancierWise()
         {
+            SqlParameter SqlParameterFromDate = new SqlParameter("@FromDate", MonthStartDate);
+            SqlParameter SqlParameterToDate = new SqlParameter("@ToDate", MonthEndDate);
+
             mQry = @"SELECT P.Name AS Head, Convert(NVARCHAR,Convert(DECIMAL(18,2),Round(IsNull(Sum(VCharge.Amount),0)/10000000,2))) + ' Crore' AS Value
                     FROM Web.SaleInvoiceHeaders H 
+                    LEFT JOIN Web.DocumentTypes D ON H.DocTypeId = D.DocumentTypeId
                     LEFT JOIN Web.People P ON H.FinancierId = P.PersonID
                     LEFT JOIN 
 	                    (SELECT Hc.HeaderTableId AS SaleInvoiceHeaderId, Hc.Amount 
@@ -323,17 +502,23 @@ namespace Service
 	                    LEFT JOIN Web.Charges C ON Hc.ChargeId = C.ChargeId
 	                    WHERE C.ChargeName = 'Net Amount') AS VCharge ON H.SaleInvoiceHeaderId = VCharge.SaleInvoiceHeaderId
                     WHERE H.FinancierId IS NOT NULL
+                    AND  H.DocDate BETWEEN @FromDate AND @ToDate
+                    AND D.DocumentCategoryId = 464
                     GROUP BY P.Name
                     ORDER BY P.Name ";
 
-            IEnumerable<DashBoardTabularData> DashBoardTabularData = db.Database.SqlQuery<DashBoardTabularData>(mQry).ToList();
+            IEnumerable<DashBoardTabularData> DashBoardTabularData = db.Database.SqlQuery<DashBoardTabularData>(mQry, SqlParameterFromDate, SqlParameterToDate).ToList();
             return DashBoardTabularData;
         }
 
         public IEnumerable<DashBoardTabularData> GetVehicleSaleDetailSalesManWise()
         {
+            SqlParameter SqlParameterFromDate = new SqlParameter("@FromDate", MonthStartDate);
+            SqlParameter SqlParameterToDate = new SqlParameter("@ToDate", MonthEndDate);
+
             mQry = @"SELECT P.Name AS Head, Convert(NVARCHAR,Convert(DECIMAL(18,2),Round(IsNull(Sum(VCharge.Amount),0)/10000000,2))) + ' Crore' AS Value
                     FROM Web.SaleInvoiceHeaders H 
+                    LEFT JOIN Web.DocumentTypes D ON H.DocTypeId = D.DocumentTypeId
                     LEFT JOIN Web.People P ON H.SalesExecutiveId = P.PersonID
                     LEFT JOIN 
 	                    (SELECT Hc.HeaderTableId AS SaleInvoiceHeaderId, Hc.Amount 
@@ -341,112 +526,264 @@ namespace Service
 	                    LEFT JOIN Web.Charges C ON Hc.ChargeId = C.ChargeId
 	                    WHERE C.ChargeName = 'Net Amount') AS VCharge ON H.SaleInvoiceHeaderId = VCharge.SaleInvoiceHeaderId
                     WHERE H.FinancierId IS NOT NULL
+                    AND  H.DocDate BETWEEN @FromDate AND @ToDate
+                    AND D.DocumentCategoryId = 464
                     GROUP BY P.Name
                     ORDER BY P.Name ";
 
-            IEnumerable<DashBoardTabularData> DashBoardTabularData = db.Database.SqlQuery<DashBoardTabularData>(mQry).ToList();
+            IEnumerable<DashBoardTabularData> DashBoardTabularData = db.Database.SqlQuery<DashBoardTabularData>(mQry, SqlParameterFromDate, SqlParameterToDate).ToList();
             return DashBoardTabularData;
         }
 
         public IEnumerable<DashBoardTabularData> GetVehicleSaleDetailProductTypeWise()
         {
-            mQry = @"SELECT P.Name AS Head, Convert(NVARCHAR,Convert(DECIMAL(18,2),Round(IsNull(Sum(VCharge.Amount),0)/10000000,2))) + ' Crore' AS Value
-                    FROM Web.SaleInvoiceHeaders H 
-                    LEFT JOIN Web.People P ON H.SalesExecutiveId = P.PersonID
-                    LEFT JOIN 
-	                    (SELECT Hc.HeaderTableId AS SaleInvoiceHeaderId, Hc.Amount 
-	                    FROM Web.SaleInvoiceHeaderCharges Hc
-	                    LEFT JOIN Web.Charges C ON Hc.ChargeId = C.ChargeId
-	                    WHERE C.ChargeName = 'Net Amount') AS VCharge ON H.SaleInvoiceHeaderId = VCharge.SaleInvoiceHeaderId
-                    WHERE H.FinancierId IS NOT NULL
-                    GROUP BY P.Name
-                    ORDER BY P.Name ";
+            SqlParameter SqlParameterFromDate = new SqlParameter("@FromDate", MonthStartDate);
+            SqlParameter SqlParameterToDate = new SqlParameter("@ToDate", MonthEndDate);
 
-            IEnumerable<DashBoardTabularData> DashBoardTabularData = db.Database.SqlQuery<DashBoardTabularData>(mQry).ToList();
+            mQry = @"SELECT VProductType.ProductTypeName AS Head, Convert(NVARCHAR,Convert(DECIMAL(18,2),Round(IsNull(Sum(VCharge.Amount),0)/10000000,2))) + ' Crore' AS Value
+                        FROM Web.SaleInvoiceHeaders H 
+                        LEFT JOIN Web.DocumentTypes D ON H.DocTypeId = D.DocumentTypeId
+                        LEFT JOIN 
+                            (SELECT Hc.HeaderTableId AS SaleInvoiceHeaderId, Hc.Amount 
+                            FROM Web.SaleInvoiceHeaderCharges Hc
+                            LEFT JOIN Web.Charges C ON Hc.ChargeId = C.ChargeId
+                            WHERE C.ChargeName = 'Net Amount') AS VCharge ON H.SaleInvoiceHeaderId = VCharge.SaleInvoiceHeaderId
+                        LEFT JOIN (
+	                        SELECT H.SaleInvoiceHeaderId, Max(Pt.ProductTypeName) AS ProductTypeName
+	                        FROM Web.SaleInvoiceHeaders H 
+	                        LEFT JOIN Web.SaleInvoiceLines L ON H.SaleInvoiceHeaderId = L.SaleInvoiceHeaderId
+	                        LEFT JOIN Web.Products P ON L.ProductId = P.ProductId
+	                        LEFT JOIN Web.ProductGroups Pg ON P.ProductGroupId = Pg.ProductGroupId
+	                        LEFT JOIN Web.ProductTypes Pt ON Pg.ProductTypeId = Pt.ProductTypeId
+	                        LEFT JOIN Web.ProductNatures Pn ON Pt.ProductNatureId = Pn.ProductNatureId
+	                        WHERE Pn.ProductNatureName = 'LOB'
+	                        GROUP BY H.SaleInvoiceHeaderId) AS VProductType ON H.SaleInvoiceHeaderId = VProductType.SaleInvoiceHeaderId
+                        WHERE H.DocDate BETWEEN '01/Feb/2018' AND '28/Feb/2018'
+                        AND D.DocumentCategoryId = 464
+                        AND VProductType.ProductTypeName IS NOT NULL
+                        GROUP BY VProductType.ProductTypeName
+                        ORDER BY VProductType.ProductTypeName ";
+
+            IEnumerable<DashBoardTabularData> DashBoardTabularData = db.Database.SqlQuery<DashBoardTabularData>(mQry, SqlParameterFromDate, SqlParameterToDate).ToList();
             return DashBoardTabularData;
         }
         public IEnumerable<DashBoardTabularData> GetVehicleProfitDetail()
         {
-            mQry = @"SELECT A.LedgerAccountName AS Head, Convert(nvarchar,IsNull(Sum(L.AmtDr),0) - IsNull(Sum(L.AmtCr),0)) AS Value
-                        FROM Web.Ledgers L 
-                        LEFT JOIN Web.LedgerAccounts A ON L.LedgerAccountId = A.LedgerAccountId
-                        LEFT JOIN Web.LedgerAccountGroups Ag ON A.LedgerAccountGroupId = Ag.LedgerAccountGroupId
-                        WHERE Ag.LedgerAccountNature = 'Bank'
-                        GROUP BY A.LedgerAccountName ";
+            SqlParameter SqlParameterFromDate = new SqlParameter("@FromDate", MonthStartDate);
+            SqlParameter SqlParameterToDate = new SqlParameter("@ToDate", MonthEndDate);
 
-            IEnumerable<DashBoardTabularData> DashBoardTabularData = db.Database.SqlQuery<DashBoardTabularData>(mQry).ToList();
+            mQry = @" SELECT Pt.ProductTypeName As Head, Convert(NVARCHAR,Convert(DECIMAL(18,2),Round(Sum(L.Amount - Purch.PurchaseAmount - IsNull(CreditNote.CreditNoteAmount,0) + IsNull(purch.RetensionTarget,0))/10000000,2))) + ' Crore' AS Value
+                        FROM Web.SaleInvoiceHeaders H
+                        LEFT JOIN web.SaleInvoiceLines L ON H.SaleInvoiceHeaderId = L.SaleInvoiceHeaderId 
+                        LEFT JOIN web.SaleDispatchLines DL ON L.SaleDispatchLineId = DL.SaleDispatchLineId 
+                        LEFT JOIN web.PackingLines PL ON DL.PackingLineId = PL.PackingLineId 
+                        LEFT JOIN web.SaleDispatchReturnLines DRL ON DL.SaleDispatchLineId = DRL.SaleDispatchLineId 
+                        LEFT JOIN web.People P ON H.BillToBuyerId = P.PersonID 
+                        LEFT JOIN web.Products Pr ON PL.ProductId = Pr.ProductId 
+                        LEFT JOIN web.ProductGroups Pg ON Pr.ProductGroupId = Pg.ProductGroupId 
+                        LEFT JOIN Web.ProductTypes Pt ON Pg.ProductTypeId = Pt.ProductTypeId
+                        LEFT JOIN web.ProductUids UID ON PL.ProductUidId = UID.ProductUIDId 
+                        LEFT JOIN (
+			                        SELECT L.SaleInvoiceLineId, Sum(L.Amount) AS CreditNoteAmount
+			                        FROM Web.SaleInvoiceReturnHeaders H
+			                        LEFT JOIN web.SaleInvoiceReturnLines L ON L.SaleInvoiceReturnHeaderId = H.SaleInvoiceReturnHeaderId 
+			                        WHERE H.Nature ='Credit Note'
+			                        GROUP BY L.SaleInvoiceLineId 
+		                          ) AS CreditNote ON CreditNote.SaleInvoiceLineId = L.SaleInvoiceLineId 
+                        LEFT JOIN (
+			                        SELECT L.JobInvoiceHeaderId, Max(H.DocNo) AS TmlInvoiceNo, Max(H.DocDate) AS TmlInvoiceDate, Max(RL.ProductUidId) AS ProductUidId, Sum(L.Amount) AS PurchaseAmount, Max(P.StandardCost) - Sum(L.Amount) AS PriceDiff,
+			                        (SELECT Sum(promo.FlatDiscount) FROM Web.PromoCodes promo WHERE max(h.DocDate) BETWEEN promo.FromDate AND promo.ToDate AND (promo.ProductId = max(p.ProductId) OR promo.ProductGroupId = max(p.ProductGroupId) OR IsNull(Max(p.ProductCategoryId),-1)=promo.ProductGroupId OR Max(pg.ProductTypeId) = promo.ProductTypeId OR IsNull(promo.ProductId,0)+IsNull(promo.ProductGroupId,0)+IsNull(promo.ProductCategoryId,0)+IsNull(promo.ProductTypeId,0) = 0)) AS RetensionTarget
+			                        FROM Web.JobInvoiceHeaders H
+			                        LEFT JOIN web.JobInvoiceLines L ON H.JobInvoiceHeaderId = L.JobInvoiceHeaderId 
+			                        LEFT JOIN web.JobReceiveLines RL ON L.JobReceiveLineId = RL.JobReceiveLineId 
+			                        LEFT JOIN web.Products P ON RL.ProductId = p.ProductId 
+			                        LEFT JOIN web.ProductGroups pg ON pg.ProductGroupId = p.ProductGroupId 
+			                        WHERE H.DocTypeId = 631
+			                        GROUP BY L.JobInvoiceHeaderId 
+		                          ) AS Purch ON PL.productUidId = Purch.ProductUidId
+                        WHERE DRL.SaleDispatchReturnLineId IS NULL AND H.DocDate BETWEEN @FromDate AND @ToDate
+                        AND PL.ProductUidId IS NOT NULL 
+                        Group By Pt.ProductTypeName ";
+
+            IEnumerable<DashBoardTabularData> DashBoardTabularData = db.Database.SqlQuery<DashBoardTabularData>(mQry, SqlParameterFromDate, SqlParameterToDate).ToList();
             return DashBoardTabularData;
         }
         public IEnumerable<DashBoardTabularData> GetDebtorsDetail()
         {
-            mQry = @"SELECT A.LedgerAccountName AS Head, Convert(nvarchar,IsNull(Sum(L.AmtDr),0) - IsNull(Sum(L.AmtCr),0)) AS Value
-                        FROM Web.Ledgers L 
-                        LEFT JOIN Web.LedgerAccounts A ON L.LedgerAccountId = A.LedgerAccountId
-                        LEFT JOIN Web.LedgerAccountGroups Ag ON A.LedgerAccountGroupId = Ag.LedgerAccountGroupId
-                        WHERE Ag.LedgerAccountNature = 'Bank'
-                        GROUP BY A.LedgerAccountName ";
+            mQry = "SELECT Convert(nvarchar,LedgerAccountGroupId) As Value FROM Web.LedgerAccountGroups WHERE LedgerAccountGroupName = '"+ Jobs.Constants.LedgerAccountGroup.LedgerAccountGroupConstants.SundryDebtors.LedgerAccountGroupName + "'";
+            DashBoardSingleValue SundryDebtorsLedgerAccountGroup = db.Database.SqlQuery<DashBoardSingleValue>(mQry).FirstOrDefault();
 
-            IEnumerable<DashBoardTabularData> DashBoardTabularData = db.Database.SqlQuery<DashBoardTabularData>(mQry).ToList();
+            SqlParameter SqlParameterSiteId = new SqlParameter("@Site", (object)DBNull.Value);
+            SqlParameter SqlParameterDivisionId = new SqlParameter("@Division", (object)DBNull.Value);
+            SqlParameter SqlParameterFromDate = new SqlParameter("@FromDate", SoftwareStartDate);
+            SqlParameter SqlParameterToDate = new SqlParameter("@ToDate", TodayDate);
+            SqlParameter SqlParameterCostCenter = new SqlParameter("@CostCenter", (object)DBNull.Value);
+            SqlParameter SqlParameterLedgerAccountGroup = new SqlParameter("@LedgerAccountGroup", SundryDebtorsLedgerAccountGroup.Value);
+
+            mQry = new FinancialDisplayService(_unitOfWork).GetQryForTrialBalance(null, null, SoftwareStartDate.ToString(), TodayDate.ToString(), null, "False", "False", SundryDebtorsLedgerAccountGroup.Value) +
+                                        @"SELECT H.BaseLedgerAccountGroupId AS LedgerAccountGroupId, Max(BaseLedgerAccountGroupName) AS Head, 
+                                        Convert(NVARCHAR,Convert(DECIMAL(18,2),Round(Sum(isnull(H.Balance,0))/10000000,2))) + ' Crore' AS Value
+                                        FROM cteAcGroup H 
+                                        GROUP BY H.BaseLedgerAccountGroupId 
+                                        Having Sum(isnull(H.Balance,0)) <> 0 
+
+                                        UNION ALL 
+
+                                        SELECT Ag.LedgerAccountGroupId AS LedgerAccountGroupId, Max(Ag.LedgerAccountGroupName) AS Head, 
+                                        Convert(NVARCHAR,Convert(DECIMAL(18,2),Round(Sum(isnull(H.Balance,0))/10000000,2))) + ' Crore'  AS Value
+                                        FROM cteLedgerBalance H 
+                                        LEFT JOIN Web.LedgerAccounts A ON H.LedgerAccountId = A.LedgerAccountId
+                                        LEFT JOIN Web.LedgerAccountGroups Ag On A.LedgerAccountGroupId = Ag.LedgerAccountGroupId
+                                        Where isnull(H.Balance,0) <> 0 
+                                        Group By Ag.LedgerAccountGroupId ";
+
+            IEnumerable<DashBoardTabularData> DashBoardTabularData = db.Database.SqlQuery<DashBoardTabularData>(mQry, SqlParameterSiteId, SqlParameterDivisionId, SqlParameterFromDate, SqlParameterToDate, SqlParameterCostCenter, SqlParameterLedgerAccountGroup).ToList();
             return DashBoardTabularData;
         }
         public IEnumerable<DashBoardTabularData> GetBankBalanceDetail()
         {
-            mQry = @"SELECT A.LedgerAccountName AS Head, Convert(nvarchar,IsNull(Sum(L.AmtDr),0) - IsNull(Sum(L.AmtCr),0)) AS Value
-                        FROM Web.Ledgers L 
-                        LEFT JOIN Web.LedgerAccounts A ON L.LedgerAccountId = A.LedgerAccountId
-                        LEFT JOIN Web.LedgerAccountGroups Ag ON A.LedgerAccountGroupId = Ag.LedgerAccountGroupId
-                        WHERE Ag.LedgerAccountNature = 'Bank'
-                        GROUP BY A.LedgerAccountName ";
+            mQry = "SELECT Convert(nvarchar,LedgerAccountGroupId) As Value FROM Web.LedgerAccountGroups WHERE LedgerAccountGroupName = '" + Jobs.Constants.LedgerAccountGroup.LedgerAccountGroupConstants.BankAccounts.LedgerAccountGroupName + "'";
+            DashBoardSingleValue SundryDebtorsLedgerAccountGroup = db.Database.SqlQuery<DashBoardSingleValue>(mQry).FirstOrDefault();
 
-            IEnumerable<DashBoardTabularData> DashBoardTabularData = db.Database.SqlQuery<DashBoardTabularData>(mQry).ToList();
+            SqlParameter SqlParameterSiteId = new SqlParameter("@Site", (object)DBNull.Value);
+            SqlParameter SqlParameterDivisionId = new SqlParameter("@Division", (object)DBNull.Value);
+            SqlParameter SqlParameterFromDate = new SqlParameter("@FromDate", SoftwareStartDate);
+            SqlParameter SqlParameterToDate = new SqlParameter("@ToDate", TodayDate);
+            SqlParameter SqlParameterCostCenter = new SqlParameter("@CostCenter", (object)DBNull.Value);
+            SqlParameter SqlParameterLedgerAccountGroup = new SqlParameter("@LedgerAccountGroup", SundryDebtorsLedgerAccountGroup.Value);
+
+            mQry = new FinancialDisplayService(_unitOfWork).GetQryForTrialBalance(null, null, SoftwareStartDate.ToString(), TodayDate.ToString(), null, "False", "False", SundryDebtorsLedgerAccountGroup.Value) +
+                                        @"SELECT H.LedgerAccountId AS LedgerAccountGroupId, LedgerAccountName AS Head, 
+                                        Convert(NVARCHAR,Convert(DECIMAL(18,2),Round(isnull(H.Balance,0)/10000000,2))) + ' Crore'  AS Value
+                                        FROM cteLedgerBalance H 
+                                        Where isnull(H.Balance,0) <> 0 ";
+
+            IEnumerable<DashBoardTabularData> DashBoardTabularData = db.Database.SqlQuery<DashBoardTabularData>(mQry, SqlParameterSiteId, SqlParameterDivisionId, SqlParameterFromDate, SqlParameterToDate, SqlParameterCostCenter, SqlParameterLedgerAccountGroup).ToList();
             return DashBoardTabularData;
         }
         public IEnumerable<DashBoardTabularData> GetVehicleStockDetail()
         {
-            mQry = @"SELECT A.LedgerAccountName AS Head, Convert(nvarchar,IsNull(Sum(L.AmtDr),0) - IsNull(Sum(L.AmtCr),0)) AS Value
-                        FROM Web.Ledgers L 
-                        LEFT JOIN Web.LedgerAccounts A ON L.LedgerAccountId = A.LedgerAccountId
-                        LEFT JOIN Web.LedgerAccountGroups Ag ON A.LedgerAccountGroupId = Ag.LedgerAccountGroupId
-                        WHERE Ag.LedgerAccountNature = 'Bank'
-                        GROUP BY A.LedgerAccountName ";
+            mQry = @"SELECT VStock.ProductTypeName AS Head, Convert(NVARCHAR,Convert(DECIMAL(18,0),IsNull(Sum(VStock.StockQty),0))) AS StockQty, 
+                        Convert(NVARCHAR,Convert(DECIMAL(18,2),Round(IsNull(Sum(VStock.StockAmount),0)/10000000,2))) + ' Crore'   AS Value
+                        FROM (
+	                        SELECT Pt.ProductTypeName, L.Qty AS StockQty,
+	                        (SELECT hC.Amount FROM Web.JobInvoiceHeaderCharges hc WITH (Nolock) 
+			                        LEFT JOIN Web.Charges cc ON cc.ChargeId = hc.ChargeId 
+			                        WHERE cc.ChargeName ='Net Amount' 
+			                        AND HC.HeaderTableId = H.JobInvoiceHeaderId ) StockAmount
+	                        FROM Web.JobInvoiceHeaders  H WITH (Nolock)
+	                        LEFT JOIN web.Sites S  WITH (NoLock) ON S.SiteId = H.SiteId 
+	                        LEFT JOIN web.Divisions D  WITH (NoLock) ON D.DivisionId = H.DivisionId 
+	                        LEFT JOIN web.Processes PR WITH (NoLock) ON PR.ProcessId = H.ProcessId 
+	                        LEFT JOIN web.JobInvoiceLines L WITH (NoLock) ON L.JobInvoiceHeaderId = H.JobInvoiceHeaderId 
+	                        LEFT JOIN web.JobReceiveLines R WITH (NoLock) ON R.JobReceiveLineId = L.JobReceiveLineId 
+	                        LEFT JOIN web.JobOrderLines JOL WITH (NoLock) ON JOL.JobOrderLineId = R.JobOrderLineId 
+	                        LEFT JOIN web.Products P WITH (NoLock) ON P.ProductId = JOL.ProductId 
+	                        LEFT JOIN web.ProductGroups PG WITH (NoLock) ON PG.ProductGroupId = P.ProductGroupId 
+	                        LEFT JOIN web.ProductTypes PT WITH (NoLock) ON PT.ProductTypeId  = PG.ProductTypeId 
+	                        LEFT JOIN web.ProductCategories PC WITH (NoLock) ON PC.ProductCategoryId = P.ProductCategoryId 
+	                        LEFT JOIN web.ProductNatures PN WITH (NoLock) ON PN.ProductNatureId = PT.ProductNatureId 
+	                        LEFT JOIN 
+	                        (
+		                        SELECT PL.ProductUidId, Max(PH.DocDate) AS PackingDate, Max(PL.PackingLineId) AS  PackingLineId
+		                        FROM web.PackingLines PL WITH (NoLock)
+		                        LEFT JOIN web.PackingHeaders PH WITH (NoLock) ON Pl.PackingHeaderId = Ph.PackingHeaderId 
+		                        LEFT JOIN web.SaleDispatchLines SDL  WITH (NoLock) ON SDL.PackingLineId = PL.PackingLineId 
+		                        LEFT JOIN web.SaleDispatchReturnLines SDRL  WITH (NoLock) ON SDRL.SaleDispatchLineId= SDL.SaleDispatchLineId 
+		                        WHERE SDRL.SaleDispatchReturnLineId IS NULL 
+		                        GROUP BY PL.ProductUidId 
+		                        ) AS PL ON PL.ProductUidId = R.ProductUidId
+	                        WHERE PR.ProcessName ='Purchase' AND PL.PackingDate IS NULL 
+	                        AND JOL.ProductId IS NOT NULL AND PN.ProductNatureName ='LOB' 
+                        ) AS VStock 
+                        GROUP BY VStock.ProductTypeName ";
 
             IEnumerable<DashBoardTabularData> DashBoardTabularData = db.Database.SqlQuery<DashBoardTabularData>(mQry).ToList();
             return DashBoardTabularData;
         }
         public IEnumerable<DashBoardTabularData> GetExpenseDetail()
         {
-            mQry = @"SELECT A.LedgerAccountName AS Head, Convert(nvarchar,IsNull(Sum(L.AmtDr),0) - IsNull(Sum(L.AmtCr),0)) AS Value
-                        FROM Web.Ledgers L 
-                        LEFT JOIN Web.LedgerAccounts A ON L.LedgerAccountId = A.LedgerAccountId
-                        LEFT JOIN Web.LedgerAccountGroups Ag ON A.LedgerAccountGroupId = Ag.LedgerAccountGroupId
-                        WHERE Ag.LedgerAccountNature = 'Bank'
-                        GROUP BY A.LedgerAccountName ";
+            mQry = "SELECT Convert(nvarchar,LedgerAccountGroupId) As Value FROM Web.LedgerAccountGroups WHERE LedgerAccountGroupName = '" + Jobs.Constants.LedgerAccountGroup.LedgerAccountGroupConstants.DirectExpenses.LedgerAccountGroupName + "'";
+            DashBoardSingleValue SundryDebtorsLedgerAccountGroup = db.Database.SqlQuery<DashBoardSingleValue>(mQry).FirstOrDefault();
 
-            IEnumerable<DashBoardTabularData> DashBoardTabularData = db.Database.SqlQuery<DashBoardTabularData>(mQry).ToList();
+            SqlParameter SqlParameterSiteId = new SqlParameter("@Site", (object)DBNull.Value);
+            SqlParameter SqlParameterDivisionId = new SqlParameter("@Division", (object)DBNull.Value);
+            SqlParameter SqlParameterFromDate = new SqlParameter("@FromDate", SoftwareStartDate);
+            SqlParameter SqlParameterToDate = new SqlParameter("@ToDate", TodayDate);
+            SqlParameter SqlParameterCostCenter = new SqlParameter("@CostCenter", (object)DBNull.Value);
+            SqlParameter SqlParameterLedgerAccountGroup = new SqlParameter("@LedgerAccountGroup", SundryDebtorsLedgerAccountGroup.Value);
+
+            mQry = new FinancialDisplayService(_unitOfWork).GetQryForTrialBalance(null, null, SoftwareStartDate.ToString(), TodayDate.ToString(), null, "False", "False", SundryDebtorsLedgerAccountGroup.Value) +
+                                        @"SELECT H.BaseLedgerAccountGroupId AS LedgerAccountGroupId, Max(BaseLedgerAccountGroupName) AS Head, 
+                                        Convert(NVARCHAR,Convert(DECIMAL(18,2),Round(Sum(isnull(H.Balance,0))/10000000,2))) + ' Crore' AS Value
+                                        FROM cteAcGroup H 
+                                        GROUP BY H.BaseLedgerAccountGroupId 
+                                        Having Sum(isnull(H.Balance,0)) <> 0 
+
+                                        UNION ALL 
+
+                                        SELECT Ag.LedgerAccountGroupId AS LedgerAccountGroupId, Max(Ag.LedgerAccountGroupName) AS Head, 
+                                        Convert(NVARCHAR,Convert(DECIMAL(18,2),Round(Sum(isnull(H.Balance,0))/10000000,2))) + ' Crore'  AS Value
+                                        FROM cteLedgerBalance H 
+                                        LEFT JOIN Web.LedgerAccounts A ON H.LedgerAccountId = A.LedgerAccountId
+                                        LEFT JOIN Web.LedgerAccountGroups Ag On A.LedgerAccountGroupId = Ag.LedgerAccountGroupId
+                                        Where isnull(H.Balance,0) <> 0 
+                                        Group By Ag.LedgerAccountGroupId ";
+
+            IEnumerable<DashBoardTabularData> DashBoardTabularData = db.Database.SqlQuery<DashBoardTabularData>(mQry, SqlParameterSiteId, SqlParameterDivisionId, SqlParameterFromDate, SqlParameterToDate, SqlParameterCostCenter, SqlParameterLedgerAccountGroup).ToList();
             return DashBoardTabularData;
         }
         public IEnumerable<DashBoardTabularData> GetCreditorsDetail()
         {
-            mQry = @"SELECT A.LedgerAccountName AS Head, Convert(nvarchar,IsNull(Sum(L.AmtDr),0) - IsNull(Sum(L.AmtCr),0)) AS Value
-                        FROM Web.Ledgers L 
-                        LEFT JOIN Web.LedgerAccounts A ON L.LedgerAccountId = A.LedgerAccountId
-                        LEFT JOIN Web.LedgerAccountGroups Ag ON A.LedgerAccountGroupId = Ag.LedgerAccountGroupId
-                        WHERE Ag.LedgerAccountNature = 'Bank'
-                        GROUP BY A.LedgerAccountName ";
+            mQry = "SELECT Convert(nvarchar,LedgerAccountGroupId) As Value FROM Web.LedgerAccountGroups WHERE LedgerAccountGroupName = '" + Jobs.Constants.LedgerAccountGroup.LedgerAccountGroupConstants.SundryCreditors.LedgerAccountGroupName + "'";
+            DashBoardSingleValue SundryDebtorsLedgerAccountGroup = db.Database.SqlQuery<DashBoardSingleValue>(mQry).FirstOrDefault();
 
-            IEnumerable<DashBoardTabularData> DashBoardTabularData = db.Database.SqlQuery<DashBoardTabularData>(mQry).ToList();
+            SqlParameter SqlParameterSiteId = new SqlParameter("@Site", (object)DBNull.Value);
+            SqlParameter SqlParameterDivisionId = new SqlParameter("@Division", (object)DBNull.Value);
+            SqlParameter SqlParameterFromDate = new SqlParameter("@FromDate", SoftwareStartDate);
+            SqlParameter SqlParameterToDate = new SqlParameter("@ToDate", TodayDate);
+            SqlParameter SqlParameterCostCenter = new SqlParameter("@CostCenter", (object)DBNull.Value);
+            SqlParameter SqlParameterLedgerAccountGroup = new SqlParameter("@LedgerAccountGroup", SundryDebtorsLedgerAccountGroup.Value);
+
+            mQry = new FinancialDisplayService(_unitOfWork).GetQryForTrialBalance(null, null, SoftwareStartDate.ToString(), TodayDate.ToString(), null, "False", "False", SundryDebtorsLedgerAccountGroup.Value) +
+                                        @"SELECT H.BaseLedgerAccountGroupId AS LedgerAccountGroupId, Max(BaseLedgerAccountGroupName) AS Head, 
+                                        Convert(NVARCHAR,Convert(DECIMAL(18,2),Round(-Sum(isnull(H.Balance,0))/10000000,2))) + ' Crore' AS Value
+                                        FROM cteAcGroup H 
+                                        GROUP BY H.BaseLedgerAccountGroupId 
+                                        Having Sum(isnull(H.Balance,0)) <> 0 
+
+                                        UNION ALL 
+
+                                        SELECT Ag.LedgerAccountGroupId AS LedgerAccountGroupId, Max(Ag.LedgerAccountGroupName) AS Head, 
+                                        Convert(NVARCHAR,Convert(DECIMAL(18,2),Round(-Sum(isnull(H.Balance,0))/10000000,2))) + ' Crore'  AS Value
+                                        FROM cteLedgerBalance H 
+                                        LEFT JOIN Web.LedgerAccounts A ON H.LedgerAccountId = A.LedgerAccountId
+                                        LEFT JOIN Web.LedgerAccountGroups Ag On A.LedgerAccountGroupId = Ag.LedgerAccountGroupId
+                                        Where isnull(H.Balance,0) <> 0 
+                                        Group By Ag.LedgerAccountGroupId ";
+
+            IEnumerable<DashBoardTabularData> DashBoardTabularData = db.Database.SqlQuery<DashBoardTabularData>(mQry, SqlParameterSiteId, SqlParameterDivisionId, SqlParameterFromDate, SqlParameterToDate, SqlParameterCostCenter, SqlParameterLedgerAccountGroup).ToList();
             return DashBoardTabularData;
         }
         public IEnumerable<DashBoardTabularData> GetCashBalanceDetail()
         {
-            mQry = @"SELECT A.LedgerAccountName AS Head, Convert(nvarchar,IsNull(Sum(L.AmtDr),0) - IsNull(Sum(L.AmtCr),0)) AS Value
-                        FROM Web.Ledgers L 
-                        LEFT JOIN Web.LedgerAccounts A ON L.LedgerAccountId = A.LedgerAccountId
-                        LEFT JOIN Web.LedgerAccountGroups Ag ON A.LedgerAccountGroupId = Ag.LedgerAccountGroupId
-                        WHERE Ag.LedgerAccountNature = 'Bank'
-                        GROUP BY A.LedgerAccountName ";
+            mQry = "SELECT Convert(nvarchar,LedgerAccountGroupId) As Value FROM Web.LedgerAccountGroups WHERE LedgerAccountGroupName = '" + Jobs.Constants.LedgerAccountGroup.LedgerAccountGroupConstants.CashinHand.LedgerAccountGroupName + "'";
+            DashBoardSingleValue SundryDebtorsLedgerAccountGroup = db.Database.SqlQuery<DashBoardSingleValue>(mQry).FirstOrDefault();
 
-            IEnumerable<DashBoardTabularData> DashBoardTabularData = db.Database.SqlQuery<DashBoardTabularData>(mQry).ToList();
+            SqlParameter SqlParameterSiteId = new SqlParameter("@Site", (object)DBNull.Value);
+            SqlParameter SqlParameterDivisionId = new SqlParameter("@Division", (object)DBNull.Value);
+            SqlParameter SqlParameterFromDate = new SqlParameter("@FromDate", SoftwareStartDate);
+            SqlParameter SqlParameterToDate = new SqlParameter("@ToDate", TodayDate);
+            SqlParameter SqlParameterCostCenter = new SqlParameter("@CostCenter", (object)DBNull.Value);
+            SqlParameter SqlParameterLedgerAccountGroup = new SqlParameter("@LedgerAccountGroup", SundryDebtorsLedgerAccountGroup.Value);
+
+            mQry = new FinancialDisplayService(_unitOfWork).GetQryForTrialBalance(null, null, SoftwareStartDate.ToString(), TodayDate.ToString(), null, "False", "False", SundryDebtorsLedgerAccountGroup.Value) +
+                                        @"SELECT H.LedgerAccountId AS LedgerAccountGroupId, LedgerAccountName AS Head, 
+                                        Convert(NVARCHAR,Convert(DECIMAL(18,2),Round(isnull(H.Balance,0)/100000,2))) + ' Lakh'  AS Value
+                                        FROM cteLedgerBalance H 
+                                        Where isnull(H.Balance,0) <> 0 ";
+
+            IEnumerable<DashBoardTabularData> DashBoardTabularData = db.Database.SqlQuery<DashBoardTabularData>(mQry, SqlParameterSiteId, SqlParameterDivisionId, SqlParameterFromDate, SqlParameterToDate, SqlParameterCostCenter, SqlParameterLedgerAccountGroup).ToList();
             return DashBoardTabularData;
         }
 
@@ -478,6 +815,16 @@ namespace Service
     public class DashBoardSingleValue
     {
         public string Value { get; set; }
+    }
+
+    public class SessnionValues
+    {
+        public DateTime MonthStartDate { get; set; }
+        public DateTime MonthEndDate { get; set; }
+        public DateTime YearStartDate { get; set; }
+        public DateTime YearEndDate { get; set; }
+        public DateTime SoftwareStartDate { get; set; }
+        public DateTime TodayDate { get; set; }
     }
 
 }

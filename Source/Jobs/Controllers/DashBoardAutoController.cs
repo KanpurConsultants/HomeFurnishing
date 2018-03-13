@@ -58,6 +58,9 @@ namespace Module
         {
             IEnumerable<DashBoardSingleValue> Debtors = _DashBoardAutoService.GetDebtors();
 
+
+
+
             JsonResult json = Json(new { Success = true, Data = Debtors }, JsonRequestBehavior.AllowGet);
             return json;
         }

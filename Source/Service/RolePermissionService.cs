@@ -174,7 +174,7 @@ namespace Service
                             AND Ca.ActionName = VRolesDocTypes.ActionName
                     WHERE 1=1 
                     And IsNull(M.IsVisible,0) <> 0
-                    AND M.Description = 'Reports' 
+                    AND M.Description = 'Reports'
                     ORDER BY ModuleSr, MenuSr ";
 
 

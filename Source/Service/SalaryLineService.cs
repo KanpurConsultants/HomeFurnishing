@@ -80,6 +80,7 @@ namespace Service
                             OtherDeduction = p.OtherDeduction,
                             LoanEMI = p.LoanEMI,
                             Advance = p.Advance,
+                            NetPayable = p.NetPayable,
                             Remark = p.Remark,
                             LockReason = p.LockReason,
                         }).FirstOrDefault();
@@ -108,6 +109,7 @@ namespace Service
                            OtherDeduction = p.OtherDeduction,
                            LoanEMI = p.LoanEMI,
                            Advance = p.Advance,
+                           NetPayable = p.NetPayable,
                            Remark = p.Remark,
                            SalaryHeaderId = p.SalaryHeaderId,
                            SalaryLineId = p.SalaryLineId,

@@ -457,9 +457,12 @@ namespace Service
 
 
 
-                
-                Ledger.AmtDr = item.AmtDr * (LedgerHeaderViewModel.ExchangeRate ?? 1);
-                Ledger.AmtCr = item.AmtCr * (LedgerHeaderViewModel.ExchangeRate ?? 1);
+
+                //Ledger.AmtDr = item.AmtDr * (LedgerHeaderViewModel.ExchangeRate ?? 1);
+                //Ledger.AmtCr = item.AmtCr * (LedgerHeaderViewModel.ExchangeRate ?? 1);
+
+                Ledger.AmtDr = item.AmtDr * ((LedgerHeaderViewModel.ExchangeRate ?? 0) != 0 ? (Decimal)LedgerHeaderViewModel.ExchangeRate : 1);
+                Ledger.AmtCr = item.AmtCr * ((LedgerHeaderViewModel.ExchangeRate ?? 0) != 0 ? (Decimal)LedgerHeaderViewModel.ExchangeRate : 1);
                 Ledger.Narration = "";
 
                 new LedgerService(_unitOfWork).Create(Ledger);

@@ -45,7 +45,7 @@ namespace Service
                 SqlParameter SqlParameterWagesPayType = new SqlParameter("@WagesPayType", (vm.WagesPayType == null) ? DBNull.Value : (object)vm.WagesPayType);
 
 
-                mQry = @"SELECT 0 As SalaryHeaderId, E.EmployeeId, P.Name+','+P.Suffix AS EmployeeName, Convert(int,P.Code) AS Code, Convert(Decimal(18,4),DAY(EOMONTH(@DocDate))) - IsNull(VSunday.NoOfSundays,0) AS Days, 0.00 AS Additions, 0.00 AS Deductions, 
+                mQry = @"SELECT Top 10 0 As SalaryHeaderId, E.EmployeeId, P.Name+','+P.Suffix AS EmployeeName, Convert(int,P.Code) AS Code, Convert(Decimal(18,4),DAY(EOMONTH(@DocDate))) - IsNull(VSunday.NoOfSundays,0) AS Days, 0.00 AS Additions, 0.00 AS Deductions, 
                         IsNull(VLoan.LoanEMI,0) AS LoanEMI, IsNull(VAdvance.Advance,0) AS Advance, @DocDate As DocDate, 
                         @DocTypeId As DocTypeId, @Remark As HeaderRemark, Convert(Decimal(18,4),DAY(EOMONTH(@DocDate))) - IsNull(VSunday.NoOfSundays,0) AS MonthDays
                         FROM Web.Employees E
@@ -111,7 +111,7 @@ namespace Service
                 SqlParameter SqlParameterSalaryHeaderId = new SqlParameter("@SalaryHeaderId", vm.SalaryHeaderId.ToString());
                 SqlParameter SqlParameterDocDate = new SqlParameter("@DocDate", vm.DocDate.ToString());
 
-                mQry = @"SELECT H.SalaryHeaderId, E.EmployeeId, P.Name+','+ P.Suffix AS EmployeeName, Convert(int,P.Code) AS Code, L.Days AS Days, 0.00 AS Additions, 0.00 AS Deductions, 
+                mQry = @"SELECT Top 10 H.SalaryHeaderId, E.EmployeeId, P.Name+','+ P.Suffix AS EmployeeName, Convert(int,P.Code) AS Code, L.Days AS Days, 0.00 AS Additions, 0.00 AS Deductions, 
                         IsNull(VLoan.LoanEMI,0) AS LoanEMI, IsNull(VAdvance.Advance,0) AS Advance, Convert(nvarchar,H.DocDate) As DocDate, 
                         H.DocTypeId As DocTypeId, H.Remark As HeaderRemark, Convert(Decimal(18,4),DAY(EOMONTH(H.DocDate))) - IsNull(VSunday.NoOfSundays,0) AS MonthDays
                         FROM Web.SalaryHeaders H
