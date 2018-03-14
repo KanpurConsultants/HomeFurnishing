@@ -149,6 +149,7 @@ namespace Model.ViewModels
         public string Name { get; set; }
         public string Suffix { get; set; }
         public string Code { get; set; }
+        public string Department { get; set; }
         public string Phone { get; set; }
         public string Mobile { get; set; }
 

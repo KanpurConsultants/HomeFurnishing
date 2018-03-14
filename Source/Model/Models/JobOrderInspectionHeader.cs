@@ -52,7 +52,7 @@ namespace Model.Models
 
         [ForeignKey("InspectionBy"), Display(Name = "Inspection By")]
         public int InspectionById { get; set; }
-        public virtual Employee InspectionBy { get; set; }
+        public virtual Person InspectionBy { get; set; }
 
 
         [Display(Name = "Remark")]

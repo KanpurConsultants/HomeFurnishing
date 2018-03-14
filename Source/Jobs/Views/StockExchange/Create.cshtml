@@ -34,31 +34,31 @@
             @CustomHelpers.RenderHeaderInfo(ViewBag.transactionType, (int?)ViewBag.PendingToSubmit, (int?)ViewBag.PendingToReview, ViewBag.Name)
 
             @*@if (ViewBag.transactionType == "submit")
-            {<h3 style="border-bottom:0px solid #e1dada;padding-bottom:0px;">
-                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>Submit @ViewBag.Name</span>
-                <input type="submit" value="Submit" name="Command:Submit" class="btn btn-primary right" style="width: 90px; background-color: #2980b9" />
-            </h3>}
-            else if (ViewBag.transactionType == "review" || ViewBag.transactionType == "ReviewContinue")
-            {<h3 style="border-bottom:0px solid #e1dada;padding-bottom:0px;">
-                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span> Review @ViewBag.Name</span>
-                <button type="submit" class="btn btn-primary right" name="Command:Review">Review</button>
-                <input type="hidden" id="IsContinue" name="IsContinue" value="" />
-            </h3>}
-            else if (ViewBag.transactionType == "detail")
-            {
-                <h3>
-                    <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>@ViewBag.Name</span>
-                </h3>
-            }
-            else
-            {
-                <h3 style="border-bottom:0px solid #e1dada;padding-bottom:0px;">
-                    <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span> @ViewBag.Name</span>
-                    <input type="submit" value="Save" class="btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9" />
-                </h3>                
-            }*@
+                {<h3 style="border-bottom:0px solid #e1dada;padding-bottom:0px;">
+                    <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>Submit @ViewBag.Name</span>
+                    <input type="submit" value="Submit" name="Command:Submit" class="btn btn-primary right" style="width: 90px; background-color: #2980b9" />
+                </h3>}
+                else if (ViewBag.transactionType == "review" || ViewBag.transactionType == "ReviewContinue")
+                {<h3 style="border-bottom:0px solid #e1dada;padding-bottom:0px;">
+                    <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span> Review @ViewBag.Name</span>
+                    <button type="submit" class="btn btn-primary right" name="Command:Review">Review</button>
+                    <input type="hidden" id="IsContinue" name="IsContinue" value="" />
+                </h3>}
+                else if (ViewBag.transactionType == "detail")
+                {
+                    <h3>
+                        <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>@ViewBag.Name</span>
+                    </h3>
+                }
+                else
+                {
+                    <h3 style="border-bottom:0px solid #e1dada;padding-bottom:0px;">
+                        <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span> @ViewBag.Name</span>
+                        <input type="submit" value="Save" class="btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9" />
+                    </h3>
+                }*@
 
-            
+
             <hr style="margin-top:0px;margin-bottom:0px" />
 
             <div class="panel-info">
@@ -70,7 +70,7 @@
                     @Html.ActionLink(" ", "Index", "StockExchange", new { id = ViewBag.id, IndexType = ViewBag.IndexStatus }, new { @class = "cbtn btn-circle glyphicon glyphicon-list", @title = "List", @data_toggle = "tooltip" })
                 </div>
                 <div class="btn-group">
-                    <a class="cbtn btn-circle glyphicon glyphicon-option-horizontal dropdown-toggle"   title="More Option" aria-expanded="false" style="padding-top: 6px;padding-bottom: 6px;" href="#" data-toggle="dropdown" id="dropdownMenu1">
+                    <a class="cbtn btn-circle glyphicon glyphicon-option-horizontal dropdown-toggle" title="More Option" aria-expanded="false" style="padding-top: 6px;padding-bottom: 6px;" href="#" data-toggle="dropdown" id="dropdownMenu1">
                     </a>
                     <ul class="dropdown-menu pull-right" aria-labelledby="dropdownMenu1">
                         <li><a id="DocHistory" data-modal="" href="@Url.Action("GetHistory", "LogHistory", new { Ids = Model.StockHeaderId, DocTypeId = Model.DocTypeId })"><span class="glyphicon glyphicon-user"> </span> History</a></li>
@@ -232,28 +232,107 @@
 
                 <hr />
 
+                @{string Action = "";
+                    if (Model.Status == (int)StatusConstants.Drafted || Model.Status == (int)StatusConstants.Import)
+                    { Action = "CreateLine"; }
+                    else if (Model.Status == (int)StatusConstants.Submitted || Model.Status == (int)StatusConstants.Modified)
+                    { Action = "CreateLineAfter_Submit"; }
+                }
+
                 <div class="row">
                     <h4 class="col-md-12 black" style="margin-top:15px">
                         <span class="glyphicon glyphicon-shopping-cart"></span>
-                        2. Issue Product
+                        2. Receive Product
                     </h4>
                 </div>
                 <div class="panel-info" style="height:40px;">
                     <div class="btn-group" style="padding:5px 0 3px 0;margin:0px;font-weight:bold">
                         <span class="glyphicon glyphicon-plus-sign"></span>
-                        @{string Action = "";
-                            if (Model.Status == (int)StatusConstants.Drafted || Model.Status == (int)StatusConstants.Import)
-                            { Action = "CreateLine"; }
-                            else if (Model.Status == (int)StatusConstants.Submitted || Model.Status == (int)StatusConstants.Modified)
-                            { Action = "CreateLineAfter_Submit"; }
-                        }
-                        @Html.ActionLink("Add New Row", Action, "StockExchange", new { id = @Model.StockHeaderId, Issue = true }, new { data_modal = "", id = "btnCreateI", @class = "toolbar", @title = "Add New", @data_toggle = "tooltip", @data_detailDisabled = "true" })
-                     </div>
-                    <div class="btn-group right" style="padding-right:15px">
-                        @Html.ActionLink(" ", "_ForExchange", "StockExchange", new { id = @Model.StockHeaderId, sid = @Model.PersonId }, new { data_modal = "", id = "btnCreateF", @class = "cbtn btn-circle glyphicon glyphicon-link toolbar right", @title = "For Exchange", @data_toggle = "tooltip", @data_detailDeleted = "true" })
+                        @Html.ActionLink("Add New Row", Action, "StockExchange", new { id = @Model.StockHeaderId, Issue = false }, new { data_modal = "", id = "btnCreateR", @class = "toolbar", @title = "Add New", @data_toggle = "tooltip", @data_detailDisabled = "true" })
                     </div>
+                    @*<div class="btn-group right" style="padding-right:15px">
+                        @Html.ActionLink(" ", "_FilterPostReceiveProductBom", "StockExchange", new { StockHeaderId = @Model.StockHeaderId }, new { data_modal = "", id = "btnCreateF", @class = "cbtn btn-circle glyphicon glyphicon-link toolbar right", @title = "For Receive Product Consumption", @data_toggle = "tooltip", @data_detailDeleted = "true" })
+                    </div>*@
+                </div>
+                <div style="padding-right:15px">
+                    <div class="panel panel-default" id="grid">
+                        <div class="panel-heading headrow" style="background-image: -webkit-linear-gradient(top, #428bca 0%, #428bca 100%);color:white">
+                            <div class="row grid-head">
+                                <div class="text-left block" style="width: 5%; ">
+                                    Srl.
+                                </div>
+
+                                <div class="block" style="width: 90%;">
+                                    <div class="row">
+                                        @*ProductInfo*@
+                                        <div class="block" style="width: 25%; ">
+                                            Product Name
+                                        </div>
+                                        <div class="block" style="width: 15%; ">
+                                            CostCenter
+                                        </div>
+                                        @*Qty*@
+                                        <div class="text-right block" style="width: 15%;">
+                                            Qty
+                                        </div>
+                                        @*Amount*@
+                                        <div class="text-right block" style="width: 10%;">
+                                            Rate
+                                        </div>
+                                        <div class="text-right block" style="width: 20%; ">
+                                            Amount
+                                        </div>
+                                        @*Remark*@
+                                        <div class="block" style="width: 15%;">
+                                            Remark
+                                        </div>
+                                    </div>
+                                </div>
+
+
+
+
+                                <div class="" style="width:5%">
+
+                                </div>
+                            </div>
+
+                        </div>
+
+
+                        <div class="panel-info" id="gbodyReceive">
+
+
+                        </div>
                     </div>
 
+                </div>
+
+                <div class="row">
+                    <h4 class="col-md-12 black" style="margin-top:15px">
+                        <span class="glyphicon glyphicon-shopping-cart"></span>
+                        3. Issue Product
+                    </h4>
+                </div>
+                <div class="panel-info" style="height:40px;">
+                    <div class="btn-group" style="padding:5px 0 3px 0;margin:0px;font-weight:bold">
+                        <span class="glyphicon glyphicon-plus-sign"></span>
+                        @Html.ActionLink("Add New Row", Action, "StockExchange", new { id = @Model.StockHeaderId, Issue = true }, new { data_modal = "", id = "btnCreateI", @class = "toolbar", @title = "Add New", @data_toggle = "tooltip", @data_detailDisabled = "true" })
+                    </div>
+                    <div class="btn-group right" style="padding-right:15px">
+                        @*@Html.ActionLink(" ", "_ForExchange", "StockExchange", new { id = @Model.StockHeaderId, sid = @Model.PersonId }, new { data_modal = "", id = "btnCreateF", @class = "cbtn btn-circle glyphicon glyphicon-link toolbar right", @title = "For Exchange", @data_toggle = "tooltip", @data_detailDeleted = "true" })
+                        @Html.ActionLink(" ", "_FilterPostReceiveProductBom", "StockExchange", new { StockHeaderId = @Model.StockHeaderId }, new { data_modal = "", id = "btnCreateF", @class = "cbtn btn-circle glyphicon glyphicon-link toolbar right", @title = "For Receive Product Consumption", @data_toggle = "tooltip", @data_detailDeleted = "true" })*@
+
+
+                        <a class="cbtn btn-circle glyphicon glyphicon-link dropdown-toggle" aria-expanded="false" style="padding-top: 6px;padding-bottom: 6px;" href="#" data-toggle="dropdown" id="dropdownMenu1">
+                        </a>
+                        <ul class="dropdown-menu pull-right" aria-labelledby="dropdownMenu1">
+                            <li><a id="btnCreateF" data-modal="" href="@Url.Action("_ForExchange", "StockExchange", new { id = @Model.StockHeaderId, sid = @Model.PersonId })"><span class="glyphicon glyphicon-user"> </span> For Exchange</a></li>
+                            <li><a id="btnCreateFP" data-modal="" href="@Url.Action("_FilterPostReceiveProductBom", "StockExchange", new { StockHeaderId = @Model.StockHeaderId })"><span class="glyphicon glyphicon-user"> </span> For Receive Product Consumption</a></li>
+                        </ul>
+
+                    </div>
+                </div>
                 <div style="padding-right:15px">
 
                     <div class="panel panel-default" id="grid">
@@ -312,75 +391,7 @@
 
 
 
-                <div class="row">
-                    <h4 class="col-md-12 black" style="margin-top:15px">
-                        <span class="glyphicon glyphicon-shopping-cart"></span>
-                        3. Receive Product
-                    </h4>
-                </div>
 
-                <div class="panel-info">
-                    <h5 style="padding:5px 0 3px 0;margin:0px;font-weight:bold">
-                        <span class="glyphicon glyphicon-plus-sign"></span>
-                        @Html.ActionLink("Add New Row", Action, "StockExchange", new { id = @Model.StockHeaderId, Issue = false }, new { data_modal = "", id = "btnCreateR", @class = "toolbar", @title = "Add New", @data_toggle = "tooltip", @data_detailDisabled = "true" })
-                    </h5>
-                </div>
-
-                <div style="padding-right:15px">
-
-                    <div class="panel panel-default" id="grid">
-
-                        <div class="panel-heading headrow" style="background-image: -webkit-linear-gradient(top, #428bca 0%, #428bca 100%);color:white">
-                            <div class="row grid-head">
-                                <div class="text-left block" style="width: 5%; ">
-                                    Srl.
-                                </div>
-
-                                <div class="block" style="width: 90%;">
-                                    <div class="row">
-                                        @*ProductInfo*@
-                                        <div class="block" style="width: 25%; ">
-                                            Product Name
-                                        </div>
-                                        <div class="block" style="width: 15%; ">
-                                            CostCenter
-                                        </div>
-                                        @*Qty*@
-                                        <div class="text-right block" style="width: 15%;">
-                                            Qty
-                                        </div>
-                                        @*Amount*@
-                                        <div class="text-right block" style="width: 10%;">
-                                            Rate
-                                        </div>
-                                        <div class="text-right block" style="width: 20%; ">
-                                            Amount
-                                        </div>
-                                        @*Remark*@
-                                        <div class="block" style="width: 15%;">
-                                            Remark
-                                        </div>
-                                    </div>
-                                </div>
-
-
-
-
-                                <div class="" style="width:5%">
-
-                                </div>
-                            </div>
-
-                        </div>
-
-
-                        <div class="panel-info" id="gbodyReceive">
-
-
-                        </div>
-                    </div>
-
-                </div>
 
 
 
@@ -390,7 +401,7 @@
             </div>
         </div>
     </div>
-}
+                    }
 
 
 @if ((ViewBag.Mode == "Add") || (ViewBag.Mode == "Edit"))
@@ -402,7 +413,7 @@
         $('#myModal').on('hidden.bs.modal', function () {
             LoadProducts();
             LoadProductsIssue();
-        });     
+        });
 
         ////To focus on the first element on modal load
         //$('#myModal').on('shown.bs.modal', function () {
@@ -466,7 +477,7 @@
         {
             LineEditUrl="/StockReceiveLine/_Detail/";
             LineDeleteUrl="/StockReceiveLine/_Detail/";
-        }      
+        }
         var unit=true;
         var dunit=true;
         var prevunit;
@@ -595,7 +606,7 @@
         {
             LineEditUrl="/StockIssueLine/_Detail/";
             LineDeleteUrl="/StockIssueLine/_Detail/";
-        }     
+        }
         var unit=true;
         var dunit=true;
         var prevunit;
@@ -735,14 +746,14 @@
 }
 
 @if ((Model.Status == (int)ActivityTypeContants.Modified || Model.Status == (int)ActivityTypeContants.Submitted)
-     && (ViewBag.transactionType == "submit" || ViewBag.transactionType == "submitContinue" || ViewBag.transactionType == "review" || ViewBag.transactionType == "ReviewContinue"))
+                 && (ViewBag.transactionType == "submit" || ViewBag.transactionType == "submitContinue" || ViewBag.transactionType == "review" || ViewBag.transactionType == "ReviewContinue"))
 {
     <script type="text/javascript">
 
         $(document).ready(function(){
             enableActivityLogReason();
         })
-        
+
         //var href = '/ActivityLog/LogEditReason'
 
         //var $btnClicked;

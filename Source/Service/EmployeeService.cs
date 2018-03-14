@@ -290,6 +290,8 @@ namespace Service
             var temp = from p in db.Employee
                        join p1 in db.Persons on p.PersonID equals p1.PersonID into PersonTable
                        from PersonTab in PersonTable.DefaultIfEmpty()
+                       join D in db.Department on p.DepartmentID equals D.DepartmentId into DTable
+                       from DTab in DTable.DefaultIfEmpty()
                        orderby PersonTab.Name
                        select new EmployeeIndexViewModel
                        {
@@ -300,6 +302,7 @@ namespace Service
                            Mobile=PersonTab.Mobile,
                            Phone=PersonTab.Phone,
                            Suffix = PersonTab.Suffix,
+                           Department= DTab.DepartmentName,
                        };
             return temp;
         }

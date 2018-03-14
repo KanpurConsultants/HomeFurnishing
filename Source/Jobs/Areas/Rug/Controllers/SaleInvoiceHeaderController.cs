@@ -19,7 +19,7 @@ using System.Text;
 using Model.ViewModel;
 using System.Xml.Linq;
 using Reports.Controllers;
-
+using Reports.Reports;
 
 namespace Jobs.Areas.Rug.Controllers
 {
@@ -1185,6 +1185,320 @@ namespace Jobs.Areas.Rug.Controllers
             ViewBag.ReportFormat = new SelectList(temp, "Value", "Text", "PDF");
 
             return PartialView("Print");
+        }
+
+        public ActionResult GeneratePrints(string Ids, int DocTypeId)
+        {
+
+            if (!string.IsNullOrEmpty(Ids))
+            {
+                int SiteId = (int)System.Web.HttpContext.Current.Session["SiteId"];
+                int DivisionId = (int)System.Web.HttpContext.Current.Session["DivisionId"];
+
+                var Settings = new SaleInvoiceSettingService(_unitOfWork).GetSaleInvoiceSettingForDocument(DocTypeId, DivisionId, SiteId);
+
+                if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, DocTypeId, Settings.ProcessId, this.ControllerContext.RouteData.Values["controller"].ToString(), "GeneratePrints") == false)
+                {
+                    return View("~/Views/Shared/PermissionDenied.cshtml").Warning("You don't have permission to do this task.");
+                }
+
+                try
+                {
+
+                    List<byte[]> PdfStream = new List<byte[]>();
+                    foreach (var item in Ids.Split(',').Select(Int32.Parse))
+                    {
+
+                        DirectReportPrint drp = new DirectReportPrint();
+
+                        var pd = db.SaleInvoiceHeader.Find(item);
+
+                        LogActivity.LogActivityDetail(LogVm.Map(new ActiivtyLogViewModel
+                        {
+                            DocTypeId = pd.DocTypeId,
+                            DocId = pd.SaleInvoiceHeaderId,
+                            ActivityType = (int)ActivityTypeContants.Print,
+                            DocNo = pd.DocNo,
+                            DocDate = pd.DocDate,
+                            DocStatus = pd.Status,
+                        }));
+
+                        byte[] Pdf;
+
+                        if (pd.Status == (int)StatusConstants.Drafted || pd.Status == (int)StatusConstants.Modified || pd.Status == (int)StatusConstants.Import)
+                        {
+                            if (Settings.SqlProcDocumentPrint == null || Settings.SqlProcDocumentPrint == "")
+                            {
+                                List<ListofQuery> QueryList = new List<ListofQuery>();
+                                QueryList = DocumentPrintData(item);
+                                Pdf = drp.DocumentPrint_New(QueryList, User.Identity.Name);
+                            }
+                            else
+                                Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint, User.Identity.Name, item);
+
+                            PdfStream.Add(Pdf);
+                        }
+                        else if (pd.Status == (int)StatusConstants.Submitted || pd.Status == (int)StatusConstants.ModificationSubmitted)
+                        {
+                            Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint_AfterSubmit, User.Identity.Name, item);
+
+                            PdfStream.Add(Pdf);
+                        }
+                        else if (pd.Status == (int)StatusConstants.Approved)
+                        {
+                            Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint_AfterApprove, User.Identity.Name, item);
+                            PdfStream.Add(Pdf);
+                        }
+
+                    }
+
+                    PdfMerger pm = new PdfMerger();
+
+                    byte[] Merge = pm.MergeFiles(PdfStream);
+
+                    if (Merge != null)
+                        return File(Merge, "application/pdf");
+
+                }
+
+                catch (Exception ex)
+                {
+                    string message = _exception.HandleException(ex);
+                    return Json(new { success = "Error", data = message }, JsonRequestBehavior.AllowGet);
+                }
+
+                return Json(new { success = "Success" }, JsonRequestBehavior.AllowGet);
+
+            }
+            return Json(new { success = "Error", data = "No Records Selected." }, JsonRequestBehavior.AllowGet);
+
+        }
+
+        private List<ListofQuery> DocumentPrintData(int item)
+        {
+
+            List<ListofQuery> DocumentPrintData = new List<ListofQuery>();
+            String QueryMain;
+
+            QueryMain = @"	DECLARE @TotalAmount DECIMAL 
+    SET @TotalAmount = (SELECT Max(Amount) FROM Web.SaleInvoiceHeaderCharges WHERE HeaderTableId = " + item + @"  AND ChargeId = 34 ) 
+
+    DECLARE @UnitDealCnt INT
+	SELECT @UnitDealCnt=sum(CASE WHEN U.UnitId != L.DealUnitId THEN 1 ELSE 0 END )
+	FROM Web.Saleinvoicelines L
+	LEFT JOIN Web.Products P WITH (Nolock) ON P.ProductId=L.ProductId
+	LEFT JOIN web.units U WITH (Nolock) ON U.UnitId=P.UnitId
+	
+	DECLARE @DocDate DATETIME
+	SET @DocDate = (SELECT DocDate FROM Web.SaleInvoiceHeaders WHERE SaleInvoiceHeaderId=" + item + @") 
+
+	
+	
+	SELECT 
+	--Header Table Fields	
+	H.SaleInvoiceHeaderId,max(H.DocTypeId) AS DocTypeId,max(H.DocNo) AS DocNo,max(DocIdCaption)+' No' AS DocIdCaption ,
+	max(H.SiteId) AS SiteId,max(H.DivisionId) AS DivisionId,max(H.DocDate) AS DocDate,max(DTS.DocIdCaption) +' Date' AS DocIdCaptionDate ,	
+   	--H.JobWorkerDocNo AS PartyDocNo,	DTS.PartyCaption +' Doc No' AS PartyDocCaption,format(H.JobWorkerDocDate,'dd/MMM/yy') AS PartyDocDate,
+    --DTS.PartyCaption +' Doc Date' AS PartyDocDateCaption,
+    max(H.CreditDays) AS CreditDays,max(H.Remark) AS Remark,max(DT.DocumentTypeShortName) AS DocumentTypeShortName,	
+	max(H.ModifiedBy +' ' + Replace(replace(convert(NVARCHAR, H.ModifiedDate, 106), ' ', '/'),'/20','/') + substring (convert(NVARCHAR,H.ModifiedDate),13,7)) AS ModifiedBy,
+	max(H.ModifiedDate) AS ModifiedDate,max(CASE WHEN Isnull(H.Status,0)=0 OR Isnull(H.Status,0)=8 THEN 0 ELSE 1 END)  AS Status,
+	max(CUR.Name) AS CurrencyName,max(CASE WHEN SPR.[Party GST NO] IS NULL THEN 'Yes' ELSE 'No' END ) AS ReverseCharge,
+	max(VDC.CompanyName) AS CompanyName,max(P.Name) AS PartyName, max(DTS.PartyCaption) AS  PartyCaption, max(P.Suffix) AS PartySuffix,	
+	max(isnull(PA.Address,'')+' '+isnull(C.CityName,'')+','+isnull(PA.ZipCode,'')+(CASE WHEN isnull(CS.StateName,'') <> isnull(S.StateName,'') AND SPR.[Party GST NO] IS NOT NULL THEN ',State : '+isnull(S.StateName,'')+(CASE WHEN S.StateCode IS NULL THEN '' ELSE ', Code : '+S.StateCode END)    ELSE '' END )) AS PartyAddress,
+	max(isnull(S.StateName,'')) AS PartyStateName,max(isnull(S.StateCode,'')) AS PartyStateCode,	
+	max(P.Mobile) AS PartyMobileNo,max([Party TIN NO]) AS [Party TIN NO],max([Party PAN NO]) AS [Party PAN NO],
+	max([Party AADHAR NO]) AS [Party AADHAR NO],max([Party GST NO]) AS [Party GST NO],max([Party CST NO]) AS [Party CST NO],
+	--Plan Detail
+	max(SDH.DocNo) AS PlanNo,max(DTS.ContraDocTypeCaption) AS ContraDocTypeCaption,
+	--Caption Fields	
+	max(DTS.SignatoryMiddleCaption) AS SignatoryMiddleCaption,max(DTS.SignatoryRightCaption) AS SignatoryRightCaption,
+	--Line Table
+	max(PD.ProductName) AS ProductName,max(DTS.ProductCaption) AS ProductCaption,max(U.UnitName) AS UnitName,max(U.DecimalPlaces) AS DecimalPlaces,max(DU.UnitName) AS DealUnitName,max(DTS.DealQtyCaption) AS DealQtyCaption,max(DU.DecimalPlaces) AS DealDecimalPlaces,
+	sum(isnull(L.Qty,0)) AS Qty,max(isnull(L.Rate,0)) AS Rate,sum(isnull(L.Amount,0)) AS Amount,sum(isnull(L.DealQty,0)) AS DealQty,
+	max(D1.Dimension1Name) AS Dimension1Name,max(DTS.Dimension1Caption) AS Dimension1Caption,max(D2.Dimension2Name) AS Dimension2Name,max(DTS.Dimension2Caption) AS Dimension2Caption,max(D3.Dimension3Name) AS Dimension3Name,max(DTS.Dimension3Caption) AS Dimension3Caption,max(D4.Dimension4Name) AS Dimension4Name,max(DTS.Dimension4Caption) AS Dimension4Caption,
+    max(DTS.SpecificationCaption) AS SpecificationCaption,max(DTS.SignatoryleftCaption) AS SignatoryleftCaption,max(L.Remark) AS LineRemark,
+	--L.DiscountPer AS DiscountPer,L.DiscountAmt AS DiscountAmt,
+	max(STC.Code) AS SalesTaxProductCodes,
+	
+	max(SDS.SalesTaxProductCodeCaption) AS SalesTaxProductCodeCaption,
+	
+	max((CASE WHEN DTS.PrintProductGroup >0 THEN isnull(PG.ProductGroupName,'') ELSE '' END)+(CASE WHEN DTS.PrintProductdescription >0 THEN isnull(','+PD.Productdescription,'') ELSE '' END)) AS ProductGroupName,
+	max(DTS.ProductGroupCaption) AS ProductGroupCaption,max(isnull(CGPD.PrintingDescription,CGPD.ChargeGroupProductName)) AS ChargeGroupProductName,
+   	--Receive Lines
+	max(PL.LotNo) AS LotNo, 
+	max(PL.BaleNo) AS BaleNo, 
+	max(CASE WHEN DTS.PrintSpecification >0 THEN   SOL.Specification ELSE '' END)  AS Specification,
+	--Formula Fields
+	isnull(@TotalAmount,0) AS NetAmount,  
+	--isnull(@ReturnAmount,0) AS ReturnAmount,
+	--isnull(@DebitAmount,0) AS DebitAmount,
+	--isnull(@CreaditAmount,0) AS CreaditAmount,   	
+	--SalesTaxGroupPersonId
+	max(CGP.ChargeGroupPersonName) AS ChargeGroupPersonName,
+	--Other Fields
+	@UnitDealCnt  AS DealUnitCnt,		
+    max(CASE WHEN Isnull(H.Status, 0) = 0 OR Isnull(H.Status, 0) = 8 THEN 'Provisional ' + isnull(DT.PrintTitle, DT.DocumentTypeName) ELSE isnull(DT.PrintTitle, DT.DocumentTypeName) END) AS ReportTitle,
+    'StdDocPrint_SaleInvoice.rdl' AS ReportName,
+    max(SalesTaxGroupProductCaption)AS SalesTaxGroupProductCaption
+    FROM Web.SaleInvoiceHeaders H WITH(Nolock)
+    LEFT JOIN web.DocumentTypes DT WITH(Nolock) ON DT.DocumentTypeId = H.DocTypeId
+    LEFT JOIN Web._DocumentTypeSettings DTS WITH(Nolock) ON DTS.DocumentTypeId = DT.DocumentTypeId
+    LEFT JOIN Web.SaleInvoiceSettings JIS WITH(Nolock) ON JIS.DocTypeId = DT.DocumentTypeId
+    LEFT JOIN web.ViewDivisionCompany VDC WITH(Nolock) ON VDC.DivisionId = H.DivisionId
+    LEFT JOIN Web.Sites SI WITH(Nolock) ON SI.SiteId = H.SiteId
+    LEFT JOIN Web.Divisions DIV WITH(Nolock) ON DIV.DivisionId = H.DivisionId
+    LEFT JOIN Web.Companies Com ON Com.CompanyId = DIV.CompanyId
+    LEFT JOIN Web.Cities CC WITH(Nolock) ON CC.CityId = Com.CityId
+    LEFT JOIN Web.States CS WITH(Nolock) ON CS.StateId = CC.StateId
+    LEFT JOIN Web.People P WITH(Nolock) ON P.PersonID = H.SaletoBuyerId
+    LEFT JOIN(SELECT TOP 1 * FROM web.SiteDivisionSettings WHERE @DocDate BETWEEN StartDate AND IsNull(EndDate, getdate()) ORDER BY StartDate) SDS  ON H.DivisionId = SDS.DivisionId AND H.SiteId = SDS.SiteId
+    LEFT JOIN(SELECT * FROM Web.PersonAddresses WITH(nolock) WHERE AddressType IS NULL) PA ON PA.PersonId = P.PersonID
+    LEFT JOIN Web.Cities C WITH(nolock) ON C.CityId = PA.CityId
+    LEFT JOIN Web.States S WITH(Nolock) ON S.StateId = C.StateId
+    LEFT JOIN web.ChargeGroupPersons CGP WITH(Nolock) ON CGP.ChargeGroupPersonId = H.SalesTaxGroupPersonId
+    LEFT JOIN Web.Currencies CUR WITH(Nolock) ON CUR.Id = H.CurrencyId
+    LEFT JOIN Web.SaleInvoiceLines L WITH(Nolock) ON L.SaleinvoiceheaderId = H.SaleInvoiceHeaderId
+    LEFT JOIN Web.SaleDispatchLines SDL WITH(Nolock) ON SDL.SaleDispatchLineId = L.SaleDispatchLineId
+    LEFT JOIN Web.SaleDispatchHeaders SDH WITH(Nolock) ON SDH.SaleDispatchHeaderId = SDL.SaleDispatchHeaderId
+    LEFT JOIN Web.PackingLines Pl ON Sdl.PackingLineId = Pl.PackingLineId
+    LEFT JOIN web.SaleOrderLines SOl WITH(Nolock) ON SOL.SaleorderLineId = PL.saleorderLineId
+    LEFT JOIN web.Products PD WITH(Nolock) ON PD.ProductId = L.ProductId
+    LEFT JOIN web.ProductGroups PG WITH(Nolock) ON PG.ProductGroupId = PD.ProductGroupid
+    LEFT JOIN Web.SalesTaxProductCodes STC WITH(Nolock) ON STC.SalesTaxProductCodeId = IsNull(PD.SalesTaxProductCodeId, Pg.DefaultSalesTaxProductCodeId)
+    LEFT JOIN Web.Dimension1 D1 WITH(Nolock) ON D1.Dimension1Id = L.Dimension1Id
+    LEFT JOIN web.Dimension2 D2 WITH(Nolock) ON D2.Dimension2Id = L.Dimension2Id
+    LEFT JOIN web.Dimension3 D3 WITH(Nolock) ON D3.Dimension3Id = L.Dimension3Id
+    LEFT JOIN Web.Dimension4 D4 WITH(nolock) ON D4.Dimension4Id = L.Dimension4Id
+    LEFT JOIN web.Units U WITH(Nolock) ON U.UnitId = PD.UnitId
+    LEFT JOIN web.Units DU WITH(Nolock) ON DU.UnitId = L.DealUnitId
+    LEFT JOIN Web.Std_PersonRegistrations SPR WITH(Nolock) ON SPR.CustomerId = H.SaleToBuyerId
+    LEFT JOIN web.ChargeGroupProducts CGPD WITH(Nolock) ON L.SalesTaxGroupProductId = CGPD.ChargeGroupProductId
+    WHERE H.SaleInvoiceHeaderId = " + item + @" 
+    GROUP BY L.ProductId, L.Dimension1Id, L.Dimension2Id, L.Dimension3Id, L.Dimension4Id, L.Rate, SDL.SaleDispatchHeaderId, H.SaleInvoiceHeaderId
+    ORDER BY max(L.Sr)";
+
+
+            ListofQuery QryMain = new ListofQuery();
+            QryMain.Query = QueryMain;
+            QryMain.QueryName = nameof(QueryMain);
+
+            DocumentPrintData.Add(QryMain);
+
+            String QueryCalculation;
+            QueryCalculation = @"DECLARE @StrGrossAmount AS NVARCHAR(50)  
+DECLARE @StrBasicExciseDuty AS NVARCHAR(50)  
+DECLARE @StrExciseECess AS NVARCHAR(50)  
+DECLARE @StrExciseHECess AS NVARCHAR(50)  
+
+DECLARE @StrSalesTaxTaxableAmt AS NVARCHAR(50)  
+DECLARE @StrVAT AS NVARCHAR(50)  
+DECLARE @StrSAT AS NVARCHAR(50) 
+DECLARE @StrCST AS NVARCHAR(50) 
+
+SET @StrGrossAmount = 'Gross Amount'
+SET @StrBasicExciseDuty = 'Basic Excise Duty'
+SET @StrExciseECess ='Excise ECess'
+SET @StrExciseHECess = 'Excise HECess'
+
+SET @StrSalesTaxTaxableAmt = 'Sales Tax Taxable Amt'
+SET @StrVAT = 'VAT'
+SET @StrSAT = 'SAT'
+SET @StrCST = 'CST'
+
+DECLARE @Qry NVARCHAR(Max);
+SET @Qry = '
+		DECLARE @GrossAmount AS DECIMAL 
+		DECLARE @BasicExciseDutyAmount AS DECIMAL 
+		DECLARE @SalesTaxTaxableAmt AS DECIMAL 
+		
+		SELECT @GrossAmount = sum ( CASE WHEN C.ChargeName = ''' + @StrGrossAmount + ''' THEN  H.Amount  ELSE 0 END ) ,
+		@BasicExciseDutyAmount = sum( CASE WHEN C.ChargeName = ''' + @StrBasicExciseDuty + ''' THEN  H.Amount  ELSE 0 END ) ,
+		@SalesTaxTaxableAmt = sum( CASE WHEN C.ChargeName = ''' + @StrSalesTaxTaxableAmt + ''' THEN  H.Amount  ELSE 0 END )
+		FROM Web.SaleInvoiceHeaderCharges H
+		LEFT JOIN web.ChargeTypes CT ON CT.ChargeTypeId = H.ChargeTypeId 
+		LEFT JOIN web.Charges C ON C.ChargeId = H.ChargeId 
+		WHERE H.Amount <> 0 AND H.HeaderTableId	= ' + Convert(Varchar," + item + @"  ) + '
+		GROUP BY H.HeaderTableId
+		
+		
+		SELECT H.Id, H.HeaderTableId, H.Sr, C.ChargeName, H.Amount, H.ChargeTypeId,  CT.ChargeTypeName, 
+		--CASE WHEN C.ChargeName = ''Vat'' THEN ( H.Amount*100/ @GrossAmount ) ELSE H.Rate End  AS Rate,
+		CASE 
+		WHEN @SalesTaxTaxableAmt>0 And C.ChargeName IN ( ''' + @StrVAT + ''',''' + @StrSAT + ''',''' + @StrCST+ ''')  THEN ( H.Amount*100/ @SalesTaxTaxableAmt   ) 
+		WHEN @GrossAmount>0 AND C.ChargeName IN ( ''' + @StrBasicExciseDuty + ''')  THEN ( H.Amount*100/ @GrossAmount   ) 
+		WHEN  @BasicExciseDutyAmount>0 AND  C.ChargeName IN ( ''' + @StrExciseECess + ''', ''' +@StrExciseHECess+ ''')  THEN ( H.Amount*100/ @BasicExciseDutyAmount   ) 
+		ELSE 0 End  AS Rate,
+		''TransactionChargesPrint.rdl'' AS ReportName,
+		''Transaction Charges'' AS ReportTitle     
+		FROM  Web.SaleInvoiceHeaderCharges  H
+		LEFT JOIN web.ChargeTypes CT ON CT.ChargeTypeId = H.ChargeTypeId 
+		LEFT JOIN web.Charges C ON C.ChargeId = H.ChargeId 
+		WHERE  ( isnull(H.ChargeTypeId,0) <> ''4'' OR C.ChargeName = ''Net Amount'') AND H.Amount <> 0
+		AND H.HeaderTableId	= ' + Convert(Varchar," + item + @"  ) + ''
+		
+	--PRINT @Qry; 
+		
+	DECLARE @TmpData TABLE
+	(
+	id BIGINT,
+	HeaderTableId INT,
+	Sr INT,
+	ChargeName NVARCHAR(50),
+	Amount DECIMAL(18,4),
+	ChargeTypeId INT,
+	ChargeTypeName NVARCHAR(50),
+	Rate DECIMAL(38,20),
+	ReportName nVarchar(255),
+	ReportTitle nVarchar(255)
+	);
+	
+	
+	Insert Into @TmpData EXEC(@Qry)
+	SELECT id,HeaderTableId,Sr,ChargeName,Amount,ChargeTypeId,ChargeTypeName,Rate,ReportName FROM @TmpData
+	ORDER BY Sr	";
+
+
+            ListofQuery QryCalculation = new ListofQuery();
+            QryCalculation.Query = QueryCalculation;
+            QryCalculation.QueryName = nameof(QueryCalculation);
+            DocumentPrintData.Add(QryCalculation);
+
+
+//            String QueryGSTSummary;
+//            QueryGSTSummary = @"DECLARE @Qry NVARCHAR(Max);
+
+//SET @Qry = '
+//SELECT  
+//--CASE WHEN PS.ProcessName IN (''Purchase'',''Sale'') THEN isnull(STGP.PrintingDescription,STGP.ChargeGroupProductName) ELSE PS.GSTPrintDesc END as ChargeGroupProductName, 
+//isnull(STGP.PrintingDescription,STGP.ChargeGroupProductName) as ChargeGroupProductName, 
+//Sum(CASE WHEN ct.ChargeTypeName =''Sales Taxable Amount'' THEN lc.Amount ELSE 0 End) AS TaxableAmount,
+//Sum(CASE WHEN ct.ChargeTypeName =''IGST'' THEN lc.Amount ELSE 0 End) AS IGST,
+//Sum(CASE WHEN ct.ChargeTypeName =''CGST'' THEN lc.Amount ELSE 0 End) AS CGST,
+//Sum(CASE WHEN ct.ChargeTypeName =''SGST'' THEN lc.Amount ELSE 0 End) AS SGST,
+//Sum(CASE WHEN ct.ChargeTypeName =''GST Cess'' THEN lc.Amount ELSE 0 End) AS GSTCess,
+//''StdDocPrintSub_GSTSummary.rdl'' AS ReportName
+//FROM Web.JobInvoiceLines L
+//LEFT JOIN Web.JobInvoiceLineCharges LC ON L.JobInvoiceLineId = LC.LineTableId 
+//LEFT JOIN web.jobInvoiceheaders H ON H.JobInvoiceHeaderId = L.JobInvoiceHeaderId
+//LEFT JOIN Web.Processes PS WITH (Nolock) ON PS.ProcessId=H.ProcessId
+//LEFT JOIN Web.Charges C ON C.ChargeId=LC.ChargeId
+//LEFT JOIN web.ChargeTypes CT ON LC.ChargeTypeId = CT.ChargeTypeId 
+//LEFT JOIN web.ChargeGroupProducts STGP ON L.SalesTaxGroupProductId = STGP.ChargeGroupProductId
+//WHERE L.JobInvoiceHeaderId =" + item + @" 
+//GROUP BY isnull(STGP.PrintingDescription,STGP.ChargeGroupProductName)
+//--GROUP BY CASE WHEN PS.ProcessName IN (''Purchase'',''Sale'') THEN isnull(STGP.PrintingDescription,STGP.ChargeGroupProductName) ELSE PS.GSTPrintDesc END '
+
+//--PRINT @Qry;
+//EXEC(@Qry);	";
+
+
+//            ListofQuery QryGSTSummary = new ListofQuery();
+//            QryGSTSummary.Query = QueryGSTSummary;
+//            QryGSTSummary.QueryName = nameof(QueryGSTSummary);
+//            DocumentPrintData.Add(QryGSTSummary);
+
+            return DocumentPrintData;
         }
 
 

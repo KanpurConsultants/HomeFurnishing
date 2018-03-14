@@ -1526,6 +1526,8 @@ namespace Jobs.Controllers
                             {
                                 if (Settings.SqlProcDocumentPrint==null || Settings.SqlProcDocumentPrint =="")
                                 {
+                                    JobInvoiceHeaderRDL cr = new JobInvoiceHeaderRDL();
+                                    drp.CreateRDLFile("DocPrint_JobInvoice", cr.DocPrint_JobInvoice());
                                     List<ListofQuery> QueryList = new List<ListofQuery>();
                                     QueryList = DocumentPrintData(item);
                                     Pdf = drp.DocumentPrint_New(QueryList, User.Identity.Name);
@@ -1539,6 +1541,8 @@ namespace Jobs.Controllers
                             {
                                 if (Settings.SqlProcDocumentPrint_AfterSubmit == null || Settings.SqlProcDocumentPrint_AfterSubmit == "")
                                 {
+									JobInvoiceHeaderRDL cr = new JobInvoiceHeaderRDL();
+                                    drp.CreateRDLFile("DocPrint_JobInvoice", cr.DocPrint_JobInvoice());
                                     List<ListofQuery> QueryList = new List<ListofQuery>();
                                     QueryList = DocumentPrintData(item);
                                     Pdf = drp.DocumentPrint_New(QueryList, User.Identity.Name);
@@ -1552,6 +1556,8 @@ namespace Jobs.Controllers
                             {
                                 if (Settings.SqlProcDocumentPrint_AfterApprove == null || Settings.SqlProcDocumentPrint_AfterApprove == "")
                                 {
+           							JobInvoiceHeaderRDL cr = new JobInvoiceHeaderRDL();
+                                    drp.CreateRDLFile("DocPrint_JobInvoice", cr.DocPrint_JobInvoice());
                                     List<ListofQuery> QueryList = new List<ListofQuery>();
                                     QueryList = DocumentPrintData(item);
                                     Pdf = drp.DocumentPrint_New(QueryList, User.Identity.Name);

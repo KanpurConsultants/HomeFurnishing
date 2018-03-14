@@ -167,6 +167,10 @@ namespace Jobs.Areas.Rug.Controllers
             ViewBag.DocNo = H.DocNo;
             ViewBag.Status = H.Status;
             ViewBag.BaleNoPattern = H.BaleNoPattern;
+            if (PackingSetting.isAllowtoUpdateBuyerSpecification==true )
+                ViewBag.isAllowtoUpdateBuyerSpecification = "Yes";
+            else
+                ViewBag.isAllowtoUpdateBuyerSpecification = "No";
             ViewBag.LineMode = "Create";
             PrepareViewBag(s);
             return PartialView("_Create", s);
@@ -941,14 +945,22 @@ namespace Jobs.Areas.Rug.Controllers
             if ((TimePlanValidation || Continue))
                 ViewBag.LineMode = "Edit";
 
+
             PackingHeader H = new PackingHeaderService(_unitOfWork).GetPackingHeader(temp.PackingHeaderId);
+
             ViewBag.DocNo = H.DocNo;
+            ViewBag.BaleNoPattern = H.BaleNoPattern;
+
             PackingLineViewModel s = _PackingLineService.GetPackingLineViewModelForLineId(id);
             s.DocTypeId = H.DocTypeId;
 
             PackingSetting PackingSetting = new PackingSettingService(_unitOfWork).GetPackingSettingForDocument(H.DocTypeId, H.DivisionId, H.SiteId);
             s.PackingSettings = Mapper.Map<PackingSetting, PackingSettingsViewModel>(PackingSetting);
 
+            if (PackingSetting.isAllowtoUpdateBuyerSpecification == true)
+                ViewBag.isAllowtoUpdateBuyerSpecification = "Yes";
+            else
+                ViewBag.isAllowtoUpdateBuyerSpecification = "No";
             ProductBuyerSettings ProductBuyerSettings = new ProductBuyerSettingsService(_unitOfWork).GetProductBuyerSettings(H.DivisionId, H.SiteId);
             s.ProductBuyerSettings = Mapper.Map<ProductBuyerSettings, ProductBuyerSettingsViewModel>(ProductBuyerSettings);
 
@@ -1044,6 +1056,13 @@ namespace Jobs.Areas.Rug.Controllers
             ProductBuyerSettings ProductBuyerSettings = new ProductBuyerSettingsService(_unitOfWork).GetProductBuyerSettings(H.DivisionId, H.SiteId);
             s.ProductBuyerSettings = Mapper.Map<ProductBuyerSettings, ProductBuyerSettingsViewModel>(ProductBuyerSettings);
 
+            ViewBag.BaleNoPattern = H.BaleNoPattern;
+            PackingSetting PackingSetting = new PackingSettingService(_unitOfWork).GetPackingSettingForDocument(H.DocTypeId, H.DivisionId, H.SiteId);
+            s.PackingSettings = Mapper.Map<PackingSetting, PackingSettingsViewModel>(PackingSetting);
+            if (PackingSetting.isAllowtoUpdateBuyerSpecification == true)
+                ViewBag.isAllowtoUpdateBuyerSpecification = "Yes";
+            else
+                ViewBag.isAllowtoUpdateBuyerSpecification = "No";
             ProductBuyer productbuyer = new ProductBuyerService(_unitOfWork).Find(H.BuyerId, temp.ProductId);
             if (productbuyer != null)
             {
@@ -2517,6 +2536,8 @@ namespace Jobs.Areas.Rug.Controllers
                         from Dimension3Tab in Dimension3Table.DefaultIfEmpty()
                         join D4 in db.Dimension4 on p.Dimension4Id equals D4.Dimension4Id into Dimension4Table
                         from Dimension4Tab in Dimension4Table.DefaultIfEmpty()
+                        join PU in db.ProductUid on StockTab.ProductUidId equals PU.ProductUIDId into PUTable
+                        from PUTab in PUTable.DefaultIfEmpty()
                         where p.StockInId == StockInId
                         select new
                         {
@@ -2535,7 +2556,10 @@ namespace Jobs.Areas.Rug.Controllers
                             BalanceQty = p.BalanceQty,
                             LotNo = p.LotNo,
                             FromProcessId = StockTab.ProcessId,
-                            FromProcessName = StockTab.Process.ProcessName
+                            FromProcessName = StockTab.Process.ProcessName,
+                            CurrenctGodownId = PUTab.CurrenctGodownId,
+                            Status = PUTab.Status
+
                         }).FirstOrDefault();
 
             if (temp != null)

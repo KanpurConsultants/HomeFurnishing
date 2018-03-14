@@ -30,7 +30,8 @@
             <div class="btn-group">
                 @Html.ActionLink(" ", "ChooseType", "SaleInvoiceHeader", new { @id = @ViewBag.id }, new { @class = "cbtn btn-circle glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip", @data_modal = "" })
                 @Html.ActionLink(" ", "GetHistory", "LogHistory", null, new { @class = "cbtn btn-circle glyphicon glyphicon-user toolbar", @title = "History", @data_toggle = "tooltip", @id = "DocHistoryI" })
-                @Html.ActionLink(" ", "Print", "SaleInvoiceHeader", null, new { @class = "cbtn btn-circle glyphicon glyphicon-print toolbar", @title = "Print", @data_toggle = "tooltip", @id = "PrintRecord", @data_modal = "" })
+                @* @Html.ActionLink(" ", "Print", "SaleInvoiceHeader", null, new { @class = "cbtn btn-circle glyphicon glyphicon-print toolbar", @title = "Print", @data_toggle = "tooltip", @id = "PrintRecord", @data_modal = "" })*@
+                @Html.ActionLink(" ", "GeneratePrints", "SaleInvoiceHeader", null, new { @class = "cbtn btn-circle glyphicon glyphicon-print toolbar", @title = "Print", @data_toggle = "tooltip", @id = "PrintRecordI", target = "_blank" })
                 @Html.ActionLink(" ", "Remove", "SaleInvoiceHeader", null, new { @class = "cbtn btn-circle glyphicon glyphicon-trash hidden-xs", @title = "Delete", @data_toggle = "tooltip", @id = "DeleteRecord", @data_modalDelete = "", onclick = "" })
             </div>
             <div class="btn-group">

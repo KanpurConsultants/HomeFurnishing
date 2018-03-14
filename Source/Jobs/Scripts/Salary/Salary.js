@@ -78,7 +78,8 @@ Salary.controller('MainCtrl', ['$scope', '$log', '$http', 'uiGridConstants', 'ui
       $scope.Post = function (SaleEnquiryLineId, ProductName) {
           var i = 0;
           var Rows = [];          
-          $scope.gridApi.core.getVisibleRows($scope.gridApi.grid).some(function (rowItem) {              
+          //$scope.gridApi.core.getVisibleRows($scope.gridApi.grid).some(function (rowItem) {              
+          $scope.gridApi.grid.rows.forEach(function (rowItem) {
               Rows[i] = rowItem.entity;
               i++;
           });

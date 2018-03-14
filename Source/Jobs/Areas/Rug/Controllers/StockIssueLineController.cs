@@ -406,21 +406,24 @@ namespace Jobs.Areas.Rug.Controllers
 
 
                 int i = 0;
-                foreach (var item in ((List<JobOrderBomMaterialIssueViewModel>)System.Web.HttpContext.Current.Session["JobOrderBomMaterialIssue"]))
+                if (System.Web.HttpContext.Current.Session["JobOrderBomMaterialIssue"] != null)
                 {
-                    JobOrderBomMaterialIssue JobOrderBomMaterialIssue = new JobOrderBomMaterialIssue();
-                    JobOrderBomMaterialIssue.JobOrderBomMaterialIssueId = i;
-                    JobOrderBomMaterialIssue.JobOrderBomId = item.JobOrderBomId;
-                    JobOrderBomMaterialIssue.StockLineId = item.StockLineId;
-                    JobOrderBomMaterialIssue.IssueForQty = item.IssueForQty;
-                    JobOrderBomMaterialIssue.Qty = item.Qty;
-                    JobOrderBomMaterialIssue.CreatedDate = DateTime.Now;
-                    JobOrderBomMaterialIssue.ModifiedDate = DateTime.Now;
-                    JobOrderBomMaterialIssue.CreatedBy = User.Identity.Name;
-                    JobOrderBomMaterialIssue.ModifiedBy = User.Identity.Name;
-                    JobOrderBomMaterialIssue.ObjectState = Model.ObjectState.Added;
-                    db.JobOrderBomMaterialIssue.Add(JobOrderBomMaterialIssue);
-                    i = i - 1;
+                    foreach (var item in ((List<JobOrderBomMaterialIssueViewModel>)System.Web.HttpContext.Current.Session["JobOrderBomMaterialIssue"]))
+                    {
+                        JobOrderBomMaterialIssue JobOrderBomMaterialIssue = new JobOrderBomMaterialIssue();
+                        JobOrderBomMaterialIssue.JobOrderBomMaterialIssueId = i;
+                        JobOrderBomMaterialIssue.JobOrderBomId = item.JobOrderBomId;
+                        JobOrderBomMaterialIssue.StockLineId = item.StockLineId;
+                        JobOrderBomMaterialIssue.IssueForQty = item.IssueForQty;
+                        JobOrderBomMaterialIssue.Qty = item.Qty;
+                        JobOrderBomMaterialIssue.CreatedDate = DateTime.Now;
+                        JobOrderBomMaterialIssue.ModifiedDate = DateTime.Now;
+                        JobOrderBomMaterialIssue.CreatedBy = User.Identity.Name;
+                        JobOrderBomMaterialIssue.ModifiedBy = User.Identity.Name;
+                        JobOrderBomMaterialIssue.ObjectState = Model.ObjectState.Added;
+                        db.JobOrderBomMaterialIssue.Add(JobOrderBomMaterialIssue);
+                        i = i - 1;
+                    }
                 }
 
                 if (Header.Status != (int)StatusConstants.Drafted && Header.Status != (int)StatusConstants.Import)

@@ -148,6 +148,7 @@ namespace Jobs.App_Start
 
 
             container.RegisterType<ISalaryWizardService, SalaryWizardService>(new PerRequestLifetimeManager());
+            container.RegisterType<ILedgerWizardService, LedgerWizardService>(new PerRequestLifetimeManager());
 
             container.RegisterType<IRolesDocTypeService, RolesDocTypeService>(new PerRequestLifetimeManager());
             container.RegisterType<IRolePermissionService, RolePermissionService>(new PerRequestLifetimeManager());

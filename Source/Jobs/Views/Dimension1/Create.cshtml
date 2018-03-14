@@ -54,7 +54,7 @@
                         <div class="form-group" style="margin-top:15px">
                             @Html.LabelFor(model => model.Description, "Description", new { @class = "control-label col-md-4 col-sm-2" })
                             <div class="col-md-7 col-sm-10">
-                                @Html.TextBoxFor(m => m.Description, null, new { @class = "form-control col-xs-6 required" })
+                                @Html.TextBoxFor(m => m.Description, null, new { @class = "form-control col-xs-6 " })
                                 @Html.ValidationMessageFor(m => m.Description, null, new { @class = "has-error" })
                             </div>
                         </div>

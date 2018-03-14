@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 using Microsoft.Reporting.WebForms;
 using Data.Models;
 using Model.Models;
-
+using System.Configuration;
 
 
 
@@ -73,7 +73,7 @@ namespace Reports.Reports
 
 
             string mimetype = "";
-            return c.ReportGenerateDirect(DataTableList, out mimtype, ReportFileTypeConstants.PDF, null,null, UserName);
+            return c.ReportGenerateNew(DataTableList, out mimtype, ReportFileTypeConstants.PDF, null, null, UserName);
 
         }
 

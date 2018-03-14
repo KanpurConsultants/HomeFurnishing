@@ -1519,7 +1519,7 @@ namespace Module
             AddFields("PackingSettings", "isVisibleProductUID", "BIT");
             AddFields("PackingSettings", "isVisibleShipMethod", "BIT");
             AddFields("PackingSettings", "filterProductDivision", "nvarchar(Max)");
-
+			AddFields("PackingSettings", "isAllowtoUpdateBuyerSpecification", "BIT");
 
             try
             {

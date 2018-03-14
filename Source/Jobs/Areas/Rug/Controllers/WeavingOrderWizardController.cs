@@ -448,6 +448,8 @@ namespace Jobs.Areas.Rug.Controllers
 
                         }
 
+                        BusinessEntity BE = new BusinessEntityService(_unitOfWork).Find(s.JobWorkerId);
+                        s.SalesTaxGroupPersonId = BE.SalesTaxGroupPartyId;
 
                         s.CreatedDate = DateTime.Now;
                         s.ModifiedDate = DateTime.Now;

@@ -427,6 +427,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Controllers\MailboxController.cs" />
+    <Compile Include="Controllers\LedgerWizardController.cs" />
     <Compile Include="Controllers\SalaryWizardController.cs" />
     <Compile Include="Controllers\LedgerAccountMergingController.cs" />
     <Compile Include="Areas\Rug\Controllers\PersonMerging.cs">
@@ -3214,6 +3215,7 @@
     <Content Include="Scripts\Mailbox\Inbox-menu.js" />
     <Content Include="Scripts\Mailbox\Inbox.js" />
     <Content Include="Scripts\Mailbox\Read-menu.js" />
+    <Content Include="Scripts\LedgerWizard\LedgerWizard.js" />
     <Content Include="Scripts\Salary\Salary.js" />
     <Content Include="Scripts\SaleEnquiryProductMappingWithGrid\SaleEnquiryProductMappingWithGrid.js" />
     <Content Include="Scripts\RolePermission\RolePermission.js" />
@@ -5355,6 +5357,8 @@
     <Content Include="Views\Mailbox\Compose.cshtml" />
     <Content Include="Views\Mailbox\Inbox.cshtml" />
     <Content Include="Views\Mailbox\Read.cshtml" />
+    <Content Include="Views\StockExchange\_ResultsReceiveProductBom.cshtml" />
+    <Content Include="Views\LedgerWizard\LedgerWizard.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

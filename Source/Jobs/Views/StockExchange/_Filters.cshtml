@@ -100,18 +100,18 @@
 
     $(document).ready(function () {
         $("#ProductId").select2("focus");       
-        CustomSelectFunction($("#ProductGroupId"), '/ComboHelpList/GetProductGroup', '/ComboHelpList/SetProductGroup', 'Enter Group Name', true, 1);
-        CustomSelectFunction($("#Dimension1Id"), '/StockExchange/GetDimension1', '/ComboHelpList/SetDimension1', 'Enter Dimension1', true, 1, PerId);
-        CustomSelectFunction($("#Dimension2Id"), '/StockExchange/GetDimension2', '/ComboHelpList/SetDimension2', 'Enter Dimension2', true, 1, PerId);
+        CustomSelectFunction($("#ProductGroupId"), '/ComboHelpList/GetProductGroup', '/ComboHelpList/SetProductGroup', ' ', true, 0);
+        CustomSelectFunction($("#Dimension1Id"), '/StockExchange/GetDimension1', '/ComboHelpList/SetDimension1', ' ', true, 0, PerId);
+        CustomSelectFunction($("#Dimension2Id"), '/StockExchange/GetDimension2', '/ComboHelpList/SetDimension2', ' ', true, 0, PerId);
     });
 
 
 
    
 
-    CustomSelectFunction($("#CostCenterId"), '/StockExchange/GetCostCenters', '/ComboHelpList/SetCostCenter', 'Enter CostCenter', true, 1, PerId);
-    CustomSelectFunction($("#RequisitionHeaderId"), '/StockExchange/GetRequisitions', '/ComboHelpList/SetCostCenter', 'Enter Requisitions', true, 1, PerId);
-    CustomSelectFunction($("#ProductId"), '/StockExchange/GetProducts', '/ComboHelpList/SetProducts', 'Enter Products', true, 1, PerId);
+    CustomSelectFunction($("#CostCenterId"), '/StockExchange/GetCostCenters', '/ComboHelpList/SetCostCenter', ' ', true, 0, PerId);
+    CustomSelectFunction($("#RequisitionHeaderId"), '/StockExchange/GetRequisitions', '/ComboHelpList/SetCostCenter', ' ', true, 0, PerId);
+    CustomSelectFunction($("#ProductId"), '/StockExchange/GetProducts', '/ComboHelpList/SetProducts', ' ', true, 0, PerId);
 
 
     //var URL = '/StockExchange/GetRequisitions/' + DocID;

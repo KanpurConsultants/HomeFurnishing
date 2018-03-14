@@ -205,7 +205,8 @@
                     </div>
 
 
-                    <div class="col-md-6" >
+                    <div class="col-md-6" style="display:@(Model.JobInvoiceSettings.IsVisibleDocQty?"":"none")">
+                        @Html.HiddenFor(m => m.JobInvoiceSettings.IsVisibleDocQty)
                         <div class="form-group">
                             @Html.LabelFor(model => model.Qty, "Qty", new { @class = "control-label col-md-4 col-sm-2" })
                             <div class="col-md-7 col-sm-10" style="padding:0px">
@@ -220,7 +221,8 @@
                         </div>
                     </div>
 
-                    <div class="col-md-6">
+                    <div class="col-md-6" style="display:@(Model.JobInvoiceSettings.isVisibleDealUnit?"":"none")">
+                        @Html.HiddenFor(m => m.JobInvoiceSettings.isVisibleDealUnit)
                         <div class="form-group">
                             @Html.LabelFor(model => model.DealUnitId, "Deal Unit& Multiplier", new { @class = "control-label col-md-4 col-sm-2" })
                             <div class="col-md-7 col-sm-10" style="padding:0px">
@@ -235,9 +237,18 @@
                         </div>
                     </div>
 
+                    <div class="col-md-6" style="display:@(Model.JobInvoiceSettings.isVisibleDealUnit?"":"none")">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.DealQty, "Deal Qty", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.DealQty, new { @class = "form-control required cusrightnormal", @readonly = true })
+                                @Html.ValidationMessageFor(model => model.DealQty, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
 
-
-                    <div class="col-md-6">
+                    <div class="col-md-6" style="display:@(Model.JobInvoiceSettings.IsVisibleRate?"":"none")">
+                        @Html.HiddenFor(m => m.JobInvoiceSettings.IsVisibleRate)
                         <div class="form-group">
                             @Html.LabelFor(model => model.Rate, "Rate", new { @class = "control-label col-md-4 col-sm-2" })
                             <div class="col-md-7 col-sm-10">
@@ -249,17 +260,10 @@
 
 
 
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            @Html.LabelFor(model => model.DealQty, "Deal Qty", new { @class = "control-label col-md-4 col-sm-2" })
-                            <div class="col-md-7 col-sm-10">
-                                @Html.TextBoxFor(model => model.DealQty, new { @class = "form-control required cusrightnormal", @readonly = true })
-                                @Html.ValidationMessageFor(model => model.DealQty, "", new { @class = "text-danger" })
-                            </div>
-                        </div>
-                    </div>
 
-                    <div class="col-md-6">
+
+                    <div class="col-md-6" style="display:@(Model.JobInvoiceSettings.isVisibleRateDiscountPer?"":"none")">
+                        @Html.HiddenFor(m => m.JobInvoiceSettings.isVisibleRateDiscountPer)
                         <div class="form-group">
                             @Html.LabelFor(model => model.DiscountPer, "Discount %", new { @class = "control-label col-md-4 col-sm-2" })
                             <div class="col-md-7 col-sm-10">
@@ -280,7 +284,8 @@
                         </div>
                     </div>
 
-                    <div class="col-md-6">
+                    <div class="col-md-6" style="display:@(Model.JobInvoiceSettings.isVisibleWeight?"":"none")">
+                        @Html.HiddenFor(m => m.JobInvoiceSettings.isVisibleWeight)
                         <div class="form-group">
                             @Html.LabelFor(model => model.Weight, "Weight", new { @class = "control-label col-md-4 col-sm-2" })
                             <div class="col-md-7 col-sm-10">

@@ -496,6 +496,7 @@ namespace Jobs.Controllers
             if ((TimePlanValidation || Continue))
                 ViewBag.LineMode = "Edit";
 
+            ViewBag.LineMode = "Edit";
             SaleEnquiryHeader H = new SaleEnquiryHeaderService(_unitOfWork).GetSaleEnquiryHeader(temp.SaleEnquiryHeaderId);
             ViewBag.DocNo = H.DocNo;
             SaleEnquiryLineViewModel s = Mapper.Map<SaleEnquiryLine, SaleEnquiryLineViewModel>(temp);

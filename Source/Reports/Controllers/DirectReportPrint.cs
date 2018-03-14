@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 using Microsoft.Reporting.WebForms;
 using Data.Models;
 using Model.Models;
-
+using System.Configuration;
 
 
 
@@ -354,6 +354,23 @@ namespace Reports.Reports
 
 
 
+        }
+
+        public void CreateRDLFile(string FileName,string FileCode)
+        {
+            string fileName = "";
+            fileName = ConfigurationManager.AppSettings["PhysicalRDLCPath"] + ConfigurationManager.AppSettings["ReportsPathFromService"] + FileName + ".rdl";
+            // Check if file already exists. If yes, delete it. 
+            if (File.Exists(fileName))
+            {
+                File.Delete(fileName);
+            }
+
+            // Create a new file 
+            using (StreamWriter sw = File.CreateText(fileName))
+            {
+                sw.Write(FileCode);
+            }
         }
 
     }

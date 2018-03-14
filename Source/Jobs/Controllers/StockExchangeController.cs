@@ -1186,6 +1186,8 @@ namespace Jobs.Controllers
             return PartialView("_Filters", vm);
         }
 
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult _FilterPost(RequisitionFiltersForExchange vm)
@@ -1198,6 +1200,19 @@ namespace Jobs.Controllers
             var Header = new StockHeaderService(_unitOfWork).Find(vm.StockHeaderId);
             svm.StockHeaderSettings = Mapper.Map<StockHeaderSettings, StockHeaderSettingsViewModel>(new StockHeaderSettingsService(_unitOfWork).GetStockHeaderSettingsForDocument(Header.DocTypeId, Header.DivisionId, Header.SiteId));
             return PartialView("_Results", svm);
+
+        }
+
+        public ActionResult _FilterPostReceiveProductBom(int StockHeaderId)
+        {
+            List<StockExchangeLineViewModel> temp = _StockLineService.GetReceiveProductBomForExchange(StockHeaderId).ToList();
+
+            StockExchangeMasterDetailModel svm = new StockExchangeMasterDetailModel();
+            svm.StockLineViewModel = temp;
+            //Getting Settings           
+            var Header = new StockHeaderService(_unitOfWork).Find(StockHeaderId);
+            svm.StockHeaderSettings = Mapper.Map<StockHeaderSettings, StockHeaderSettingsViewModel>(new StockHeaderSettingsService(_unitOfWork).GetStockHeaderSettingsForDocument(Header.DocTypeId, Header.DivisionId, Header.SiteId));
+            return PartialView("_ResultsReceiveProductBom", svm);
 
         }
 
@@ -1652,7 +1667,279 @@ namespace Jobs.Controllers
         }
 
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult _ResultsPostReceiveProductBom(StockExchangeMasterDetailModel vm)
+        {
+            int Cnt = 0;
+            int pk = 0;
 
+            int IssSerial = _StockLineService.GetMaxSr(vm.StockLineViewModel.FirstOrDefault().StockHeaderId);
+
+            StockHeader Header = new StockHeaderService(_unitOfWork).Find(vm.StockLineViewModel.FirstOrDefault().StockHeaderId);
+
+            StockHeaderSettings Settings = new StockHeaderSettingsService(_unitOfWork).GetStockHeaderSettingsForDocument(Header.DocTypeId, Header.DivisionId, Header.SiteId);
+
+            bool BeforeSave = true;
+            try
+            {
+                BeforeSave = StockExchangeDocEvents.beforeLineSaveBulkEvent(this, new StockEventArgs(vm.StockLineViewModel.FirstOrDefault().StockHeaderId), ref db);
+            }
+            catch (Exception ex)
+            {
+                string message = _exception.HandleException(ex);
+                TempData["CSEXC"] += message;
+                EventException = true;
+            }
+
+            if (!BeforeSave)
+                ModelState.AddModelError("", "Validation failed before save");
+
+            //decimal Qty = vm.StockLineViewModel.Where(m => m.Rate > 0).Sum(m => m.Qty);
+
+
+            if (ModelState.IsValid && BeforeSave && !EventException)
+            {
+                foreach (var item in vm.StockLineViewModel.Where(m => m.QtyRec > 0))
+                {
+                    //if (item.Qty > 0 &&  ((Settings.isMandatoryRate.HasValue && Settings.isMandatoryRate == true )? item.Rate > 0 : 1 == 1))
+                    if (item.QtyRec > 0)
+                    {
+                        StockLine line = new StockLine();
+
+                        StockViewModel StockViewModel = new StockViewModel();
+
+                        if (Cnt == 0)
+                        {
+                            StockViewModel.StockHeaderId = Header.StockHeaderId;
+                        }
+                        else
+                        {
+                            if (Header.StockHeaderId != null && Header.StockHeaderId != 0)
+                            {
+                                StockViewModel.StockHeaderId = (int)Header.StockHeaderId;
+                            }
+                            else
+                            {
+                                StockViewModel.StockHeaderId = -1;
+                            }
+                        }
+
+                        StockViewModel.StockId = -Cnt;
+                        StockViewModel.DocHeaderId = Header.StockHeaderId;
+                        StockViewModel.DocLineId = line.StockLineId;
+                        StockViewModel.DocTypeId = Header.DocTypeId;
+                        StockViewModel.StockHeaderDocDate = Header.DocDate;
+                        StockViewModel.StockDocDate = Header.DocDate;
+                        StockViewModel.DocNo = Header.DocNo;
+                        StockViewModel.DivisionId = Header.DivisionId;
+                        StockViewModel.SiteId = Header.SiteId;
+                        StockViewModel.CurrencyId = null;
+                        StockViewModel.PersonId = Header.PersonId;
+                        StockViewModel.ProductId = item.ProductId;
+                        StockViewModel.HeaderFromGodownId = null;
+                        StockViewModel.HeaderGodownId = Header.GodownId;
+                        StockViewModel.HeaderProcessId = Header.ProcessId;
+                        StockViewModel.GodownId = (int)Header.GodownId;
+                        StockViewModel.Remark = Header.Remark;
+                        StockViewModel.Status = Header.Status;
+                        StockViewModel.ProcessId = Header.ProcessId;
+                        StockViewModel.LotNo = null;
+                        StockViewModel.CostCenterId = item.CostCenterId;
+                        StockViewModel.Qty_Iss = 0;
+                        StockViewModel.Qty_Rec = item.QtyRec;
+                        StockViewModel.Rate = item.Rate;
+                        StockViewModel.ExpiryDate = null;
+                        StockViewModel.Specification = item.Specification;
+                        StockViewModel.Dimension1Id = item.Dimension1Id;
+                        StockViewModel.Dimension2Id = item.Dimension2Id;
+                        StockViewModel.Dimension3Id = item.Dimension3Id;
+                        StockViewModel.Dimension4Id = item.Dimension4Id;
+                        StockViewModel.ProductUidId = item.ProductUidId;
+                        StockViewModel.CreatedBy = User.Identity.Name;
+                        StockViewModel.CreatedDate = DateTime.Now;
+                        StockViewModel.ModifiedBy = User.Identity.Name;
+                        StockViewModel.ModifiedDate = DateTime.Now;
+
+                        string StockPostingError = "";
+                        StockPostingError = new StockService(_unitOfWork).StockPostDB(ref StockViewModel, ref db);
+
+                        if (StockPostingError != "")
+                        {
+                            string message = StockPostingError;
+                            ModelState.AddModelError("", message);
+                            return PartialView("_Results", vm);
+                        }
+
+                        if (Cnt == 0)
+                        {
+                            Header.StockHeaderId = StockViewModel.StockHeaderId;
+                        }
+                        line.StockId = StockViewModel.StockId;
+
+
+
+
+                        if (Settings.isPostedInStockProcess ?? false)
+                        {
+                            StockProcessViewModel StockProcessViewModel = new StockProcessViewModel();
+
+                            if (Header.StockHeaderId != null && Header.StockHeaderId != 0)//If Transaction Header Table Has Stock Header Id Then It will Save Here.
+                            {
+                                StockProcessViewModel.StockHeaderId = (int)Header.StockHeaderId;
+                            }
+                            else if (Cnt > 0)//If function will only post in stock process then after first iteration of loop the stock header id will go -1
+                            {
+                                StockProcessViewModel.StockHeaderId = -1;
+                            }
+                            else//If function will only post in stock process then this statement will execute.For Example Job consumption.
+                            {
+                                StockProcessViewModel.StockHeaderId = 0;
+                            }
+                            StockProcessViewModel.StockProcessId = -Cnt;
+                            StockProcessViewModel.DocHeaderId = Header.StockHeaderId;
+                            StockProcessViewModel.DocLineId = line.StockLineId;
+                            StockProcessViewModel.DocTypeId = Header.DocTypeId;
+                            StockProcessViewModel.StockHeaderDocDate = Header.DocDate;
+                            StockProcessViewModel.StockProcessDocDate = Header.DocDate;
+                            StockProcessViewModel.DocNo = Header.DocNo;
+                            StockProcessViewModel.DivisionId = Header.DivisionId;
+                            StockProcessViewModel.SiteId = Header.SiteId;
+                            StockProcessViewModel.CurrencyId = null;
+                            StockProcessViewModel.PersonId = Header.PersonId;
+                            StockProcessViewModel.ProductId = item.ProductId;
+                            StockProcessViewModel.HeaderFromGodownId = null;
+                            StockProcessViewModel.HeaderGodownId = Header.GodownId;
+                            StockProcessViewModel.HeaderProcessId = Header.ProcessId;
+                            StockProcessViewModel.GodownId = (int)Header.GodownId;
+                            StockProcessViewModel.Remark = Header.Remark;
+                            StockProcessViewModel.Status = Header.Status;
+                            StockProcessViewModel.ProcessId = Header.ProcessId;
+                            StockProcessViewModel.LotNo = null;
+                            StockProcessViewModel.CostCenterId = item.CostCenterId;
+                            StockProcessViewModel.Qty_Iss = item.QtyRec;
+                            StockProcessViewModel.Qty_Rec = 0;
+                            StockProcessViewModel.Rate = item.Rate;
+                            StockProcessViewModel.ExpiryDate = null;
+                            StockProcessViewModel.Specification = item.Specification;
+                            StockProcessViewModel.Dimension1Id = item.Dimension1Id;
+                            StockProcessViewModel.Dimension2Id = item.Dimension2Id;
+                            StockProcessViewModel.Dimension3Id = item.Dimension3Id;
+                            StockProcessViewModel.Dimension4Id = item.Dimension4Id;
+                            StockProcessViewModel.ProductUidId = item.ProductUidId;
+                            StockProcessViewModel.CreatedBy = User.Identity.Name;
+                            StockProcessViewModel.CreatedDate = DateTime.Now;
+                            StockProcessViewModel.ModifiedBy = User.Identity.Name;
+                            StockProcessViewModel.ModifiedDate = DateTime.Now;
+
+                            string StockProcessPostingError = "";
+                            StockProcessPostingError = new StockProcessService(_unitOfWork).StockProcessPostDB(ref StockProcessViewModel, ref db);
+
+                            if (StockProcessPostingError != "")
+                            {
+                                string message = StockProcessPostingError;
+                                ModelState.AddModelError("", message);
+                                return PartialView("_Results", vm);
+                            }
+
+                            line.StockProcessId = StockProcessViewModel.StockProcessId;
+                        }
+
+
+                        line.StockHeaderId = item.StockHeaderId;
+                        line.RequisitionLineId = item.RequisitionLineId;
+                        line.ProductId = item.ProductId;
+                        line.Dimension1Id = item.Dimension1Id;
+                        line.Dimension2Id = item.Dimension2Id;
+                        line.Dimension3Id = item.Dimension3Id;
+                        line.Dimension4Id = item.Dimension4Id;
+                        line.Specification = item.Specification;
+                        line.Qty = item.QtyRec;
+                        line.CostCenterId = item.CostCenterId;
+                        line.DocNature = StockNatureConstants.Receive;
+                        line.Rate = item.Rate ?? 0;
+                        line.Amount = (line.Qty * line.Rate);
+                        line.CreatedDate = DateTime.Now;
+                        line.ModifiedDate = DateTime.Now;
+                        line.CreatedBy = User.Identity.Name;
+                        line.ModifiedBy = User.Identity.Name;
+                        line.StockLineId = pk;
+                        line.Sr = IssSerial++;
+                        line.ObjectState = Model.ObjectState.Added;
+                        db.StockLine.Add(line);
+                        //_StockLineService.Create(line);
+                        pk++;
+                        Cnt = Cnt + 1;
+                    }
+
+                }
+
+
+
+
+
+                if (Header.Status != (int)StatusConstants.Drafted)
+                {
+                    Header.Status = (int)StatusConstants.Modified;
+                    Header.ModifiedBy = User.Identity.Name;
+                    Header.ModifiedDate = DateTime.Now;
+                }
+
+                Header.ObjectState = Model.ObjectState.Modified;
+                db.StockHeader.Add(Header);
+
+                try
+                {
+                    StockExchangeDocEvents.onLineSaveBulkEvent(this, new StockEventArgs(vm.StockLineViewModel.FirstOrDefault().StockHeaderId), ref db);
+                }
+                catch (Exception ex)
+                {
+                    string message = _exception.HandleException(ex);
+                    TempData["CSEXC"] += message;
+                    EventException = true;
+                }
+
+                //new StockHeaderService(_unitOfWork).Update(Header);
+                try
+                {
+                    if (EventException)
+                    { throw new Exception(); }
+                    db.SaveChanges();
+                }
+
+                catch (Exception ex)
+                {
+                    string message = _exception.HandleException(ex);
+                    TempData["CSEXCL"] += message;
+                    return PartialView("_Results", vm);
+                }
+
+                try
+                {
+                    StockExchangeDocEvents.afterLineSaveBulkEvent(this, new StockEventArgs(vm.StockLineViewModel.FirstOrDefault().StockHeaderId), ref db);
+                }
+                catch (Exception ex)
+                {
+                    string message = _exception.HandleException(ex);
+                    TempData["CSEXC"] += message;
+                }
+
+                LogActivity.LogActivityDetail(LogVm.Map(new ActiivtyLogViewModel
+                {
+                    DocTypeId = Header.DocTypeId,
+                    DocId = Header.StockHeaderId,
+                    ActivityType = (int)ActivityTypeContants.MultipleCreate,
+                    DocNo = Header.DocNo,
+                    DocDate = Header.DocDate,
+                    DocStatus = Header.Status,
+                }));
+
+                return Json(new { success = true });
+
+            }
+            return PartialView("_Results", vm);
+
+        }
 
 
 

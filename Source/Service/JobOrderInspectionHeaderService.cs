@@ -59,13 +59,15 @@ namespace Service
         public JobOrderInspectionHeaderViewModel GetJobOrderInspectionHeader(int id)
         {
             return (from p in db.JobOrderInspectionHeader
+                    join E in db.Persons on p.InspectionById equals E.PersonID into ETable
+                    from ETab in ETable.DefaultIfEmpty()
                     where p.JobOrderInspectionHeaderId == id
                     select new JobOrderInspectionHeaderViewModel
                     {
                         DivisionId=p.DivisionId,
                         DivisionName=p.Division.DivisionName,
                         DocTypeName=p.DocType.DocumentTypeName,
-                        InspectionByName=p.InspectionBy.Person.Name,
+                        InspectionByName= ETab.Name,
                         InspectionById=p.InspectionById,
                         JobWorkerId=p.JobWorkerId,
                         JobWorkerName=p.JobWorker.Person.Name,

@@ -76,7 +76,7 @@ namespace Service
         IEnumerable<ComboBoxResult> GetStockProcessBalanceForReceive(int StockHeaderId, string term);
         IEnumerable<StockIssueForProductsFilterViewModel> GetProductsForFilters(ProductsFiltersForIssue svm);
         IEnumerable<StockLineViewModel> GetBOMDetailForProducts(ProductsFilterViewModel vm);
-
+        IEnumerable<StockExchangeLineViewModel> GetReceiveProductBomForExchange(int StockHeaderId);
 
     }
 
@@ -1029,6 +1029,8 @@ namespace Service
         }
 
 
+
+
         public IEnumerable<StockExchangeLineViewModel> GetRequisitionsForExchange(RequisitionFiltersForExchange vm)
         {
 
@@ -1130,6 +1132,53 @@ namespace Service
 
 
                         );
+            return temp;
+        }
+
+        public IEnumerable<StockExchangeLineViewModel> GetReceiveProductBomForExchange(int StockHeaderId)
+        {
+            var StockHeader = new StockHeaderService(_unitOfWork).Find(StockHeaderId);
+
+            var settings = new StockHeaderSettingsService(_unitOfWork).GetStockHeaderSettingsForDocument(StockHeader.DocTypeId, StockHeader.DivisionId, StockHeader.SiteId);
+
+            var temp = (from L in db.StockLine
+                        join Bd in db.BomDetail on L.ProductId equals Bd.BaseProductId into BomDetailTable
+                        from BomDetailTab in BomDetailTable.DefaultIfEmpty()
+                        join P in db.Product on BomDetailTab.ProductId equals P.ProductId into ProductTable from ProductTab in ProductTable.DefaultIfEmpty()
+                        join D1 in db.Dimension1 on BomDetailTab.ProductId equals D1.Dimension1Id into Dimension1Table
+                        from Dimension1Tab in Dimension1Table.DefaultIfEmpty()
+                        join D2 in db.Dimension2 on BomDetailTab.ProductId equals D2.Dimension2Id into Dimension2Table
+                        from Dimension2Tab in Dimension2Table.DefaultIfEmpty()
+                        join D3 in db.Dimension3 on BomDetailTab.ProductId equals D3.Dimension3Id into Dimension3Table
+                        from Dimension3Tab in Dimension3Table.DefaultIfEmpty()
+                        join D4 in db.Dimension4 on BomDetailTab.ProductId equals D4.Dimension4Id into Dimension4Table
+                        from Dimension4Tab in Dimension4Table.DefaultIfEmpty()
+                        where L.StockHeaderId == StockHeaderId && L.DocNature == StockNatureConstants.Receive
+                        group new { L, BomDetailTab, ProductTab, Dimension1Tab, Dimension2Tab, Dimension3Tab, Dimension4Tab } by new { BomDetailTab.ProductId, BomDetailTab.Dimension1Id, BomDetailTab.Dimension2Id, BomDetailTab.Dimension3Id, BomDetailTab.Dimension4Id } into Results
+                        select new StockExchangeLineViewModel
+                        {
+                            Dimension1Name = Results.Max(i => i.Dimension1Tab.Dimension1Name),
+                            Dimension2Name = Results.Max(i => i.Dimension2Tab.Dimension2Name),
+                            Dimension3Name = Results.Max(i => i.Dimension3Tab.Dimension3Name),
+                            Dimension4Name = Results.Max(i => i.Dimension4Tab.Dimension4Name),
+                            Specification = null,
+                            Dimension1Id = Results.Max(i => i.BomDetailTab.Dimension1Id),
+                            Dimension2Id = Results.Max(i => i.BomDetailTab.Dimension2Id),
+                            Dimension3Id = Results.Max(i => i.BomDetailTab.Dimension3Id),
+                            Dimension4Id = Results.Max(i => i.BomDetailTab.Dimension4Id),
+                            ProcessId = null,
+                            RequisitionHeaderDocNo = null,
+                            ProductName = Results.Max(i => i.ProductTab.ProductName),
+                            ProductId = Results.Max(i => i.BomDetailTab.ProductId),
+                            CostCenterId = null,
+                            CostCenterName = null,
+                            StockHeaderId = StockHeaderId,
+                            RequisitionLineId = null,
+                            UnitId = Results.Max(i => i.ProductTab.UnitId),
+                            UnitName = Results.Max(i => i.ProductTab.Unit.UnitName),
+                            UnitDecimalPlaces = Results.Max(i => i.ProductTab.Unit.DecimalPlaces),
+                            QtyIss = Results.Sum(i => i.L.Qty * i.BomDetailTab.Qty),
+                        });
             return temp;
         }
 
