@@ -330,7 +330,7 @@ function SetSingleValue(functionname, Div_Id) {
         type: "POST",
         url: '/DashBoardAuto/' + functionname,
         success: function (result) {
-            $(Div_Id).text(result.Data[0].Value);
+            $(Div_Id).text(FormatValues(result.Data[0].Value));
         },
         error: function (xhr, ajaxOptions, thrownError) {
             alert('Failed to retrieve product details.' + thrownError);
@@ -339,6 +339,29 @@ function SetSingleValue(functionname, Div_Id) {
 }
 
 //-----------------------------End Single Value Function---------------------------------------------------------
+
+
+//----------------------Set Double Value------------------------------------------------
+
+function SetDoubleValue(functionname, Div_Id_Value1, Div_Id_Value2) {
+    $.ajax({
+        async: false,
+        cache: false,
+        type: "POST",
+        url: '/DashBoardAuto/' + functionname,
+        success: function (result) {
+            $(Div_Id_Value1).text(FormatValues(result.Data[0].Value1));
+            $(Div_Id_Value2).text(FormatValues(result.Data[0].Value2));
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert('Failed to retrieve product details.' + thrownError);
+        }
+    });
+}
+
+//-----------------------------End Double Value Function---------------------------------------------------------
+
+
 
 //----------------------Start For Readymande Table Design-------------------------------
 
@@ -360,7 +383,7 @@ function DesignTable(functionname, Head_Caption, Value_Caption, Div_Id) {
             result.Data.forEach(function (value) {
                 TableHTML = TableHTML + '<tr> ' +
                         ' <td style="width: 200px">' + value.Head + '</td> ' +
-                        ' <td style="width: 100px">' + value.Value + '</td> ' +
+                        ' <td style="width: 100px">' + FormatValues(value.Value) + '</td> ' +
                         ' </tr>'
             });
         },
@@ -369,8 +392,6 @@ function DesignTable(functionname, Head_Caption, Value_Caption, Div_Id) {
         }
     });
     TableHTML = TableHTML + '</table></div>'
-    console.log(TableHTML);
-    console.log(Div_Id);
     $(Div_Id).html(TableHTML)
 }
 //----------------------End For Readymande Table Design-------------------------------
@@ -378,8 +399,61 @@ function DesignTable(functionname, Head_Caption, Value_Caption, Div_Id) {
 
 
 
+
+//----------------------Start For Readymande Table Design-------------------------------
+
+
+function DesignTable_ThreeColumns(functionname, Head_Caption, Value1_Caption, Value2_Caption, Div_Id) {
+    var TableHTML = '<div class="box-body" style="overflow-y:auto; height: 400px;"> ' +
+                                ' <table class="table table-bordered"> '
+    TableHTML = TableHTML + '<tr> ' +
+                                '<th style="width: 200px">' + Head_Caption + '</th> ' +
+                                '<th style="width: 100px">' + Value1_Caption + '</th> ' +
+                                '<th style="width: 100px">' + Value2_Caption + '</th> ' +
+                            '</tr>'
+
+    $.ajax({
+        async: false,
+        cache: false,
+        type: "POST",
+        url: '/DashBoardAuto/' + functionname,
+        success: function (result) {
+            result.Data.forEach(function (value) {
+                TableHTML = TableHTML + '<tr> ' +
+                        ' <td style="width: 200px">' + value.Head + '</td> ' +
+                        ' <td style="width: 100px">' + value.Value1 + '</td> ' +
+                        ' <td style="width: 100px">' + FormatValues(value.Value2) + '</td> ' +
+                        ' </tr>'
+            });
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert('Failed to retrieve product details.' + thrownError);
+        }
+    });
+    TableHTML = TableHTML + '</table></div>'
+    $(Div_Id).html(TableHTML)
+}
+//----------------------End For Readymande Table Design-------------------------------
+
+//---------------------------------Start For Formet Values-------------------------------------
+
+function FormatValues(Value) {
+    if (Math.abs(Value) < 1000)
+        return parseFloat(Value).toFixed(2);
+    if (Math.abs(Value) < 100000)
+        return parseFloat(Value / 1000).toFixed(2) + ' Thousand';
+    else if (Math.abs(Value) < 10000000)
+        return parseFloat(Value / 100000).toFixed(2) + ' Lakh';
+    else if (Math.abs(Value) >= 10000000)
+        return parseFloat(Value / 10000000).toFixed(2) + ' Crore';
+}
+
+//---------------------------------End Formet Values-------------------------------------
+
+
 $(document).ready(function () {
-    SetSingleValue('GetVehicleSale', '#VehicleSaleAmount')
+    SetDoubleValue('GetVehicleSale', '#VehicleSaleAmount', '#VehicleSaleAmount_Today')
+
     SetSingleValue('GetVehicleProfit', '#VehicleProfitAmount')
     SetSingleValue('GetDebtors', '#DebtorsAmount')
     SetSingleValue('GetBankBalance', '#BankBalanceAmount')
@@ -389,17 +463,48 @@ $(document).ready(function () {
     SetSingleValue('GetCreditors', '#CreditorsAmount')
     SetSingleValue('GetCashBalance', '#CashBalanceAmount')
 
-    DesignTable('GetVehicleSaleDetailFinancierWise', 'Financier', 'Amount', '#VehicleSaleDetailFinancierWise');
-    DesignTable('GetVehicleSaleDetailSalesManWise', 'Sales Man', 'Amount', '#VehicleSaleDetailSalesManWise');
-    DesignTable('GetVehicleSaleDetailProductTypeWise', 'Type', 'Amount', '#VehicleSaleDetailProductTypeWise');
+    SetSingleValue('GetVehiclePurchase', '#VehiclePurchaseAmount')
+    SetSingleValue('GetVehiclePurchaseOrder', '#VehiclePurchaseOrderAmount')
 
-    DesignTable('GetVehicleProfitDetail', 'Type', 'Amount', '#VehicleProfitDetailTable');
+    SetDoubleValue('GetWorkshopSale', '#WorkshopSaleAmount', '#WorkshopSaleAmount_Today')
+    SetDoubleValue('GetSpareSale', '#SpareSaleAmount', '#SpareSaleAmount_Today')
+
+    DesignTable_ThreeColumns('GetVehicleSaleDetailSalesManWise', 'Sales Man', "Qty", 'Amount', '#VehicleSaleDetailSalesManWise');
+    DesignTable_ThreeColumns('GetVehicleSaleDetailProductTypeWise', 'Type', "Qty", 'Amount', '#VehicleSaleDetailProductTypeWise');
+    DesignTable_ThreeColumns('GetVehicleSaleDetailProductGroupWise', 'Group', "Qty", 'Amount', '#VehicleSaleDetailProductGroupWise');
+
+    DesignTable('GetVehicleProfitDetailProductGroupWise', 'Group', 'Amount', '#VehicleProfitDetailProductGroupWise');
+    DesignTable('GetVehicleProfitDetailSalesManWise', 'Sales Man', 'Amount', '#VehicleProfitDetailSalesManWise');
+    DesignTable('GetVehicleProfitDetailBranchWise', 'Branch', 'Amount', '#VehicleProfitDetailBranchWise');
+
     DesignTable('GetDebtorsDetail', 'Group', 'Amount', '#DebtorsDetailTable');
+
     DesignTable('GetBankBalanceDetail', 'Bank Account', 'Amount', '#BankBalanceDetailTable');
 
-    DesignTable('GetVehicleStockDetail', 'Type', 'Amount', '#VehicleStockDetailTable');
-    DesignTable('GetExpenseDetail', 'Group', 'Amount', '#ExpenseDetailTable');
+    DesignTable_ThreeColumns('GetVehicleStockDetailProductTypeWise', 'Type', "Qty", 'Amount', '#VehicleStockDetailProductTypeWise');
+    DesignTable_ThreeColumns('GetVehicleStockDetailProductGroupWise', 'Group', "Qty", 'Amount', '#VehicleStockDetailProductGroupWise');
+
+    DesignTable('GetExpenseDetailLedgerAccountWise', 'Group', 'Amount', '#ExpenseDetailLedgerAccountWise');
+    DesignTable('GetExpenseDetailBranchWise', 'Branch', 'Amount', '#ExpenseDetailBranchWise');
+    DesignTable('GetExpenseDetailCostCenterWise', 'Cost Center', 'Amount', '#ExpenseDetailCostCenterWise');
+
     DesignTable('GetCreditorsDetail', 'Group', 'Amount', '#CreditorsDetailTable');
-    DesignTable('GetCashBalanceDetail', 'Group', 'Amount', '#CashBalanceDetailTable');
+
+    DesignTable('GetCashBalanceDetailLedgerAccountWise', 'Group', 'Amount', '#CashBalanceDetailLedgerAccountWise');
+    DesignTable('GetCashBalanceDetailBranchWise', 'Branch', 'Amount', '#CashBalanceDetailBranchWise');
+
+
+    DesignTable_ThreeColumns('GetVehiclePurchaseDetailProductTypeWise', 'Type', "Qty", 'Amount', '#VehiclePurchaseDetailProductTypeWise');
+    DesignTable_ThreeColumns('GetVehiclePurchaseDetailProductGroupWise', 'Group', "Qty", 'Amount', '#VehiclePurchaseDetailProductGroupWise');
+
+    DesignTable_ThreeColumns('GetVehiclePurchaseOrderDetailProductTypeWise', 'Type', "Qty", 'Amount', '#VehiclePurchaseOrderDetailProductTypeWise');
+    DesignTable_ThreeColumns('GetVehiclePurchaseOrderDetailProductGroupWise', 'Group', "Qty", 'Amount', '#VehiclePurchaseOrderDetailProductGroupWise');
+
+
+    DesignTable('GetWorkshopSaleDetailProductTypeWise', 'Type', 'Amount', '#WorkshopSaleDetailProductTypeWise');
+    DesignTable('GetWorkshopSaleDetailProductGroupWise', 'Group', 'Amount', '#WorkshopSaleDetailProductGroupWise');
+
+    DesignTable('GetSpareSaleDetailProductTypeWise', 'Type', 'Amount', '#SpareSaleDetailProductTypeWise');
+    DesignTable('GetSpareSaleDetailProductGroupWise', 'Group', 'Amount', '#SpareSaleDetailProductGroupWise');
 });
 

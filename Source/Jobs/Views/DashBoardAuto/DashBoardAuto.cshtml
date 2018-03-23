@@ -3,7 +3,7 @@
 }
 
 @{
-    ViewBag.Title = "Create";
+    ViewBag.Title = "Dashboard";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -30,7 +30,8 @@
             <span class="info-box-icon bg-aqua"><i class="fa fa-bar-chart-o"></i></span>
             <div class="info-box-content">
                 <span class="info-box-text">Vehicle Sale</span>
-                <span class="info-box-number" id="VehicleSaleAmount"></span>
+                <span class="info-box-number" id="VehicleSaleAmount"><span style="font-size:x-small">  [Mmonth]</span></span>
+                <span id="VehicleSaleAmount_Today"></span><span style="font-size:x-small">  [Today]</span>
             </div>
         </div>
     </div>
@@ -65,35 +66,40 @@
 </div>
 
 <div class="row">
-    <div class="col-md-6" id="VehicleSaleDetail" style="display:none">
-        <div class="nav-tabs-custom ">
+    <div class="col-md-6" id="VehicleSaleDetail" style="display:none;">
+        <div class="nav-tabs-custom "style="border-top:solid;border-top-color:#3c8dbc" >
             <ul class="nav nav-tabs pull-right ">
                 <li class="pull-left header"><i class="fa fa-inbox"></i> Vehicle Sale Detail</li>
                 <li class="pull-right header"><button type="button" id="VehicleSaleDetailClose" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button></li>
-                <li class="active"><a href="#VehicleSaleDetailFinancierWise" data-toggle="tab">Financier</a></li>
-                <li><a href="#VehicleSaleDetailSalesManWise" data-toggle="tab">Sales Man</a></li>
+                <li class="active"><a href="#VehicleSaleDetailSalesManWise" data-toggle="tab">Sales Man</a></li>
                 <li><a href="#VehicleSaleDetailProductTypeWise" data-toggle="tab">Type</a></li>
+                <li><a href="#VehicleSaleDetailProductGroupWise" data-toggle="tab">Group</a></li>
             </ul>
             <div class="tab-content no-padding">
-                <div class="chart tab-pane active" id="VehicleSaleDetailFinancierWise" style="position: relative; height: 300px;"></div>
-                <div class="chart tab-pane" id="VehicleSaleDetailSalesManWise" style="position: relative; height: 300px;"></div>
+                <div class="chart tab-pane active" id="VehicleSaleDetailSalesManWise" style="position: relative; height: 300px;"></div>
                 <div class="chart tab-pane" id="VehicleSaleDetailProductTypeWise" style="position: relative; height: 300px;"></div>
+                <div class="chart tab-pane" id="VehicleSaleDetailProductGroupWise" style="position: relative; height: 300px;"></div>
             </div>
         </div>
     </div>
     <div class="col-md-6" id="VehicleProfitDetail" style="display:none">
-        <div class="nav-tabs-custom">
+        <div class="nav-tabs-custom"style="border-top:solid;border-top-color:#3c8dbc" >
             <ul class="nav nav-tabs pull-right">
                 <li class="pull-left header"><i class="fa fa-inbox"></i> Vehicle Profit Detail</li>
                 <li><button type="button" id="VehicleProfitDetailClose" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button></li>
+                <li  class="active"><a href="#VehicleProfitDetailProductGroupWise" data-toggle="tab">Group</a></li>
+                <li><a href="#VehicleProfitDetailSalesManWise" data-toggle="tab">Sales Man</a></li>
+                <li><a href="#VehicleProfitDetailBranchWise" data-toggle="tab">Branch</a></li>
             </ul>
             <div class="tab-content no-padding">
-                <div class="chart tab-pane active" id="VehicleProfitDetailTable" style="position: relative; height: 300px;"></div>
+                <div class="chart tab-pane active" id="VehicleProfitDetailProductGroupWise" style="position: relative; height: 300px;"></div>
+                <div class="chart tab-pane" id="VehicleProfitDetailSalesManWise" style="position: relative; height: 300px;"></div>
+                <div class="chart tab-pane" id="VehicleProfitDetailBranchWise" style="position: relative; height: 300px;"></div>
             </div>
         </div>
     </div>
     <div class="col-md-6" id="DebtorsDetail" style="display:none">
-        <div class="nav-tabs-custom">
+        <div class="nav-tabs-custom"style="border-top:solid;border-top-color:#3c8dbc" >
             <ul class="nav nav-tabs pull-right">
                 <li class="pull-left header"><i class="fa fa-inbox"></i> Debtors Detail</li>
                 <li><button type="button" id="DebtorsDetailClose" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button></li>
@@ -104,7 +110,7 @@
         </div>
     </div>
     <div class="col-md-6" id="BankBalanceDetail" style="display:none">
-        <div class="nav-tabs-custom">
+        <div class="nav-tabs-custom"style="border-top:solid;border-top-color:#3c8dbc" >
             <ul class="nav nav-tabs pull-right">
                 <li class="pull-left header"><i class="fa fa-inbox"></i> Bank Balance Detail</li>
                 <li><button type="button" id="BankBalanceDetailClose" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button></li>
@@ -160,29 +166,37 @@
 
 <div class="row">
     <div class="col-md-6" id="VehicleStockDetail" style="display:none">
-        <div class="nav-tabs-custom">
+        <div class="nav-tabs-custom"style="border-top:solid;border-top-color:#3c8dbc" >
             <ul class="nav nav-tabs pull-right">
                 <li class="pull-left header"><i class="fa fa-inbox"></i> Vehicle Stock Detail</li>
                 <li><button type="button" id="VehicleStockDetailClose" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button></li>
+                <li class="active"><a href="#VehicleStockDetailProductTypeWise" data-toggle="tab">Type</a></li>
+                <li><a href="#VehicleStockDetailProductGroupWise" data-toggle="tab">Group</a></li>
             </ul>
             <div class="tab-content no-padding">
-                <div class="chart tab-pane active" id="VehicleStockDetailTable" style="position: relative; height: 300px;"></div>
+                <div class="chart tab-pane active" id="VehicleStockDetailProductTypeWise" style="position: relative; height: 300px;"></div>
+                <div class="chart tab-pane" id="VehicleStockDetailProductGroupWise" style="position: relative; height: 300px;"></div>
             </div>
         </div>
     </div>
     <div class="col-md-6" id="ExpenseDetail" style="display:none">
-        <div class="nav-tabs-custom">
+        <div class="nav-tabs-custom"style="border-top:solid;border-top-color:#3c8dbc" >
             <ul class="nav nav-tabs pull-right">
                 <li class="pull-left header"><i class="fa fa-inbox"></i> Expense Detail</li>
                 <li><button type="button" id="ExpenseDetailClose" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button></li>
+                <li class="active"><a href="#ExpenseDetailLedgerAccountWise" data-toggle="tab">Groups</a></li>
+                <li><a href="#ExpenseDetailBranchWise" data-toggle="tab">Branch</a></li>
+                <li><a href="#ExpenseDetailCostCenterWise" data-toggle="tab">Cost Center</a></li>
             </ul>
             <div class="tab-content no-padding">
-                <div class="chart tab-pane active" id="ExpenseDetailTable" style="position: relative; height: 300px;"></div>
+                <div class="chart tab-pane active" id="ExpenseDetailLedgerAccountWise" style="position: relative; height: 300px;"></div>
+                <div class="chart tab-pane" id="ExpenseDetailBranchWise" style="position: relative; height: 300px;"></div>
+                <div class="chart tab-pane" id="ExpenseDetailCostCenterWise" style="position: relative; height: 300px;"></div>
             </div>
         </div>
     </div>
     <div class="col-md-6" id="CreditorsDetail" style="display:none">
-        <div class="nav-tabs-custom">
+        <div class="nav-tabs-custom"style="border-top:solid;border-top-color:#3c8dbc" >
             <ul class="nav nav-tabs pull-right">
                 <li class="pull-left header"><i class="fa fa-inbox"></i> Creditors Detail</li>
                 <li><button type="button" id="CreditorsDetailClose" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button></li>
@@ -193,13 +207,16 @@
         </div>
     </div>
     <div class="col-md-6" id="CashBalanceDetail" style="display:none">
-        <div class="nav-tabs-custom">
+        <div class="nav-tabs-custom"style="border-top:solid;border-top-color:#3c8dbc" >
             <ul class="nav nav-tabs pull-right">
                 <li class="pull-left header"><i class="fa fa-inbox"></i> Cash Balance Detail</li>
                 <li><button type="button" id="CashBalanceDetailClose" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button></li>
+                <li  class="active"><a href="#CashBalanceDetailLedgerAccountWise" data-toggle="tab">Accounts</a></li>
+                <li><a href="#CashBalanceDetailBranchWise" data-toggle="tab">Branch</a></li>
             </ul>
             <div class="tab-content no-padding">
-                <div class="chart tab-pane active" id="CashBalanceDetailTable" style="position: relative; height: 300px;"></div>
+                <div class="chart tab-pane active" id="CashBalanceDetailLedgerAccountWise" style="position: relative; height: 300px;"></div>
+                <div class="chart tab-pane" id="CashBalanceDetailBranchWise" style="position: relative; height: 300px;"></div>
             </div>
         </div>
     </div>
@@ -252,6 +269,107 @@
     </div>
 </div>
 
+<div class="row">
+    <div class="col-md-3 col-sm-6 col-xs-12" id="VehiclePurchaseOrderSummary">
+        <div class="info-box">
+            <span class="info-box-icon bg-aqua"><i class="fa fa-cart-plus"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Vehicle Purchase</span>ORDER
+                <span class="info-box-number" id="VehiclePurchaseOrderAmount"></span>
+            </div>
+        </div>
+    </div>
+    <div class="clearfix visible-sm-block"></div>
+    <div class="col-md-3 col-sm-6 col-xs-12" id="VehiclePurchaseSummary">
+        <div class="info-box">
+            <span class="info-box-icon bg-red"><i class="fa fa-shopping-cart"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Vehicle Purchase</span>
+                <span class="info-box-number" id="VehiclePurchaseAmount"></span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6 col-xs-12" id="WorkshopSaleSummary">
+        <div class="info-box">
+            <span class="info-box-icon bg-green"><i class="fa fa-home"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Work Shop Sale</span>
+                <span class="info-box-number" id="WorkshopSaleAmount"></span>
+                <span id="WorkshopSaleAmount_Today"></span><span style="font-size:x-small">  [Today]</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6 col-xs-12" id="SpareSaleSummary">
+        <div class="info-box">
+            <span class="info-box-icon bg-yellow"><i class="fa fa-bar-chart-o"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Spare Sale</span>
+                <span class="info-box-number" id="SpareSaleAmount"></span>
+                <span id="SpareSaleAmount_Today"></span><span style="font-size:x-small">  [Today]</span>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6" id="VehiclePurchaseDetail" style="display:none;">
+        <div class="nav-tabs-custom"style="border-top:solid;border-top-color:#3c8dbc" >
+            <ul class="nav nav-tabs pull-right ">
+                <li class="pull-left header"><i class="fa fa-inbox"></i> Vehicle Purchase Detail</li>
+                <li class="pull-right header"><button type="button" id="VehiclePurchaseDetailClose" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button></li>
+                <li class="active"><a href="#VehiclePurchaseDetailProductTypeWise" data-toggle="tab">Type</a></li>
+                <li><a href="#VehiclePurchaseDetailProductGroupWise" data-toggle="tab">Group</a></li>
+            </ul>
+            <div class="tab-content no-padding">
+                <div class="chart tab-pane active" id="VehiclePurchaseDetailProductTypeWise" style="position: relative; height: 300px;"></div>
+                <div class="chart tab-pane" id="VehiclePurchaseDetailProductGroupWise" style="position: relative; height: 300px;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6" id="VehiclePurchaseOrderDetail" style="display:none;">
+        <div class="nav-tabs-custom"style="border-top:solid;border-top-color:#3c8dbc" >
+            <ul class="nav nav-tabs pull-right ">
+                <li class="pull-left header"><i class="fa fa-inbox"></i> Vehicle Purchase Order Detail</li>
+                <li class="pull-right header"><button type="button" id="VehiclePurchaseOrderDetailClose" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button></li>
+                <li class="active"><a href="#VehiclePurchaseOrderDetailProductTypeWise" data-toggle="tab">Type</a></li>
+                <li><a href="#VehiclePurchaseOrderDetailProductGroupWise" data-toggle="tab">Group</a></li>
+            </ul>
+            <div class="tab-content no-padding">
+                <div class="chart tab-pane active" id="VehiclePurchaseOrderDetailProductTypeWise" style="position: relative; height: 300px;"></div>
+                <div class="chart tab-pane" id="VehiclePurchaseOrderDetailProductGroupWise" style="position: relative; height: 300px;"></div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="col-md-6" id="WorkshopSaleDetail" style="display:none;">
+        <div class="nav-tabs-custom"style="border-top:solid;border-top-color:#3c8dbc" >
+            <ul class="nav nav-tabs pull-right ">
+                <li class="pull-left header"><i class="fa fa-inbox"></i> Workshop Sale Detail</li>
+                <li class="pull-right header"><button type="button" id="WorkshopSaleDetailClose" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button></li>
+                <li class="active"><a href="#WorkshopSaleDetailProductTypeWise" data-toggle="tab">Type</a></li>
+                <li><a href="#WorkshopSaleDetailProductGroupWise" data-toggle="tab">Group</a></li>
+            </ul>
+            <div class="tab-content no-padding">
+                <div class="chart tab-pane active" id="WorkshopSaleDetailProductTypeWise" style="position: relative; height: 300px;"></div>
+                <div class="chart tab-pane" id="WorkshopSaleDetailProductGroupWise" style="position: relative; height: 300px;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6" id="SpareSaleDetail" style="display:none;">
+        <div class="nav-tabs-custom"style="border-top:solid;border-top-color:#3c8dbc" >
+            <ul class="nav nav-tabs pull-right ">
+                <li class="pull-left header"><i class="fa fa-inbox"></i> Spare Sale Detail</li>
+                <li class="pull-right header"><button type="button" id="SpareSaleDetailClose" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button></li>
+                <li class="active"><a href="#SpareSaleDetailProductTypeWise" data-toggle="tab">Type</a></li>
+                <li><a href="#SpareSaleDetailProductGroupWise" data-toggle="tab">Group</a></li>
+            </ul>
+            <div class="tab-content no-padding">
+                <div class="chart tab-pane active" id="SpareSaleDetailProductTypeWise" style="position: relative; height: 300px;"></div>
+                <div class="chart tab-pane" id="SpareSaleDetailProductGroupWise" style="position: relative; height: 300px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div class="row">
     <div class="col-md-6">
@@ -298,6 +416,8 @@
         </div>
     </div>
 </div>
+
+
 
 
 <script src="~/AdminLTE/plugins/jQuery/jQuery-2.2.0.min.js"></script>
@@ -375,6 +495,12 @@
     Expand_Detail('#CreditorsSummary', "#CreditorsDetail")
     Expand_Detail('#CashBalanceSummary', "#CashBalanceDetail")
 
+    Expand_Detail('#VehiclePurchaseSummary', "#VehiclePurchaseDetail")
+    Expand_Detail('#VehiclePurchaseOrderSummary', "#VehiclePurchaseOrderDetail")
+
+    Expand_Detail('#WorkshopSaleSummary', "#WorkshopSaleDetail")
+    Expand_Detail('#SpareSaleSummary', "#SpareSaleDetail")
+
     Expand_Detail('#VehicleSaleDetailClose', "#VehicleSaleDetail")
     Expand_Detail('#VehicleProfitDetailClose', "#VehicleProfitDetail")
     Expand_Detail('#DebtorsDetailClose', "#DebtorsDetail")
@@ -384,5 +510,11 @@
     Expand_Detail('#ExpenseDetailClose', "#ExpenseDetail")
     Expand_Detail('#CreditorsDetailClose', "#CreditorsDetail")
     Expand_Detail('#CashBalanceDetailClose', "#CashBalanceDetail")
+
+    Expand_Detail('#VehiclePurchaseDetailClose', "#VehiclePurchaseDetail")
+    Expand_Detail('#VehiclePurchaseOrderDetailClose', "#VehiclePurchaseOrderDetail")
+
+    Expand_Detail('#WorkshopSaleDetailClose', "#WorkshopSaleDetail")
+    Expand_Detail('#SpareSaleDetailClose', "#SpareSaleDetail")
 </script>
 

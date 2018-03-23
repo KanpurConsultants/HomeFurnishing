@@ -1014,10 +1014,9 @@ namespace Jobs.Controllers
             ViewBag.IndexStatus = IndexType;
             JobOrderHeaderViewModel s = _JobOrderHeaderService.GetJobOrderHeader(id);
 
-            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, s.DocTypeId, s.ProcessId, this.ControllerContext.RouteData.Values["controller"].ToString(),"Edit") == false)
-            {
-                return View("~/Views/Shared/PermissionDenied.cshtml").Warning("You don't have permission to do this task.");
-            }
+            if (s.Status != (int)StatusConstants.Drafted)
+                if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, s.DocTypeId, s.ProcessId, this.ControllerContext.RouteData.Values["controller"].ToString(),"Edit") == false)
+                    return RedirectToAction("DetailInformation", new { id = id, IndexType = IndexType }).Warning("You don't have permission to do this task.");
 
 
             #region DocTypeTimeLineValidation
@@ -3046,7 +3045,7 @@ namespace Jobs.Controllers
                         <td style='border: 1px solid black;border-collapse: collapse;padding: 15px;'>" + item.ProductName + @"</td>
                         <td style='border: 1px solid black;border-collapse: collapse;padding: 15px;'>" + item.ProductGroupName + @"</td>
                         <td style='border: 1px solid black;border-collapse: collapse;padding: 15px;'>" + Math.Round(item.Qty,0) + @"</td>
-                        <td style='border: 1px solid black;border-collapse: collapse;padding: 15px;'>0001339800</td>
+                        <td style='border: 1px solid black;border-collapse: collapse;padding: 15px;'>1339800</td>
                         </tr>";
             }
 

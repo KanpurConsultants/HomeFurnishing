@@ -753,10 +753,9 @@ namespace Jobs.Controllers
             ViewBag.IndexStatus = IndexType;
             SaleQuotationHeaderViewModel s = _SaleQuotationHeaderService.GetSaleQuotationHeader(id);
 
-            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, s.DocTypeId, s.ProcessId, this.ControllerContext.RouteData.Values["controller"].ToString(), "Edit") == false)
-            {
-                return View("~/Views/Shared/PermissionDenied.cshtml").Warning("You don't have permission to do this task.");
-            }
+            if (s.Status != (int)StatusConstants.Drafted)
+                if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, s.DocTypeId, s.ProcessId, this.ControllerContext.RouteData.Values["controller"].ToString(), "Edit") == false)
+                    return RedirectToAction("DetailInformation", new { id = id, IndexType = IndexType }).Warning("You don't have permission to do this task.");
 
             #region DocTypeTimeLineValidation
             try

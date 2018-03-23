@@ -305,12 +305,12 @@ namespace Module
             System.Web.HttpContext.Current.Session["DivisionId"] = DivisionId;
             System.Web.HttpContext.Current.Session["SiteId"] = SiteId;
 
-            var ExistingData = _RolesDocTypeService.GetRolesDocTypeList().FirstOrDefault();
-            if (ExistingData == null)
-            {
-                var UserId = User.Identity.GetUserId();
-                System.Web.HttpContext.Current.Session["Roles"] = _userRolesService.GetUserRolesForSession(UserId);
-            }
+            //var ExistingData = _RolesDocTypeService.GetRolesDocTypeList().FirstOrDefault();
+            //if (ExistingData == null)
+            //{
+            var UserId = User.Identity.GetUserId();
+            System.Web.HttpContext.Current.Session["Roles"] = _userRolesService.GetUserRolesForSession(UserId);
+            //}
 
             Site S = _siteSelectionService.GetSite(SiteId);
             Division D = _siteSelectionService.GetDivision(DivisionId);

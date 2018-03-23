@@ -843,10 +843,10 @@ namespace Jobs.Controllers
 
             JobInvoiceHeaderViewModel pt = _JobInvoiceHeaderService.GetJobInvoiceHeader(id);
 
-            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, pt.DocTypeId, pt.ProcessId, this.ControllerContext.RouteData.Values["controller"].ToString(), "Edit") == false)
-            {
-                return View("~/Views/Shared/PermissionDenied.cshtml").Warning("You don't have permission to do this task.");
-            }
+            if (pt.Status != (int)StatusConstants.Drafted)
+                if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, pt.DocTypeId, pt.ProcessId, this.ControllerContext.RouteData.Values["controller"].ToString(), "Edit") == false)
+                    return RedirectToAction("DetailInformation", new { id = id, IndexType = IndexType }).Warning("You don't have permission to do this task."); ;
+
 
             string SiteName = db.Site.Find(pt.SiteId).SiteName;
             int LoginSiteId = (int)System.Web.HttpContext.Current.Session["SiteId"];

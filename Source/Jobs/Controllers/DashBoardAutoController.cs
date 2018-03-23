@@ -24,7 +24,7 @@ namespace Module
         }
         public JsonResult GetVehicleSale()
         {
-            IEnumerable<DashBoardSingleValue> VehicleSale = _DashBoardAutoService.GetVehicleSale();
+            IEnumerable<DashBoardDoubleValue> VehicleSale = _DashBoardAutoService.GetVehicleSale();
 
             JsonResult json = Json(new { Success = true, Data = VehicleSale }, JsonRequestBehavior.AllowGet);
             return json;
@@ -90,10 +90,38 @@ namespace Module
         }
 
 
+        public JsonResult GetVehiclePurchase()
+        {
+            IEnumerable<DashBoardSingleValue> VehiclePurchase = _DashBoardAutoService.GetVehiclePurchase();
+
+            JsonResult json = Json(new { Success = true, Data = VehiclePurchase }, JsonRequestBehavior.AllowGet);
+            return json;
+        }
+
+        public JsonResult GetVehiclePurchaseOrder()
+        {
+            IEnumerable<DashBoardSingleValue> VehiclePurchaseOrder = _DashBoardAutoService.GetVehiclePurchaseOrder();
+
+            JsonResult json = Json(new { Success = true, Data = VehiclePurchaseOrder }, JsonRequestBehavior.AllowGet);
+            return json;
+        }
 
 
 
+        public JsonResult GetWorkshopSale()
+        {
+            IEnumerable<DashBoardDoubleValue> WorkshopSale = _DashBoardAutoService.GetWorkshopSale();
 
+            JsonResult json = Json(new { Success = true, Data = WorkshopSale }, JsonRequestBehavior.AllowGet);
+            return json;
+        }
+        public JsonResult GetSpareSale()
+        {
+            IEnumerable<DashBoardDoubleValue> SpareSale = _DashBoardAutoService.GetSpareSale();
+
+            JsonResult json = Json(new { Success = true, Data = SpareSale }, JsonRequestBehavior.AllowGet);
+            return json;
+        }
 
 
         public JsonResult GetVehicleSalePieChartData()
@@ -129,17 +157,9 @@ namespace Module
 
 
 
-        public JsonResult GetVehicleSaleDetailFinancierWise()
-        {
-            IEnumerable<DashBoardTabularData> DashBoardSaleDetailFinancierWise = _DashBoardAutoService.GetVehicleSaleDetailFinancierWise();
-
-            JsonResult json = Json(new { Success = true, Data = DashBoardSaleDetailFinancierWise }, JsonRequestBehavior.AllowGet);
-            return json;
-        }
-
         public JsonResult GetVehicleSaleDetailSalesManWise()
         {
-            IEnumerable<DashBoardTabularData> DashBoardSaleDetailSalesManWise = _DashBoardAutoService.GetVehicleSaleDetailSalesManWise();
+            IEnumerable<DashBoardTabularData_ThreeColumns> DashBoardSaleDetailSalesManWise = _DashBoardAutoService.GetVehicleSaleDetailSalesManWise();
 
             JsonResult json = Json(new { Success = true, Data = DashBoardSaleDetailSalesManWise }, JsonRequestBehavior.AllowGet);
             return json;
@@ -147,19 +167,44 @@ namespace Module
 
         public JsonResult GetVehicleSaleDetailProductTypeWise()
         {
-            IEnumerable<DashBoardTabularData> DashBoardSaleDetailProductTypeWise = _DashBoardAutoService.GetVehicleSaleDetailProductTypeWise();
+            IEnumerable<DashBoardTabularData_ThreeColumns> DashBoardSaleDetailProductTypeWise = _DashBoardAutoService.GetVehicleSaleDetailProductTypeWise();
 
             JsonResult json = Json(new { Success = true, Data = DashBoardSaleDetailProductTypeWise }, JsonRequestBehavior.AllowGet);
             return json;
         }
 
-        public JsonResult GetVehicleProfitDetail()
+        public JsonResult GetVehicleSaleDetailProductGroupWise()
         {
-            IEnumerable<DashBoardTabularData> DashBoardTabularData = _DashBoardAutoService.GetVehicleProfitDetail();
+            IEnumerable<DashBoardTabularData_ThreeColumns> DashBoardSaleDetailProductGroupWise = _DashBoardAutoService.GetVehicleSaleDetailProductGroupWise();
+
+            JsonResult json = Json(new { Success = true, Data = DashBoardSaleDetailProductGroupWise }, JsonRequestBehavior.AllowGet);
+            return json;
+        }
+
+        public JsonResult GetVehicleProfitDetailProductGroupWise()
+        {
+            IEnumerable<DashBoardTabularData> DashBoardTabularData = _DashBoardAutoService.GetVehicleProfitDetailProductGroupWise();
 
             JsonResult json = Json(new { Success = true, Data = DashBoardTabularData }, JsonRequestBehavior.AllowGet);
             return json;
         }
+
+        public JsonResult GetVehicleProfitDetailSalesManWise()
+        {
+            IEnumerable<DashBoardTabularData> DashBoardTabularData = _DashBoardAutoService.GetVehicleProfitDetailSalesManWise();
+
+            JsonResult json = Json(new { Success = true, Data = DashBoardTabularData }, JsonRequestBehavior.AllowGet);
+            return json;
+        }
+
+        public JsonResult GetVehicleProfitDetailBranchWise()
+        {
+            IEnumerable<DashBoardTabularData> DashBoardTabularData = _DashBoardAutoService.GetVehicleProfitDetailBranchWise();
+
+            JsonResult json = Json(new { Success = true, Data = DashBoardTabularData }, JsonRequestBehavior.AllowGet);
+            return json;
+        }
+
         public JsonResult GetDebtorsDetail()
         {
             IEnumerable<DashBoardTabularData> DashBoardTabularData = _DashBoardAutoService.GetDebtorsDetail();
@@ -176,17 +221,41 @@ namespace Module
             return json;
         }
 
-        public JsonResult GetVehicleStockDetail()
+        public JsonResult GetVehicleStockDetailProductTypeWise()
         {
-            IEnumerable<DashBoardTabularData> DashBoardTabularData = _DashBoardAutoService.GetVehicleStockDetail();
+            IEnumerable<DashBoardTabularData_ThreeColumns> DashBoardTabularData = _DashBoardAutoService.GetVehicleStockDetailProductTypeWise();
 
             JsonResult json = Json(new { Success = true, Data = DashBoardTabularData }, JsonRequestBehavior.AllowGet);
             return json;
         }
 
-        public JsonResult GetExpenseDetail()
+        public JsonResult GetVehicleStockDetailProductGroupWise()
         {
-            IEnumerable<DashBoardTabularData> DashBoardTabularData = _DashBoardAutoService.GetExpenseDetail();
+            IEnumerable<DashBoardTabularData_ThreeColumns> DashBoardTabularData = _DashBoardAutoService.GetVehicleStockDetailProductGroupWise();
+
+            JsonResult json = Json(new { Success = true, Data = DashBoardTabularData }, JsonRequestBehavior.AllowGet);
+            return json;
+        }
+
+        public JsonResult GetExpenseDetailLedgerAccountWise()
+        {
+            IEnumerable<DashBoardTabularData> DashBoardTabularData = _DashBoardAutoService.GetExpenseDetailLedgerAccountWise();
+
+            JsonResult json = Json(new { Success = true, Data = DashBoardTabularData }, JsonRequestBehavior.AllowGet);
+            return json;
+        }
+
+        public JsonResult GetExpenseDetailBranchWise()
+        {
+            IEnumerable<DashBoardTabularData> DashBoardTabularData = _DashBoardAutoService.GetExpenseDetailBranchWise();
+
+            JsonResult json = Json(new { Success = true, Data = DashBoardTabularData }, JsonRequestBehavior.AllowGet);
+            return json;
+        }
+
+        public JsonResult GetExpenseDetailCostCenterWise()
+        {
+            IEnumerable<DashBoardTabularData> DashBoardTabularData = _DashBoardAutoService.GetExpenseDetailCostCenterWise();
 
             JsonResult json = Json(new { Success = true, Data = DashBoardTabularData }, JsonRequestBehavior.AllowGet);
             return json;
@@ -200,12 +269,91 @@ namespace Module
             return json;
         }
 
-        public JsonResult GetCashBalanceDetail()
+        public JsonResult GetCashBalanceDetailLedgerAccountWise()
         {
-            IEnumerable<DashBoardTabularData> DashBoardTabularData = _DashBoardAutoService.GetCashBalanceDetail();
+            IEnumerable<DashBoardTabularData> DashBoardTabularData = _DashBoardAutoService.GetCashBalanceDetailLedgerAccountWise();
 
             JsonResult json = Json(new { Success = true, Data = DashBoardTabularData }, JsonRequestBehavior.AllowGet);
             return json;
         }
+
+        public JsonResult GetCashBalanceDetailBranchWise()
+        {
+            IEnumerable<DashBoardTabularData> DashBoardTabularData = _DashBoardAutoService.GetCashBalanceDetailBranchWise();
+
+            JsonResult json = Json(new { Success = true, Data = DashBoardTabularData }, JsonRequestBehavior.AllowGet);
+            return json;
+        }
+
+
+
+        public JsonResult GetVehiclePurchaseDetailProductTypeWise()
+        {
+            IEnumerable<DashBoardTabularData_ThreeColumns> DashBoardPurchaseDetailProductTypeWise = _DashBoardAutoService.GetVehiclePurchaseDetailProductTypeWise();
+
+            JsonResult json = Json(new { Success = true, Data = DashBoardPurchaseDetailProductTypeWise }, JsonRequestBehavior.AllowGet);
+            return json;
+        }
+
+        public JsonResult GetVehiclePurchaseDetailProductGroupWise()
+        {
+            IEnumerable<DashBoardTabularData_ThreeColumns> DashBoardPurchaseDetailProductGroupWise = _DashBoardAutoService.GetVehiclePurchaseDetailProductGroupWise();
+
+            JsonResult json = Json(new { Success = true, Data = DashBoardPurchaseDetailProductGroupWise }, JsonRequestBehavior.AllowGet);
+            return json;
+        }
+
+
+        public JsonResult GetVehiclePurchaseOrderDetailProductTypeWise()
+        {
+            IEnumerable<DashBoardTabularData_ThreeColumns> DashBoardPurchaseOrderDetailProductTypeWise = _DashBoardAutoService.GetVehiclePurchaseOrderDetailProductTypeWise();
+
+            JsonResult json = Json(new { Success = true, Data = DashBoardPurchaseOrderDetailProductTypeWise }, JsonRequestBehavior.AllowGet);
+            return json;
+        }
+
+        public JsonResult GetVehiclePurchaseOrderDetailProductGroupWise()
+        {
+            IEnumerable<DashBoardTabularData_ThreeColumns> DashBoardPurchaseOrderDetailProductGroupWise = _DashBoardAutoService.GetVehiclePurchaseOrderDetailProductGroupWise();
+
+            JsonResult json = Json(new { Success = true, Data = DashBoardPurchaseOrderDetailProductGroupWise }, JsonRequestBehavior.AllowGet);
+            return json;
+        }
+
+
+
+        public JsonResult GetWorkshopSaleDetailProductTypeWise()
+        {
+            IEnumerable<DashBoardTabularData> DashBoardPurchaseDetailProductTypeWise = _DashBoardAutoService.GetWorkshopSaleDetailProductTypeWise();
+
+            JsonResult json = Json(new { Success = true, Data = DashBoardPurchaseDetailProductTypeWise }, JsonRequestBehavior.AllowGet);
+            return json;
+        }
+
+        public JsonResult GetWorkshopSaleDetailProductGroupWise()
+        {
+            IEnumerable<DashBoardTabularData> DashBoardPurchaseDetailProductGroupWise = _DashBoardAutoService.GetWorkshopSaleDetailProductGroupWise();
+
+            JsonResult json = Json(new { Success = true, Data = DashBoardPurchaseDetailProductGroupWise }, JsonRequestBehavior.AllowGet);
+            return json;
+        }
+
+
+        public JsonResult GetSpareSaleDetailProductTypeWise()
+        {
+            IEnumerable<DashBoardTabularData> DashBoardPurchaseDetailProductTypeWise = _DashBoardAutoService.GetSpareSaleDetailProductTypeWise();
+
+            JsonResult json = Json(new { Success = true, Data = DashBoardPurchaseDetailProductTypeWise }, JsonRequestBehavior.AllowGet);
+            return json;
+        }
+
+        public JsonResult GetSpareSaleDetailProductGroupWise()
+        {
+            IEnumerable<DashBoardTabularData> DashBoardPurchaseDetailProductGroupWise = _DashBoardAutoService.GetSpareSaleDetailProductGroupWise();
+
+            JsonResult json = Json(new { Success = true, Data = DashBoardPurchaseDetailProductGroupWise }, JsonRequestBehavior.AllowGet);
+            return json;
+        }
+
     }   
 }

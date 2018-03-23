@@ -384,10 +384,9 @@ namespace Jobs.Controllers
                 return HttpNotFound();
             }
 
-            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, pt.DocTypeId, null, this.ControllerContext.RouteData.Values["controller"].ToString(), "Edit") == false)
-            {
-                return View("~/Views/Shared/PermissionDenied.cshtml").Warning("You don't have permission to do this task.");
-            }
+            if (pt.Status != (int)StatusConstants.Drafted)
+                if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, pt.DocTypeId, null, this.ControllerContext.RouteData.Values["controller"].ToString(), "Edit") == false)
+                    return RedirectToAction("DetailInformation", new { id = id, IndexType = IndexType }).Warning("You don't have permission to do this task.");
 
             SaleDeliveryOrderCancelHeaderViewModel temp = AutoMapper.Mapper.Map<SaleDeliveryOrderCancelHeader, SaleDeliveryOrderCancelHeaderViewModel>(pt);
 

@@ -481,10 +481,9 @@ namespace Jobs.Controllers
                 return HttpNotFound();
             }
 
-            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, pt.DocTypeId, pt.ProcessId, this.ControllerContext.RouteData.Values["controller"].ToString(), "Edit") == false)
-            {
-                return View("~/Views/Shared/PermissionDenied.cshtml").Warning("You don't have permission to do this task.");
-            }
+            if (pt.Status != (int)StatusConstants.Drafted)
+                if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, pt.DocTypeId, pt.ProcessId, this.ControllerContext.RouteData.Values["controller"].ToString(), "Edit") == false)
+                    return RedirectToAction("DetailInformation", new { id = id, IndexType = IndexType }).Warning("You don't have permission to do this task.");
 
             JobOrderAmendmentHeaderViewModel temp = AutoMapper.Mapper.Map<JobOrderAmendmentHeader, JobOrderAmendmentHeaderViewModel>(pt);
 

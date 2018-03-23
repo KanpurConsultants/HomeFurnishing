@@ -78,15 +78,7 @@ namespace Jobs.Controllers
 
         public ActionResult Create(int id)
         {
-            var DocType = new DocumentTypeService(_unitOfWork).FindByName(MasterDocTypeConstants.ProductCategry);
-            int DocTypeId = 0;
-
-            if (DocType != null)
-                DocTypeId = DocType.DocumentTypeId;
-            else
-                return View("~/Views/Shared/InValidSettings.cshtml").Warning("Document Type named " + MasterDocTypeConstants.ProductCategry + " is not defined in database.");
-
-            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, DocTypeId, null, this.ControllerContext.RouteData.Values["controller"].ToString(), "Create") == false)
+            if (new ProductService(_unitOfWork).IsActionAllowed(UserRoles, id, this.ControllerContext.RouteData.Values["controller"].ToString(), "Create") == false)
             {
                 return View("~/Views/Shared/PermissionDenied.cshtml").Warning("You don't have permission to do this task.");
             }
@@ -218,24 +210,19 @@ namespace Jobs.Controllers
 
         public ActionResult Edit(int id)
         {
-            var DocType = new DocumentTypeService(_unitOfWork).FindByName(MasterDocTypeConstants.ProductCategry);
-            int DocTypeId = 0;
-
-            if (DocType != null)
-                DocTypeId = DocType.DocumentTypeId;
-            else
-                return View("~/Views/Shared/InValidSettings.cshtml").Warning("Document Type named " + MasterDocTypeConstants.ProductCategry + " is not defined in database.");
-
-            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, DocTypeId, null, this.ControllerContext.RouteData.Values["controller"].ToString(), "Edit") == false)
-            {
-                return View("~/Views/Shared/PermissionDenied.cshtml").Warning("You don't have permission to do this task.");
-            }
-
             ProductCategory pt = _ProductCategoryService.Find(id);
             if (pt == null)
             {
                 return HttpNotFound();
             }
+
+            ProductType Type = new ProductTypeService(_unitOfWork).Find(pt.ProductTypeId);
+
+            if (new ProductService(_unitOfWork).IsActionAllowed(UserRoles, Type.ProductTypeId, this.ControllerContext.RouteData.Values["controller"].ToString(), "Edit") == false)
+            {
+                return View("~/Views/Shared/PermissionDenied.cshtml").Warning("You don't have permission to do this task.");
+            }
+
             ViewBag.id = pt.ProductTypeId;
 
             var settings = new ProductTypeSettingsService(_unitOfWork).GetProductTypeSettingsForDocument(pt.ProductTypeId);
@@ -259,23 +246,17 @@ namespace Jobs.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            var DocType = new DocumentTypeService(_unitOfWork).FindByName(MasterDocTypeConstants.ProductCategry);
-            int DocTypeId = 0;
-
-            if (DocType != null)
-                DocTypeId = DocType.DocumentTypeId;
-            else
-                return View("~/Views/Shared/InValidSettings.cshtml").Warning("Document Type named " + MasterDocTypeConstants.ProductCategry + " is not defined in database.");
-
-            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, DocTypeId, null, this.ControllerContext.RouteData.Values["controller"].ToString(), "Delete") == false)
-            {
-                return PartialView("~/Views/Shared/PermissionDenied_Modal.cshtml").Warning("You don't have permission to do this task.");
-            }
-
             ProductCategory ProductCategory = _ProductCategoryService.Find(id);
             if (ProductCategory == null)
             {
                 return HttpNotFound();
+            }
+
+            ProductType Type = new ProductTypeService(_unitOfWork).Find(ProductCategory.ProductTypeId);
+
+            if (new ProductService(_unitOfWork).IsActionAllowed(UserRoles, Type.ProductTypeId, this.ControllerContext.RouteData.Values["controller"].ToString(), "Delete") == false)
+            {
+                return View("~/Views/Shared/PermissionDenied.cshtml").Warning("You don't have permission to do this task.");
             }
 
             ReasonViewModel vm = new ReasonViewModel()

@@ -119,7 +119,9 @@ namespace Service
 
             mQry = mQry + " UNION ALL ";
 
-            mQry = mQry + @"SELECT Pt.ProductTypeId As DocumentTypeId, Pt.ProductTypeName As DocumentTypeName, IsNull(Max(Mm.ModuleName),'Others') As ModuleName, 
+            mQry = mQry + @"SELECT Pt.ProductTypeId As DocumentTypeId, 
+                        M.MenuName + ' ['+ Pt.ProductTypeName +']' As DocumentTypeName, 
+                        IsNull(Max(Mm.ModuleName),'Others') As ModuleName, 
                         IsNull(Max(Sm.SubModuleName),'Others') As SubModuleName, 
                         Max(Mm.Srl) AS ModuleSr, Max(M.Srl) AS MenuSr,
                         Max(Ca.ControllerName) AS ControllerName, 
@@ -149,7 +151,7 @@ namespace Service
                         AND Pt.ProductTypeId IS NOT NULL
                         AND Ca.DisplayName IN ('Add', 'Edit', 'Delete', 'Print', 'Submit')
                         AND IsNull(M.IsVisible,0) <> 0
-                        GROUP BY Pt.ProductTypeId, Pt.ProductTypeName ";
+                        GROUP BY Pt.ProductTypeId, M.MenuName + ' ['+ Pt.ProductTypeName +']' ";
 
             mQry = mQry + " UNION ALL ";
 
@@ -174,7 +176,7 @@ namespace Service
                             AND Ca.ActionName = VRolesDocTypes.ActionName
                     WHERE 1=1 
                     And IsNull(M.IsVisible,0) <> 0
-                    AND M.Description = 'Reports'
+                    AND M.Description In ('Reports','Display','Tools')
                     ORDER BY ModuleSr, MenuSr ";
 
 

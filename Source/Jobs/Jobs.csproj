@@ -426,6 +426,7 @@
     <Compile Include="Areas\Rug\Controllers\PackingSettingsController.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Controllers\JobInvoiceHeaderrdl.cs" />
     <Compile Include="Controllers\MailboxController.cs" />
     <Compile Include="Controllers\LedgerWizardController.cs" />
     <Compile Include="Controllers\SalaryWizardController.cs" />
@@ -658,8 +659,6 @@
     <Compile Include="Controllers\Dimension2Controller.cs" />
     <Compile Include="Controllers\Dimension3Controller.cs" />
     <Compile Include="Controllers\Dimension4Controller.cs" />
-    <Compile Include="Controllers\DirectPurchaseInvoiceHeaderController.cs" />
-    <Compile Include="Controllers\DirectPurchaseInvoiceLineController.cs" />
     <Compile Include="Controllers\DirectSaleInvoiceHeaderController.cs" />
     <Compile Include="Controllers\DirectSaleInvoiceLineController.cs" />
     <Compile Include="Controllers\DispatchWaybillHeaderController.cs" />
@@ -770,38 +769,6 @@
     <Compile Include="Controllers\ProductUidUpdationController.cs" />
     <Compile Include="Controllers\ProjectController.cs" />
     <Compile Include="Controllers\PromoCodeController.cs" />
-    <Compile Include="Controllers\PurchaseGoodsReceiptHeaderController.cs" />
-    <Compile Include="Controllers\PurchaseGoodsReceiptLineController.cs" />
-    <Compile Include="Controllers\PurchaseGoodsReceiptSettingsController.cs" />
-    <Compile Include="Controllers\PurchaseGoodsReturnHeaderController.cs" />
-    <Compile Include="Controllers\PurchaseGoodsReturnLineController.cs" />
-    <Compile Include="Controllers\PurchaseIndentCancelHeaderController.cs" />
-    <Compile Include="Controllers\PurchaseIndentCancelLineController.cs" />
-    <Compile Include="Controllers\PurchaseIndentHeaderController.cs" />
-    <Compile Include="Controllers\PurchaseIndentLineController.cs" />
-    <Compile Include="Controllers\PurchaseIndentSettingsController.cs" />
-    <Compile Include="Controllers\PurchaseInvoiceHeaderController.cs" />
-    <Compile Include="Controllers\PurchaseInvoiceLineController.cs" />
-    <Compile Include="Controllers\PurchaseInvoiceReturnHeaderController.cs" />
-    <Compile Include="Controllers\PurchaseInvoiceReturnLineController.cs" />
-    <Compile Include="Controllers\PurchaseInvoiceSettingsController.cs" />
-    <Compile Include="Controllers\PurchaseOrderAmendmentHeaderController.cs" />
-    <Compile Include="Controllers\PurchaseOrderCancelHeaderController.cs" />
-    <Compile Include="Controllers\PurchaseOrderCancelLineController.cs" />
-    <Compile Include="Controllers\PurchaseOrderCancelWizardController.cs" />
-    <Compile Include="Controllers\PurchaseOrderDueDateExtensionController.cs" />
-    <Compile Include="Controllers\PurchaseOrderExcelImportController.cs" />
-    <Compile Include="Controllers\PurchaseOrderHeaderChargeController.cs" />
-    <Compile Include="Controllers\PurchaseOrderHeaderController.cs" />
-    <Compile Include="Controllers\PurchaseOrderLineController.cs" />
-    <Compile Include="Controllers\PurchaseOrderRateAmendmentLineController.cs" />
-    <Compile Include="Controllers\PurchaseOrderRateAmendmentWizardController.cs" />
-    <Compile Include="Controllers\PurchaseOrderSettingsController.cs" />
-    <Compile Include="Controllers\PurchaseQuotationHeaderController.cs" />
-    <Compile Include="Controllers\PurchaseQuotationLineController.cs" />
-    <Compile Include="Controllers\PurchaseQuotationSettingsController.cs" />
-    <Compile Include="Controllers\PurchaseQuotationWizardController.cs" />
-    <Compile Include="Controllers\PurchaseWaybillController.cs" />
     <Compile Include="Controllers\QAGroupController.cs" />
     <Compile Include="Controllers\QAGroupLineController.cs" />
     <Compile Include="Controllers\RateConversionHeaderController.cs" />

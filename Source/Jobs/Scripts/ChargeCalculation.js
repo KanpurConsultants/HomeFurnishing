@@ -530,6 +530,8 @@ function AssignValuesToChargeRates() {
 }
 
 
+
+
 function AssignValuesToCharges() {
 
     for (var i = 0; i < ProductFields.length; i++) {

@@ -296,8 +296,6 @@ namespace Service
         {
             var Today = DateTime.Now.Date;
 
-
-
             var ExistingData = (from L in ((ApplicationDbContext)_context).RolesDocType select L).FirstOrDefault();
             if (ExistingData == null)
             {
@@ -309,22 +307,37 @@ namespace Service
             }
             else
             {
-                if (System.Web.HttpContext.Current.Session["SiteId"] != null && System.Web.HttpContext.Current.Session["DivisionId"] != null)
-                {
-                    int SiteId = (int)System.Web.HttpContext.Current.Session["SiteId"];
-                    int DivisionId = (int)System.Web.HttpContext.Current.Session["DivisionId"];
+                var RoleNameList = (from p in ((ApplicationDbContext)_context).UserRole
+                                join t in ((ApplicationDbContext)_context).Roles on p.RoleId equals t.Id
+                                where p.UserId == UserId && (p.ExpiryDate == null || p.ExpiryDate >= Today)
+                                select t.Name).ToArray();
 
-                    return (from p in ((ApplicationDbContext)_context).UserRole
-                            join t in ((ApplicationDbContext)_context).Roles on p.RoleId equals t.Id
-                            where p.UserId == UserId && p.SiteId == SiteId && p.DivisionId == DivisionId && (p.ExpiryDate == null || p.ExpiryDate >= Today)
-                            group t by t.Id into g
-                            select g.Max(m => m.Name)).ToList();
+                if (!RoleNameList.Contains("Admin"))
+                { 
+                    if (System.Web.HttpContext.Current.Session["SiteId"] != null && System.Web.HttpContext.Current.Session["DivisionId"] != null)
+                    {
+                        int SiteId = (int)System.Web.HttpContext.Current.Session["SiteId"];
+                        int DivisionId = (int)System.Web.HttpContext.Current.Session["DivisionId"];
+
+                        return (from p in ((ApplicationDbContext)_context).UserRole
+                                join t in ((ApplicationDbContext)_context).Roles on p.RoleId equals t.Id
+                                where p.UserId == UserId && p.SiteId == SiteId && p.DivisionId == DivisionId && (p.ExpiryDate == null || p.ExpiryDate >= Today)
+                                group t by t.Id into g
+                                select g.Max(m => m.Name)).ToList();
+                    }
+                    else
+                    {
+                        return (from p in ((ApplicationDbContext)_context).UserRole
+                                join t in ((ApplicationDbContext)_context).Roles on p.RoleId equals t.Id
+                                where p.UserId == UserId && (p.ExpiryDate == null || p.ExpiryDate >= Today)
+                                group t by t.Id into g
+                                select g.Max(m => m.Name)).ToList();
+                    }
                 }
                 else
                 {
-                    return (from p in ((ApplicationDbContext)_context).UserRole
-                            join t in ((ApplicationDbContext)_context).Roles on p.RoleId equals t.Id
-                            where p.UserId == UserId && (p.ExpiryDate == null || p.ExpiryDate >= Today)
+                    return (from t in ((ApplicationDbContext)_context).Roles 
+                            where t.Name == "Admin"
                             group t by t.Id into g
                             select g.Max(m => m.Name)).ToList();
                 }

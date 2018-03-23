@@ -135,19 +135,6 @@ namespace Service
             }
             else
             {
-                //var pt1 = (from R in _unitOfWork.Repository<RolesDocType>().Instance.Where(m => m.DocTypeId != null)
-                //           join D in _unitOfWork.Repository<DocumentType>().Instance on R.DocTypeId equals D.DocumentTypeId into DocumentTypeTable
-                //           from DocumentTypeTab in DocumentTypeTable.DefaultIfEmpty()
-                //           join C in _unitOfWork.Repository<ControllerAction>().Instance on R.ControllerName equals C.ControllerName into ControllerActionTable
-                //           from ControllerActionTab in ControllerActionTable.DefaultIfEmpty()
-                //           join M in _unitOfWork.Repository<Menu>().Instance on new { B1 = ControllerActionTab.ControllerActionId, B2 = DocumentTypeTab.DocumentCategoryId } equals new { B1 = M.ControllerActionId ?? 0, B2 = M.DocumentCategoryId ?? 0 } into MenuTable
-                //           from MenuTab in MenuTable.DefaultIfEmpty()
-                //           join Md in _unitOfWork.Repository<MenuModule>().Instance on MenuTab.ModuleId equals Md.ModuleId into ModuleTable
-                //           from ModuleTab in ModuleTable.DefaultIfEmpty()
-                //           where RoleId.Contains(R.RoleId) && ModuleTab.ModuleId != null
-                //           group ModuleTab by ModuleTab.ModuleId into Result
-                //           select Result.FirstOrDefault());
-
                 var pt1 = (from R in _unitOfWork.Repository<RolesDocType>().Instance.Where(m => m.DocTypeId != null)
                            join D in _unitOfWork.Repository<DocumentType>().Instance on R.DocTypeId equals D.DocumentTypeId into DocumentTypeTable
                            from DocumentTypeTab in DocumentTypeTable.DefaultIfEmpty()
@@ -200,14 +187,12 @@ namespace Service
         public MenuModuleViewModelList GetModules()
         {
             List<string> UserRoles = (List<string>)System.Web.HttpContext.Current.Session["Roles"];
-            int SiteID = (int)System.Web.HttpContext.Current.Session["SiteId"];
+            int SiteId = (int)System.Web.HttpContext.Current.Session["SiteId"];
             int DivisionId = (int)System.Web.HttpContext.Current.Session["DivisionId"];
             MenuModuleViewModelList Vm = new MenuModuleViewModelList();
             List<MenuModouleViewModel> ma = new List<MenuModouleViewModel>();
 
-            if ((List<MenuModouleViewModel>)System.Web.HttpContext.Current.Session["UserModuleList"] != null)
-                ma = (List<MenuModouleViewModel>)System.Web.HttpContext.Current.Session["UserModuleList"];
-            else if (UserRoles.Contains("Admin"))
+            if (UserRoles.Contains("Admin"))
             {
                 var pt = (from p in _ModuleRepository.Instance
                           where p.IsActive == true
@@ -224,47 +209,15 @@ namespace Service
                           );
 
                 Vm.MenuModule = pt.ToList();
-
                 return Vm;
             }
             else
             {
-                List<MenuModouleViewModel> ModuleList = new List<MenuModouleViewModel>();
-                //Testing Block
-
-                var Roles = _userRolesService.GetRolesList().ToList();
-
-                var RoleId = string.Join(",", from p in Roles
-                                              where UserRoles.Contains(p.Name)
-                                              select p.Id.ToString());
-                //End
-
-                var pt = (from p in _unitOfWork.Repository<RolesMenu>().Instance
-                          join t in _unitOfWork.Repository<Menu>().Instance on p.MenuId equals t.MenuId
-                          join t2 in _unitOfWork.Repository<MenuModule>().Instance on t.ModuleId equals t2.ModuleId
-                          where p.SiteId == SiteID && p.DivisionId == DivisionId && RoleId.Contains(p.RoleId)
-                          group t2 by t2.ModuleId into g
-                          select g.FirstOrDefault()
-                              );
-
-                if (pt != null)
-                    ModuleList = (from p in pt
-                                  select new MenuModouleViewModel
-                                  {
-                                      IconName = p.IconName,
-                                      IsActive = p.IsActive,
-                                      ModuleId = p.ModuleId,
-                                      ModuleName = p.ModuleName,
-                                      Srl = p.Srl,
-                                      URL = p.URL,
-                                  }).ToList();
-
+                List<MenuModouleViewModel> ModuleList = GetModuleListForUser(UserRoles,SiteId, DivisionId).ToList();
                 Vm.MenuModule = ModuleList;
+                return Vm;
             }
-            Vm.MenuModule = ma;
-            return Vm;
         }
-
 
         //public MenuModuleViewModelList GetModules()
         //{
@@ -303,31 +256,18 @@ namespace Service
 
         //        var Roles = _userRolesService.GetRolesList().ToList();
 
-        //        var temp = from p in Roles
-        //                   where UserRoles.Contains(p.Name)
-        //                   select p.Id;
-
         //        var RoleId = string.Join(",", from p in Roles
         //                                      where UserRoles.Contains(p.Name)
         //                                      select p.Id.ToString());
         //        //End
 
-        //        //var pt = (from p in _unitOfWork.Repository<RolesMenu>().Instance
-        //        //          join t in _unitOfWork.Repository<Menu>().Instance on p.MenuId equals t.MenuId
-        //        //          join t2 in _unitOfWork.Repository<MenuModule>().Instance on t.ModuleId equals t2.ModuleId
-        //        //          where p.SiteId == SiteID && p.DivisionId == DivisionId && RoleId.Contains(p.RoleId)
-        //        //          group t2 by t2.ModuleId into g
-        //        //          select g.FirstOrDefault()
-        //        //              );
-
-        //        var pt = (from R in _unitOfWork.Repository<RolesDocType>().Instance
-        //                 join D in _unitOfWork.Repository<DocumentType>().Instance on R.DocTypeId equals D.DocumentTypeId into DocumentTypeTable from DocumentTypeTab in DocumentTypeTable.DefaultIfEmpty()
-        //                 join C in _unitOfWork.Repository<ControllerAction>().Instance on new { A1 = R.ControllerName, A2 = R.ActionName }  equals new { A1 = C.ControllerName, A2 = C.ActionName } into ControllerActionTable from ControllerActionTab in ControllerActionTable.DefaultIfEmpty()
-        //                 join M in _unitOfWork.Repository<Menu>().Instance on new { B1 = ControllerActionTab.ControllerActionId, B2 = DocumentTypeTab.DocumentCategoryId } equals new { B1 = M.ControllerActionId ?? 0, B2 = M.DocumentCategoryId ?? 0 } into MenuTable from MenuTab in MenuTable.DefaultIfEmpty()
-        //                 join Md in _unitOfWork.Repository<MenuModule>().Instance on MenuTab.ModuleId equals Md.ModuleId into ModuleTable from ModuleTab in ModuleTable.DefaultIfEmpty()
-        //                 where RoleId.Contains(R.RoleId) && ModuleTab.ModuleId != null
-        //                 group ModuleTab by ModuleTab.ModuleId into Result
-        //                 select Result.FirstOrDefault());
+        //        var pt = (from p in _unitOfWork.Repository<RolesMenu>().Instance
+        //                  join t in _unitOfWork.Repository<Menu>().Instance on p.MenuId equals t.MenuId
+        //                  join t2 in _unitOfWork.Repository<MenuModule>().Instance on t.ModuleId equals t2.ModuleId
+        //                  where p.SiteId == SiteID && p.DivisionId == DivisionId && RoleId.Contains(p.RoleId)
+        //                  group t2 by t2.ModuleId into g
+        //                  select g.FirstOrDefault()
+        //                      );
 
         //        if (pt != null)
         //            ModuleList = (from p in pt
@@ -346,6 +286,7 @@ namespace Service
         //    Vm.MenuModule = ma;
         //    return Vm;
         //}
+
 
         public MenuModule Add(MenuModule pt)
         {

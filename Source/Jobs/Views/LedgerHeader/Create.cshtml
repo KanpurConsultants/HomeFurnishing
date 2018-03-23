@@ -369,9 +369,6 @@
 {
 
     <script type="text/javascript">
-
-
-
         //For Populating Modal PopUp on DoubleClick Of Row
         $('#gbody').on("dblclick",'.grid-body',function(){
             var text = $(this).find(".id").val();
@@ -411,6 +408,9 @@
         $(document).ready(function(){
             enableModalTransitions();
         })
+
+        
+        //$('#myModal').attr('disabled', 'disabled')
 
         //To focus on the first element on modal load
         //$('#myModal').on('shown.bs.modal', function () {

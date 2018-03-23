@@ -481,10 +481,9 @@ namespace Jobs.Controllers
             ViewBag.IndexStatus = IndexType;
             SaleDeliveryHeader DeliveryHeader = _SaleDeliveryHeaderService.Find(id);
 
-            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, DeliveryHeader.DocTypeId, null, this.ControllerContext.RouteData.Values["controller"].ToString(), "Edit") == false)
-            {
-                return View("~/Views/Shared/PermissionDenied.cshtml").Warning("You don't have permission to do this task.");
-            }
+            if (DeliveryHeader.Status != (int)StatusConstants.Drafted)
+                if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, DeliveryHeader.DocTypeId, null, this.ControllerContext.RouteData.Values["controller"].ToString(), "Edit") == false)
+                    return RedirectToAction("DetailInformation", new { id = id, IndexType = IndexType }).Warning("You don't have permission to do this task.");
 
             #region DocTypeTimeLineValidation
             try

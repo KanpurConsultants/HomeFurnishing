@@ -486,12 +486,11 @@ namespace Jobs.Controllers
             SaleDispatchHeader DispactchHeader = _SaleDispatchHeaderService.Find(id);
             PackingHeader packingHeader = _PackingHeaderService.Find(DispactchHeader.PackingHeaderId.Value);
 
-            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, DispactchHeader.DocTypeId, null, this.ControllerContext.RouteData.Values["controller"].ToString(), "Edit") == false)
-            {
-                return View("~/Views/Shared/PermissionDenied.cshtml").Warning("You don't have permission to do this task.");
-            }
+            if (DispactchHeader.Status != (int)StatusConstants.Drafted)
+                if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, DispactchHeader.DocTypeId, null, this.ControllerContext.RouteData.Values["controller"].ToString(), "Edit") == false)
+                    return RedirectToAction("DetailInformation", new { id = id, IndexType = IndexType }).Warning("You don't have permission to do this task.");
 
-            
+
 
             #region DocTypeTimeLineValidation
             try
