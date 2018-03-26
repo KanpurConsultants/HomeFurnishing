@@ -95,7 +95,7 @@ namespace Jobs.Controllers
             vm.ReportHeader = header;
             vm.ReportLine = lines;
             vm.ReportHeaderId = header.ReportHeaderId;
-
+            vm.IsHideHeaderDetail = header.IsHideHeaderDetail ?? false;
 
             if (DocTypeId != null)
             {

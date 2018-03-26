@@ -56,10 +56,6 @@
     <script src="~/Scripts/angular.js"></script>
     <script src="~/Scripts/angular-touch.js"></script>
     <script src="~/Scripts/angular-animate.js"></script>
-    @*<script src="http://ui-grid.info/docs/grunt-scripts/csv.js"></script>
-    <script src="http://ui-grid.info/docs/grunt-scripts/pdfmake.js"></script>
-    <script src="http://ui-grid.info/docs/grunt-scripts/vfs_fonts.js"></script>*@
-
     
 
 
@@ -120,6 +116,7 @@
                     @Html.HiddenFor(m => m.DealUnitColumnCaption)
                     @Html.HiddenFor(m => m.SiteName)
                     @Html.HiddenFor(m => m.DivisionName)
+                    @Html.HiddenFor(m => m.IsHideHeaderDetail)
 
 
                     <div class="form-horizontal" role="form" id="ReportFilters">
@@ -319,7 +316,6 @@
 
                 if (this.DataType == "Multi Select"||this.DataType=="Single Select" && !(this.ListItem))
                 {
-
                     var getFunction= '/ComboHelpList/' + this.ServiceFuncGet;
                     var setFunction= '/ComboHelpList/' + this.ServiceFuncSet;
                     var NoofChar=this.NoOfCharToEnter;

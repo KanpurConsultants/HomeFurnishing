@@ -26,6 +26,7 @@ namespace Model.Models
         public string ReportSQL { get; set; }
         public bool? IsGridReport { get; set; }
         public bool? IsPDFReport { get; set; }
+        public bool? IsHideHeaderDetail { get; set; }
 
         [Display(Name = "Created By")]
         public string CreatedBy { get; set; }

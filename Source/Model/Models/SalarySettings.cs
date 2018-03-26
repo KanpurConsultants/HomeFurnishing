@@ -89,7 +89,7 @@ namespace Model.Models
 
 
 
-        
+        public bool? isAllowedDuplicatePrint { get; set; }        
 
 
         [Display(Name = "Created By")]

@@ -1387,6 +1387,7 @@ namespace Service
                         || string.IsNullOrEmpty(term) ? 1 == 1 : Dimension4Tab.Dimension4Name.ToLower().Contains(term.ToLower())
                         || string.IsNullOrEmpty(term) ? 1 == 1 : StockTab.LotNo.ToLower().Contains(term.ToLower())
                         || string.IsNullOrEmpty(term) ? 1 == 1 : StockTab.ProductUid.ProductUidName.ToLower().Contains(term.ToLower())
+                        || string.IsNullOrEmpty(term) ? 1 == 1 : StockTab.ProductUid.LotNo.ToLower().Contains(term.ToLower())
                         )
                     select new ComboBoxResult
                     {
@@ -1394,7 +1395,7 @@ namespace Service
                         text = StockTab.StockHeader.DocType.DocumentTypeShortName + "-" + p.StockInNo,
                         TextProp1 = "Balance :" + p.BalanceQty,
                         TextProp2 = "Date :" + p.StockInDate,
-                        AProp1 = ProductTab.ProductName + ((StockTab.ProductUid.ProductUidName == null) ? "" : "," + StockTab.ProductUid.ProductUidName),
+                        AProp1 = ProductTab.ProductName + ((StockTab.ProductUid.ProductUidName == null) ? "" : "," + StockTab.ProductUid.ProductUidName) + ((StockTab.ProductUid.LotNo == null) ? "" : "," + StockTab.ProductUid.LotNo) ,
                         AProp2 = ((Dimension1Tab.Dimension1Name == null) ? "" : Dimension1Tab.Dimension1Name) +
                                     ((Dimension2Tab.Dimension2Name == null) ? "" : "," + Dimension2Tab.Dimension2Name) +
                                     ((Dimension3Tab.Dimension3Name == null) ? "" : "," + Dimension3Tab.Dimension3Name) +

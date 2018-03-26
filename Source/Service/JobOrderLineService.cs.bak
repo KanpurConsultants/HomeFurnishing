@@ -1509,7 +1509,6 @@ namespace Service
             return temp;
         }
 
-
         public IEnumerable<ComboBoxResult> FGetProductUidHelpList(int Id, string term)
         {
             var JobOrderHeader = new JobOrderHeaderService(_unitOfWork).Find(Id);

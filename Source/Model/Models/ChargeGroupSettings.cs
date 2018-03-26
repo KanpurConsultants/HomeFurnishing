@@ -10,7 +10,7 @@ namespace Model.Models
         {
         }
 
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        //[DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Key]
         public int ChargeGroupSettingsId { get; set; }
 

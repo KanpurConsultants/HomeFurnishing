@@ -69,6 +69,7 @@ namespace Model.Models
         public int ? GodownId { get; set; }
         public virtual Godown Godown { get; set; }
 
+        public bool? IsDocumentPrinted { get; set; }
         [Display(Name = "DrCr"), MaxLength(2)]
         public string DrCr { get; set; }
         public string  Narration { get; set; }

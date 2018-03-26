@@ -162,16 +162,32 @@
                                         </div>
                                     </div>
 
+                                    @if (Model.JobReceiveSettings.SqlProcGenProductUID==""||Model.JobReceiveSettings.SqlProcGenProductUID==null  )
+                                    { 
                                     <div class="col-md-6" style="display:@(Model.JobReceiveSettings.isVisibleLotNo ? "" : "none")">
                                         @Html.HiddenFor(m => m.JobReceiveSettings.isVisibleLotNo)
                                         <div class="form-group">
                                             @Html.LabelFor(model => model.LotNo, "Lot No", new { @class = "control-label col-md-4 col-sm-2" })
                                             <div class="col-md-7 col-sm-10">
-                                                @Html.TextBoxFor(m => m.LotNo, new { @class = "form-control ", @readonly = "true" })
+                                                @Html.TextBoxFor(m => m.LotNo, new { @class = "form-control " })                                                
                                                 @Html.ValidationMessageFor(m => m.LotNo, "", new { @class = "text-danger" })
                                             </div>
                                         </div>
                                     </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="col-md-6" style="display:@(Model.JobReceiveSettings.isVisibleLotNo ? "" : "none")">
+                                            @Html.HiddenFor(m => m.JobReceiveSettings.isVisibleLotNo)
+                                            <div class="form-group">
+                                                @Html.LabelFor(model => model.LotNo, "Lot No", new { @class = "control-label col-md-4 col-sm-2" })
+                                                <div class="col-md-7 col-sm-10">
+                                                    @Html.TextBoxFor(m => m.LotNo, new { @class = "form-control ", @readonly = "true" })
+                                                    @Html.ValidationMessageFor(m => m.LotNo, "", new { @class = "text-danger" })
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
 
                                     <div class="col-md-6">
                                         <div class="form-group">
@@ -1088,17 +1104,26 @@
         return;
     });
 
-    $('#ProductUidName').keyup(function(){
-        if ($('#ProductUidName').val() == null || $('#ProductUidName').val() == "")
+    $('#ProductUidName').keyup(function()
+    {
+        @*alert('@Model.JobReceiveSettings.SqlProcGenProductUID');*@
+        if ('@Model.JobReceiveSettings.SqlProcGenProductUID' == null || '@Model.JobReceiveSettings.SqlProcGenProductUID' == "")
         {
-            $('#Qty').removeAttr('readonly');
-            $('#LotNo').removeAttr('readonly');
+            //alert($('#SqlProcGenProductUID').val());
         }
-        else{
-            $('#Qty').val('1');
-            $('#Qty').attr('readonly', 'true');
-            $('#LotNo').attr('readonly', 'true');
-            $('#LotNo').val($('#ProductUidName').val());
+        else
+        {
+            if ($('#ProductUidName').val() == null || $('#ProductUidName').val() == "")
+            {
+                $('#Qty').removeAttr('readonly');
+                $('#LotNo').removeAttr('readonly');
+            }
+            else{
+                $('#Qty').val('1');
+                $('#Qty').attr('readonly', 'true');
+                $('#LotNo').attr('readonly', 'true');
+                $('#LotNo').val($('#ProductUidName').val());
+            }
         }
     });
 
@@ -1115,7 +1140,9 @@
     });
 
     $('#Length,#Width').focusout(function(){
-        RoundDimensions();
+        //RoundDimensions();
+        GetUnitConversionMultiplier();
+        Calculation();
     });
 
     function RoundDimensions()
@@ -1214,7 +1241,7 @@
                     type: "POST",
                     async: false,
                     url: "@(Url.Action("GetUnitConversionMultiplier"))",
-                    data: { ProductId: $("#ProductId").val(),Length: $("#Length").val(),Width: $("#Width").val(),Height: $("#Height").val(),ToUnitId: $("#DealUnitId").val()},
+                    data: { DocumentTypeId: $("#DocTypeId").val(),ProductId: $("#ProductId").val(),Length: $("#Length").val(),Width: $("#Width").val(),Height: $("#Height").val(),ToUnitId: $("#DealUnitId").val()},
                 success: function (data) {
                     if (data) {
                         $('#UnitConversionMultiplier').val(0);

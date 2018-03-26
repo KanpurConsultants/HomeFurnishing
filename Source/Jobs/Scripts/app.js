@@ -237,35 +237,38 @@ app.controller('MainCtrl', ['$scope', '$log', '$http', 'uiGridConstants', 'uiGri
 
           doc.autoTable(pdfColumns, Rows, {
               addPageContent: function (data) {
-                  // HEADER
-                  doc.setFontSize(10);
-                  doc.setFontStyle('bold');
-
-                  if ($("#ReportHeaderCompanyDetail_LogoBlob").val() != null && $("#ReportHeaderCompanyDetail_LogoBlob").val() != "")
-                  {
-                      var imgData = 'data:image/jpeg;base64,' + $("#ReportHeaderCompanyDetail_LogoBlob").val();
-                      doc.addImage(imgData, 'JPEG', data.settings.margin.left, 6, 20, 18);
-                  }
-                  doc.text($("#ReportHeaderCompanyDetail_CompanyName").val(), data.settings.margin.left + 22, 10)
-                  doc.setFontSize(9);
-                  doc.setFontStyle('normal');
-                  doc.text($("#ReportHeaderCompanyDetail_Address").val(), data.settings.margin.left + 22, 14)
-                  doc.text($("#ReportHeaderCompanyDetail_CityName").val(), data.settings.margin.left + 22, 18)
-                  doc.text($("#ReportHeaderCompanyDetail_Phone").val(), data.settings.margin.left + 22, 22)
-
-                  doc.setFontStyle('bold');
-
                   var pageWidth = doc.internal.pageSize.width;
 
-                  doc.textEx('SITE :' + $("#SiteName").val(), pageWidth - (doc.getStringUnitWidth('SITE :' + $("#SiteName").val()) * doc.internal.getFontSize() / doc.internal.scaleFactor), 10, 'right', 'middle');
-                  doc.textEx('DIVISION :' + $("#DivisionName").val(), pageWidth - (doc.getStringUnitWidth('SITE :' + $("#SiteName").val()) * doc.internal.getFontSize() / doc.internal.scaleFactor), 14, 'right', 'middle');
+                  // HEADER
+                  if ($("#IsHideHeaderDetail").val() != 'True')
+                  {
+                      doc.setFontSize(10);
+                      doc.setFontStyle('bold');
+
+                      if ($("#ReportHeaderCompanyDetail_LogoBlob").val() != null && $("#ReportHeaderCompanyDetail_LogoBlob").val() != "")
+                      {
+                          var imgData = 'data:image/jpeg;base64,' + $("#ReportHeaderCompanyDetail_LogoBlob").val();
+                          doc.addImage(imgData, 'JPEG', data.settings.margin.left, 6, 20, 18);
+                      }
+                      doc.text($("#ReportHeaderCompanyDetail_CompanyName").val(), data.settings.margin.left + 22, 10)
+                      doc.setFontSize(9);
+                      doc.setFontStyle('normal');
+                      doc.text($("#ReportHeaderCompanyDetail_Address").val(), data.settings.margin.left + 22, 14)
+                      doc.text($("#ReportHeaderCompanyDetail_CityName").val(), data.settings.margin.left + 22, 18)
+                      doc.text($("#ReportHeaderCompanyDetail_Phone").val(), data.settings.margin.left + 22, 22)
+
+                      doc.setFontStyle('bold');
+
+
+                      doc.textEx('SITE :' + $("#SiteName").val(), pageWidth - (doc.getStringUnitWidth('SITE :' + $("#SiteName").val()) * doc.internal.getFontSize() / doc.internal.scaleFactor), 10, 'right', 'middle');
+                      doc.textEx('DIVISION :' + $("#DivisionName").val(), pageWidth - (doc.getStringUnitWidth('SITE :' + $("#SiteName").val()) * doc.internal.getFontSize() / doc.internal.scaleFactor), 14, 'right', 'middle');
+                  }
 
                   doc.setFontSize(15);
                   doc.setFontStyle('bold');
 
                   var ReportTitle = ($("#ReportTitle").val() != null && $("#ReportTitle").val()) ? $("#ReportTitle").val() : $("#ReportHeader_ReportName").val();
                   xOffset = (doc.internal.pageSize.width / 2) - (doc.getStringUnitWidth(ReportTitle) * doc.internal.getFontSize() / 2);
-
 
                   var fontSize = doc.internal.getFontSize();
                   

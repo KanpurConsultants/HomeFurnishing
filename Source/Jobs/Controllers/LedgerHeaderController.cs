@@ -1549,6 +1549,8 @@ namespace Jobs.Controllers
 
                         var pd = db.LedgerHeader.Find(item);
 
+                        if (Settings.isAllowedDuplicatePrint == false && pd.IsDocumentPrinted == true)
+                            throw new Exception("Duplicate Print Not Allowed");
                         LogActivity.LogActivityDetail(LogVm.Map(new ActiivtyLogViewModel
                         {
                             DocTypeId = pd.DocTypeId,
@@ -1579,6 +1581,12 @@ namespace Jobs.Controllers
                             Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint_AfterApprove, User.Identity.Name, item);
                             PdfStream.Add(Pdf);
                         }
+
+                        if (pd.Status == 1)
+                            pd.IsDocumentPrinted = true;
+                        pd.ObjectState = Model.ObjectState.Modified;
+                        db.LedgerHeader.Add(pd);
+                        db.SaveChanges();
 
                     }
 

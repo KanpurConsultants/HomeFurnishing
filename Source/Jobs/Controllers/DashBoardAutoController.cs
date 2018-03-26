@@ -213,9 +213,25 @@ namespace Module
             return json;
         }
 
-        public JsonResult GetBankBalanceDetail()
+        public JsonResult GetBankBalanceDetailBankAc()
         {
-            IEnumerable<DashBoardTabularData> DashBoardTabularData = _DashBoardAutoService.GetBankBalanceDetail();
+            IEnumerable<DashBoardTabularData> DashBoardTabularData = _DashBoardAutoService.GetBankBalanceDetailBankAc();
+
+            JsonResult json = Json(new { Success = true, Data = DashBoardTabularData }, JsonRequestBehavior.AllowGet);
+            return json;
+        }
+
+        public JsonResult GetBankBalanceDetailBankODAc()
+        {
+            IEnumerable<DashBoardTabularData> DashBoardTabularData = _DashBoardAutoService.GetBankBalanceDetailBankODAc();
+
+            JsonResult json = Json(new { Success = true, Data = DashBoardTabularData }, JsonRequestBehavior.AllowGet);
+            return json;
+        }
+
+        public JsonResult GetBankBalanceDetailChannelFinanceAc()
+        {
+            IEnumerable<DashBoardTabularData> DashBoardTabularData = _DashBoardAutoService.GetBankBalanceDetailChannelFinanceAc();
 
             JsonResult json = Json(new { Success = true, Data = DashBoardTabularData }, JsonRequestBehavior.AllowGet);
             return json;

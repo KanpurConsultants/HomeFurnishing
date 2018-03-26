@@ -225,6 +225,7 @@ namespace Jobs.Areas.Rug.Controllers
                     JobReceiveHeader JobReceiveHeader = new JobReceiveHeader();
                     JobReceiveHeader = new WeavingReceiveQACombinedService(db).Create(vm, User.Identity.Name);
 
+                    JobReceiveSettings Setting = new JobReceiveSettingsService(_unitOfWork).GetJobReceiveSettingsForDocument(JobReceiveHeader.DocTypeId, JobReceiveHeader.DivisionId, JobReceiveHeader.SiteId);
 
                     try
                     {
@@ -243,7 +244,13 @@ namespace Jobs.Areas.Rug.Controllers
 
                     if (vm.ProductUidName != null || vm.LotNo  != null)
                     {
-                        ProductUid ProductUid = new ProductUidService(_unitOfWork).Find(vm.LotNo);
+                        string ProductUidName = "";
+                        if (vm.ProductUidName != null)
+                            ProductUidName = vm.ProductUidName;
+                        else if (vm.ProductUidName == null)
+                            ProductUidName = vm.LotNo;
+
+                        ProductUid ProductUid = new ProductUidService(_unitOfWork).Find(ProductUidName);
                         ProductUid.ModifiedDate = DateTime.Now;
                         if (ProductUid.GenDocId == 0)
                         {
@@ -258,6 +265,9 @@ namespace Jobs.Areas.Rug.Controllers
                         ProductUid.LastTransactionDocTypeId = JobReceiveHeader.DocTypeId;
                         ProductUid.LastTransactionDocDate = JobReceiveHeader.DocDate;
                         ProductUid.LastTransactionPersonId = JobReceiveHeader.JobWorkerId;
+                       
+                        if ((Setting.SqlProcGenProductUID ==null || Setting.SqlProcGenProductUID == ""))
+                            ProductUid.LotNo = vm.LotNo;
 
                         ProductUid.ObjectState = Model.ObjectState.Modified;
                         db1.ProductUid.Add(ProductUid);

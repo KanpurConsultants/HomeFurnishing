@@ -41,7 +41,7 @@ namespace Service
                 }
                 else if (ex.InnerException != null)
                 {
-                    message = ex.InnerException.Message;
+                    message = ex.InnerException.InnerException.Message;
                 }
                 else
                 {

@@ -215,6 +215,11 @@ namespace Module
 
             AddFields("WeavingRetensions", "ProductQualityId", "INT", "ProductQualities");
 
+            AddFields("SalaryHeaders", "IsDocumentPrinted", "Bit");
+            AddFields("SalarySettings", "isAllowedDuplicatePrint", "BIT NOT NULL DEFAULT(1)");
+
+            AddFields("LedgerHeaders", "IsDocumentPrinted", "Bit");
+            AddFields("LedgerSettings", "isAllowedDuplicatePrint", "BIT NOT NULL DEFAULT(1)");
             try
             {
                 if ((int)ExecuteScaler("SELECT Count(*) AS Cnt FROM INFORMATION_SCHEMA.Tables WHERE TABLE_NAME = 'SaleQuotationHeaders'") == 0)
@@ -3675,6 +3680,9 @@ namespace Module
             AddFields("SalaryLines", "NetPayable", "DECIMAL(18,4) NOT NULL DEFAULT((0))");
 
             AddFields("SalaryHeaders", "LedgerHeaderId", "Int","LedgerHeaders");
+
+
+            AddFields("ReportHeaders", "IsHideHeaderDetail", "BIT");
 
 
             ReCreateProcedures();

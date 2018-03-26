@@ -479,7 +479,9 @@ $(document).ready(function () {
 
     DesignTable('GetDebtorsDetail', 'Group', 'Amount', '#DebtorsDetailTable');
 
-    DesignTable('GetBankBalanceDetail', 'Bank Account', 'Amount', '#BankBalanceDetailTable');
+    DesignTable('GetBankBalanceDetailBankAc', 'Bank Account', 'Amount', '#BankBalanceDetailBankAc');
+    DesignTable('GetBankBalanceDetailBankODAc', 'Bank OD Account', 'Amount', '#BankBalanceDetailBankODAc');
+    DesignTable('GetBankBalanceDetailChannelFinanceAc', 'Channel Finance', 'Amount', '#BankBalanceDetailChannelFinanceAc');
 
     DesignTable_ThreeColumns('GetVehicleStockDetailProductTypeWise', 'Type', "Qty", 'Amount', '#VehicleStockDetailProductTypeWise');
     DesignTable_ThreeColumns('GetVehicleStockDetailProductGroupWise', 'Group', "Qty", 'Amount', '#VehicleStockDetailProductGroupWise');

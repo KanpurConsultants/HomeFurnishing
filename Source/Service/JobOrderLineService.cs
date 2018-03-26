@@ -1587,6 +1587,7 @@ namespace Service
                         || string.IsNullOrEmpty(term) ? 1 == 1 : Dimension4Tab.Dimension4Name.ToLower().Contains(term.ToLower())
                         || string.IsNullOrEmpty(term) ? 1 == 1 : StockTab.LotNo.ToLower().Contains(term.ToLower())
                         || string.IsNullOrEmpty(term) ? 1 == 1 : StockTab.ProductUid.ProductUidName.ToLower().Contains(term.ToLower())
+                        || string.IsNullOrEmpty(term) ? 1 == 1 : StockTab.ProductUid.LotNo.ToLower().Contains(term.ToLower())
                         )
                     select new ComboBoxResult
                     {

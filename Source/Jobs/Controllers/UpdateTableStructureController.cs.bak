@@ -1519,7 +1519,7 @@ namespace Module
             AddFields("PackingSettings", "isVisibleProductUID", "BIT");
             AddFields("PackingSettings", "isVisibleShipMethod", "BIT");
             AddFields("PackingSettings", "filterProductDivision", "nvarchar(Max)");
-
+			AddFields("PackingSettings", "isAllowtoUpdateBuyerSpecification", "BIT");
 
             try
             {
@@ -3675,6 +3675,9 @@ namespace Module
             AddFields("SalaryLines", "NetPayable", "DECIMAL(18,4) NOT NULL DEFAULT((0))");
 
             AddFields("SalaryHeaders", "LedgerHeaderId", "Int","LedgerHeaders");
+
+
+            AddFields("ReportHeaders", "IsHideHeaderDetail", "BIT");
 
 
             ReCreateProcedures();

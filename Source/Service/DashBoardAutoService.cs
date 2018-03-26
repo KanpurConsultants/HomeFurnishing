@@ -48,7 +48,9 @@ namespace Service
 
         IEnumerable<DashBoardTabularData> GetDebtorsDetail();
 
-        IEnumerable<DashBoardTabularData> GetBankBalanceDetail();
+        IEnumerable<DashBoardTabularData> GetBankBalanceDetailBankAc();
+        IEnumerable<DashBoardTabularData> GetBankBalanceDetailBankODAc();
+        IEnumerable<DashBoardTabularData> GetBankBalanceDetailChannelFinanceAc();
 
         IEnumerable<DashBoardTabularData_ThreeColumns> GetVehicleStockDetailProductTypeWise();
         IEnumerable<DashBoardTabularData_ThreeColumns> GetVehicleStockDetailProductGroupWise();
@@ -552,7 +554,7 @@ namespace Service
             return DashBoardTabularData;
         }
 
-        public IEnumerable<DashBoardTabularData> GetBankBalanceDetail()
+        public IEnumerable<DashBoardTabularData> GetBankBalanceDetailBankAc()
         {
             mQry = "SELECT Convert(nvarchar,LedgerAccountGroupId) As Value FROM Web.LedgerAccountGroups WHERE LedgerAccountGroupName = '" + Jobs.Constants.LedgerAccountGroup.LedgerAccountGroupConstants.BankAccounts.LedgerAccountGroupName + "'";
             DashBoardSingleValue SundryDebtorsLedgerAccountGroup = db.Database.SqlQuery<DashBoardSingleValue>(mQry).FirstOrDefault();
@@ -565,7 +567,75 @@ namespace Service
             SqlParameter SqlParameterLedgerAccountGroup = new SqlParameter("@LedgerAccountGroup", SundryDebtorsLedgerAccountGroup.Value);
 
             mQry = new FinancialDisplayService(_unitOfWork).GetQryForTrialBalance(null, null, SoftwareStartDate.ToString(), TodayDate.ToString(), null, "False", "False", SundryDebtorsLedgerAccountGroup.Value) +
-                                        @"SELECT H.LedgerAccountId AS LedgerAccountGroupId, LedgerAccountName AS Head, 
+                                        @"SELECT H.BaseLedgerAccountGroupId AS LedgerAccountGroupId, Max(BaseLedgerAccountGroupName) AS Head, 
+                                        Convert(NVARCHAR,Sum(isnull(H.Balance,0))) AS Value
+                                        FROM cteAcGroup H 
+                                        GROUP BY H.BaseLedgerAccountGroupId 
+                                        Having Sum(isnull(H.Balance,0)) <> 0 
+
+                                        UNION ALL 
+
+                                        SELECT H.LedgerAccountId AS LedgerAccountGroupId, LedgerAccountName AS Head, 
+                                        Convert(NVARCHAR,isnull(H.Balance,0))  AS Value
+                                        FROM cteLedgerBalance H 
+                                        Where isnull(H.Balance,0) <> 0 ";
+
+            IEnumerable<DashBoardTabularData> DashBoardTabularData = db.Database.SqlQuery<DashBoardTabularData>(mQry, SqlParameterSiteId, SqlParameterDivisionId, SqlParameterFromDate, SqlParameterToDate, SqlParameterCostCenter, SqlParameterLedgerAccountGroup).ToList();
+            return DashBoardTabularData;
+        }
+
+        public IEnumerable<DashBoardTabularData> GetBankBalanceDetailBankODAc()
+        {
+            mQry = "SELECT Convert(nvarchar,LedgerAccountGroupId) As Value FROM Web.LedgerAccountGroups WHERE LedgerAccountGroupName = '" + Jobs.Constants.LedgerAccountGroup.LedgerAccountGroupConstants.BankODAc.LedgerAccountGroupName + "'";
+            DashBoardSingleValue SundryDebtorsLedgerAccountGroup = db.Database.SqlQuery<DashBoardSingleValue>(mQry).FirstOrDefault();
+
+            SqlParameter SqlParameterSiteId = new SqlParameter("@Site", (object)DBNull.Value);
+            SqlParameter SqlParameterDivisionId = new SqlParameter("@Division", (object)DBNull.Value);
+            SqlParameter SqlParameterFromDate = new SqlParameter("@FromDate", SoftwareStartDate);
+            SqlParameter SqlParameterToDate = new SqlParameter("@ToDate", TodayDate);
+            SqlParameter SqlParameterCostCenter = new SqlParameter("@CostCenter", (object)DBNull.Value);
+            SqlParameter SqlParameterLedgerAccountGroup = new SqlParameter("@LedgerAccountGroup", SundryDebtorsLedgerAccountGroup.Value);
+
+            mQry = new FinancialDisplayService(_unitOfWork).GetQryForTrialBalance(null, null, SoftwareStartDate.ToString(), TodayDate.ToString(), null, "False", "False", SundryDebtorsLedgerAccountGroup.Value) +
+                                        @"SELECT H.BaseLedgerAccountGroupId AS LedgerAccountGroupId, Max(BaseLedgerAccountGroupName) AS Head, 
+                                        Convert(NVARCHAR,Sum(isnull(H.Balance,0))) AS Value
+                                        FROM cteAcGroup H 
+                                        GROUP BY H.BaseLedgerAccountGroupId 
+                                        Having Sum(isnull(H.Balance,0)) <> 0 
+
+                                        UNION ALL 
+
+                                        SELECT H.LedgerAccountId AS LedgerAccountGroupId, LedgerAccountName AS Head, 
+                                        Convert(NVARCHAR,isnull(H.Balance,0))  AS Value
+                                        FROM cteLedgerBalance H 
+                                        Where isnull(H.Balance,0) <> 0 ";
+
+            IEnumerable<DashBoardTabularData> DashBoardTabularData = db.Database.SqlQuery<DashBoardTabularData>(mQry, SqlParameterSiteId, SqlParameterDivisionId, SqlParameterFromDate, SqlParameterToDate, SqlParameterCostCenter, SqlParameterLedgerAccountGroup).ToList();
+            return DashBoardTabularData;
+        }
+
+        public IEnumerable<DashBoardTabularData> GetBankBalanceDetailChannelFinanceAc()
+        {
+            mQry = "SELECT Convert(nvarchar,LedgerAccountGroupId) As Value FROM Web.LedgerAccountGroups WHERE LedgerAccountGroupName = 'Channel Finance Vehicle'";
+            DashBoardSingleValue SundryDebtorsLedgerAccountGroup = db.Database.SqlQuery<DashBoardSingleValue>(mQry).FirstOrDefault();
+
+            SqlParameter SqlParameterSiteId = new SqlParameter("@Site", (object)DBNull.Value);
+            SqlParameter SqlParameterDivisionId = new SqlParameter("@Division", (object)DBNull.Value);
+            SqlParameter SqlParameterFromDate = new SqlParameter("@FromDate", SoftwareStartDate);
+            SqlParameter SqlParameterToDate = new SqlParameter("@ToDate", TodayDate);
+            SqlParameter SqlParameterCostCenter = new SqlParameter("@CostCenter", (object)DBNull.Value);
+            SqlParameter SqlParameterLedgerAccountGroup = new SqlParameter("@LedgerAccountGroup", SundryDebtorsLedgerAccountGroup.Value);
+
+            mQry = new FinancialDisplayService(_unitOfWork).GetQryForTrialBalance(null, null, SoftwareStartDate.ToString(), TodayDate.ToString(), null, "False", "False", SundryDebtorsLedgerAccountGroup.Value) +
+                                        @"SELECT H.BaseLedgerAccountGroupId AS LedgerAccountGroupId, Max(BaseLedgerAccountGroupName) AS Head, 
+                                        Convert(NVARCHAR,Sum(isnull(H.Balance,0))) AS Value
+                                        FROM cteAcGroup H 
+                                        GROUP BY H.BaseLedgerAccountGroupId 
+                                        Having Sum(isnull(H.Balance,0)) <> 0 
+
+                                        UNION ALL 
+
+                                        SELECT H.LedgerAccountId AS LedgerAccountGroupId, LedgerAccountName AS Head, 
                                         Convert(NVARCHAR,isnull(H.Balance,0))  AS Value
                                         FROM cteLedgerBalance H 
                                         Where isnull(H.Balance,0) <> 0 ";

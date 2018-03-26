@@ -23,6 +23,8 @@ namespace Model.ViewModels
         public List<ReportLine> ReportLine{ get; set; }
         public ReportHeaderCompanyDetail ReportHeaderCompanyDetail { get; set; }
 
+        public bool IsHideHeaderDetail { get; set; }
+
         public string ReportTitle { get; set; }
 
         public string QtyColumnCaption { get; set; }

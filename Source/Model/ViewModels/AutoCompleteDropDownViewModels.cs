@@ -47,6 +47,10 @@ namespace Model.ViewModels
     {
         public string id { get; set; }
         public string text { get; set; }
+        public string AProp1 { get; set; }
+        public string AProp2 { get; set; }
+        public string TextProp1 { get; set; }
+        public string TextProp2 { get; set; }
         public int RecCount { get; set; }
     }
 

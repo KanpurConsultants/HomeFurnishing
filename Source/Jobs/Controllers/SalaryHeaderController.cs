@@ -1304,6 +1304,8 @@ namespace Jobs.Controllers
                         DirectReportPrint drp = new DirectReportPrint();
                         var pd = db.SalaryHeader.Find(item);
 
+                        if (Settings.isAllowedDuplicatePrint == false && pd.IsDocumentPrinted == true)
+                            throw new Exception("Duplicate Print Not Allowed");
                         LogActivity.LogActivityDetail(LogVm.Map(new ActiivtyLogViewModel
                         {
                             DocTypeId = pd.DocTypeId,
@@ -1344,6 +1346,12 @@ namespace Jobs.Controllers
                             }
 
                         }
+
+                        if (pd.Status ==1)
+                        pd.IsDocumentPrinted = true;
+                        pd.ObjectState = Model.ObjectState.Modified;
+                        db.SalaryHeader.Add(pd);
+                        db.SaveChanges();
                     }
 
                     PdfMerger pm = new PdfMerger();
