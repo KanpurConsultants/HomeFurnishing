@@ -652,7 +652,9 @@ namespace Service
                                 UnitConversionMultiplier = tab1.UnitConversionMultiplier,
                                 Rate = tab1.SaleOrderLine.Rate,
                                 DiscountPer = tab1.SaleOrderLine.DiscountPer,
-                                GodownId = tab.GodownId
+                                GodownId = tab.GodownId,
+                                SalesTaxGroupProductId = tab2.SalesTaxGroupProductId ?? tab2.ProductGroup.DefaultSalesTaxGroupProductId,
+                                SalesTaxGroupPersonId = SaleInvoice.SalesTaxGroupPersonId
                             });
 
                 return temp;

@@ -993,6 +993,16 @@ namespace Jobs.Controllers
                 IEnumerable<Ledger> LedgerList = (from L in db.Ledger where L.LedgerHeaderId == Si.LedgerHeaderId select L).ToList();
                 foreach (Ledger Ledger in LedgerList)
                 {
+                    var LedgerAdjs = (from p in db.LedgerAdj
+                                      where p.CrLedgerId == Ledger.LedgerId || p.DrLedgerId == Ledger.LedgerId
+                                      select p).ToList();
+
+                    foreach (var item2 in LedgerAdjs)
+                    {
+                        item2.ObjectState = Model.ObjectState.Deleted;
+                        db.LedgerAdj.Remove(item2);
+                    }
+
                     Ledger.ObjectState = Model.ObjectState.Deleted;
                     db.Ledger.Remove(Ledger);
                 }

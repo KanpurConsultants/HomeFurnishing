@@ -115,7 +115,7 @@ namespace Jobs.Controllers
 
             SaleDispatchHeader Dh = new SaleDispatchHeaderService(_unitOfWork).Find(Sh.SaleDispatchHeaderId.Value);
 
-
+            List<LineChargeRates> LineChargeRates = new List<LineChargeRates>();
 
             SaleDispatchLine LastRecord = _SaleDispatchLineService.GetSaleDispatchLineList(Dh.SaleDispatchHeaderId).OrderByDescending(m => m.SaleDispatchLineId).FirstOrDefault();
 
@@ -375,6 +375,14 @@ namespace Jobs.Controllers
 
                         LineList.Add(new LineDetailListViewModel { Amount = line.Amount, Rate = line.Rate, LineTableId = line.SaleInvoiceLineId, HeaderTableId = item.SaleInvoiceHeaderId, PersonID = Sh.BillToBuyerId });
 
+                        List<CalculationProductViewModel> ChargeRates = new CalculationProductService(_unitOfWork).GetChargeRates(CalculationId, Sh.DocTypeId, Sh.SiteId, Sh.DivisionId,
+                                Settings.ProcessId ?? 0, item.SalesTaxGroupPersonId, item.SalesTaxGroupProductId).ToList();
+                        if (ChargeRates != null)
+                        {
+                            LineChargeRates.Add(new LineChargeRates { LineId = line.SaleInvoiceLineId, ChargeRates = ChargeRates });
+                        }
+
+
                         pk++;
                         Cnt = Cnt + 1;
                     }
@@ -384,7 +392,24 @@ namespace Jobs.Controllers
 
                 new SaleOrderLineStatusService(_unitOfWork).UpdateSaleQtyInvoiceMultiple(LineStatus, Sh.DocDate);
 
-                new ChargesCalculationService(_unitOfWork).CalculateCharges(LineList, vm.DirectSaleInvoiceLineViewModel.FirstOrDefault().SaleInvoiceHeaderId, CalculationId, MaxLineId, out LineCharges, out HeaderChargeEdit, out HeaderCharges, "Web.SaleInvoiceHeaderCharges", "Web.SaleInvoiceLineCharges", out PersonCount, Sh.DocTypeId, Sh.SiteId, Sh.DivisionId);
+
+                var LineListWithReferences = (from p in LineList
+                                              join t3 in LineChargeRates on p.LineTableId equals t3.LineId into LineChargeRatesTable
+                                              from LineChargeRatesTab in LineChargeRatesTable.DefaultIfEmpty()
+                                              orderby p.LineTableId
+                                              select new LineDetailListViewModel
+                                              {
+                                                  Amount = p.Amount,
+                                                  DealQty = p.DealQty,
+                                                  HeaderTableId = p.HeaderTableId,
+                                                  LineTableId = p.LineTableId,
+                                                  PersonID = p.PersonID,
+                                                  Rate = p.Rate,
+                                                  CostCenterId = p.CostCenterId,
+                                                  ChargeRates = LineChargeRatesTab.ChargeRates,
+                                              }).ToList();
+
+                new ChargesCalculationService(_unitOfWork).CalculateCharges(LineListWithReferences, vm.DirectSaleInvoiceLineViewModel.FirstOrDefault().SaleInvoiceHeaderId, CalculationId, MaxLineId, out LineCharges, out HeaderChargeEdit, out HeaderCharges, "Web.SaleInvoiceHeaderCharges", "Web.SaleInvoiceLineCharges", out PersonCount, Sh.DocTypeId, Sh.SiteId, Sh.DivisionId);
 
                 //Saving Charges
                 foreach (var item in LineCharges)
