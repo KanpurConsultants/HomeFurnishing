@@ -1112,7 +1112,7 @@ namespace Jobs.Areas.Rug.Controllers
         public ActionResult PrintAfter_Submit(int id, string ReportFileType)
         {
             PackingHeader header = _PackingHeaderService.Find(id);
-            if (header.Status == (int)StatusConstants.Submitted || header.Status == (int)StatusConstants.Modified || header.Status == (int)StatusConstants.ModificationSubmitted)
+            if (header.Status == (int)StatusConstants.Submitted || header.Status == (int)StatusConstants.Approved  || header.Status == (int)StatusConstants.Modified || header.Status == (int)StatusConstants.ModificationSubmitted)
                 return RedirectToAction("DocPrint", new { id = id, ReportFileType = ReportFileType });
             else
                 return HttpNotFound();

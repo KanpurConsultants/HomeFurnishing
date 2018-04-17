@@ -53,7 +53,7 @@
             @Html.HiddenFor(m => m.OtherBuyerDeliveryOrders)
             @Html.HiddenFor(m => m.PartyProductUid)
             @Html.HiddenFor(m => m.DimensionUnitDecimalPlaces)
-            @Html.HiddenFor(m => m.DimensionUnitDecimalPlaces)
+            @Html.HiddenFor(m => m.PackingSettings.isVisibleProductInvoiceGroup)
             @Html.HiddenFor(m => m.PackingSettings.isAllowtoUpdateBuyerSpecification)
 
             <div class="form-horizontal modal-body">
@@ -518,10 +518,6 @@
             $("#Qty").prop('readonly', true);
             $('#ProductInvoiceGroupId').prop('readonly', true);
             $('#StockInId').attr('readonly','true');
-            if ("#isAllowtoUpdateBuyerSpecification".val()=true)
-                $("#BaleNo").focus() ;
-            else 
-                $("#Length").focus() ;
         }
     })
 
@@ -591,7 +587,7 @@
         });
     }
 
-    $("#save").click(function () 
+    $("#save").click(function ()
     {
         if ($('#ProductId').select2('data') != null) {
             $("#ProductName").val($('#ProductId').select2('data').text);
@@ -619,51 +615,62 @@
                 type: "POST",
                 url: "@(Url.Action("GetStockInDetailJson"))",
                 data: { StockInId: $("#StockInId").val()},
-            success: function (data) {
-                if (data != null)
-                {
-                    $("#StockInBalanceQty").val(data.BalanceQty);
-                    $("#Qty").val(data.BalanceQty);
-                    $("#LotNo").val(data.LotNo);
-                    $("#ProductId").select2('data', { id: data.ProductId, text: data.ProductName});
-                    if (data.FromProcessId != null)
+                success: function (data) {
+                    if (data != null)
                     {
-                        $("#FromProcessId").select2('data', { id: data.FromProcessId, text: data.FromProcessName});
+                        if(data.Status=="Pack")
+                        {
+                            $("#ProductUidValidation").text("Bar Code Already Packed");
+                        }
+                        else if( data.CurrenctGodownId==null || data.Status=="Issue")
+                        {
+                            $("#ProductUidValidation").text("Bar Code Not Present in Godown");
+                        }
+                        else
+                        {
+                            $("#StockInBalanceQty").val(data.BalanceQty);
+                            $("#Qty").val(data.BalanceQty);
+                            $("#LotNo").val(data.LotNo);
+                            $("#ProductId").select2('data', { id: data.ProductId, text: data.ProductName});
+                            if (data.FromProcessId != null)
+                            {
+                                $("#FromProcessId").select2('data', { id: data.FromProcessId, text: data.FromProcessName});
+                            }
+                            else{
+                                $("#FromProcessId").select2('data', { id: '', text: ''});
+                            }
+
+
+                            if (data.ProductUidId != null)
+                            {
+                                $("#ProductUidId").val(data.ProductUidId);
+                                $("#ProductUidName").val(data.ProductUidName);
+                            }
+
+                            $("#ProductUidName").attr('readonly', 'true');
+                            $("#ProductId").attr('readonly', 'true');
+                            $("#Dimension1Id").attr('readonly', 'true');
+                            $("#Dimension2Id").attr('readonly', 'true');
+                            $("#Dimension3Id").attr('readonly', 'true');
+                            $("#Dimension4Id").attr('readonly', 'true');
+                            $("#FromProcessId").attr('readonly', 'true');
+                            //GetProductDetail()
+                            Validate_Product();
+                        }
                     }
                     else{
-                        $("#FromProcessId").select2('data', { id: '', text: ''});
+                        $("#StockInBalanceQty").val(0);
+                        $("#LotNo").val("");
                     }
-
-
-                    if (data.ProductUidId != null)
-                    {
-                        $("#ProductUidId").val(data.ProductUidId);
-                        $("#ProductUidName").val(data.ProductUidName);
-                    }
-                            
-                    $("#ProductUidName").attr('readonly', 'true');
-                    $("#ProductId").attr('readonly', 'true');
-                    $("#Dimension1Id").attr('readonly', 'true');
-                    $("#Dimension2Id").attr('readonly', 'true');
-                    $("#Dimension3Id").attr('readonly', 'true');
-                    $("#Dimension4Id").attr('readonly', 'true');
-                    $("#FromProcessId").attr('readonly', 'true');
-                    //GetProductDetail()
-                    Validate_Product();
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert('Failed to retrieve Stock In details.' + thrownError);
+                    ProcessProgress.hide();
                 }
-                else{
-                    $("#StockInBalanceQty").val(0);
-                    $("#LotNo").val("");
-                }
-            },
-            error: function (xhr, ajaxOptions, thrownError) {
-                alert('Failed to retrieve Stock In details.' + thrownError);
-                ProcessProgress.hide();
-            }
-        });
+            });
 
-    }
-    else {
+        }
+        else {
             $("#StockInBalanceQty").val(0);
             $("#LotNo").val("");
 
@@ -700,6 +707,14 @@
 
     $(function () {
         //$("#DealQty,#Qty").keyup(Calculation);
+        $("#BaleNo").focusout(function(){
+            //alert("Hello");
+            var isAllowtoUpdateBuyerSpecification1 = '@ViewBag.isAllowtoUpdateBuyerSpecification';
+            if (isAllowtoUpdateBuyerSpecification1=="Yes")
+                $("#BaleNo").select();
+            else
+                $("#Length").focus() ;
+        });
 
         $("#DealQty,#Qty").keyup(function(){
             QtyValidation();
@@ -734,12 +749,16 @@
                 url: "@(Url.Action("GetProductUIDDetailJson"))",
                 data: { ProductUIDNo: $("#ProductUidName").val(),PackingHeaderId: $("#PackingHeaderId").val()},
                 success: function (data) {
-                    if (Object.keys(data).length != 0) {                        
+                    if (Object.keys(data).length != 0) {
                         if(data[0].Status=="Pack")
                         {
                             $("#ProductUidValidation").text("Bar Code Already Packed");
                         }
-                        else 
+                        else if( data[0].CurrenctGodownId==null || data[0].Status=="Issue")
+                        {
+                            $("#ProductUidValidation").text("Bar Code Not Present in Godown");
+                        }
+                        else
                         {
                             $("#ProductUidValidation").text("");
                             $("#ProductId").val(data[0].ProductId);
@@ -758,7 +777,7 @@
 
                             $('#ProductId').prop('readonly', true);
                             $("#BaleNo").focus();
-                            //$("#Length").select();
+
                         }
                     }
                     else {
@@ -957,50 +976,50 @@
                 type: "POST",
                 url: "@(Url.Action("GetProductCustomDetailJson"))",
                 data: { ProductId: $("#ProductId").val(), PackingHeaderId: $("#PackingHeaderId").val() },
-            success: function (data) {
-                if (data.length > 0)
-                {
-                    $("#BuyerSku").val(data[0].BuyerSku);
-                    $("#BuyerSpecification").val(data[0].BuyerSpecification);
-                    $("#BuyerSpecification1").val(data[0].BuyerSpecification1);
-                    $("#BuyerSpecification2").val(data[0].BuyerSpecification2);
-                    $("#BuyerSpecification3").val(data[0].BuyerSpecification3);
-                    //if (data[0].BuyerSku != null)
-                    //{
-                    //    $("#BuyerSku").select2("data", { id: data[0].BuyerSku, text: data[0].BuyerSku });
-                    //}
-                    //if (data[0].BuyerSpecification != null)
-                    //{
-                    //    $("#BuyerSpecification").select2("data", { id: data[0].BuyerSpecification, text: data[0].BuyerSpecification });
-                    //}
-                    //if (data[0].BuyerSpecification1 != null)
-                    //{
-                    //    $("#BuyerSpecification1").select2("data", { id: data[0].BuyerSpecification1, text: data[0].BuyerSpecification1 });
-                    //}
-                    //if (data[0].BuyerSpecification2 != null)
-                    //{
-                    //    $("#BuyerSpecification2").select2("data", { id: data[0].BuyerSpecification2, text: data[0].BuyerSpecification2 });
-                    //}
-                    //if (data[0].BuyerSpecification3 != null)
-                    //{
-                    //    $("#BuyerSpecification3").select2("data", { id: data[0].BuyerSpecification3, text: data[0].BuyerSpecification3 });
-                    //}
-                }
-                else{
-                    $("#BuyerSku").val("");
-                    $("#BuyerSpecification").val("");
-                    $("#BuyerSpecification1").val("");
-                    $("#BuyerSpecification2").val("");
-                    $("#BuyerSpecification3").val("");
+                success: function (data) {
+                    if (data.length > 0)
+                    {
+                        $("#BuyerSku").val(data[0].BuyerSku);
+                        $("#BuyerSpecification").val(data[0].BuyerSpecification);
+                        $("#BuyerSpecification1").val(data[0].BuyerSpecification1);
+                        $("#BuyerSpecification2").val(data[0].BuyerSpecification2);
+                        $("#BuyerSpecification3").val(data[0].BuyerSpecification3);
+                        //if (data[0].BuyerSku != null)
+                        //{
+                        //    $("#BuyerSku").select2("data", { id: data[0].BuyerSku, text: data[0].BuyerSku });
+                        //}
+                        //if (data[0].BuyerSpecification != null)
+                        //{
+                        //    $("#BuyerSpecification").select2("data", { id: data[0].BuyerSpecification, text: data[0].BuyerSpecification });
+                        //}
+                        //if (data[0].BuyerSpecification1 != null)
+                        //{
+                        //    $("#BuyerSpecification1").select2("data", { id: data[0].BuyerSpecification1, text: data[0].BuyerSpecification1 });
+                        //}
+                        //if (data[0].BuyerSpecification2 != null)
+                        //{
+                        //    $("#BuyerSpecification2").select2("data", { id: data[0].BuyerSpecification2, text: data[0].BuyerSpecification2 });
+                        //}
+                        //if (data[0].BuyerSpecification3 != null)
+                        //{
+                        //    $("#BuyerSpecification3").select2("data", { id: data[0].BuyerSpecification3, text: data[0].BuyerSpecification3 });
+                        //}
+                    }
+                    else{
+                        $("#BuyerSku").val("");
+                        $("#BuyerSpecification").val("");
+                        $("#BuyerSpecification1").val("");
+                        $("#BuyerSpecification2").val("");
+                        $("#BuyerSpecification3").val("");
 
+                    }
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert('Failed to retrieve product details.' + thrownError);
+                    ProcessProgress.hide();
                 }
-            },
-            error: function (xhr, ajaxOptions, thrownError) {
-                alert('Failed to retrieve product details.' + thrownError);
-                ProcessProgress.hide();
-            }
-        });
-    }}
+            });
+        }}
 
 
     function GetProductDimensions() {
@@ -1012,27 +1031,27 @@
                 type: "POST",
                 url: "@(Url.Action("GetProductDimensionsJson"))",
                 data: { ProductId: $("#ProductId").val(), DealUnitId: $("#DealUnitId").val(), DocTypeId: $("#DocTypeId").val() },
-            success: function (data) {
-                if (data != null)
-                {
-                    $("#Length").val(data.Length);
-                    $("#Width").val(data.Width);
-                    $("#DimensionUnitDecimalPlaces").val(data.DimensionUnitDecimalPlaces);
-                    //$("#Height").val(data.Height);
+                success: function (data) {
+                    if (data != null)
+                    {
+                        $("#Length").val(data.Length);
+                        $("#Width").val(data.Width);
+                        $("#DimensionUnitDecimalPlaces").val(data.DimensionUnitDecimalPlaces);
+                        //$("#Height").val(data.Height);
+                    }
+                    else{
+                        $("#Length").val("");
+                        $("#Width").val("");
+                        $("#DimensionUnitDecimalPlaces").val(0);
+                        //$("#Height").val("");
+                    }
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert('Failed to retrieve product details.' + thrownError);
+                    ProcessProgress.hide();
                 }
-                else{
-                    $("#Length").val("");
-                    $("#Width").val("");
-                    $("#DimensionUnitDecimalPlaces").val(0);
-                    //$("#Height").val("");
-                }
-            },
-            error: function (xhr, ajaxOptions, thrownError) {
-                alert('Failed to retrieve product details.' + thrownError);
-                ProcessProgress.hide();
-            }
-        });
-    }}
+            });
+        }}
 
 
 
@@ -1049,7 +1068,8 @@
 
     function GetBaleNo() {
         //alert("P");
-        var BaleNoPattern = @ViewBag.BaleNoPattern
+        var BaleNoPattern = @ViewBag.BaleNoPattern;
+        var isAllowtoUpdateBuyerSpecification1 = '@ViewBag.isAllowtoUpdateBuyerSpecification';
         $.ajax({
             cache: false,
             async: false,
@@ -1058,7 +1078,11 @@
             data: { PackingHeaderId: $("#PackingHeaderId").val(), ProductInvoiceGroupId: $("#ProductInvoiceGroupId").val(), SaleOrderLineId: $("#SaleOrderLineId").val(), BaleNoPatternId: BaleNoPattern,DealQty: $("#DealQty").val(),ProductId: $("#ProductId").val()},
             success: function (data) {
                 $("#BaleNo").val(data[0].NewBaleNo);
-                $("#BaleNo").select();
+                //alert(isAllowtoUpdateBuyerSpecification1);
+                if (isAllowtoUpdateBuyerSpecification1=="Yes")
+                    $("#BaleNo").select();
+                else
+                    $("#Length").focus() ;
             },
             error: function (xhr, ajaxOptions, thrownError) {
                 alert('Failed to retrieve Bale No.' + thrownError);
@@ -1121,11 +1145,11 @@
             else if ($("#ProductUidId").val() != 0 && $("#ProductUidId").val() != null && $("#ProductUidId").val() != "")
             {
                 $.ajax({
-                        cache: false,
-                        async: false,
-                        type: "POST",
-                        url: "@(Url.Action("GetSaleOrderLineIdListForProductUidJson"))",
-                        data: { ProductUidId: $("#ProductUidId").val(), PackingHeaderId: $("#PackingHeaderId").val() } ,
+                    cache: false,
+                    async: false,
+                    type: "POST",
+                    url: "@(Url.Action("GetSaleOrderLineIdListForProductUidJson"))",
+                    data: { ProductUidId: $("#ProductUidId").val(), PackingHeaderId: $("#PackingHeaderId").val() } ,
                     success: function (data) {
                         SaleOrderLineId.html('');
                         if(data.length!=0)
@@ -1147,42 +1171,42 @@
                     type: "POST",
                     url: "@(Url.Action("GetSaleOrderLineIdListJson"))",
                     data: { ProductId: $("#ProductId").val(), PackingHeaderId: $("#PackingHeaderId").val(), PackingLineId: $("#PackingLineId").val() },
-                success: function (data) {
-                    SaleOrderLineId.html('');
-                    //SaleOrderLineId.append($('<option></option>').html('-Please Select-'));
+                    success: function (data) {
+                        SaleOrderLineId.html('');
+                        //SaleOrderLineId.append($('<option></option>').html('-Please Select-'));
 
-                    //alert($("#ProductId").select2('data').text);
-                    if(data.length!=0)
-                    {
-                        $.each(data, function (id, option) {
-                            SaleOrderLineId.append($('<option> </option>').val(option.SaleOrderLineId).html(option.SaleOrderNo));
-                        });
-                        GetSpecification();
-                        $('#errormsg').remove();
-                        $('#ExtraPO').css('display', 'none')
-                    }
-                    else
-                    {
-                        //alert("P");
-                        if ($('#CreateExtraSaleOrder').val().toString().toUpperCase()== "FALSE")
+                        //alert($("#ProductId").select2('data').text);
+                        if(data.length!=0)
                         {
+                            $.each(data, function (id, option) {
+                                SaleOrderLineId.append($('<option> </option>').val(option.SaleOrderLineId).html(option.SaleOrderNo));
+                            });
+                            GetSpecification();
                             $('#errormsg').remove();
-                            SaleOrderLineId.html('');
-                            if( !$('#errormsg').length)
-                            {
-                                $('#ExtraPO').before("<span id=errormsg style='color:red'> No sale order is pending for product "+ $("#ProductId").select2('data').text +" . Want to create extra sale order ?  </span>")
-                                //$('#ExtraPO').removeAttr('display');
-                                $('#ExtraPO').css('display', '')
-
-                            }
-                            //$('#ProductId').select2("val","");
+                            $('#ExtraPO').css('display', 'none')
                         }
+                        else
+                        {
+                            //alert("P");
+                            if ($('#CreateExtraSaleOrder').val().toString().toUpperCase()== "FALSE")
+                            {
+                                $('#errormsg').remove();
+                                SaleOrderLineId.html('');
+                                if( !$('#errormsg').length)
+                                {
+                                    $('#ExtraPO').before("<span id=errormsg style='color:red'> No sale order is pending for product "+ $("#ProductId").select2('data').text +" . Want to create extra sale order ?  </span>")
+                                    //$('#ExtraPO').removeAttr('display');
+                                    $('#ExtraPO').css('display', '')
+
+                                }
+                                //$('#ProductId').select2("val","");
+                            }
+                        }
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to Retrive Sale Order List.' + thrownError);
                     }
-                },
-                error: function (xhr, ajaxOptions, thrownError) {
-                    alert('Failed to Retrive Sale Order List.' + thrownError);
-                }
-            });
+                });
 
             }
             else
@@ -1465,17 +1489,17 @@
 
     function RoundDimensions()
     {
-        if ($('#Length').val() != 0) 
+        if ($('#Length').val() != 0)
         {
             $('#Length').val(parseFloat($('#Length').val()).toFixed($('#DimensionUnitDecimalPlaces').val()));
         }
 
-        if ($('#Width').val() != 0) 
+        if ($('#Width').val() != 0)
         {
             $('#Width').val(parseFloat($('#Width').val()).toFixed($('#DimensionUnitDecimalPlaces').val()));
         }
 
-        if ($('#Height').val() != 0) 
+        if ($('#Height').val() != 0)
         {
             $('#Height').val(parseFloat($('#Height').val()).toFixed($('#DimensionUnitDecimalPlaces').val()));
         }
@@ -1491,47 +1515,47 @@
                 async: false,
                 url: "@(Url.Action("GetUnitConversionMultiplier"))",
                 data: { DocumentTypeId: $("#DocTypeId").val(), ProductId: $("#ProductId").val(),Length: $("#Length").val(),Width: $("#Width").val(),Height: $("#Height").val(),ToUnitId: $("#DealUnitId").val()},
-            success: function (data) {
-                if (data) {
-                    $('#UnitConversionMultiplier').val(data);
-                    $('#DealQty').val(data * $("#Qty").val());
+                success: function (data) {
+                    if (data) {
+                        $('#UnitConversionMultiplier').val(data);
+                        $('#DealQty').val(data * $("#Qty").val());
+                    }
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert('Failed to retrieve product details.' + thrownError);
                 }
-            },
-            error: function (xhr, ajaxOptions, thrownError) {
-                alert('Failed to retrieve product details.' + thrownError);
-            }
-        });
-        $('#DealUnitId').attr('readonly', 'true');
-        $('#UnitConversionMultiplier').attr('readonly', 'true');
-        $('#DealQty').attr('readonly', 'true');
-    }
-    else if ($("#UnitId").val() == $("#DealUnitId").val()) 
-    {
-        $("#UnitConversionMultiplier").val(1);
-        Calculation.call();
-        $('#DealUnitId').removeAttr('readonly');
-        $('#UnitConversionMultiplier').removeAttr('readonly');
-        $('#DealQty').removeAttr('readonly');
-    }
-    else 
-    {
-        $.ajax({
-            cache: false,
-            type: "POST",
-            url: "@(Url.Action("GetUnitConversionDetailJson"))",
-        data: { ProductId: $("#ProductId").val(), UnitId: $("#UnitId").val(), DeliveryUnitId: $("#DealUnitId").val() },
-
-        success: function (data) {
-            $("#UnitConversionMultiplier").val(data[0].Value);
-            Calculation.call();
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-            alert('Failed to retrieve Unit conversion details.' + thrownError);
+            });
+            $('#DealUnitId').attr('readonly', 'true');
+            $('#UnitConversionMultiplier').attr('readonly', 'true');
+            $('#DealQty').attr('readonly', 'true');
         }
-        });
-        $('#DealUnitId').removeAttr('readonly');
-        $('#UnitConversionMultiplier').removeAttr('readonly');
-        $('#DealQty').removeAttr('readonly');
+        else if ($("#UnitId").val() == $("#DealUnitId").val())
+        {
+            $("#UnitConversionMultiplier").val(1);
+            Calculation.call();
+            $('#DealUnitId').removeAttr('readonly');
+            $('#UnitConversionMultiplier').removeAttr('readonly');
+            $('#DealQty').removeAttr('readonly');
+        }
+        else
+        {
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url: "@(Url.Action("GetUnitConversionDetailJson"))",
+                data: { ProductId: $("#ProductId").val(), UnitId: $("#UnitId").val(), DeliveryUnitId: $("#DealUnitId").val() },
+
+                success: function (data) {
+                    $("#UnitConversionMultiplier").val(data[0].Value);
+                    Calculation.call();
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert('Failed to retrieve Unit conversion details.' + thrownError);
+                }
+            });
+            $('#DealUnitId').removeAttr('readonly');
+            $('#UnitConversionMultiplier').removeAttr('readonly');
+            $('#DealQty').removeAttr('readonly');
         }
     }
 </script>

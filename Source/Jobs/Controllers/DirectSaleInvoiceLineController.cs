@@ -200,6 +200,7 @@ namespace Jobs.Controllers
                         StockViewModel.CurrencyId = null;
                         StockViewModel.PersonId = Dh.SaleToBuyerId;
                         StockViewModel.ProductId = item.ProductId;
+                        StockViewModel.ProductUidId = item.ProductUidId;
                         StockViewModel.HeaderFromGodownId = null;
                         StockViewModel.HeaderGodownId = null;
                         StockViewModel.HeaderProcessId = null;
@@ -327,6 +328,7 @@ namespace Jobs.Controllers
                         line.UnitConversionMultiplier = item.UnitConversionMultiplier;
                         line.Rate = item.Rate;
                         line.DealUnitId = item.DealUnitId;
+                        line.SalesTaxGroupProductId = item.SalesTaxGroupProductId;
                         line.DealQty = item.Qty * item.UnitConversionMultiplier ?? 0;
                         line.DiscountPer = item.DiscountPer;
                         if (Settings.CalculateDiscountOnRate)

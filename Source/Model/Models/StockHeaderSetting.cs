@@ -64,6 +64,8 @@ namespace Model.Models
         public bool? isVisibleMaterialRequest { get; set; }
         public bool? isVisibleStockIn { get; set; }
         public bool? IsMandatoryStockIn { get; set; }
+        public bool? isMandatoryLotNo { get; set; }
+        public bool? isMandatoryLotNoOrDimension1 { get; set; }
 
         [MaxLength(50)]
         public string PersonFieldHeading { get; set; }

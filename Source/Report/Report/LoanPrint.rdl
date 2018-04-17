@@ -1372,7 +1372,7 @@
         <TablixBody>
           <TablixColumns>
             <TablixColumn>
-              <Width>1.2894in</Width>
+              <Width>0.91667in</Width>
             </TablixColumn>
             <TablixColumn>
               <Width>0.2896in</Width>
@@ -1381,7 +1381,7 @@
               <Width>4.04884in</Width>
             </TablixColumn>
             <TablixColumn>
-              <Width>2.04697in</Width>
+              <Width>2.39468in</Width>
             </TablixColumn>
           </TablixColumns>
           <TablixRows>
@@ -1445,7 +1445,7 @@
                               </Style>
                             </TextRun>
                             <TextRun>
-                              <Value>=Code.RupeesToWord(Sum(Fields!Amount.Value, "DsMain"))</Value>
+                              <Value>=Code.RupeesToWord(Sum(Fields!Amount.Value, "DsMain")) +" Only"</Value>
                               <Style>
                                 <FontFamily>Tahoma</FontFamily>
                                 <FontSize>9pt</FontSize>
@@ -1581,22 +1581,14 @@
                 </TablixCell>
                 <TablixCell>
                   <CellContents>
-                    <Textbox Name="Textbox35">
+                    <Textbox Name="Textbox2">
                       <CanGrow>true</CanGrow>
                       <KeepTogether>true</KeepTogether>
                       <Paragraphs>
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>For </Value>
-                              <Style>
-                                <FontFamily>tahoma</FontFamily>
-                                <FontSize>9pt</FontSize>
-                                <FontWeight>Bold</FontWeight>
-                              </Style>
-                            </TextRun>
-                            <TextRun>
-                              <Value>=Parameters!CompanyName.Value</Value>
+                              <Value />
                               <Style>
                                 <FontFamily>tahoma</FontFamily>
                                 <FontSize>9pt</FontSize>
@@ -1609,7 +1601,7 @@
                           </Style>
                         </Paragraph>
                       </Paragraphs>
-                      <rd:DefaultName>Textbox35</rd:DefaultName>
+                      <rd:DefaultName>Textbox2</rd:DefaultName>
                       <Style>
                         <Border>
                           <Style>None</Style>
@@ -1770,14 +1762,14 @@
               <TablixCells>
                 <TablixCell>
                   <CellContents>
-                    <Textbox Name="Textbox40">
+                    <Textbox Name="Textbox63">
                       <CanGrow>true</CanGrow>
                       <KeepTogether>true</KeepTogether>
                       <Paragraphs>
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>Approved By</Value>
+                              <Value>Modified By</Value>
                               <Style>
                                 <FontFamily>Tahoma</FontFamily>
                                 <FontSize>9pt</FontSize>
@@ -1839,14 +1831,14 @@
                 </TablixCell>
                 <TablixCell>
                   <CellContents>
-                    <Textbox Name="ApproveBy">
+                    <Textbox Name="ModifiedBy">
                       <CanGrow>true</CanGrow>
                       <KeepTogether>true</KeepTogether>
                       <Paragraphs>
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value />
+                              <Value>=Fields!ModifiedBy.Value</Value>
                               <Style>
                                 <FontFamily>Tahoma</FontFamily>
                                 <FontSize>9pt</FontSize>
@@ -1858,7 +1850,7 @@
                           </Style>
                         </Paragraph>
                       </Paragraphs>
-                      <rd:DefaultName>ApproveBy</rd:DefaultName>
+                      <rd:DefaultName>ModifiedBy</rd:DefaultName>
                       <Style>
                         <Border>
                           <Style>None</Style>
@@ -1930,7 +1922,7 @@
         <Top>2.20152in</Top>
         <Left>0.04243in</Left>
         <Height>0.91252in</Height>
-        <Width>7.67481in</Width>
+        <Width>7.64979in</Width>
         <ZIndex>2</ZIndex>
         <Style>
           <Border>
@@ -1945,6 +1937,9 @@
         <Height>0.29167in</Height>
         <Width>7.69042in</Width>
         <ZIndex>3</ZIndex>
+        <Visibility>
+          <Hidden>=iif(First(Fields!isPrintinLetterhead.Value, "DsMain")="true",true,false)</Hidden>
+        </Visibility>
         <Style>
           <Border>
             <Style>None</Style>
@@ -2382,9 +2377,17 @@
           <DataField>ReportTitle</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
+        <Field Name="isPrintinLetterhead">
+          <DataField>isPrintinLetterhead</DataField>
+          <rd:TypeName>System.Boolean</rd:TypeName>
+        </Field>
         <Field Name="BaseRate">
           <DataField>BaseRate</DataField>
           <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="ModifiedBy">
+          <DataField>ModifiedBy</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
         </Field>
         <Field Name="SubReportProcList">
           <DataField>SubReportProcList</DataField>

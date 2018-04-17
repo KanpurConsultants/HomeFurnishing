@@ -117,10 +117,17 @@
 
                     <div class="col-md-6" style="display:@(Model.JobInvoiceSettings.isVisibleJobReceive ? "" : "none")">
                         <div class="form-group">
-                            @Html.LabelFor(model => model.ReceiveAsOnDate, "As On Date", new { @class = "control-label col-md-4 col-sm-2" })
+                            @Html.LabelFor(model => model.ReceiveFromDate, "From Date", new { @class = "control-label col-md-4 col-sm-2" })
                             <div class="col-md-7 col-sm-10">
-                                @Html.TextBoxFor(m => m.ReceiveAsOnDate, "{0:dd/MMMM/yyyy}", new { @class = "datepicker form-control required" })
-                                @Html.ValidationMessageFor(model => model.ReceiveAsOnDate, "", new { @class = "text-danger" })
+                                @Html.TextBoxFor(m => m.ReceiveFromDate, "{0:dd/MMMM/yyyy}", new { @class = "datepicker form-control required" })
+                                @Html.ValidationMessageFor(model => model.ReceiveFromDate, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ReceiveToDate, "To Date", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(m => m.ReceiveToDate, "{0:dd/MMMM/yyyy}", new { @class = "datepicker form-control required" })
+                                @Html.ValidationMessageFor(model => model.ReceiveToDate, "", new { @class = "text-danger" })
                             </div>
                         </div>
                     </div>

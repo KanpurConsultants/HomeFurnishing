@@ -56,6 +56,8 @@ namespace Model.Models
         public string filterContraDivisions { get; set; }
         public string filterPersonRoles { get; set; }
 
+        public bool? isMandatoryLotNo { get; set; }
+        public bool? isMandatoryLotNoOrDimension1 { get; set; }
 
         [MaxLength(100)]
         public string SqlProcGatePass { get; set; }

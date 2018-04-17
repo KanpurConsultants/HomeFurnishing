@@ -427,6 +427,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Controllers\JobInvoiceHeaderrdl.cs" />
+    <Compile Include="Controllers\JobOrderHeaderrdl.cs" />
     <Compile Include="Controllers\MailboxController.cs" />
     <Compile Include="Controllers\LedgerWizardController.cs" />
     <Compile Include="Controllers\SalaryWizardController.cs" />
@@ -749,6 +750,7 @@
     <Compile Include="Controllers\SalaryHeaderController.cs" />
     <Compile Include="Controllers\SalaryLineController.cs" />
     <Compile Include="Controllers\SalarySettingsController.cs" />
+    <Compile Include="Controllers\SaleInvoiceHeaderrdl.cs" />
     <Compile Include="Controllers\UserRolesNewController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Controllers\ProductCustomGroupHeaderController.cs" />

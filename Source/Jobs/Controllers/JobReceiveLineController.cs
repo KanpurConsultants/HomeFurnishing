@@ -646,12 +646,20 @@ namespace Jobs.Controllers
             if (!BeforeSave)
                 ModelState.AddModelError("", "Validation failed before save");
 
+            JobReceiveHeader Header = new JobReceiveHeaderService(_unitOfWork).Find(vm.JobReceiveLineViewModel.FirstOrDefault().JobReceiveHeaderId);
+
+            JobReceiveSettings Settings = new JobReceiveSettingsService(_unitOfWork).GetJobReceiveSettingsForDocument(Header.DocTypeId, Header.DivisionId, Header.SiteId);
+
+            if (Settings.isMandatoryLotNo == true && vm.JobReceiveLineViewModel.Where(m => m.LotNo == null && (m.ReceiveQty + m.LossQty) != 0).Any())
+            {
+                ModelState.AddModelError("", "The LotNo field is required");
+            }
+            if (Settings.isMandatoryLotNoOrDimension1 == true && vm.JobReceiveLineViewModel.Where(m => m.LotNo == null && m.Dimension1Id == null && (m.ReceiveQty + m.LossQty) != 0).Any())
+            {
+                ModelState.AddModelError("", "The LotNo field is required");
+            }
             if (ModelState.IsValid && BeforeSave && !EventException)
             {
-                JobReceiveHeader Header = new JobReceiveHeaderService(_unitOfWork).Find(vm.JobReceiveLineViewModel.FirstOrDefault().JobReceiveHeaderId);
-
-                JobReceiveSettings Settings = new JobReceiveSettingsService(_unitOfWork).GetJobReceiveSettingsForDocument(Header.DocTypeId, Header.DivisionId, Header.SiteId);
-
                 var JobOrderLineIds = vm.JobReceiveLineViewModel.Select(m => m.JobOrderLineId).ToArray();
 
                 var JobOrderLineCostCenterRecords = (from p in db.JobOrderLine
@@ -1603,6 +1611,7 @@ namespace Jobs.Controllers
                             line.Dimension2Id = JobOrderLine.Dimension2Id;
                             line.Dimension3Id = JobOrderLine.Dimension3Id;
                             line.Dimension4Id = JobOrderLine.Dimension4Id;
+                            line.LotNo= JobOrderLine.LotNo;
                             line.Qty = 1;
                             line.PassQty = line.Qty;
                             line.DealUnitId = JobOrderLine.DealUnitId;
@@ -1780,7 +1789,7 @@ namespace Jobs.Controllers
                                 StockViewModel.Remark = Header.Remark;
                                 StockViewModel.Status = Header.Status;
                                 StockViewModel.ProcessId = Header.ProcessId;
-                                StockViewModel.LotNo = null;
+                                StockViewModel.LotNo = JobOrderLine.LotNo;
 
                                 if (temp != null)
                                 {
@@ -1859,7 +1868,7 @@ namespace Jobs.Controllers
                                 StockProcessViewModel.Remark = Header.Remark;
                                 StockProcessViewModel.Status = Header.Status;
                                 StockProcessViewModel.ProcessId = Header.ProcessId;
-                                StockProcessViewModel.LotNo = null;
+                                StockProcessViewModel.LotNo = JobOrderLine.LotNo;
 
                                 if (temp != null)
                                 {
@@ -2221,6 +2230,15 @@ namespace Jobs.Controllers
             if (svm.JobReceiveSettings.isVisibleMachine && svm.JobReceiveSettings.isMandatoryMachine && (svm.MachineId <= 0 || svm.MachineId == null))
             {
                 ModelState.AddModelError("MachineId", "The Machine field is required");
+            }
+
+            if (settings.isMandatoryLotNo == true && svm.LotNo == null)
+            {
+                ModelState.AddModelError("LotNo", "The LotNo field is required");
+            }
+            if (settings.isMandatoryLotNoOrDimension1 == true && svm.LotNo == null && svm.Dimension1Id == null)
+            {
+                ModelState.AddModelError("LotNo", "The LotNo field is required");
             }
 
             //if (svm.OrderBalanceQty < svm.DocQty)

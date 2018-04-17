@@ -59,7 +59,7 @@ namespace Service
                         FROM Web.Employees E
                         LEFT JOIN Web.People P On E.PersonId = P.PersonId
                         LEFT JOIN Web.LedgerAccounts A ON P.PersonID = A.PersonId 
-                        WHERE E.DateOfJoining <= @DocDate AND E.DateOfRelieving IS NULL " +
+                        WHERE isnull(P.IsActive,1) =1 And E.DateOfJoining <= @DocDate AND E.DateOfRelieving IS NULL " +
                         (vm.DepartmentId != null ? " AND E.DepartmentId = @DepartmentId" : "") +
                         (vm.WagesPayType != null ? " AND E.WagesPayType = @WagesPayType" : "") +
                         " Order By A.LedgerAccountName ";

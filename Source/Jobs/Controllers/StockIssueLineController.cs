@@ -495,6 +495,14 @@ namespace Jobs.Controllers
                 {
                     ModelState.AddModelError("CostCenterId", "The Cost Center field is required");
                 }
+                if (settings.isMandatoryLotNo == true && svm.LotNo == null)
+                {
+                    ModelState.AddModelError("LotNo", "The LotNo field is required");
+                }
+                if (settings.isMandatoryLotNoOrDimension1 == true && svm.LotNo == null && svm.Dimension1Id == null)
+                {
+                    ModelState.AddModelError("LotNo", "The LotNo field is required");
+                }
 
             }
 

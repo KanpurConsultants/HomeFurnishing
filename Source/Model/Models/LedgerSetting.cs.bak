@@ -92,6 +92,7 @@ namespace Model.Models
         public virtual Menu WizardMenu { get; set; }
 
 
+        public bool? isAllowedDuplicatePrint { get; set; }
 
         [ForeignKey("CancelDocType"), Display(Name = "Cancel Type")]
         public int? CancelDocTypeId { get; set; }

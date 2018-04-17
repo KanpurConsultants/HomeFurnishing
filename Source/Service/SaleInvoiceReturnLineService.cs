@@ -78,6 +78,8 @@ namespace Service
         }
         public IEnumerable<SaleInvoiceReturnLineViewModel> GetSaleReceiptForFilters(SaleInvoiceReturnLineFilterViewModel vm)
         {
+            var SaleInvoiceReturnHeader = db.SaleInvoiceReturnHeader.Find(vm.SaleInvoiceReturnHeaderId);
+
             string[] ProductIdArr = null;
             if (!string.IsNullOrEmpty(vm.ProductId)) { ProductIdArr = vm.ProductId.Split(",".ToCharArray()); }
             else { ProductIdArr = new string[] { "NA" }; }
@@ -125,13 +127,15 @@ namespace Service
                             DealunitDecimalPlaces=linetab.DealUnit.DecimalPlaces,
                             DiscountPer = linetab.DiscountPer,
                             ProductUidName = packtab.ProductUid.ProductUidName,
-                        }
-
-                        );
+                            SalesTaxGroupPersonId = SaleInvoiceReturnHeader.SalesTaxGroupPersonId,
+                            SalesTaxGroupProductId = tab2.SalesTaxGroupProductId
+                        });
             return temp;
         }
         public IEnumerable<SaleInvoiceReturnLineViewModel> GetSaleInvoiceForFilters(SaleInvoiceReturnLineFilterViewModel vm)
         {
+            var SaleInvoiceReturnHeader = db.SaleInvoiceReturnHeader.Find(vm.SaleInvoiceReturnHeaderId);
+
             string[] ProductIdArr = null;
             if (!string.IsNullOrEmpty(vm.ProductId)) { ProductIdArr = vm.ProductId.Split(",".ToCharArray()); }
             else { ProductIdArr = new string[] { "NA" }; }
@@ -179,10 +183,9 @@ namespace Service
                             DealunitDecimalPlaces=linetab.DealUnit.DecimalPlaces,
                             DiscountPer = linetab.DiscountPer,
                             ProductUidName = tab3.ProductUid.ProductUidName,
-                            
-                        }
-
-                        );
+                            SalesTaxGroupPersonId = SaleInvoiceReturnHeader.SalesTaxGroupPersonId,
+                            SalesTaxGroupProductId = linetab.SalesTaxGroupProductId
+                        });
             return temp;
         }
         public void Update(SaleInvoiceReturnLine pt)

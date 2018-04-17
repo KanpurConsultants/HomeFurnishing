@@ -107,6 +107,8 @@ namespace Jobs.Controllers
             int Serial = _SaleInvoiceReturnLineService.GetMaxSr(vm.SaleInvoiceReturnLineViewModel.FirstOrDefault().SaleInvoiceReturnHeaderId);
             bool HeaderChargeEdit = false;
 
+            List<LineChargeRates> LineChargeRates = new List<LineChargeRates>();
+
             SaleInvoiceReturnHeader Header = new SaleInvoiceReturnHeaderService(_unitOfWork).Find(vm.SaleInvoiceReturnLineViewModel.FirstOrDefault().SaleInvoiceReturnHeaderId);
 
             SaleInvoiceSetting Settings = new SaleInvoiceSettingService(_unitOfWork).GetSaleInvoiceSettingForDocument(Header.DocTypeId, Header.DivisionId, Header.SiteId);
@@ -248,6 +250,15 @@ namespace Jobs.Controllers
                         _SaleInvoiceReturnLineService.Create(line);
 
                         LineList.Add(new LineDetailListViewModel { Amount = line.Amount, Rate = line.Rate, LineTableId = line.SaleInvoiceReturnLineId, HeaderTableId = item.SaleInvoiceReturnHeaderId, PersonID = Header.BuyerId, DealQty = line.DealQty });
+
+                        List<CalculationProductViewModel> ChargeRates = new CalculationProductService(_unitOfWork).GetChargeRates(CalculationId, Header.DocTypeId, Header.SiteId, Header.DivisionId,
+                            Settings.ProcessId ?? 0, item.SalesTaxGroupPersonId, item.SalesTaxGroupProductId).ToList();
+                        if (ChargeRates != null)
+                        {
+                            LineChargeRates.Add(new LineChargeRates { LineId = line.SaleInvoiceReturnLineId, ChargeRates = ChargeRates });
+                        }
+
+
                         Gpk++;
                         pk++;
 
@@ -257,7 +268,23 @@ namespace Jobs.Controllers
 
                 new SaleDispatchReturnHeaderService(_unitOfWork).Update(GoodsRetHeader);
 
-                new ChargesCalculationService(_unitOfWork).CalculateCharges(LineList, vm.SaleInvoiceReturnLineViewModel.FirstOrDefault().SaleInvoiceReturnHeaderId, CalculationId, MaxLineId, out LineCharges, out HeaderChargeEdit, out HeaderCharges, "Web.SaleInvoiceReturnHeaderCharges", "Web.SaleInvoiceReturnLineCharges", out PersonCount, Header.DocTypeId, Header.SiteId, Header.DivisionId);
+                var LineListWithReferences = (from p in LineList
+                                              join t3 in LineChargeRates on p.LineTableId equals t3.LineId into LineChargeRatesTable
+                                              from LineChargeRatesTab in LineChargeRatesTable.DefaultIfEmpty()
+                                              orderby p.LineTableId
+                                              select new LineDetailListViewModel
+                                              {
+                                                  Amount = p.Amount,
+                                                  DealQty = p.DealQty,
+                                                  HeaderTableId = p.HeaderTableId,
+                                                  LineTableId = p.LineTableId,
+                                                  PersonID = p.PersonID,
+                                                  Rate = p.Rate,
+                                                  CostCenterId = p.CostCenterId,
+                                                  ChargeRates = LineChargeRatesTab.ChargeRates,
+                                              }).ToList();
+
+                new ChargesCalculationService(_unitOfWork).CalculateCharges(LineListWithReferences, vm.SaleInvoiceReturnLineViewModel.FirstOrDefault().SaleInvoiceReturnHeaderId, CalculationId, MaxLineId, out LineCharges, out HeaderChargeEdit, out HeaderCharges, "Web.SaleInvoiceReturnHeaderCharges", "Web.SaleInvoiceReturnLineCharges", out PersonCount, Header.DocTypeId, Header.SiteId, Header.DivisionId);
 
                 // Saving Charges
                 foreach (var item in LineCharges)

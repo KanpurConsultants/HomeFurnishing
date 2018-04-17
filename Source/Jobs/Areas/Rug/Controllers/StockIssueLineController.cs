@@ -173,6 +173,15 @@ namespace Jobs.Areas.Rug.Controllers
                 ModelState.AddModelError("", "CostCenter is mandatory");
             }
 
+            if (Settings.isMandatoryLotNo == true && vm.StockLineViewModel.Where(m => m.LotNo == null && m.Qty != 0).Any())
+            {
+                ModelState.AddModelError("", "The LotNo field is required");
+            }
+            if (Settings.isMandatoryLotNoOrDimension1 == true && vm.StockLineViewModel.Where(m => m.LotNo == null && m.Dimension1Id == null && m.Qty != 0).Any())
+            {
+                ModelState.AddModelError("", "The LotNo field is required");
+            }
+
             decimal Qty = vm.StockLineViewModel.Where(m => m.Rate > 0).Sum(m => m.Qty);
 
             bool BeforeSave = true;
@@ -586,6 +595,15 @@ namespace Jobs.Areas.Rug.Controllers
                 if (settings.isMandatoryLineCostCenter == true && !svm.CostCenterId.HasValue)
                 {
                     ModelState.AddModelError("CostCenterId", "The Cost Center field is required");
+                }
+
+                if (settings.isMandatoryLotNo == true && svm.LotNo == null)
+                {
+                    ModelState.AddModelError("LotNo", "The LotNo field is required");
+                }
+                if (settings.isMandatoryLotNoOrDimension1 == true && svm.LotNo == null && svm.Dimension1Id == null)
+                {
+                    ModelState.AddModelError("LotNo", "The LotNo field is required");
                 }
 
             }

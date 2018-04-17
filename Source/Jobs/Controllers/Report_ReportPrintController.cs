@@ -251,7 +251,7 @@ namespace Jobs.Controllers
                     ReportGenerateService c = new ReportGenerateService();
                     byte[] BAR;
                     //BAR = c.ReportGenerate(ReportData, out mimtype, ReportFileType, Paralist, SubReportDataList);
-                    BAR = c.ReportGenerate(ReportData, out mimtype, ReportFileType, Paralist, SubReportDataList, null, SubReportNameList, User.Identity.Name);
+                    BAR = c.ReportGenerate(ReportData, out mimtype, ReportFileType, Paralist, SubReportDataList, null, SubReportNameList, User.Identity.Name, header.IsHideHeaderDetail);
 
                     XElement s = new XElement(CustomStringOp.CleanCode(header.ReportName));
                     XElement Name = new XElement("Filters");

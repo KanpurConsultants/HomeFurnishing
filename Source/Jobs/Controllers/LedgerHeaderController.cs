@@ -342,6 +342,7 @@ namespace Jobs.Controllers
                     {
                         string message = _exception.HandleException(ex);
                         TempData["CSEXC"] += message;
+                        ModelState.AddModelError("", message);
                         PrepareViewBag(vm.DocTypeId, null);
                         ViewBag.Mode = "Add";
                         return View("Create", vm);
@@ -374,10 +375,20 @@ namespace Jobs.Controllers
                 #region EditRecord
                 else
                 {
+                    LedgerHeader temp = _LedgerHeaderService.Find(pt.LedgerHeaderId);
+                    if ((vm.DocDate.Month >= 4 && temp.DocDate.Month <= 3) || (vm.DocDate.Month <= 3 && temp.DocDate.Month >= 4))
+                    {
+                        //string message = "Year Change is not allowed while editing entry.";
+                        //TempData["CSEXC"] += message;
+                        ModelState.AddModelError("", "Year Change is not allowed while editing entry.");
+                        PrepareViewBag(vm.DocTypeId, null);
+                        ViewBag.Mode = "Edit";
+                        return View("Create", vm);
+                    }
+
                     List<LogTypeViewModel> LogList = new List<LogTypeViewModel>();
                     bool UpdateLedgerPosting = false;
                     int LedgerAccountId = 0;
-                    LedgerHeader temp = _LedgerHeaderService.Find(pt.LedgerHeaderId);
                     if (temp.LedgerAccountId.HasValue && temp.LedgerAccountId != pt.LedgerAccountId)
                     { UpdateLedgerPosting = true; LedgerAccountId = temp.LedgerAccountId.Value; }
 

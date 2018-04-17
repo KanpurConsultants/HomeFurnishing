@@ -622,6 +622,8 @@ namespace Service
                             from tab1 in table1.DefaultIfEmpty()
                             join product in db.Product on p.ProductId equals product.ProductId into table2
                             from tab2 in table2.DefaultIfEmpty()
+                            join PU in db.ProductUid on tab1.ProductUidId equals PU.ProductId into tablePU
+                            from tabPU in tablePU.DefaultIfEmpty()
                             where (string.IsNullOrEmpty(vm.ProductId) ? 1 == 1 : ProductIdArr.Contains(p.ProductId.ToString()))
                             && (string.IsNullOrEmpty(vm.PackingHeaderId) ? 1 == 1 : PackingIdArr.Contains(p.PackingHeaderId.ToString()))
                             && (string.IsNullOrEmpty(vm.ProductGroupId) ? 1 == 1 : ProductGroupIdArr.Contains(tab2.ProductGroupId.ToString()))
@@ -638,6 +640,8 @@ namespace Service
                                 PackingDocNo = tab.DocNo,
                                 ProductName = tab2.ProductName,
                                 ProductId = p.ProductId,
+                                ProductUidName = tabPU.ProductUidName,
+                                ProductUidId = tab1.ProductUidId,
                                 SaleInvoiceHeaderId = vm.SaleInvoiceHeaderId,
                                 PackingLineId = p.PackingLineId,
                                 SaleOrderLineId = tab1.SaleOrderLineId,

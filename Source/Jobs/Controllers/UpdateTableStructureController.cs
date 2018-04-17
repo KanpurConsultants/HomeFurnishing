@@ -217,9 +217,11 @@ namespace Module
 
             AddFields("SalaryHeaders", "IsDocumentPrinted", "Bit");
             AddFields("SalarySettings", "isAllowedDuplicatePrint", "BIT NOT NULL DEFAULT(1)");
+            AddFields("SalarySettings", "isPrintinLetterhead", "BIT");
 
             AddFields("LedgerHeaders", "IsDocumentPrinted", "Bit");
             AddFields("LedgerSettings", "isAllowedDuplicatePrint", "BIT NOT NULL DEFAULT(1)");
+            AddFields("LedgerSettings", "isPrintinLetterhead", "BIT");
             try
             {
                 if ((int)ExecuteScaler("SELECT Count(*) AS Cnt FROM INFORMATION_SCHEMA.Tables WHERE TABLE_NAME = 'SaleQuotationHeaders'") == 0)
@@ -2049,6 +2051,8 @@ namespace Module
             AddFields("StockHeaderSettings", "IsMandatoryStockIn", "BIT");
             AddFields("StockHeaderSettings", "isMandatoryLotNo", "BIT");
             AddFields("StockHeaderSettings", "isMandatoryLotNoOrDimension1", "BIT");
+            AddFields("JobReceiveSettings", "isMandatoryLotNo", "BIT");
+            AddFields("JobReceiveSettings", "isMandatoryLotNoOrDimension1", "BIT");
 
             try
             {

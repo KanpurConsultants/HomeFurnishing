@@ -237,7 +237,7 @@ namespace Services.PropertyTax
                     }).ToList();
 
             double x = 0;
-            var PropertyList = PropertyList_Temp.OrderBy(sx => double.TryParse(sx.HouseNo.Replace("-C","").Replace("-","."), out x) ? x : 0);
+            var PropertyList = PropertyList_Temp.OrderBy(sx => double.TryParse((sx.HouseNo ?? "").Replace("-C","").Replace("-","."), out x) ? x : 0);
 
             return PropertyList;
         }
@@ -739,7 +739,7 @@ namespace Services.PropertyTax
             if (vmPropertyHeader != null)
             {
                 SqlParameter SqlParameterPersonId = new SqlParameter("@PersonId", vmPropertyHeader.PersonID);
-                _unitOfWork.SqlQuery<string>("" + ConfigurationManager.AppSettings["DataBaseSchema"] + ".sp_CalculatePropertyTax @PersonId", SqlParameterPersonId).ToList();
+                var s = _unitOfWork.SqlQuery<object>("" + ConfigurationManager.AppSettings["DataBaseSchema"] + ".sp_CalculatePropertyTax @PersonId", SqlParameterPersonId).ToList();
             }
 
 

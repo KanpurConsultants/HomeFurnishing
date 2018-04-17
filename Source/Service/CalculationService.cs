@@ -526,6 +526,37 @@ namespace Service
                 IEnumerable<Ledger> LedgerList = (from p in Context.Ledger
                                                   where p.LedgerHeaderId == LedHeadId
                                                   select p).ToList();
+
+
+                var LedgerAdjDrList = (from H in Context.LedgerHeader
+                                       join L in Context.Ledger on H.LedgerHeaderId equals L.LedgerHeaderId into LedgerTable
+                                       from LedgerTab in LedgerTable.DefaultIfEmpty()
+                                       join La in Context.LedgerAdj on LedgerTab.LedgerId equals La.DrLedgerId into LedgerAdjTable
+                                       from LedgerAdjTab in LedgerAdjTable.DefaultIfEmpty()
+                                       where H.LedgerHeaderId == LedgerHeader.LedgerHeaderId && LedgerAdjTab.LedgerAdjId != null
+                                       select LedgerAdjTab).ToList();
+
+                foreach (LedgerAdj item in LedgerAdjDrList)
+                {
+                    item.ObjectState = Model.ObjectState.Deleted;
+                    Context.LedgerAdj.Remove(item);
+                }
+
+                var LedgerAdjCrList = (from H in Context.LedgerHeader
+                                       join L in Context.Ledger on H.LedgerHeaderId equals L.LedgerHeaderId into LedgerTable
+                                       from LedgerTab in LedgerTable.DefaultIfEmpty()
+                                       join La in Context.LedgerAdj on LedgerTab.LedgerId equals La.CrLedgerId into LedgerAdjTable
+                                       from LedgerAdjTab in LedgerAdjTable.DefaultIfEmpty()
+                                       where H.LedgerHeaderId == LedgerHeader.LedgerHeaderId && LedgerAdjTab.LedgerAdjId != null
+                                       select LedgerAdjTab).ToList();
+
+                foreach (LedgerAdj item in LedgerAdjCrList)
+                {
+                    item.ObjectState = Model.ObjectState.Deleted;
+                    Context.LedgerAdj.Remove(item);
+                }
+
+
                 foreach (Ledger item in LedgerList)
                 {
                     item.ObjectState = Model.ObjectState.Deleted;

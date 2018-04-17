@@ -19,7 +19,7 @@ namespace Service
         string ReportName = "";
         string ReportTitle = "";
         string SubReportTitle = "";
-
+        string isHideHeaderDetail = "";
         string SiteName = "";
         string DivisionName = "";
         string FileType = "";
@@ -33,13 +33,16 @@ namespace Service
         List<DataTable> ListSubReportData;
         List<string> ListSubReportName;
 
-        public byte[] ReportGenerate(DataTable Dt, out string mimeType, string ReportFormatType = "PDF", List<string> ParaList = null, List<DataTable> SubReportDataList = null, string BaseDirectoryPath = null, List<string> SubReportNameList = null, string UserName = null)
+        public byte[] ReportGenerate(DataTable Dt, out string mimeType, string ReportFormatType = "PDF", List<string> ParaList = null, List<DataTable> SubReportDataList = null, string BaseDirectoryPath = null, List<string> SubReportNameList = null, string UserName = null, bool? IsHideHeaderDetail = false )
         {
             ReportDataSource reportdatasource = new ReportDataSource("DsMain", Dt);
             ReportViewer reportViewer = new ReportViewer();
             mimeType = "";
             byte[] Bytes;
 
+            
+            if (IsHideHeaderDetail == true)
+                isHideHeaderDetail = "true";
 
             PrintedBy = UserName;
             ListSubReportData = SubReportDataList;
@@ -679,6 +682,10 @@ namespace Service
             }
 
 
+            if (reportViewer.LocalReport.GetParameters().Where(i => i.Name == "IsHideHeaderDetail").Count() > 0)
+            {
+                reportViewer.LocalReport.SetParameters(new ReportParameter("IsHideHeaderDetail", isHideHeaderDetail));
+            }
 
 
             reportViewer.HyperlinkTarget = "_blank";

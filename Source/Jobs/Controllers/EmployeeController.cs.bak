@@ -165,7 +165,8 @@ namespace Jobs.Controllers
                 return View("~/Views/Shared/InValidSettings.cshtml");
             }
 
-
+            var DivisionId = (int)System.Web.HttpContext.Current.Session["DivisionId"];
+            var SiteId = (int)System.Web.HttpContext.Current.Session["SiteId"];
 
             EmployeeViewModel p = new EmployeeViewModel();
             p.CalculationId = settings.CalculationId;
@@ -173,6 +174,10 @@ namespace Jobs.Controllers
             p.Code = new PersonService(_unitOfWork).GetMaxCode();
             p.LedgerAccountGroupId = settings.LedgerAccountGroupId;
             p.DateOfJoining = DateTime.Now;
+
+            p.DivisionId = DivisionId;
+            p.SiteId = SiteId;
+            p.DocTypeId = DocTypeId;
             //p.DateOfRelieving = DateTime.Now;
             PrepareViewBag();
             return View("Create", p);
@@ -857,7 +862,7 @@ namespace Jobs.Controllers
                     DocId = vm.id,
                     UserRemark = vm.Reason,
                     Narration = "Employee is deleted with Name:" + person.Name,
-                    DocTypeId = new DocumentTypeService(_unitOfWork).FindByName(TransactionDocCategoryConstants.SaleOrder).DocumentTypeId,
+                    DocTypeId = new DocumentTypeService(_unitOfWork).FindByName(MasterDocTypeConstants.Employee).DocumentTypeId,
                     UploadDate = DateTime.Now,
 
                 };
@@ -887,7 +892,7 @@ namespace Jobs.Controllers
                 }
 
 
-                IEnumerable<PersonProcess> personProcess = new PersonProcessService(_unitOfWork).GetPersonProcessIdListByPersonId(vm.id);
+                IEnumerable<PersonProcess> personProcess = new PersonProcessService(_unitOfWork).GetPersonProcessIdListByPersonId(employee.PersonID);
                 //Mark ObjectState.Delete to all the Person Process For Above Person. 
                 foreach (PersonProcess item in personProcess)
                 {
@@ -895,7 +900,7 @@ namespace Jobs.Controllers
                 }
 
 
-                IEnumerable<PersonRegistration> personregistration = new PersonRegistrationService(_unitOfWork).GetPersonRegistrationIdListByPersonId(vm.id);
+                IEnumerable<PersonRegistration> personregistration = new PersonRegistrationService(_unitOfWork).GetPersonRegistrationIdListByPersonId(employee.PersonID);
                 //Mark ObjectState.Delete to all the Person Registration For Above Person. 
                 foreach (PersonRegistration item in personregistration)
                 {

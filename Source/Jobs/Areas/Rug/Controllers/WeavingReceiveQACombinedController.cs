@@ -310,6 +310,8 @@ namespace Jobs.Areas.Rug.Controllers
 
                     JobReceiveQAHeader temp = new JobReceiveQAHeaderService(db).Find(vm.JobReceiveQAHeaderId);
 
+                    JobReceiveSettings Setting = new JobReceiveSettingsService(_unitOfWork).GetJobReceiveSettingsForDocument(vm.DocTypeId, vm.DivisionId, vm.SiteId);
+
                     JobReceiveQAHeader ExRec = new JobReceiveQAHeader();
                     ExRec = Mapper.Map<JobReceiveQAHeader>(temp);
 
@@ -321,6 +323,19 @@ namespace Jobs.Areas.Rug.Controllers
 
 
                     new WeavingReceiveQACombinedService(db).Update(vm, User.Identity.Name);
+
+                    if (vm.ProductUidId != null)
+                    {
+
+                        ProductUid ProductUid = new ProductUidService(_unitOfWork).Find((int)vm.ProductUidId);
+
+
+                        if ((Setting.SqlProcGenProductUID == null || Setting.SqlProcGenProductUID == ""))
+                            ProductUid.LotNo = vm.LotNo;
+
+                        ProductUid.ObjectState = Model.ObjectState.Modified;
+                        db.ProductUid.Add(ProductUid);
+                    }
 
                     LogList.Add(new LogTypeViewModel
                     {
@@ -1732,7 +1747,7 @@ namespace Jobs.Areas.Rug.Controllers
                         from Dimension1Tab in Dimension1Table.DefaultIfEmpty()
                         join D2 in db.Dimension2 on L.Dimension2Id equals D2.Dimension2Id into Dimension2Table
                         from Dimension2Tab in Dimension2Table.DefaultIfEmpty()
-                        where L.JobOrderLineId == (int)PUS.GenLineId
+                        where L.JobOrderLineId == (int)PUS.GenLineId && PUS.LastTransactionDocId == PUS.GenDocId && (int)PUS.LastTransactionDocTypeId == PUS.GenDocTypeId
                         select new JobOrderDetail
                         {
                             JobOrderHeaderDocNo = L.JobOrderNo,
@@ -1957,7 +1972,8 @@ namespace Jobs.Areas.Rug.Controllers
 
 
                     vm.SiteId = MainBranchId;
-                    
+                    vm.DivisionId = MainDivisionId;
+
                     string DocNo = new DocumentTypeService(_unitOfWork).FGetNewDocNo("DocNo", ConfigurationManager.AppSettings["DataBaseSchema"] + ".JobReceiveHeaders", vm.DocTypeId, vm.DocDate, vm.DivisionId, vm.SiteId);
                     string[] tokens = DocNo.Split('-');
                     string Prefix = tokens[0];

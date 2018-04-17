@@ -1032,7 +1032,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>="Amount in Words (Rs.) "+Code.RupeesToWord(Sum(Fields!Balance.Value, "DsMain"))</Value>
+                                  <Value>="Amount in Words (Rs.) "+Code.RupeesToWord(Sum(Fields!Balance.Value, "DsMain")) +" Only"</Value>
                                   <Style>
                                     <FontFamily>Tahoma</FontFamily>
                                     <FontSize>9pt</FontSize>
@@ -3215,6 +3215,9 @@
             <Height>0.30208in</Height>
             <Width>7.6628in</Width>
             <ZIndex>2</ZIndex>
+            <Visibility>
+              <Hidden>=iif(Parameters!IsHideHeaderDetail.Value="true",true,false)</Hidden>
+            </Visibility>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -3935,6 +3938,12 @@
       <Nullable>true</Nullable>
       <AllowBlank>true</AllowBlank>
       <Prompt>Ledger Account Group</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="IsHideHeaderDetail">
+      <DataType>String</DataType>
+      <Nullable>true</Nullable>
+      <AllowBlank>true</AllowBlank>
+      <Prompt>IsHideHeaderDetail</Prompt>
     </ReportParameter>
   </ReportParameters>
   <Code>

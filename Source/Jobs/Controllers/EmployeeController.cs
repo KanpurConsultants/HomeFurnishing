@@ -529,6 +529,7 @@ namespace Jobs.Controllers
                     _PersonAddressService.Update(personaddress);
 
                     account.LedgerAccountName = person.Name;
+                    account.IsActive = person.IsActive;
                     account.LedgerAccountSuffix = person.Suffix;
                     account.ModifiedDate = DateTime.Now;
                     account.ModifiedBy = User.Identity.Name;

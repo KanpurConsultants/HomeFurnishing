@@ -98,8 +98,8 @@ namespace Service
                             AND IsNull(L.AmtDr,0) - IsNull(VAdj.AdjustedAmount,0) > 0
 	                        GROUP BY E.EmployeeId
                         ) AS VAdvance ON E.EmployeeId = VAdvance.EmployeeId
-                        WHERE E.DateOfJoining <= @DocDate AND E.DateOfRelieving IS NULL " +
-                        (vm.DepartmentId != null ? " AND E.DepartmentId = @DepartmentId" : "") +
+                        WHERE isnull(P.IsActive,1) =1 And E.DateOfJoining <= @DocDate AND E.DateOfRelieving IS NULL " +
+                        (vm.DepartmentId != null ? " AND E.DepartmentId IN (SELECT Items FROM [dbo].[Split] (@DepartmentId, ',')) " : "") +
                         (vm.WagesPayType != null ? " AND E.WagesPayType = @WagesPayType" : "") +
                         " AND VSalaryLine.EmployeeId IS NULL AND IsNull(E.BasicSalary,0) > 0 Order By P.Name+','+P.Suffix ";
 

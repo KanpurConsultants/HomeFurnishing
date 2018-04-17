@@ -244,7 +244,13 @@ namespace Jobs.Areas.Rug.Controllers
 
                     if (vm.ProductUidName != null || vm.LotNo  != null)
                     {
-                        ProductUid ProductUid = new ProductUidService(_unitOfWork).Find(vm.LotNo);
+                        string ProductUidName = "";
+                        if (vm.ProductUidName != null)
+                            ProductUidName = vm.ProductUidName;
+                        else if (vm.ProductUidName == null)
+                            ProductUidName = vm.LotNo;
+
+                        ProductUid ProductUid = new ProductUidService(_unitOfWork).Find(ProductUidName);
                         ProductUid.ModifiedDate = DateTime.Now;
                         if (ProductUid.GenDocId == 0)
                         {
@@ -259,6 +265,9 @@ namespace Jobs.Areas.Rug.Controllers
                         ProductUid.LastTransactionDocTypeId = JobReceiveHeader.DocTypeId;
                         ProductUid.LastTransactionDocDate = JobReceiveHeader.DocDate;
                         ProductUid.LastTransactionPersonId = JobReceiveHeader.JobWorkerId;
+                       
+                        if ((Setting.SqlProcGenProductUID ==null || Setting.SqlProcGenProductUID == ""))
+                            ProductUid.LotNo = vm.LotNo;
 
                         ProductUid.ObjectState = Model.ObjectState.Modified;
                         db1.ProductUid.Add(ProductUid);
@@ -301,6 +310,8 @@ namespace Jobs.Areas.Rug.Controllers
 
                     JobReceiveQAHeader temp = new JobReceiveQAHeaderService(db).Find(vm.JobReceiveQAHeaderId);
 
+                    JobReceiveSettings Setting = new JobReceiveSettingsService(_unitOfWork).GetJobReceiveSettingsForDocument(vm.DocTypeId, vm.DivisionId, vm.SiteId);
+
                     JobReceiveQAHeader ExRec = new JobReceiveQAHeader();
                     ExRec = Mapper.Map<JobReceiveQAHeader>(temp);
 
@@ -312,6 +323,19 @@ namespace Jobs.Areas.Rug.Controllers
 
 
                     new WeavingReceiveQACombinedService(db).Update(vm, User.Identity.Name);
+
+                    if (vm.ProductUidId != null)
+                    {
+
+                        ProductUid ProductUid = new ProductUidService(_unitOfWork).Find((int)vm.ProductUidId);
+
+
+                        if ((Setting.SqlProcGenProductUID == null || Setting.SqlProcGenProductUID == ""))
+                            ProductUid.LotNo = vm.LotNo;
+
+                        ProductUid.ObjectState = Model.ObjectState.Modified;
+                        db.ProductUid.Add(ProductUid);
+                    }
 
                     LogList.Add(new LogTypeViewModel
                     {
@@ -1723,7 +1747,7 @@ namespace Jobs.Areas.Rug.Controllers
                         from Dimension1Tab in Dimension1Table.DefaultIfEmpty()
                         join D2 in db.Dimension2 on L.Dimension2Id equals D2.Dimension2Id into Dimension2Table
                         from Dimension2Tab in Dimension2Table.DefaultIfEmpty()
-                        where L.JobOrderLineId == (int)PUS.GenLineId
+                        where L.JobOrderLineId == (int)PUS.GenLineId && PUS.LastTransactionDocId == PUS.GenDocId && (int)PUS.LastTransactionDocTypeId == PUS.GenDocTypeId
                         select new JobOrderDetail
                         {
                             JobOrderHeaderDocNo = L.JobOrderNo,

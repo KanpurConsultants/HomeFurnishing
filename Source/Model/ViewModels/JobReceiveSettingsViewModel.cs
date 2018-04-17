@@ -61,6 +61,8 @@ namespace Model.ViewModel
 
         public string filterPersonRoles { get; set; }
 
+        public bool? isMandatoryLotNo { get; set; }
+        public bool? isMandatoryLotNoOrDimension1 { get; set; }
         [Range(1,int.MaxValue,ErrorMessage="Process field is required")]
         public int ProcessId { get; set; }
         public string ProcessName { get; set; }        

@@ -2660,10 +2660,11 @@ namespace Jobs.Controllers
 
                                     if (Settings.SqlProcDocumentPrint == null || Settings.SqlProcDocumentPrint == "")
                                     {
-                                        //List<string> QueryList = new List<string>();
-                                        //QueryList = DocumentPrintData(item);
-                                        //Pdf = drp.DocumentPrint(QueryList, User.Identity.Name);
-                                        Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint, User.Identity.Name, item);
+                                        JobOrderHeaderRDL cr = new JobOrderHeaderRDL();
+                                        //drp.CreateRDLFile("Std_JobOrderPrint", cr.DocPrint_JobOrder());
+                                        List<ListofQuery> QueryList = new List<ListofQuery>();
+                                        QueryList = DocumentPrintData(item);
+                                        Pdf = drp.DocumentPrint_New(QueryList, User.Identity.Name);
                                     }
                                     else
                                     Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint, User.Identity.Name, item);
@@ -2674,10 +2675,11 @@ namespace Jobs.Controllers
                                 {
                                     if (Settings.SqlProcDocumentPrint_AfterSubmit == null || Settings.SqlProcDocumentPrint_AfterSubmit == "")
                                     {
-                                        //List<string> QueryList = new List<string>();
-                                        //QueryList = DocumentPrintData(item);
-                                        //Pdf = drp.DocumentPrint(QueryList, User.Identity.Name);
-                                        Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint_AfterSubmit, User.Identity.Name, item);
+                                        JobOrderHeaderRDL cr = new JobOrderHeaderRDL();
+                                        drp.CreateRDLFile("Std_JobOrderPrint", cr.DocPrint_JobOrder());
+                                        List<ListofQuery> QueryList = new List<ListofQuery>();
+                                        QueryList = DocumentPrintData(item);
+                                        Pdf = drp.DocumentPrint_New(QueryList, User.Identity.Name);
                                     }
                                     else
                                         Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint_AfterSubmit, User.Identity.Name, item);
@@ -2688,10 +2690,11 @@ namespace Jobs.Controllers
                                 {
                                     if (Settings.SqlProcDocumentPrint_AfterApprove == null || Settings.SqlProcDocumentPrint_AfterApprove == "")
                                     {
-                                        //List<string> QueryList = new List<string>();
-                                        //QueryList = DocumentPrintData(item);
-                                        //Pdf = drp.DocumentPrint(QueryList, User.Identity.Name);
-                                        Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint_AfterApprove, User.Identity.Name, item);
+                                        JobOrderHeaderRDL cr = new JobOrderHeaderRDL();
+                                        drp.CreateRDLFile("Std_JobOrderPrint", cr.DocPrint_JobOrder());
+                                        List<ListofQuery> QueryList = new List<ListofQuery>();
+                                        QueryList = DocumentPrintData(item);
+                                        Pdf = drp.DocumentPrint_New(QueryList, User.Identity.Name);
                                     }
                                     else
                                         Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint_AfterApprove, User.Identity.Name, item);
@@ -2742,10 +2745,7 @@ namespace Jobs.Controllers
             //return Json(new { success = "Error", data = "File Not Found. " }, JsonRequestBehavior.AllowGet);
 
             //}
-            return Json(new { success = "Error", data = "No Records Selected." }, JsonRequestBehavior.AllowGet);
-
-
-
+            return Json(new { success = "Error", data = "No Records Selected." }, JsonRequestBehavior.AllowGet);          
             
 
             
@@ -2754,57 +2754,123 @@ namespace Jobs.Controllers
         }
 
 
-
-        
-		private List<string> DocumentPrintData(int item)
+        private List<ListofQuery> DocumentPrintData(int item)
         {
-            List<string> DocumentPrintData = new List<string>();
-            String mQry;
-            mQry = @"DECLARE @TotalAmount DECIMAL 
-            DECLARE @Id INT  =" + item + @"
+            JobOrderHeader JOH = new JobOrderHeaderService(_unitOfWork).Find(item);
 
-            SET @TotalAmount = (SELECT Max(Amount) FROM web.jobOrderheadercharges WHERE HeaderTableId = @Id AND ChargeId = 34 ) 
+            List<ListofQuery> DocumentPrintData = new List<ListofQuery>();
+            String QueryMain;
+            QueryMain= @"DECLARE @TotalAmount DECIMAL 
+    SET @TotalAmount = (SELECT Max(Amount) FROM web.JobOrderheaderCharges WHERE HeaderTableId = " + item + @" AND ChargeId = 34 ) 
+	
+	DECLARE @DocDate DATETIME
+    SET @DocDate = (SELECT DocDate FROM Web.JobOrderHeaders WHERE JobOrderHeaderId = " + item + @") 
+  
+	  
+	DECLARE @UnitDealCnt INT
+    SELECT
+    @UnitDealCnt = sum(CASE WHEN UnitId != DealunitId THEN 1 ELSE 0 END)
+    FROM Web.JobOrderLines WHERE JobOrderHeaderId = " + item + @"
 
-            SELECT H.JobOrderHeaderId AS JobOrderHeaderId,P.Name,P.Code,PA.Address,City.CityName AS CityName, P.Mobile AS MobileNo
-            ,(SELECT TOP 1  PR.RegistrationNo  FROM web.PersonRegistrations PR WHERE PersonId =H.JobWorkerId   AND RegistrationType ='Tin No' ) AS TinNo
-             , DT.DocumentTypeShortName +'-'+ H.DocNo AS SlipNo, replace(convert(VARCHAR, H.DocDate, 106), ' ', '/')  AS Date,replace(convert(VARCHAR, H.DueDate, 106), ' ', '/')  AS DueDate
-             , H.CreditDays,PD.ProductName,D1.Dimension1Name AS shade, D1.Description AS Colour,D2.Dimension2Name AS Design,POH.DocNo AS 'PoNo',
-             L.Qty AS Qty,L.DealQty AS DealQty, L.Rate, L.Amount AS Amount,H.Remark, H.TermsAndConditions
-             ,DT.DocumentTypeShortName, H.DocNo,L.JobOrderlineid
-            ,L.DueDate AS LineDueDate,L.Remark AS LineRemark, U.UnitName AS Unit, isnull(U.DecimalPlaces,0) AS DecimalPlaces,   
-              UD.UnitName AS DealUnit, isnull(UD.DecimalPlaces,0) AS DeliveryUnitDecimalPlace, B.Code AS BuyerCode,
-             H.ModifiedBy +' ' + Replace(replace(convert(NVARCHAR, H.ModifiedDate, 106), ' ', '/'),'/20','/') + substring (convert(NVARCHAR,H.ModifiedDate),13,7) AS ModifiedBy, H.ModifiedDate,
-             (Dt.DocumentTypeName)  AS ReportTitle,
-             WD.DivisionName AS DIVISION, WP.Name AS OrderBy,
-             H.SiteId AS SiteId,H.DivisionId, 'JobOrderPrint.rdl' AS ReportName,@TotalAmount AS NetAmount,
-             H.GatePassHeaderId AS  GatePassHeaderId,'web.jobOrderheadercharges' AS ChargesTableName,  G.GodownName AS Godown,
-            CASE WHEN Isnull(H.Status,0)=0 OR Isnull(H.Status,0)=8 THEN 0 ELSE 1 END AS Status 
-            FROM ( SELECT * FROM [Web]._JobOrderHeaders WITH (nolock) WHERE JobOrderHeaderId	= @Id ) H 
-            LEFT JOIN Web.Godowns G WITH (Nolock) ON G.GodownId=H.GodownId
-            LEFT JOIN Web._JobOrderLines L WITH (nolock)  ON H.JobOrderHeaderId=L.JobOrderHeaderId
-            LEFT JOIN Web.DocumentTypes DT WITH (nolock) ON DT.DocumentTypeId = H.DocTypeId 
-            LEFT JOIN Web.People P WITH (nolock) ON P.PersonID = H.JobWorkerId
-            LEFT JOIN Web.PersonAddresses PA WITH (nolock) ON PA.PersonId = P.PersonID 
-            LEFT JOIN Web.Cities City WITH (nolock) ON City.CityId = PA.CityId
-            LEFT JOIN Web.Products PD WITH (nolock) ON PD.ProductId = L.ProductId 
-            LEFT JOIN web.ProductGroups PG WITH (nolock) ON PG.ProductGroupId = PD.ProductGroupId
-            LEFT JOIN Web.Divisions WD WITH (nolock) ON WD.DivisionId=H.DivisionId
-            LEFT JOIN Web.Sites WS WITH (nolock) ON WS.SiteId=H.SiteId
-            LEFT JOIN Web._People WP WITH (nolock) ON   WP.PersonId=H.OrderById
-            LEFT JOIN web.ProductTypes PT WITH (nolock) ON PT.ProductTypeId = PG.ProductTypeId
-            LEFT JOIN Web.Units U WITH (nolock) ON U.UnitId = PD.UnitId 
-            LEFT JOIN Web.Units UD WITH (nolock) ON UD.UnitId = L.DealUnitId  
-            LEFT JOIN web.Dimension1 D1  WITH (nolock) ON D1.Dimension1Id=L.Dimension1Id
-            LEFT JOIN web.Dimension2 D2 WITH (nolock) ON D2.Dimension2Id=L.Dimension2Id
-            LEFT JOIN Web.ProdOrderLines PO WITH (nolock) ON PO.ProdOrderLineId=L.ProdOrderLineId
-            LEFT JOIN Web.ProdOrderHeaders  POH WITH (nolock) ON  POH.ProdOrderHeaderId=PO.ProdOrderHeaderId
-            LEFT JOIN Web.People  B WITH (Nolock) ON B.PersonId = POH.BuyerId
-            WHERE H.JobOrderHeaderId	= @Id";
+    SELECT
+    --Header Table Fields
+    H.JobOrderHeaderId,H.DocTypeId,H.DocNo,DocIdCaption + ' No' AS DocIdCaption,
+      H.SiteId,H.DivisionId,H.DocDate,DTS.DocIdCaption + ' Date' AS DocIdCaptionDate, format(H.DueDate, 'dd/MMM/yy') AS DueDate, DocIdCaption+'Due Date' AS DocIdCaptionDueDate, Pp.Name AS OrderBy,	(CASE WHEN JOS.isVisibleProcessHeader > 0 THEN PS.ProcessName ELSE NULL END) AS ProcessName,
+         H.TermsAndConditions,H.CreditDays,H.Remark,DT.DocumentTypeShortName,(CASE WHEN H.IsGatePassPrinted = 1 THEN NULL ELSE H.GatePassHeaderId END) as GatePassHeaderId,H.ModifiedBy + ' ' + Replace(replace(convert(NVARCHAR, H.ModifiedDate, 106), ' ', '/'), '/20', '/') + substring(convert(NVARCHAR, H.ModifiedDate), 13, 7) AS ModifiedBy,
+               H.ModifiedDate,(CASE WHEN Isnull(H.Status, 0)= 0 OR Isnull(H.Status, 0)= 8 THEN 0 ELSE 1 END)  AS Status,
+                   CUR.Name AS CurrencyName,SM.ShipMethodName,SMA.Address AS ShipToAddress,DLT.DeliveryTermsName,
+	(CASE WHEN SPR.[Party GST NO]
+        IS NULL THEN 'Yes' ELSE 'No' END ) AS ReverseCharge,
+VDC.CompanyName,
+	--Godown Detail
+    G.GodownName,
+	--Person Detail
+    P.Name AS PartyName, DTS.PartyCaption AS  PartyCaption, P.Suffix AS PartySuffix,	
+    isnull(PA.Address,'')+' '+isnull(C.CityName,'')+','+isnull(PA.ZipCode,'')+(CASE WHEN isnull(CS.StateName,'') <> isnull(S.StateName,'') AND SPR.[Party GST NO] IS NOT NULL THEN ',State : '+isnull(S.StateName,'')+(CASE WHEN S.StateCode IS NULL THEN '' ELSE ', Code : '+S.StateCode END)    ELSE '' END ) AS PartyAddress,
+    isnull(S.StateName, '') AS PartyStateName, isnull(S.StateCode, '') AS PartyStateCode,
+
+       P.Mobile AS PartyMobileNo,	SPR.*,
+	--Plan Detail
+    POH.DocNo AS PlanNo,DTS.ContraDocTypeCaption,
+	--Caption Fields
+    DTS.SignatoryMiddleCaption,DTS.SignatoryRightCaption,
+	--Line Table
+    PD.ProductName,DTS.ProductCaption,U.UnitName,U.DecimalPlaces,DU.UnitName AS DealUnitName,DTS.DealQtyCaption,DU.DecimalPlaces AS DealDecimalPlaces,
+    isnull(L.Qty,0) AS Qty, isnull(L.Rate, 0) AS Rate, isnull(L.Amount, 0) AS Amount, isnull(L.DealQty, 0) AS DealQty,
+          D1.Dimension1Name,DTS.Dimension1Caption,D2.Dimension2Name,DTS.Dimension2Caption,D3.Dimension3Name,DTS.Dimension3Caption,D4.Dimension4Name,DTS.Dimension4Caption,
+	L.LotNo AS LotNo,(CASE WHEN DTS.PrintSpecification >0 THEN L.Specification ELSE '' END)  AS Specification, DTS.SpecificationCaption,DTS.SignatoryleftCaption,L.Remark AS LineRemark,
+	L.DiscountPer AS DiscountPer,
+	L.DiscountAmt AS DiscountAmt,
+	--STC.Code AS SalesTaxProductCodes,
+	(CASE WHEN H.ProcessId IN(26,28) THEN STC.Code ELSE PSSTC.Code END)  AS SalesTaxProductCodes,
+    (SELECT TOP 1 SalesTaxProductCodeCaption FROM web.SiteDivisionSettings WHERE H.DocDate BETWEEN StartDate AND IsNull(EndDate, getdate()) AND SiteId = H.SiteId AND DivisionId = H.DivisionId)  AS SalesTaxProductCodeCaption,
+       (CASE WHEN DTS.PrintProductGroup > 0 THEN isnull(PG.ProductGroupName, '') ELSE '' END)+(CASE WHEN DTS.PrintProductdescription >0 THEN isnull(','+PD.Productdescription,'') ELSE '' END) AS ProductGroupName,
+         DTS.ProductGroupCaption,  
+	PU.ProductUidName,
+	(CASE WHEN PS.ProcessName IN('Purchase','Sale') THEN isnull(CGPD.PrintingDescription, CGPD.ChargeGroupProductName) ELSE PS.GSTPrintDesc END)  AS ChargeGroupProductName,
 
 
-            String mQry1;
-            mQry1 = @"DECLARE @Id INT = " + item + @"
-                    DECLARE @TableName NVARCHAR(255) = 'web.JobInvoiceHeaderCharges'
+   DTS.ProductUidCaption,
+	--Formula Fields
+    @TotalAmount AS NetAmount,     	
+	--SalesTaxGroupPersonId
+    CGP.ChargeGroupPersonName,
+	--Other Fields
+    @UnitDealCnt AS DealUnitCnt,
+	'StdDocPrintSub_CalculationHeaders ' + convert(NVARCHAR, " + item + @") + ', ' + '''web.jobOrderheadercharges'''+ ', ' + '''Web.JobOrderLineCharges'''+ ', ' + '''Web.JobOrderLines''' AS SubReportProcList,
+     (CASE WHEN Isnull(H.Status, 0) = 0 OR Isnull(H.Status, 0) = 8 THEN 'Provisional ' + isnull(DT.PrintTitle, DT.DocumentTypeName) ELSE isnull(DT.PrintTitle, DT.DocumentTypeName) END) AS ReportTitle,
+          	'Std_JobOrderPrint.rdl' AS ReportName,
+              SalesTaxGroupProductCaption
+    FROM Web.JobOrderHeaders H WITH (Nolock)
+    LEFT JOIN web.DocumentTypes DT WITH(Nolock) ON DT.DocumentTypeId=H.DocTypeId
+   LEFT JOIN Web._DocumentTypeSettings DTS WITH (Nolock) ON DTS.DocumentTypeId=DT.DocumentTypeId
+   LEFT JOIN Web.JobOrderSettings JOS WITH (Nolock) ON JOS.DocTypeId=DT.DocumentTypeId AND JOS.SiteId= H.SiteId AND JOS.DivisionId= H.DivisionId
+    LEFT JOIN web.ViewDivisionCompany VDC WITH (Nolock) ON VDC.DivisionId=H.DivisionId
+   LEFT JOIN Web.Sites SI WITH (Nolock) ON SI.SiteId=H.SiteId
+   LEFT JOIN Web.Divisions DIV WITH (Nolock) ON DIV.DivisionId=H.DivisionId
+   LEFT JOIN Web.Companies Com ON Com.CompanyId = DIV.CompanyId
+    LEFT JOIN Web.Cities CC WITH (Nolock) ON CC.CityId=Com.CityId
+   LEFT JOIN Web.States CS WITH (Nolock) ON CS.StateId=CC.StateId
+   LEFT JOIN Web.Processes PS WITH (Nolock) ON PS.ProcessId=H.ProcessId
+   LEFT JOIN Web.SalesTaxProductCodes PSSTC WITH (Nolock) ON PSSTC.SalesTaxProductCodeId=PS.SalesTaxProductCodeId
+   LEFT JOIN Web.People P WITH (Nolock) ON P.PersonID=H.JobWorkerId
+   LEFT JOIN web.Godowns G WITH (Nolock) ON G.GodownId=H.GodownId
+   LEFT JOIN (SELECT TOP 1 * FROM web.SiteDivisionSettings WHERE @DocDate BETWEEN StartDate AND IsNull(EndDate, getdate()) ORDER BY StartDate) SDS ON H.DivisionId = SDS.DivisionId AND  H.SiteId = SDS.SiteId
+   LEFT JOIN(SELECT* FROM Web.PersonAddresses WITH (nolock) WHERE AddressType IS NULL) PA ON PA.PersonId = P.PersonID
+LEFT JOIN Web.Cities C WITH (nolock) ON C.CityId = PA.CityId
+LEFT JOIN Web.States S WITH (Nolock) ON S.StateId=C.StateId
+LEFT JOIN web.People Pp WITH (Nolock) ON Pp.PersonID=H.OrderById
+LEFT JOIN web.ChargeGroupPersons CGP WITH (Nolock) ON CGP.ChargeGroupPersonId=H.SalesTaxGroupPersonId
+LEFT JOIN Web.Currencies CUR WITH (Nolock) ON CUR.Id=H.CurrencyId
+LEFT JOIN Web.ShipMethods SM WITH (Nolock) ON SM.ShipMethodId=H.ShipMethodId
+LEFT JOIN Web.PersonAddresses SMA WITH (Nolock) ON SMA.PersonAddressID=H.ShipToAddressId
+LEFT JOIN Web.DeliveryTerms DLT WITH (Nolock) ON DLT.DeliveryTermsId=H.DeliveryTermsId
+LEFT JOIN Web.JobOrderLines L WITH (Nolock) ON L.JobOrderHeaderId=H.JobOrderHeaderId
+LEFT JOIN Web.ProductUids PU WITH (Nolock) ON PU.ProductUIDId=L.ProductUidId
+LEFT JOIN Web.ProdOrderLines POl WITH (Nolock) ON POl.ProdOrderLineId=L.ProdOrderLineId
+LEFT JOIN Web.ProdOrderHeaders POH WITH (Nolock) ON POH.ProdOrderHeaderId=POL.ProdOrderHeaderId
+LEFT JOIN web.Products PD WITH (Nolock) ON PD.ProductId=L.ProductId
+LEFT JOIN web.ProductGroups PG WITH (Nolock) ON PG.ProductGroupId=PD.ProductGroupid
+LEFT JOIN Web.SalesTaxProductCodes STC WITH (Nolock) ON STC.SalesTaxProductCodeId= IsNull(PD.SalesTaxProductCodeId, Pg.DefaultSalesTaxProductCodeId)
+    LEFT JOIN Web.Dimension1 D1 WITH(Nolock) ON D1.Dimension1Id=L.Dimension1Id
+   LEFT JOIN web.Dimension2 D2 WITH (Nolock) ON D2.Dimension2Id=L.Dimension2Id
+   LEFT JOIN web.Dimension3 D3 WITH (Nolock) ON D3.Dimension3Id=L.Dimension3Id
+   LEFT JOIN Web.Dimension4 D4 WITH (nolock) ON D4.Dimension4Id=L.Dimension4Id
+   LEFT JOIN web.Units U WITH (Nolock) ON U.UnitId=PD.UnitId
+   LEFT JOIN web.Units DU WITH (Nolock) ON DU.UnitId=L.DealUnitId
+   LEFT JOIN Web.Std_PersonRegistrations SPR WITH (Nolock) ON SPR.CustomerId=H.JobWorkerId
+   LEFT JOIN web.ChargeGroupProducts CGPD WITH (Nolock) ON L.SalesTaxGroupProductId = CGPD.ChargeGroupProductId
+      WHERE H.JoborderheaderId= " + item + @"
+    ORDER BY L.Sr";
+            ListofQuery QryMain = new ListofQuery();
+            QryMain.Query = QueryMain;
+            QryMain.QueryName = nameof(QueryMain);
+            DocumentPrintData.Add(QryMain);
+
+
+            String QueryCalculation;
+            QueryCalculation = @"
+                    DECLARE @TableName NVARCHAR(255) = 'web.JobOrderHeaderCharges'
 
                     DECLARE @StrGrossAmount AS NVARCHAR(50)
                     DECLARE @StrBasicExciseDuty AS NVARCHAR(50)
@@ -2838,7 +2904,7 @@ namespace Jobs.Controllers
                             FROM ' + @TableName + ' H
                             LEFT JOIN web.ChargeTypes CT ON CT.ChargeTypeId = H.ChargeTypeId
                             LEFT JOIN web.Charges C ON C.ChargeId = H.ChargeId
-                            WHERE H.Amount <> 0 AND H.HeaderTableId = ' + Convert(Varchar,@Id ) + '
+                            WHERE H.Amount <> 0 AND H.HeaderTableId = ' + Convert(Varchar," + item + @" ) + '
                             GROUP BY H.HeaderTableId
 
 
@@ -2855,7 +2921,7 @@ namespace Jobs.Controllers
                             LEFT JOIN web.ChargeTypes CT ON CT.ChargeTypeId = H.ChargeTypeId
                             LEFT JOIN web.Charges C ON C.ChargeId = H.ChargeId
                             WHERE(isnull(H.ChargeTypeId, 0) <> ''4'' OR C.ChargeName = ''Net Amount'') AND H.Amount <> 0
-                            AND H.HeaderTableId = ' + Convert(Varchar,@Id ) + ''
+                            AND H.HeaderTableId = ' + Convert(Varchar," + item + @" ) + ''
 
 
                         DECLARE @TmpData TABLE
@@ -2877,11 +2943,76 @@ namespace Jobs.Controllers
                                     SELECT id, HeaderTableId, Sr, ChargeName, Amount, ChargeTypeId, ChargeTypeName, Rate, ReportName FROM @TmpData
                                     ORDER BY Sr";
 
-            DocumentPrintData.Add(mQry);
-            DocumentPrintData.Add(mQry1);
+
+            ListofQuery QryCalculation = new ListofQuery();
+            QryCalculation.Query = QueryCalculation;
+            QryCalculation.QueryName = nameof(QueryCalculation);
+            DocumentPrintData.Add(QryCalculation);
+
+
+            String QueryGSTSummary;
+            QueryGSTSummary = @"DECLARE @Qry NVARCHAR(Max);
+
+SET @Qry = '
+SELECT  
+--CASE WHEN PS.ProcessName IN (''Purchase'',''Sale'') THEN isnull(STGP.PrintingDescription,STGP.ChargeGroupProductName) ELSE PS.GSTPrintDesc END as ChargeGroupProductName, 
+isnull(STGP.PrintingDescription,STGP.ChargeGroupProductName) as ChargeGroupProductName, 
+Sum(CASE WHEN ct.ChargeTypeName =''Sales Taxable Amount'' THEN lc.Amount ELSE 0 End) AS TaxableAmount,
+Sum(CASE WHEN ct.ChargeTypeName =''IGST'' THEN lc.Amount ELSE 0 End) AS IGST,
+Sum(CASE WHEN ct.ChargeTypeName =''CGST'' THEN lc.Amount ELSE 0 End) AS CGST,
+Sum(CASE WHEN ct.ChargeTypeName =''SGST'' THEN lc.Amount ELSE 0 End) AS SGST,
+Sum(CASE WHEN ct.ChargeTypeName =''GST Cess'' THEN lc.Amount ELSE 0 End) AS GSTCess,
+''StdDocPrintSub_GSTSummary.rdl'' AS ReportName
+FROM Web.JobOrderLines L
+LEFT JOIN Web.JobOrderLineCharges LC ON L.JobOrderLineId = LC.LineTableId 
+LEFT JOIN web.JobOrderheaders H ON H.JobOrderHeaderId = L.JobOrderHeaderId
+LEFT JOIN Web.Processes PS WITH (Nolock) ON PS.ProcessId=H.ProcessId
+LEFT JOIN Web.Charges C ON C.ChargeId=LC.ChargeId
+LEFT JOIN web.ChargeTypes CT ON LC.ChargeTypeId = CT.ChargeTypeId 
+LEFT JOIN web.ChargeGroupProducts STGP ON L.SalesTaxGroupProductId = STGP.ChargeGroupProductId
+WHERE L.JobOrderHeaderId =" + item + @" 
+GROUP BY isnull(STGP.PrintingDescription,STGP.ChargeGroupProductName)
+--GROUP BY CASE WHEN PS.ProcessName IN (''Purchase'',''Sale'') THEN isnull(STGP.PrintingDescription,STGP.ChargeGroupProductName) ELSE PS.GSTPrintDesc END '
+
+--PRINT @Qry;
+EXEC(@Qry);	";
+
+
+            ListofQuery QryGSTSummary = new ListofQuery();
+            QryGSTSummary.Query = QueryGSTSummary;
+            QryGSTSummary.QueryName = nameof(QueryGSTSummary);
+            DocumentPrintData.Add(QryGSTSummary);
+
+            if (JOH.GatePassHeaderId != null)
+            {
+                String QueryGatePass;
+                QueryGatePass = @"SELECT H.GatePassHeaderId,  DT.DocumentTypeShortName +'-'+ H.DocNo AS DocNo, H.DocDate,  H.Remark, P.Name AS PersonName, G.GodownName,  
+                L.GatePassLineId, L.Product, L.Specification, L.Qty, U.UnitName, U.DecimalPlaces,
+                ' " + JOH.DocNo + @"' AS ReferenceDocNo,'GatePassPrint.rdl'  AS ReportName, 'Gate Pass' AS ReportTitle,
+                NULL AS SubReportProcList,
+                DTS.SignatoryleftCaption,
+                DTS.SignatoryMiddleCaption,
+                DTS.SignatoryRightCaption    
+                FROM Web.GatePassHeaders H
+                LEFT JOIN web.Godowns G ON G.GodownId = H.GodownId 
+                LEFT JOIN web.People P ON P.PersonID  = H.PersonID 
+                LEFT JOIN [Web].DocumentTypes DT WITH (nolock) ON DT.DocumentTypeId = H.DocTypeId 
+                LEFT JOIN web._DocumentTypeSettings DTS WITH (Nolock) ON DTS.DocumentTypeId=H.DocTypeId 
+                LEFT JOIN web.GatePassLines L ON L.GatePassHeaderId = H.GatePassHeaderId 
+                LEFT JOIN web.Units U ON U.UnitId = L.UnitId 
+                WHERE H.GatePassHeaderId = " + JOH.GatePassHeaderId + @" ";
+
+
+                ListofQuery QryGatePass = new ListofQuery();
+                QryGatePass.Query = QueryGatePass;
+                QryGatePass.QueryName = nameof(QueryGatePass);
+                DocumentPrintData.Add(QryGatePass);
+            }
             return DocumentPrintData;
 
         }
+
+
 
 
         protected string GetIPAddress()
