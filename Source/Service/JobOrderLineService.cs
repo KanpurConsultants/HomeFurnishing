@@ -1600,7 +1600,7 @@ namespace Service
                                     ((Dimension2Tab.Dimension2Name == null) ? "" : "," + Dimension2Tab.Dimension2Name) +
                                     ((Dimension3Tab.Dimension3Name == null) ? "" : "," + Dimension3Tab.Dimension3Name) +
                                     ((Dimension4Tab.Dimension4Name == null) ? "" : "," + Dimension4Tab.Dimension4Name) + 
-                                    ((p.LotNo == null) ? "" : "," + p.LotNo)
+                                    ((p.LotNo == null) ? "" : ",CN:" + p.LotNo)
                     });
         }
 

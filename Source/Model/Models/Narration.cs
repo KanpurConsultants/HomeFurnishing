@@ -16,8 +16,14 @@ namespace Model.Models
 
         [Key]
         public int NarrationId { get; set; }
-        [Display (Name="Delivery Terms")]
-        [MaxLength(50, ErrorMessage = "Narration Name cannot exceed 50 characters"), Required]
+
+        [ForeignKey("DocType")]
+        public int DocTypeId { get; set; }
+        public virtual DocumentType DocType { get; set; }
+
+
+        [Display (Name="Narration")]
+        [Required]
         [Index("IX_Narration_NarrationName", IsUnique = true)]
         public string NarrationName { get; set; }
 

@@ -1576,20 +1576,46 @@ namespace Jobs.Controllers
 
                         if (pd.Status == (int)StatusConstants.Drafted || pd.Status == (int)StatusConstants.Import || pd.Status == (int)StatusConstants.Modified)
                         {
-                            //LogAct(item.ToString());
-                            Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint, User.Identity.Name, item);
+                            if (Settings.SqlProcDocumentPrint == null || Settings.SqlProcDocumentPrint == "")
+                            {
+                                LedgerHeaderRDL cr = new LedgerHeaderRDL();
+                                drp.CreateRDLFile("Std_Payment_Print", cr.Create_Std_Payment_Print());
+                                List<ListofQuery> QueryList = new List<ListofQuery>();
+                                QueryList = DocumentPrintData(item);
+                                Pdf = drp.DocumentPrint_New(QueryList, User.Identity.Name);
+                            }
+                            else
+                                Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint, User.Identity.Name, item);
 
                             PdfStream.Add(Pdf);
                         }
                         else if (pd.Status == (int)StatusConstants.Submitted || pd.Status == (int)StatusConstants.ModificationSubmitted)
                         {
-                            Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint_AfterSubmit, User.Identity.Name, item);
+                            if (Settings.SqlProcDocumentPrint == null || Settings.SqlProcDocumentPrint == "")
+                            {
+                                LedgerHeaderRDL cr = new LedgerHeaderRDL();
+                                drp.CreateRDLFile("Std_Payment_Print", cr.Create_Std_Payment_Print());
+                                List<ListofQuery> QueryList = new List<ListofQuery>();
+                                QueryList = DocumentPrintData(item);
+                                Pdf = drp.DocumentPrint_New(QueryList, User.Identity.Name);
+                            }
+                            else
+                                Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint_AfterSubmit, User.Identity.Name, item);
 
                             PdfStream.Add(Pdf);
                         }
                         else
                         {
-                            Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint_AfterApprove, User.Identity.Name, item);
+                            if (Settings.SqlProcDocumentPrint == null || Settings.SqlProcDocumentPrint == "")
+                            {
+                                LedgerHeaderRDL cr = new LedgerHeaderRDL();
+                                drp.CreateRDLFile("Std_Payment_Print", cr.Create_Std_Payment_Print());
+                                List<ListofQuery> QueryList = new List<ListofQuery>();
+                                QueryList = DocumentPrintData(item);
+                                Pdf = drp.DocumentPrint_New(QueryList, User.Identity.Name);
+                            }
+                            else
+                                Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint_AfterApprove, User.Identity.Name, item);
                             PdfStream.Add(Pdf);
                         }
 
@@ -1621,6 +1647,60 @@ namespace Jobs.Controllers
 
             }
             return Json(new { success = "Error", data = "No Records Selected." }, JsonRequestBehavior.AllowGet);
+
+        }
+
+
+        private List<ListofQuery> DocumentPrintData(int item)
+        {
+            StockHeader SH = new StockHeaderService(_unitOfWork).Find(item);
+
+            List<ListofQuery> DocumentPrintData = new List<ListofQuery>();
+            String QueryMain;
+
+
+            QueryMain = @"Declare @CostcenterCNT Int 
+Declare @ChequeNOCNT Int
+
+SELECT @CostcenterCNT = Count(*)
+ FROM
+(SELECT * FROM Web.LedgerHeaders WHERE LedgerHeaderId= " + item + @") H
+LEFT JOIN Web.LedgerLines L WITH (nolock) ON L.LedgerHeaderId=H.LedgerHeaderId
+where L.CostCenterId Is Not NULL
+
+SELECT @ChequeNOCNT=Count(*)
+ FROM
+(SELECT * FROM Web.LedgerHeaders WHERE LedgerHeaderId= " + item + @") H
+LEFT JOIN Web.LedgerLines L WITH (nolock) ON L.LedgerHeaderId=H.LedgerHeaderId
+where L.ChqNo Is Not NULL
+
+
+SELECT H.LedgerHeaderId,H.SiteId,H.DivisionId,HLA.LedgerAccountName,
+H.DocNo,H.DocDate AS PaymentDate,H.Narration,CH.CostCenterName AS HeaderCostCenterName,
+CC.CostCenterName,LAS.LedgerAccountName+' {'+LAS.LedgerAccountSuffix+'}' AS jobworkername,
+DTS.PartyCaption AS  PartyCaption,DTS.CostCenterCaption, DTS.SignatoryMiddleCaption,DTS.SignatoryRightCaption,
+L.ChqNo,L.Chqdate,L.Amount,L.Remark,DT.Nature, 'Std_Payment_Print.rdl'  as  ReportName,
+(CASE  WHEN H.Status='0' OR H.Status IS NULL THEN 'Provisional' +' '+ DT.DocumentTypeName ELSE DT.DocumentTypeName END)   AS ReportTitle, NULL AS SubReportProcList
+ FROM
+(SELECT * FROM Web.LedgerHeaders WHERE LedgerHeaderId= " + item + @") H
+LEFT JOIN Web._DocumentTypeSettings DTS WITH (Nolock) ON DTS.DocumentTypeId=H.DocTypeId
+LEFT JOIN Web.LedgerLines L WITH (nolock) ON L.LedgerHeaderId=H.LedgerHeaderId
+LEFT JOIN Web.LedgerAccounts HLA WITH (nolock) ON HLA.LedgerAccountId=H.LedgerAccountId
+LEFT JOIN Web.DocumentTypes DT WITH (nolock) ON DT.DocumentTypeId=H.DocTypeId
+LEFT JOIN Web.CostCenters CC WITH (nolock) ON CC.CostCenterId = L.CostCenterId
+LEFT JOIN Web.CostCenters CH WITH (nolock) ON CH.CostCenterId = H.CostCenterId
+LEFT JOIN Web.LedgerAccounts LAS WITH (nolock) ON LAS.LedgerAccountId=L.LedgerAccountId";
+
+            ListofQuery QryMain = new ListofQuery();
+            QryMain.Query = QueryMain;
+            QryMain.QueryName = nameof(QueryMain);
+            DocumentPrintData.Add(QryMain);
+
+
+
+
+
+            return DocumentPrintData;
 
         }
         #region submitValidation

@@ -1079,10 +1079,11 @@
             success: function (data) {
                 $("#BaleNo").val(data[0].NewBaleNo);
                 //alert(isAllowtoUpdateBuyerSpecification1);
-                if (isAllowtoUpdateBuyerSpecification1=="Yes")
-                    $("#BaleNo").select();
-                else
-                    $("#Length").focus() ;
+                //if (isAllowtoUpdateBuyerSpecification1=="Yes")
+                //    $("#BaleNo").select();
+                //else
+                //    $("#Length").focus() ;
+                $("#BaleNo").select();
             },
             error: function (xhr, ajaxOptions, thrownError) {
                 alert('Failed to retrieve Bale No.' + thrownError);

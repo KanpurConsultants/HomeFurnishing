@@ -2661,7 +2661,7 @@ namespace Jobs.Controllers
                                     if (Settings.SqlProcDocumentPrint == null || Settings.SqlProcDocumentPrint == "")
                                     {
                                         JobOrderHeaderRDL cr = new JobOrderHeaderRDL();
-                                        //drp.CreateRDLFile("Std_JobOrderPrint", cr.DocPrint_JobOrder());
+                                        drp.CreateRDLFile("Std_JobOrder_Print", cr.Create_Std_JobOrder_Print());
                                         List<ListofQuery> QueryList = new List<ListofQuery>();
                                         QueryList = DocumentPrintData(item);
                                         Pdf = drp.DocumentPrint_New(QueryList, User.Identity.Name);
@@ -2676,7 +2676,7 @@ namespace Jobs.Controllers
                                     if (Settings.SqlProcDocumentPrint_AfterSubmit == null || Settings.SqlProcDocumentPrint_AfterSubmit == "")
                                     {
                                         JobOrderHeaderRDL cr = new JobOrderHeaderRDL();
-                                        drp.CreateRDLFile("Std_JobOrderPrint", cr.DocPrint_JobOrder());
+                                        drp.CreateRDLFile("Std_JobOrder_Print", cr.Create_Std_JobOrder_Print());
                                         List<ListofQuery> QueryList = new List<ListofQuery>();
                                         QueryList = DocumentPrintData(item);
                                         Pdf = drp.DocumentPrint_New(QueryList, User.Identity.Name);
@@ -2691,7 +2691,7 @@ namespace Jobs.Controllers
                                     if (Settings.SqlProcDocumentPrint_AfterApprove == null || Settings.SqlProcDocumentPrint_AfterApprove == "")
                                     {
                                         JobOrderHeaderRDL cr = new JobOrderHeaderRDL();
-                                        drp.CreateRDLFile("Std_JobOrderPrint", cr.DocPrint_JobOrder());
+                                        drp.CreateRDLFile("Std_JobOrder_Print", cr.Create_Std_JobOrder_Print());
                                         List<ListofQuery> QueryList = new List<ListofQuery>();
                                         QueryList = DocumentPrintData(item);
                                         Pdf = drp.DocumentPrint_New(QueryList, User.Identity.Name);
@@ -2819,7 +2819,7 @@ VDC.CompanyName,
     @UnitDealCnt AS DealUnitCnt,
 	'StdDocPrintSub_CalculationHeaders ' + convert(NVARCHAR, " + item + @") + ', ' + '''web.jobOrderheadercharges'''+ ', ' + '''Web.JobOrderLineCharges'''+ ', ' + '''Web.JobOrderLines''' AS SubReportProcList,
      (CASE WHEN Isnull(H.Status, 0) = 0 OR Isnull(H.Status, 0) = 8 THEN 'Provisional ' + isnull(DT.PrintTitle, DT.DocumentTypeName) ELSE isnull(DT.PrintTitle, DT.DocumentTypeName) END) AS ReportTitle,
-          	'Std_JobOrderPrint.rdl' AS ReportName,
+          	'Std_JobOrder_Print.rdl' AS ReportName,
               SalesTaxGroupProductCaption
     FROM Web.JobOrderHeaders H WITH (Nolock)
     LEFT JOIN web.DocumentTypes DT WITH(Nolock) ON DT.DocumentTypeId=H.DocTypeId
@@ -2870,7 +2870,7 @@ LEFT JOIN Web.SalesTaxProductCodes STC WITH (Nolock) ON STC.SalesTaxProductCodeI
 
             String QueryCalculation;
             QueryCalculation = @"
-                    DECLARE @TableName NVARCHAR(255) = 'web.JobOrderHeaderCharges'
+
 
                     DECLARE @StrGrossAmount AS NVARCHAR(50)
                     DECLARE @StrBasicExciseDuty AS NVARCHAR(50)
@@ -2901,7 +2901,7 @@ LEFT JOIN Web.SalesTaxProductCodes STC WITH (Nolock) ON STC.SalesTaxProductCodeI
                             SELECT @GrossAmount = sum(CASE WHEN C.ChargeName = ''' + @StrGrossAmount + ''' THEN  H.Amount  ELSE 0 END),
                             @BasicExciseDutyAmount = sum(CASE WHEN C.ChargeName = ''' + @StrBasicExciseDuty + ''' THEN  H.Amount  ELSE 0 END),
                             @SalesTaxTaxableAmt = sum(CASE WHEN C.ChargeName = ''' + @StrSalesTaxTaxableAmt + ''' THEN  H.Amount  ELSE 0 END)
-                            FROM ' + @TableName + ' H
+                            FROM web.JobOrderHeaderCharges H
                             LEFT JOIN web.ChargeTypes CT ON CT.ChargeTypeId = H.ChargeTypeId
                             LEFT JOIN web.Charges C ON C.ChargeId = H.ChargeId
                             WHERE H.Amount <> 0 AND H.HeaderTableId = ' + Convert(Varchar," + item + @" ) + '
@@ -2917,11 +2917,13 @@ LEFT JOIN Web.SalesTaxProductCodes STC WITH (Nolock) ON STC.SalesTaxProductCodeI
                             ELSE 0 End AS Rate,
 		                    ''TransactionChargesPrint.rdl'' AS ReportName,
                             ''Transaction Charges'' AS ReportTitle
-                            FROM  ' + @TableName + '  H
+                            FROM Web.JobOrderheaders JOH
+                            Left Join web.JobOrderHeaderCharges  H on JOH.JobOrderHeaderId = H.HeaderTableId
                             LEFT JOIN web.ChargeTypes CT ON CT.ChargeTypeId = H.ChargeTypeId
                             LEFT JOIN web.Charges C ON C.ChargeId = H.ChargeId
-                            WHERE(isnull(H.ChargeTypeId, 0) <> ''4'' OR C.ChargeName = ''Net Amount'') AND H.Amount <> 0
-                            AND H.HeaderTableId = ' + Convert(Varchar," + item + @" ) + ''
+                            WHERE(isnull(H.ChargeTypeId, 0) <> ''4'' OR C.ChargeName = ''Net Amount'') 
+                            --AND H.Amount <> 0
+                            AND JOH.JobOrderHeaderId = ' + Convert(Varchar," + item + @" ) + ''
 
 
                         DECLARE @TmpData TABLE
@@ -2983,31 +2985,32 @@ EXEC(@Qry);	";
             QryGSTSummary.QueryName = nameof(QueryGSTSummary);
             DocumentPrintData.Add(QryGSTSummary);
 
-            if (JOH.GatePassHeaderId != null)
-            {
+
+
                 String QueryGatePass;
-                QueryGatePass = @"SELECT H.GatePassHeaderId,  DT.DocumentTypeShortName +'-'+ H.DocNo AS DocNo, H.DocDate,  H.Remark, P.Name AS PersonName, G.GodownName,  
+                QueryGatePass = @"SELECT JOH.JobOrderHeaderId, H.GatePassHeaderId,  DT.DocumentTypeShortName +'-'+ H.DocNo AS DocNo, H.DocDate,  H.Remark, P.Name AS PersonName, G.GodownName,  
                 L.GatePassLineId, L.Product, L.Specification, L.Qty, U.UnitName, U.DecimalPlaces,
                 ' " + JOH.DocNo + @"' AS ReferenceDocNo,'GatePassPrint.rdl'  AS ReportName, 'Gate Pass' AS ReportTitle,
                 NULL AS SubReportProcList,
                 DTS.SignatoryleftCaption,
                 DTS.SignatoryMiddleCaption,
                 DTS.SignatoryRightCaption    
-                FROM Web.GatePassHeaders H
+                FROM Web.joborderheaders JOH
+                LEFT JOIN  Web.GatePassHeaders H ON JOH.GatePassHeaderId = H.GatePassHeaderId 
                 LEFT JOIN web.Godowns G ON G.GodownId = H.GodownId 
                 LEFT JOIN web.People P ON P.PersonID  = H.PersonID 
                 LEFT JOIN [Web].DocumentTypes DT WITH (nolock) ON DT.DocumentTypeId = H.DocTypeId 
                 LEFT JOIN web._DocumentTypeSettings DTS WITH (Nolock) ON DTS.DocumentTypeId=H.DocTypeId 
                 LEFT JOIN web.GatePassLines L ON L.GatePassHeaderId = H.GatePassHeaderId 
                 LEFT JOIN web.Units U ON U.UnitId = L.UnitId 
-                WHERE H.GatePassHeaderId = " + JOH.GatePassHeaderId + @" ";
+                WHERE JOH.JobOrderHeaderId = " + item + @" ";
 
 
                 ListofQuery QryGatePass = new ListofQuery();
                 QryGatePass.Query = QueryGatePass;
                 QryGatePass.QueryName = nameof(QueryGatePass);
                 DocumentPrintData.Add(QryGatePass);
-            }
+
             return DocumentPrintData;
 
         }

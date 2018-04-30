@@ -271,6 +271,7 @@
     <Compile Include="ViewModels\CompanySettingsViewModel.cs" />
     <Compile Include="ViewModels\ControllerActionViewModel.cs" />
     <Compile Include="ViewModels\DARViewModel.cs" />
+    <Compile Include="ViewModels\NarrationViewModel.cs" />
     <Compile Include="ViewModels\Dimension1.cs">
       <SubType>Code</SubType>
     </Compile>

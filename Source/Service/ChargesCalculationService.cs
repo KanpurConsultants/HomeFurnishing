@@ -70,7 +70,8 @@ namespace Service
                 else if (LineCharges[i].RateType == (byte)RateTypeEnum.Percentage)
                 {
                     var calculateOn = LineCharges[i].CalculateOnCode;
-                    Line[selector] = Line[calculateOn] * (Line[selectorRate] / 100);
+                    Line[selector] = Math.Round(Convert.ToDecimal(Line[calculateOn] * (Line[selectorRate] / 100)),2);
+                    //Line[selector] = Line[calculateOn] * (Line[selectorRate] / 100);
                     //$(selector).val(parseFloat(parseFloat($(calculateOn).val()) * parseFloat($(selectorRate).val()) / 100).toFixed(2));
                 }
                 else if (LineCharges[i].RateType == (byte)RateTypeEnum.Rate)

@@ -45,6 +45,7 @@ namespace Service
         SaleInvoiceHeader FindDirectSaleInvoice(int id);
         IQueryable<ComboBoxResult> GetCustomPerson(int Id, string term);
         IEnumerable<DocumentTypeHeaderAttributeViewModel> GetDocumentHeaderAttribute(int id);
+        string GetNarration(int SaleInvoiceHeaderId);
     }
     public class SaleInvoiceHeaderService : ISaleInvoiceHeaderService
     {
@@ -482,6 +483,53 @@ namespace Service
                        };
 
             return temp;
+        }
+
+        public string GetNarration(int SaleInvoiceHeaderId)
+        {
+            string Narration = "";
+
+            var SaleInvoiceHeader_Data = (from H in db.SaleInvoiceHeader
+                                          join L in db.SaleInvoiceLine on H.SaleInvoiceHeaderId equals L.SaleInvoiceHeaderId into SaleInvoiceLineTable
+                                          from SaleInvoiceLineTab in SaleInvoiceLineTable.DefaultIfEmpty()
+                                          where H.SaleInvoiceHeaderId == SaleInvoiceHeaderId
+                                          select new
+                                          {
+                                              DocTypeId = H.DocTypeId,
+                                              SaleToBuyerName = H.SaleToBuyer.Name,
+                                              ProductName = SaleInvoiceLineTab.SaleDispatchLine.PackingLine.Product.ProductName,
+                                              ProductUidName = SaleInvoiceLineTab.SaleDispatchLine.PackingLine.ProductUid.ProductUidName,
+                                              ProductGroupName = SaleInvoiceLineTab.SaleDispatchLine.PackingLine.Product.ProductGroup.ProductGroupName,
+                                              Qty = SaleInvoiceLineTab.Qty,
+                                              Rate = SaleInvoiceLineTab.Rate,
+                                              Amount = SaleInvoiceLineTab.Amount,
+                                          }).FirstOrDefault();
+
+            var SaleInvoiceHeaderCharges_Data = (from Hc in db.SaleInvoiceHeaderCharge
+                                                 where Hc.HeaderTableId == SaleInvoiceHeaderId
+                                                 && Hc.Charge.ChargeName == "Net Amount"
+                                                 select new
+                                                 {
+                                                     NetAmount = Hc.Amount
+                                                 }).FirstOrDefault();
+
+
+
+            if (SaleInvoiceHeader_Data != null)
+            {
+                var Narration_Temp = (from H in db.Narration where H.DocTypeId == SaleInvoiceHeader_Data.DocTypeId select new { Narration = H.NarrationName }).FirstOrDefault();
+
+                if (Narration_Temp != null)
+                    Narration = Narration_Temp.Narration.Replace("<CustomerName>", SaleInvoiceHeader_Data.SaleToBuyerName)
+                                            .Replace("<ProductName>", SaleInvoiceHeader_Data.ProductName)
+                                            .Replace("<ProductGroupName>", SaleInvoiceHeader_Data.ProductGroupName)
+                                            .Replace("<ProductUidName>", SaleInvoiceHeader_Data.ProductUidName)
+                                            .Replace("<Qty>", SaleInvoiceHeader_Data.Qty.ToString())
+                                            .Replace("<Rate>", SaleInvoiceHeader_Data.Rate.ToString())
+                                            .Replace("<Amount>", SaleInvoiceHeader_Data.Amount.ToString())
+                                            .Replace("<NetAmount>", SaleInvoiceHeaderCharges_Data.NetAmount.ToString());
+            }
+            return Narration;
         }
 
     }

@@ -1343,6 +1343,9 @@ namespace Service
 
             var settings = new PackingSettingService(_unitOfWork).GetPackingSettingForDocument(PackingHeader.DocTypeId, PackingHeader.DivisionId, PackingHeader.SiteId);
 
+            string[] ProductTypes = null;
+            if (!string.IsNullOrEmpty(settings.filterProductTypes)) { ProductTypes = settings.filterProductTypes.Split(",".ToCharArray()); }
+            else { ProductTypes = new string[] { "NA" }; }
 
             string[] contraSites = null;
             if (!string.IsNullOrEmpty(settings.filterContraSites)) { contraSites = settings.filterContraSites.Split(",".ToCharArray()); }
@@ -1371,20 +1374,21 @@ namespace Service
                     from Dimension4Tab in Dimension4Table.DefaultIfEmpty()
                     where p.BalanceQty > 0 && StockTab.GodownId == PackingHeader.GodownId
                         && StockTab.StockHeader.DocTypeId != PackingHeader.DocTypeId
-                    && (ProductId == null || ProductId == 0 ? 1 == 1 : p.ProductId == ProductId)
-                    && (Dimension1Id == null ? 1 == 1 : p.Dimension1Id == Dimension1Id)
-                    && (Dimension2Id == null ? 1 == 1 : p.Dimension2Id == Dimension2Id)
-                    && (Dimension3Id == null ? 1 == 1 : p.Dimension3Id == Dimension3Id)
-                    && (Dimension4Id == null ? 1 == 1 : p.Dimension4Id == Dimension4Id)
-                    && (string.IsNullOrEmpty(settings.filterContraSites) ? p.SiteId == CurrentSiteId : contraSites.Contains(p.SiteId.ToString()))
-                    && (string.IsNullOrEmpty(settings.filterContraDivisions) ? p.DivisionId == CurrentDivisionId : contraDivisions.Contains(p.DivisionId.ToString()))
+                    //&& (ProductId == null || ProductId == 0 ? 1 == 1 : p.ProductId == ProductId)
+                    //&& (Dimension1Id == null ? 1 == 1 : p.Dimension1Id == Dimension1Id)
+                    //&& (Dimension2Id == null ? 1 == 1 : p.Dimension2Id == Dimension2Id)
+                    //&& (Dimension3Id == null ? 1 == 1 : p.Dimension3Id == Dimension3Id)
+                    //&& (Dimension4Id == null ? 1 == 1 : p.Dimension4Id == Dimension4Id)
+                    && (string.IsNullOrEmpty(settings.filterProductTypes) ? 1 == 1 : ProductTypes.Contains(StockTab.Product.ProductGroup.ProductTypeId.ToString()))
+                    //&& (string.IsNullOrEmpty(settings.filterContraSites) ? p.SiteId == CurrentSiteId : contraSites.Contains(p.SiteId.ToString()))
+                    //&& (string.IsNullOrEmpty(settings.filterContraDivisions) ? p.DivisionId == CurrentDivisionId : contraDivisions.Contains(p.DivisionId.ToString()))
                     && (string.IsNullOrEmpty(term) ? 1 == 1 : p.StockInNo.ToLower().Contains(term.ToLower())
                         || string.IsNullOrEmpty(term) ? 1 == 1 : StockTab.StockHeader.DocType.DocumentTypeShortName.ToLower().Contains(term.ToLower())
                         || string.IsNullOrEmpty(term) ? 1 == 1 : ProductTab.ProductName.ToLower().Contains(term.ToLower())
-                        || string.IsNullOrEmpty(term) ? 1 == 1 : Dimension1Tab.Dimension1Name.ToLower().Contains(term.ToLower())
-                        || string.IsNullOrEmpty(term) ? 1 == 1 : Dimension2Tab.Dimension2Name.ToLower().Contains(term.ToLower())
-                        || string.IsNullOrEmpty(term) ? 1 == 1 : Dimension3Tab.Dimension3Name.ToLower().Contains(term.ToLower())
-                        || string.IsNullOrEmpty(term) ? 1 == 1 : Dimension4Tab.Dimension4Name.ToLower().Contains(term.ToLower())
+                        //|| string.IsNullOrEmpty(term) ? 1 == 1 : Dimension1Tab.Dimension1Name.ToLower().Contains(term.ToLower())
+                        //|| string.IsNullOrEmpty(term) ? 1 == 1 : Dimension2Tab.Dimension2Name.ToLower().Contains(term.ToLower())
+                        //|| string.IsNullOrEmpty(term) ? 1 == 1 : Dimension3Tab.Dimension3Name.ToLower().Contains(term.ToLower())
+                        //|| string.IsNullOrEmpty(term) ? 1 == 1 : Dimension4Tab.Dimension4Name.ToLower().Contains(term.ToLower())
                         || string.IsNullOrEmpty(term) ? 1 == 1 : StockTab.LotNo.ToLower().Contains(term.ToLower())
                         || string.IsNullOrEmpty(term) ? 1 == 1 : StockTab.ProductUid.ProductUidName.ToLower().Contains(term.ToLower())
                         || string.IsNullOrEmpty(term) ? 1 == 1 : StockTab.ProductUid.LotNo.ToLower().Contains(term.ToLower())
@@ -1400,7 +1404,7 @@ namespace Service
                                     ((Dimension2Tab.Dimension2Name == null) ? "" : "," + Dimension2Tab.Dimension2Name) +
                                     ((Dimension3Tab.Dimension3Name == null) ? "" : "," + Dimension3Tab.Dimension3Name) +
                                     ((Dimension4Tab.Dimension4Name == null) ? "" : "," + Dimension4Tab.Dimension4Name) +
-                                    ((p.LotNo == null) ? "" : "," + p.LotNo)
+                                    ((p.LotNo == null) ? "" : ",CN:" + p.LotNo)
                     });
         }
 

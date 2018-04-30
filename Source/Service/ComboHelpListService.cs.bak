@@ -2754,7 +2754,21 @@ namespace Service
             return list;
         }
 
+        public IQueryable<ComboBoxResult> GetUnitConversionFors(string term)
+        {
+            var list = (from D in db.UnitConversonFor
+                        where 1==1
+                        && (string.IsNullOrEmpty(term) ? 1 == 1 : (D.UnitconversionForName.ToLower().Contains(term.ToLower())))
+                        orderby D.UnitconversionForName
+                        select new ComboBoxResult
+                        {
+                            id = D.UnitconversionForId.ToString(),
+                            text = D.UnitconversionForName
+                        }
+              );
 
+            return list;
+        }
 
         public IQueryable<ComboBoxResult> GetDeliveryTerms(string term)
         {

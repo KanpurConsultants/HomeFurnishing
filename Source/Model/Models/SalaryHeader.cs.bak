@@ -55,7 +55,9 @@ namespace Model.Models
 
         [Display(Name = "Modified Date"), DisplayFormat(DataFormatString = "{0:dd/MMM/yyyy}")]
         public DateTime ModifiedDate { get; set; }
-        
+
+        public bool? IsDocumentPrinted { get; set; }
+
         [Display(Name = "Lock Reason")]
         public string LockReason { get; set; }
 

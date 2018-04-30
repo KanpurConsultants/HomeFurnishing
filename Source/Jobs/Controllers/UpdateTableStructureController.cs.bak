@@ -2051,6 +2051,8 @@ namespace Module
             AddFields("StockHeaderSettings", "IsMandatoryStockIn", "BIT");
             AddFields("StockHeaderSettings", "isMandatoryLotNo", "BIT");
             AddFields("StockHeaderSettings", "isMandatoryLotNoOrDimension1", "BIT");
+            AddFields("JobReceiveSettings", "isMandatoryLotNo", "BIT");
+            AddFields("JobReceiveSettings", "isMandatoryLotNoOrDimension1", "BIT");
 
             try
             {
@@ -3686,6 +3688,10 @@ namespace Module
 
             AddFields("ReportHeaders", "IsHideHeaderDetail", "BIT");
 
+            AddFields("JobInvoiceSettings", "JobInvoiceReturnDocTypeId", "Int","DocumentTypes");
+
+
+            
 
             ReCreateProcedures();
             DataCorrection();

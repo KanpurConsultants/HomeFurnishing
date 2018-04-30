@@ -141,6 +141,11 @@ namespace Model.Models
         public virtual ChargeGroupPerson SalesTaxGroupPerson { get; set; }
 
 
+        [ForeignKey("JobInvoiceReturnDocType")]
+        public int? JobInvoiceReturnDocTypeId { get; set; }
+        public virtual DocumentType JobInvoiceReturnDocType { get; set; }
+
+
         [ForeignKey("Process")]
         public int ProcessId { get; set; }
         public virtual Process Process { get; set; }

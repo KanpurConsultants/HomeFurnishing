@@ -6,7 +6,7 @@ namespace Model.Models
 {
     public class City : EntityBase, IHistoryLog
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        //[DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Key]
         public int CityId { get; set; }
         [Display (Name="Name")]

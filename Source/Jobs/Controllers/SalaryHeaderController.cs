@@ -1417,16 +1417,102 @@ namespace Jobs.Controllers
             IEnumerable<SalaryHeaderCharge> SalaryHeaderHeaderCharges = from H in db.SalaryHeaderCharge where H.HeaderTableId == Header.SalaryHeaderId select H;
             IEnumerable<SalaryLineCharge> SalaryHeaderLineCharges = from L in db.SalaryLineCharge where L.HeaderTableId == Header.SalaryHeaderId select L;
 
-            new CalculationService(_unitOfWork).LedgerPostingDB(ref LedgerHeaderViewModel, SalaryHeaderHeaderCharges, SalaryHeaderLineCharges, ref db);
+            if (SalaryHeaderLineCharges.Count() > 0)
+                new CalculationService(_unitOfWork).LedgerPostingDB(ref LedgerHeaderViewModel, SalaryHeaderHeaderCharges, SalaryHeaderLineCharges, ref db);
+            else
+            {
+                if (LedgerHeaderViewModel.LedgerHeaderId == 0)
+                {
+                    LedgerHeader LedgerHeader = new LedgerHeader();
+
+                    LedgerHeader.DocHeaderId = LedgerHeaderViewModel.DocHeaderId;
+                    LedgerHeader.DocTypeId = LedgerHeaderViewModel.DocTypeId;
+                    LedgerHeader.DocDate = LedgerHeaderViewModel.DocDate;
+                    LedgerHeader.DocNo = LedgerHeaderViewModel.DocNo;
+                    LedgerHeader.DivisionId = LedgerHeaderViewModel.DivisionId;
+                    LedgerHeader.SiteId = LedgerHeaderViewModel.SiteId;
+                    LedgerHeader.PartyDocNo = LedgerHeaderViewModel.PartyDocNo;
+                    LedgerHeader.PartyDocDate = LedgerHeaderViewModel.PartyDocDate;
+                    LedgerHeader.Narration = LedgerHeaderViewModel.Narration;
+                    LedgerHeader.Remark = LedgerHeaderViewModel.Remark;
+                    LedgerHeader.CreatedBy = LedgerHeaderViewModel.CreatedBy;
+                    LedgerHeader.ProcessId = LedgerHeaderViewModel.ProcessId;
+                    LedgerHeader.CreatedDate = DateTime.Now.Date;
+                    LedgerHeader.ModifiedBy = LedgerHeaderViewModel.ModifiedBy;
+                    LedgerHeader.ModifiedDate = DateTime.Now.Date;
+                    LedgerHeader.ObjectState = Model.ObjectState.Added;
+                    db.LedgerHeader.Add(LedgerHeader);
+                    //new LedgerHeaderService(_unitOfWork).Create(LedgerHeader);
+                }
+                else
+                {
+
+                    int LedHeadId = LedgerHeaderViewModel.LedgerHeaderId;
+                    LedgerHeader LedgerHeader = (from p in db.LedgerHeader
+                                                 where p.LedgerHeaderId == LedHeadId
+                                                 select p).FirstOrDefault();
+
+                    LedgerHeader.DocHeaderId = LedgerHeaderViewModel.DocHeaderId;
+                    LedgerHeader.DocTypeId = LedgerHeaderViewModel.DocTypeId;
+                    LedgerHeader.DocDate = LedgerHeaderViewModel.DocDate;
+                    LedgerHeader.DocNo = LedgerHeaderViewModel.DocNo;
+                    LedgerHeader.DivisionId = LedgerHeaderViewModel.DivisionId;
+                    LedgerHeader.ProcessId = LedgerHeaderViewModel.ProcessId;
+                    LedgerHeader.SiteId = LedgerHeaderViewModel.SiteId;
+                    LedgerHeader.PartyDocNo = LedgerHeaderViewModel.PartyDocNo;
+                    LedgerHeader.PartyDocDate = LedgerHeaderViewModel.PartyDocDate;
+                    LedgerHeader.Narration = LedgerHeaderViewModel.Narration;
+                    LedgerHeader.Remark = LedgerHeaderViewModel.Remark;
+                    LedgerHeader.ModifiedBy = LedgerHeaderViewModel.ModifiedBy;
+                    LedgerHeader.ModifiedDate = DateTime.Now.Date;
+                    LedgerHeader.ObjectState = Model.ObjectState.Modified;
+                    db.LedgerHeader.Add(LedgerHeader);
+                }
+
+                    IEnumerable<SalaryLine> SalaryLineList = from L in db.SalaryLine where L.SalaryHeaderId == Header.SalaryHeaderId select L;
+
+                foreach (var Line in SalaryLineList)
+                {
+                    #region LedgerSave
+                    Ledger Ledger = new Ledger();
+
+                    LedgerAccount LA = new LedgerAccountService(_unitOfWork).GetLedgerAccountByPersondId(Line.EmployeeId);
+                    PersonProcess PP = new PersonProcessService(_unitOfWork).GetPersonProcessIdListByPersonId(Line.EmployeeId).FirstOrDefault();
+                    Process P = new ProcessService(_unitOfWork).Find(PP.ProcessId);
+                    LedgerAccount LAC = new LedgerAccountService(_unitOfWork).Find(P.AccountId);
+
+                    Ledger.AmtCr = Line.NetPayable;
+                    Ledger.ContraLedgerAccountId = LAC.LedgerAccountId;
+                    Ledger.LedgerAccountId = LA.LedgerAccountId;
+                    Ledger.LedgerHeaderId = LedgerHeaderViewModel.LedgerHeaderId;
+                    Ledger.Narration = Header.Remark + Line.Remark;
+                    Ledger.ObjectState = Model.ObjectState.Added;
+                    Ledger.LedgerId = 1;
+                    db.Ledger.Add(Ledger);
+
+                    #endregion
+
+                    #region ContraLedgerSave
+                    Ledger ContraLedger = new Ledger();
+
+                    ContraLedger.AmtDr = Line.NetPayable;
+                    ContraLedger.LedgerHeaderId = LedgerHeaderViewModel.LedgerHeaderId;
+                    ContraLedger.LedgerAccountId = LAC.LedgerAccountId;
+                    ContraLedger.ContraLedgerAccountId = LA.LedgerAccountId;
+                    ContraLedger.ObjectState = Model.ObjectState.Added;
+                    db.Ledger.Add(ContraLedger);
+                    #endregion
+                }
+
+            }
 
             Header.LedgerHeaderId = LedgerHeaderViewModel.LedgerHeaderId;
 
 
             var LedgerLineList_Temp = (from L in db.SalaryLine
-                                       join E in db.Employee on L.EmployeeId equals E.EmployeeId into EmployeeTable
-                                       from EmployeeTab in EmployeeTable.DefaultIfEmpty()
-                                       join A in db.LedgerAccount on EmployeeTab.PersonID equals A.PersonId into LedgerAccountTable
+                                       join A in db.LedgerAccount on L.EmployeeId equals A.PersonId into LedgerAccountTable
                                        from LedgerAccountTab in LedgerAccountTable.DefaultIfEmpty()
+
                                        where L.SalaryHeaderId == Header.SalaryHeaderId
                                        select new
                                        {

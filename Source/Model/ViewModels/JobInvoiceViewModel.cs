@@ -79,6 +79,9 @@ namespace Model.ViewModel
         public decimal? TotalAmount { get; set; }
         public int? DecimalPlaces { get; set; }
 
+        public string AdditionalInfo { get; set; }
+        public string ReturnNature { get; set; }
+
         public string ProductUidName { get; set; }
         public string ProductName { get; set; }
         public string ProductGroupName { get; set; }

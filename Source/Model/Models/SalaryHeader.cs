@@ -23,6 +23,9 @@ namespace Model.Models
         [Display(Name = "Doc No"), MaxLength(20)]
         public string DocNo { get; set; }
 
+        [MaxLength(20)]
+        public string WagesPayType { get; set; }
+
         [ForeignKey("Division"), Display(Name = "Division")]
         public int DivisionId { get; set; }
         public virtual Division Division { get; set; }

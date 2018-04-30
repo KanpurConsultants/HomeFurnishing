@@ -25,6 +25,7 @@ namespace Model.ViewModels
         public string EmployeeName { get; set; }
 
         public decimal Days { get; set; }
+        public decimal BasicSalary { get; set; }
         public decimal? OtherAddition { get; set; }
         public decimal? OtherDeduction { get; set; }
         public decimal? LoanEMI { get; set; }

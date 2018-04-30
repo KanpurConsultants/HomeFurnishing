@@ -876,6 +876,16 @@ namespace Jobs.Controllers
                 return RedirectToAction("DetailInformation", new { id = id, IndexType = IndexType });
             }
 
+            var JobInvoiceReturn = db.JobInvoiceReturnLine.Where(i => i.JobInvoiceLine.JobInvoiceHeaderId == id).FirstOrDefault();
+            if (JobInvoiceReturn != null)
+            {
+                pt.ReturnNature = (from H in db.JobInvoiceReturnHeader where H.JobInvoiceReturnHeaderId == JobInvoiceReturn.JobInvoiceReturnHeaderId select new { DocTypeNature = H.DocType.Nature }).FirstOrDefault().DocTypeNature;
+                if (pt.ReturnNature == TransactionNatureConstants.Credit)
+                    pt.AdditionalInfo = "Credit Note is generated for this invoice.";
+                else
+                    pt.AdditionalInfo = "Invoice is cancelled.";
+            }
+
 
             if (pt.JobReceiveHeaderId != null)
             {
@@ -1064,7 +1074,7 @@ namespace Jobs.Controllers
                     LedgerHeaderViewModel.SiteId = pd.SiteId;
                     LedgerHeaderViewModel.PartyDocNo = pd.JobWorkerDocNo;
                     LedgerHeaderViewModel.PartyDocDate = pd.JobWorkerDocDate;
-                    LedgerHeaderViewModel.Narration = "";
+                    LedgerHeaderViewModel.Narration = _JobInvoiceHeaderService.GetNarration(pd.JobInvoiceHeaderId);
                     LedgerHeaderViewModel.Remark = pd.Remark;
                     LedgerHeaderViewModel.CreatedBy = pd.CreatedBy;
                     LedgerHeaderViewModel.CreatedDate = DateTime.Now.Date;
@@ -1865,7 +1875,7 @@ namespace Jobs.Controllers
                                 if (Settings.SqlProcDocumentPrint == null || Settings.SqlProcDocumentPrint == "")
                                 {
                                     JobInvoiceHeaderRDL cr = new JobInvoiceHeaderRDL();
-                                    drp.CreateRDLFile("StdDocPrint_JobInvoice", cr.Create_StdDocPrint_JobInvoice());
+                                    drp.CreateRDLFile("Std_JobInvoice_Print", cr.Create_Std_JobInvoice_Print());
                                     List<ListofQuery> QueryList = new List<ListofQuery>();
                                     QueryList = DocumentPrintData(item);
                                     Pdf = drp.DocumentPrint_New(QueryList, User.Identity.Name);
@@ -1880,7 +1890,7 @@ namespace Jobs.Controllers
                                 if (Settings.SqlProcDocumentPrint_AfterSubmit == null || Settings.SqlProcDocumentPrint_AfterSubmit == "")
                                 {
                                     JobInvoiceHeaderRDL cr = new JobInvoiceHeaderRDL();
-                                    drp.CreateRDLFile("StdDocPrint_JobInvoice", cr.Create_StdDocPrint_JobInvoice());
+                                    drp.CreateRDLFile("Std_JobInvoice_Print", cr.Create_Std_JobInvoice_Print());
                                     List<ListofQuery> QueryList = new List<ListofQuery>();
                                     QueryList = DocumentPrintData(item);
                                     Pdf = drp.DocumentPrint_New(QueryList, User.Identity.Name);
@@ -1895,7 +1905,7 @@ namespace Jobs.Controllers
                                 if (Settings.SqlProcDocumentPrint_AfterApprove == null || Settings.SqlProcDocumentPrint_AfterApprove == "")
                                 {
                                     JobInvoiceHeaderRDL cr = new JobInvoiceHeaderRDL();
-                                    drp.CreateRDLFile("StdDocPrint_JobInvoice", cr.Create_StdDocPrint_JobInvoice());
+                                    drp.CreateRDLFile("Std_JobInvoice_Print", cr.Create_Std_JobInvoice_Print());
                                     List<ListofQuery> QueryList = new List<ListofQuery>();
                                     QueryList = DocumentPrintData(item);
                                     Pdf = drp.DocumentPrint_New(QueryList, User.Identity.Name);
@@ -2015,7 +2025,7 @@ P.Mobile AS PartyMobileNo,	SPR.*,
 	--Other Fields
 	@UnitDealCnt  AS DealUnitCnt,		
 	(CASE WHEN Isnull(H.Status,0)=0 OR Isnull(H.Status,0)=8 THEN 'Provisional ' +isnull(DT.PrintTitle,DT.DocumentTypeName) ELSE isnull(DT.PrintTitle,DT.DocumentTypeName) END) AS ReportTitle, 
-	'StdDocPrint_JobInvoice.rdl' AS ReportName,		
+	'Std_JobInvoice_Print.rdl' AS ReportName,		
 	SalesTaxGroupProductCaption,
 	SDS.SalesTaxProductCodeCaption
 	FROM Web.JobInvoiceHeaders H WITH (Nolock)
@@ -2246,5 +2256,379 @@ EXEC(@Qry);	";
             }
             base.Dispose(disposing);
         }
+
+        [HttpGet]
+        public ActionResult _CreateInvoiceReturn(int id)
+        {
+            JobInvoiceReturn JobInvoiceReturn = new JobInvoiceReturn();
+            JobInvoiceReturn.JobInvoiceHeaderId = id;
+            ViewBag.ReasonList = new ReasonService(_unitOfWork).GetReasonList(TransactionDocCategoryConstants.JobInvoiceReturn).ToList();
+            JobInvoiceReturn.DocDate = DateTime.Now;
+            return PartialView("_InvoiceReturn", JobInvoiceReturn);
+        }
+
+        [HttpPost]
+        //[ValidateAntiForgeryToken]
+        public ActionResult _CreateInvoiceReturnPost(JobInvoiceReturn svm)
+        {
+            int Cnt = 0;
+            int Serial = 0;
+            int pk = 0;
+            int Gpk = 0;
+            int PersonCount = 0;
+            bool HeaderChargeEdit = false;
+
+            JobInvoiceHeader JobInvoiceHeader = new JobInvoiceHeaderService(_unitOfWork).Find(svm.JobInvoiceHeaderId);
+            JobReceiveHeader JobReceiveHeader = new JobReceiveHeaderService(_unitOfWork).Find(JobInvoiceHeader.JobReceiveHeaderId ?? 0);
+            var DispatchLine = new JobReceiveLineService(_unitOfWork).GetJobReceiveLineList(JobReceiveHeader.JobReceiveHeaderId);
+            List<LineChargeRates> LineChargeRates = new List<LineChargeRates>();
+
+            var JobInvoiceSettings = new JobInvoiceSettingsService(_unitOfWork).GetJobInvoiceSettingsForDocument(JobInvoiceHeader.DocTypeId, JobInvoiceHeader.DivisionId, JobInvoiceHeader.SiteId);
+            int InvoiceRetHeaderDocTypeId = 0;
+
+            if (JobInvoiceSettings.JobInvoiceReturnDocTypeId == null)
+            {
+                string message = "Invoice Return Document Type is not difined in settings.";
+                ModelState.AddModelError("", message);
+                return PartialView("_InvoiceReturn", svm);
+            }
+            else
+            {
+                InvoiceRetHeaderDocTypeId = (int)JobInvoiceSettings.JobInvoiceReturnDocTypeId;
+            }
+
+
+            if (ModelState.IsValid)
+            {
+                var JobInvoiceLineList = (from p in db.ViewJobInvoiceBalance
+                                          join l in db.JobInvoiceLine on p.JobInvoiceLineId equals l.JobInvoiceLineId into linetable
+                                          from linetab in linetable.DefaultIfEmpty()
+                                          join t in db.JobInvoiceHeader on p.JobInvoiceHeaderId equals t.JobInvoiceHeaderId into table
+                                          from tab in table.DefaultIfEmpty()
+                                          join t1 in db.JobReceiveLine on p.JobReceiveLineId equals t1.JobReceiveLineId into table1
+                                          from tab1 in table1.DefaultIfEmpty()
+                                          join product in db.Product on tab1.ProductId equals product.ProductId into table2
+                                          from tab2 in table2.DefaultIfEmpty()
+                                          where p.JobInvoiceHeaderId == JobInvoiceHeader.JobInvoiceHeaderId
+                                          && p.BalanceQty > 0
+                                          select new JobInvoiceReturnLineViewModel
+                                          {
+                                              Dimension1Name = tab1.Dimension1.Dimension1Name,
+                                              Dimension2Name = tab1.Dimension2.Dimension2Name,
+                                              Specification = tab1.Specification,
+                                              InvoiceBalQty = p.BalanceQty,
+                                              Qty = p.BalanceQty,
+                                              JobInvoiceHeaderDocNo = tab.DocNo,
+                                              ProductName = tab2.ProductName,
+                                              ProductId = p.ProductId,
+                                              JobInvoiceLineId = p.JobInvoiceLineId,
+                                              UnitId = tab2.UnitId,
+                                              UnitConversionMultiplier = tab1.UnitConversionMultiplier,
+                                              DealUnitId = linetab.DealUnitId,
+                                              Rate = linetab.Rate,
+                                              Amount = linetab.Amount,
+                                              unitDecimalPlaces = tab2.Unit.DecimalPlaces,
+                                              DealunitDecimalPlaces = linetab.DealUnit.DecimalPlaces,
+                                              DiscountPer = linetab.RateDiscountPer,
+                                              ProductUidName = tab1.ProductUid.ProductUidName,
+                                              SalesTaxGroupProductId = linetab.SalesTaxGroupProductId
+                                          }).ToList();
+
+                if (JobInvoiceLineList.Sum(i => i.InvoiceBalQty) > 0)
+                {
+                    JobInvoiceSettings Settings = new JobInvoiceSettingsService(_unitOfWork).GetJobInvoiceSettingsForDocument(InvoiceRetHeaderDocTypeId, JobInvoiceHeader.DivisionId, JobInvoiceHeader.SiteId);
+
+                    JobReturnHeader GoodsRetHeader = new JobReturnHeader();
+                    GoodsRetHeader.DocTypeId = (int)Settings.JobReturnDocTypeId;
+                    GoodsRetHeader.DocDate = svm.DocDate;
+                    GoodsRetHeader.DocNo = new DocumentTypeService(_unitOfWork).FGetNewDocNo("DocNo", ConfigurationManager.AppSettings["DataBaseSchema"] + ".JobReturnHeaders", GoodsRetHeader.DocTypeId, svm.DocDate, JobInvoiceHeader.DivisionId, JobInvoiceHeader.SiteId);
+                    GoodsRetHeader.SiteId = JobInvoiceHeader.SiteId;
+                    GoodsRetHeader.DivisionId = JobInvoiceHeader.DivisionId;
+                    GoodsRetHeader.ProcessId = JobInvoiceHeader.ProcessId;
+                    GoodsRetHeader.JobWorkerId = (int)JobInvoiceHeader.JobWorkerId;
+                    GoodsRetHeader.ReasonId = svm.ReasonId;
+                    GoodsRetHeader.GodownId = JobReceiveHeader.GodownId;
+                    GoodsRetHeader.Remark = svm.Remark;
+                    GoodsRetHeader.CreatedDate = DateTime.Now;
+                    GoodsRetHeader.ModifiedDate = DateTime.Now;
+                    GoodsRetHeader.CreatedBy = User.Identity.Name;
+                    GoodsRetHeader.ModifiedBy = User.Identity.Name;
+                    GoodsRetHeader.ObjectState = Model.ObjectState.Added;
+                    //new JobReturnHeaderService(_unitOfWork).Create(GoodsRetHeader);
+                    db.JobReturnHeader.Add(GoodsRetHeader);
+
+                    JobInvoiceReturnHeader InvoiceRetHeader = new JobInvoiceReturnHeader();
+                    InvoiceRetHeader.DocTypeId = InvoiceRetHeaderDocTypeId;
+                    InvoiceRetHeader.DocDate = svm.DocDate;
+                    InvoiceRetHeader.DocNo = new DocumentTypeService(_unitOfWork).FGetNewDocNo("DocNo", ConfigurationManager.AppSettings["DataBaseSchema"] + ".JobInvoiceReturnHeaders", InvoiceRetHeader.DocTypeId, svm.DocDate, JobInvoiceHeader.DivisionId, JobInvoiceHeader.SiteId);
+                    InvoiceRetHeader.JobWorkerId = (int)JobInvoiceHeader.JobWorkerId;
+                    InvoiceRetHeader.SiteId = JobInvoiceHeader.SiteId;
+                    InvoiceRetHeader.DivisionId = JobInvoiceHeader.DivisionId;
+                    InvoiceRetHeader.ProcessId = JobInvoiceHeader.ProcessId;
+                    InvoiceRetHeader.ReasonId = svm.ReasonId;
+                    InvoiceRetHeader.Remark = svm.Remark ?? "Cancellation";
+                    InvoiceRetHeader.Nature = TransactionNatureConstants.Return;
+                    InvoiceRetHeader.CreatedDate = DateTime.Now;
+                    InvoiceRetHeader.ModifiedDate = DateTime.Now;
+                    InvoiceRetHeader.CreatedBy = User.Identity.Name;
+                    InvoiceRetHeader.ModifiedBy = User.Identity.Name;
+                    InvoiceRetHeader.JobReturnHeaderId = GoodsRetHeader.JobReturnHeaderId;
+                    InvoiceRetHeader.SalesTaxGroupPersonId = JobInvoiceHeader.SalesTaxGroupPersonId;
+                    InvoiceRetHeader.ObjectState = Model.ObjectState.Added;
+                    //new JobInvoiceReturnHeaderService(db).Create(InvoiceRetHeader);
+                    db.JobInvoiceReturnHeader.Add(InvoiceRetHeader);
+
+                    int CalculationId = (int)Settings.CalculationId;
+
+                    List<LineDetailListViewModel> LineList = new List<LineDetailListViewModel>();
+                    List<HeaderChargeViewModel> HeaderCharges = new List<HeaderChargeViewModel>();
+                    List<LineChargeViewModel> LineCharges = new List<LineChargeViewModel>();
+
+
+                    foreach (var item in JobInvoiceLineList)
+                    {
+                        decimal balqty = (from p in db.ViewJobInvoiceBalance
+                                          where p.JobInvoiceLineId == item.JobInvoiceLineId
+                                          select p.BalanceQty).FirstOrDefault();
+
+
+                        if (item.Qty > 0 && item.Qty <= balqty)
+                        {
+                            JobInvoiceReturnLine line = new JobInvoiceReturnLine();
+                            //var receipt = new JobReceiveLineService(_unitOfWork).Find(item.JobReceiveLineId );
+
+
+                            line.JobInvoiceReturnHeaderId = InvoiceRetHeader.JobInvoiceReturnHeaderId;
+                            line.JobInvoiceLineId = item.JobInvoiceLineId;
+                            line.Qty = item.Qty;
+                            line.Sr = Serial++;
+                            line.Rate = item.Rate;
+                            line.DealQty = item.UnitConversionMultiplier * item.Qty;
+                            line.DealUnitId = item.DealUnitId;
+                            line.UnitConversionMultiplier = item.UnitConversionMultiplier;
+                            line.Amount = item.Amount;
+
+                            line.SalesTaxGroupProductId = item.SalesTaxGroupProductId;
+                            line.Remark = item.Remark;
+                            line.CreatedDate = DateTime.Now;
+                            line.ModifiedDate = DateTime.Now;
+                            line.CreatedBy = User.Identity.Name;
+                            line.ModifiedBy = User.Identity.Name;
+                            line.JobInvoiceReturnLineId = pk;
+
+
+                            JobReturnLine GLine = Mapper.Map<JobInvoiceReturnLine, JobReturnLine>(line);
+                            GLine.JobReceiveLineId = new JobInvoiceLineService(_unitOfWork).Find(line.JobInvoiceLineId).JobReceiveLineId;
+                            GLine.JobReturnHeaderId = GoodsRetHeader.JobReturnHeaderId;
+                            GLine.JobReturnLineId = Gpk;
+                            GLine.Qty = line.Qty;
+                            GLine.ObjectState = Model.ObjectState.Added;
+
+
+                            JobReceiveLine JobReceiveLine = new JobReceiveLineService(_unitOfWork).Find(GLine.JobReceiveLineId);
+
+                            StockViewModel StockViewModel = new StockViewModel();
+
+
+                            if (Cnt == 0)
+                            {
+                                StockViewModel.StockHeaderId = GoodsRetHeader.StockHeaderId ?? 0;
+                            }
+                            else
+                            {
+                                if (GoodsRetHeader.StockHeaderId != null && GoodsRetHeader.StockHeaderId != 0)
+                                {
+                                    StockViewModel.StockHeaderId = (int)GoodsRetHeader.StockHeaderId;
+                                }
+                                else
+                                {
+                                    StockViewModel.StockHeaderId = -1;
+                                }
+
+                            }
+
+                            StockViewModel.StockId = -Cnt;
+
+                            StockViewModel.DocHeaderId = GoodsRetHeader.JobReturnHeaderId;
+                            StockViewModel.DocLineId = JobReceiveLine.JobReceiveLineId;
+                            StockViewModel.DocTypeId = GoodsRetHeader.DocTypeId;
+                            StockViewModel.StockHeaderDocDate = GoodsRetHeader.DocDate;
+                            StockViewModel.StockDocDate = GoodsRetHeader.DocDate;
+                            StockViewModel.DocNo = GoodsRetHeader.DocNo;
+                            StockViewModel.DivisionId = GoodsRetHeader.DivisionId;
+                            StockViewModel.SiteId = GoodsRetHeader.SiteId;
+                            StockViewModel.CurrencyId = null;
+                            StockViewModel.PersonId = GoodsRetHeader.JobWorkerId;
+                            StockViewModel.ProductId = JobReceiveLine.ProductId;
+                            StockViewModel.ProductUidId = JobReceiveLine.ProductUidId;
+                            StockViewModel.HeaderFromGodownId = null;
+                            StockViewModel.HeaderGodownId = null;
+                            StockViewModel.HeaderProcessId = Settings.ProcessId;
+                            StockViewModel.GodownId = GoodsRetHeader.GodownId;
+                            StockViewModel.Remark = svm.Remark;
+                            StockViewModel.Status = 0;
+                            StockViewModel.ProcessId = null;
+                            StockViewModel.LotNo = null;
+                            StockViewModel.CostCenterId = null;
+                            StockViewModel.Qty_Iss = 0;
+                            StockViewModel.Qty_Rec = GLine.Qty;
+                            StockViewModel.Rate = null;
+                            StockViewModel.ExpiryDate = null;
+                            StockViewModel.Specification = JobReceiveLine.Specification;
+                            StockViewModel.Dimension1Id = JobReceiveLine.Dimension1Id;
+                            StockViewModel.Dimension2Id = JobReceiveLine.Dimension2Id;
+                            StockViewModel.CreatedBy = User.Identity.Name;
+                            StockViewModel.CreatedDate = DateTime.Now;
+                            StockViewModel.ModifiedBy = User.Identity.Name;
+                            StockViewModel.ModifiedDate = DateTime.Now;
+
+                            string StockPostingError = "";
+                            StockPostingError = new StockService(_unitOfWork).StockPostDB(ref StockViewModel, ref db);
+
+                            if (StockPostingError != "")
+                            {
+                                string message = StockPostingError;
+                                ModelState.AddModelError("", message);
+                                return PartialView("_InvoiceReturn", svm);
+                            }
+
+
+                            if (Cnt == 0)
+                            {
+                                GoodsRetHeader.StockHeaderId = StockViewModel.StockHeaderId;
+                            }
+
+
+                            GLine.StockId = StockViewModel.StockId;
+
+
+                            //new JobReturnLineService(_unitOfWork).Create(GLine);
+                            GLine.ObjectState = Model.ObjectState.Added;
+                            db.JobReturnLine.Add(GLine);
+
+
+                            line.JobReturnLineId = GLine.JobReturnLineId;
+                            line.ObjectState = Model.ObjectState.Added;
+                            //new JobInvoiceReturnLineService(db).Create(line);
+                            db.JobInvoiceReturnLine.Add(line);
+
+                            LineList.Add(new LineDetailListViewModel { Amount = line.Amount, Rate = line.Rate, LineTableId = line.JobInvoiceReturnLineId, HeaderTableId = item.JobInvoiceReturnHeaderId, PersonID = InvoiceRetHeader.JobWorkerId, DealQty = line.DealQty });
+
+                            List<CalculationProductViewModel> ChargeRates = new CalculationProductService(_unitOfWork).GetChargeRates(CalculationId, InvoiceRetHeader.DocTypeId, InvoiceRetHeader.SiteId, InvoiceRetHeader.DivisionId,
+                                    Settings.ProcessId, InvoiceRetHeader.SalesTaxGroupPersonId, item.SalesTaxGroupProductId).ToList();
+                            if (ChargeRates != null)
+                            {
+                                LineChargeRates.Add(new LineChargeRates { LineId = line.JobInvoiceReturnLineId, ChargeRates = ChargeRates });
+                            }
+
+
+                            Gpk++;
+                            pk++;
+
+                            Cnt = Cnt + 1;
+                        }
+                    }
+
+                    var LineListWithReferences = (from p in LineList
+                                                  join t3 in LineChargeRates on p.LineTableId equals t3.LineId into LineChargeRatesTable
+                                                  from LineChargeRatesTab in LineChargeRatesTable.DefaultIfEmpty()
+                                                  orderby p.LineTableId
+                                                  select new LineDetailListViewModel
+                                                  {
+                                                      Amount = p.Amount,
+                                                      DealQty = p.DealQty,
+                                                      HeaderTableId = p.HeaderTableId,
+                                                      LineTableId = p.LineTableId,
+                                                      PersonID = p.PersonID,
+                                                      Rate = p.Rate,
+                                                      CostCenterId = p.CostCenterId,
+                                                      ChargeRates = LineChargeRatesTab.ChargeRates,
+                                                  }).ToList();
+
+                    if (CalculationId != null)
+                    {
+                        new ChargesCalculationService(_unitOfWork).CalculateCharges(LineListWithReferences, InvoiceRetHeader.JobInvoiceReturnHeaderId, (int)CalculationId, null, out LineCharges, out HeaderChargeEdit, out HeaderCharges, "Web.JobInvoiceReturnHeaderCharges", "Web.JobInvoiceReturnLineCharges", out PersonCount, InvoiceRetHeader.DocTypeId, InvoiceRetHeader.SiteId, InvoiceRetHeader.DivisionId);
+                    }
+
+                    // Saving Charges
+                    foreach (var item in LineCharges)
+                    {
+                        JobInvoiceReturnLineCharge PoLineCharge = Mapper.Map<LineChargeViewModel, JobInvoiceReturnLineCharge>(item);
+                        PoLineCharge.HeaderTableId = InvoiceRetHeader.JobInvoiceReturnHeaderId;
+                        PoLineCharge.ObjectState = Model.ObjectState.Added;
+                        new JobInvoiceReturnLineChargeService(db).Create(PoLineCharge);
+                    }
+
+
+                    //Saving Header charges
+                    for (int i = 0; i < HeaderCharges.Count(); i++)
+                    {
+                        JobInvoiceReturnHeaderCharge POHeaderCharge = Mapper.Map<HeaderChargeViewModel, JobInvoiceReturnHeaderCharge>(HeaderCharges[i]);
+                        POHeaderCharge.HeaderTableId = InvoiceRetHeader.JobInvoiceReturnHeaderId;
+                        POHeaderCharge.PersonID = InvoiceRetHeader.JobWorkerId;
+                        POHeaderCharge.ObjectState = Model.ObjectState.Added;
+                        new JobInvoiceReturnHeaderChargeService(db).Create(POHeaderCharge);
+                    }
+
+                    try
+                    {
+                        //_unitOfWork.Save();
+                        db.SaveChanges();
+                    }
+                    catch (Exception ex)
+                    {
+                        string message = _exception.HandleException(ex);
+                        ModelState.AddModelError("", message);
+                        return PartialView("_InvoiceReturn", svm);
+                    }
+
+                    LogActivity.LogActivityDetail(LogVm.Map(new ActiivtyLogViewModel
+                    {
+                        DocTypeId = JobInvoiceHeader.DocTypeId,
+                        DocId = InvoiceRetHeader.JobInvoiceReturnHeaderId,
+                        ActivityType = (int)ActivityTypeContants.MultipleCreate,
+                        DocNo = JobInvoiceHeader.DocNo,
+                        DocDate = JobInvoiceHeader.DocDate,
+                        DocStatus = JobInvoiceHeader.Status,
+                    }));
+
+
+                    try
+                    {
+                        StockHeader StockHeader = new StockHeaderService(_unitOfWork).Find((int)GoodsRetHeader.StockHeaderId);
+                        StockHeader.DocHeaderId = GoodsRetHeader.JobReturnHeaderId;
+                        new StockHeaderService(_unitOfWork).Update(StockHeader);
+                        _unitOfWork.Save();
+                    }
+                    catch (Exception ex)
+                    {
+                        string message = _exception.HandleException(ex);
+                    }
+
+                    return Json(new { success = true, Url = "/JobInvoiceReturnHeader/Submit/" + InvoiceRetHeader.JobInvoiceReturnHeaderId });
+                }
+            }
+            else
+            {
+                string message = "Balance is 0 for this invoice.";
+                ModelState.AddModelError("", message);
+                return PartialView("_InvoiceReturn", svm);
+            }
+            return PartialView("_InvoiceReturn", svm);
+        }
+
+        public ActionResult _InvoiceReturnSubmit(int id)
+        {
+            return Redirect(System.Configuration.ConfigurationManager.AppSettings["JobDomain"] + "/JobInvoiceReturnHeader/Submit/" + id);
+        }
+    }
+
+    public class JobInvoiceReturn
+    {
+        public int JobInvoiceHeaderId { get; set; }
+        public DateTime DocDate { get; set; }
+        public int ReasonId { get; set; }
+        public string ReasonName { get; set; }
+        public string Remark { get; set; }
     }
 }

@@ -1642,20 +1642,46 @@ namespace Jobs.Areas.Rug.Controllers
 
                             if (pd.Status == (int)StatusConstants.Drafted || pd.Status == (int)StatusConstants.Modified || pd.Status == (int)StatusConstants.Import)
                             {
-                                //LogAct(item.ToString());
-                                Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint, User.Identity.Name, item);
+                                if (Settings.SqlProcDocumentPrint == null || Settings.SqlProcDocumentPrint == "")
+                                {
+                                    StockHeaderRDL cr = new StockHeaderRDL();
+                                    drp.CreateRDLFile("Std_StockIssue_Print", cr.Create_Std_StockIssue_Print());
+                                    List<ListofQuery> QueryList = new List<ListofQuery>();
+                                    QueryList = DocumentPrintData(item);
+                                    Pdf = drp.DocumentPrint_New(QueryList, User.Identity.Name);
+                                }
+                                else
+                                    Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint, User.Identity.Name, item);
 
                                 PdfStream.Add(Pdf);
                             }
                             else if (pd.Status == (int)StatusConstants.Submitted || pd.Status == (int)StatusConstants.ModificationSubmitted)
                             {
-                                Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint, User.Identity.Name, item);
+                                if (Settings.SqlProcDocumentPrint == null || Settings.SqlProcDocumentPrint == "")
+                                {
+                                    StockHeaderRDL cr = new StockHeaderRDL();
+                                    drp.CreateRDLFile("Std_StockIssue_Print", cr.Create_Std_StockIssue_Print());
+                                    List<ListofQuery> QueryList = new List<ListofQuery>();
+                                    QueryList = DocumentPrintData(item);
+                                    Pdf = drp.DocumentPrint_New(QueryList, User.Identity.Name);
+                                }
+                                else
+                                    Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint, User.Identity.Name, item);
 
                                 PdfStream.Add(Pdf);
                             }
                             else
                             {
-                                Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint, User.Identity.Name, item);
+                                if (Settings.SqlProcDocumentPrint == null || Settings.SqlProcDocumentPrint == "")
+                                {
+                                    StockHeaderRDL cr = new StockHeaderRDL();
+                                    drp.CreateRDLFile("Std_StockIssue_Print", cr.Create_Std_StockIssue_Print());
+                                    List<ListofQuery> QueryList = new List<ListofQuery>();
+                                    QueryList = DocumentPrintData(item);
+                                    Pdf = drp.DocumentPrint_New(QueryList, User.Identity.Name);
+                                }
+                                else
+                                    Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint, User.Identity.Name, item);
                                 PdfStream.Add(Pdf);
                             }
 
@@ -1700,6 +1726,138 @@ namespace Jobs.Areas.Rug.Controllers
 
             }
             return Json(new { success = "Error", data = "No Records Selected." }, JsonRequestBehavior.AllowGet);
+
+        }
+
+        private List<ListofQuery> DocumentPrintData(int item)
+        {
+            StockHeader SH = new StockHeaderService(_unitOfWork).Find(item);
+
+            List<ListofQuery> DocumentPrintData = new List<ListofQuery>();
+            String QueryMain;
+
+            QueryMain = @"DECLARE @CostCenterCnt INT =0
+    SELECT @CostCenterCnt=sum(CASE WHEN CostCenterId IS NULL THEN 0 ELSE 1 END ) FROM Web.StockLines WHERE StockHeaderId=" + item + @"
+
+
+	DECLARE @DocDate DATETIME
+	SET @DocDate = (SELECT DocDate FROM Web.JobOrderHeaders WHERE JobOrderHeaderId=" + item + @") 
+	
+ 
+	
+	SELECT 
+	--Header Table Fields	
+	H.StockHeaderId,H.DocTypeId,H.DocNo,DocIdCaption+' No' AS DocIdCaption ,
+	H.SiteId,H.DivisionId,H.DocDate,DTS.DocIdCaption +' Date' AS DocIdCaptionDate,
+	PS.ProcessName AS ProcessName,
+	H.Remark,DT.DocumentTypeShortName,(CASE WHEN H.IsGatePassPrinted=1 THEN NULL ELSE  H.GatePassHeaderId END) as GatePassHeaderId,H.ModifiedBy +' ' + Replace(replace(convert(NVARCHAR, H.ModifiedDate, 106), ' ', '/'),'/20','/') + substring (convert(NVARCHAR,H.ModifiedDate),13,7) AS ModifiedBy,
+	H.ModifiedDate,(CASE WHEN Isnull(H.Status,0)=0 OR Isnull(H.Status,0)=8 THEN 0 ELSE 1 END)  AS Status,
+   	(CASE WHEN SPR.[Party GST NO] IS NULL THEN 'Yes' ELSE 'No' END ) AS ReverseCharge,
+	VDC.CompanyName,
+	--Godown Detail
+	G.GodownName,
+	F.GodownName AS FromGodownName,
+	--Person Detail
+	P.Name AS PartyName, DTS.PartyCaption AS  PartyCaption, P.Suffix AS PartySuffix,	
+	isnull(PA.Address,'')+' '+isnull(C.CityName,'')+','+isnull(PA.ZipCode,'')+(CASE WHEN isnull(CS.StateName,'') <> isnull(S.StateName,'') AND SPR.[Party GST NO] IS NOT NULL THEN ',State : '+isnull(S.StateName,'')+(CASE WHEN S.StateCode IS NULL THEN '' ELSE ', Code : '+S.StateCode END)    ELSE '' END ) AS PartyAddress,
+	isnull(S.StateName,'') AS PartyStateName,isnull(S.StateCode,'') AS PartyStateCode,	
+	
+	P.Mobile AS PartyMobileNo,	SPR.*,
+	
+	--Caption Fields	
+	DTS.SignatoryMiddleCaption,DTS.SignatoryRightCaption,
+	--Line Table
+	PD.ProductName,DTS.ProductCaption,U.UnitName,U.DecimalPlaces,
+	isnull(L.Qty,0) AS Qty,isnull(L.Rate,0) AS Rate,isnull(L.Amount,0) AS Amount,
+	D1.Dimension1Name,DTS.Dimension1Caption,D2.Dimension2Name,DTS.Dimension2Caption,D3.Dimension3Name,DTS.Dimension3Caption,D4.Dimension4Name,DTS.Dimension4Caption,
+	L.LotNo AS LotNo,(CASE WHEN DTS.PrintSpecification >0 THEN   L.Specification ELSE '' END)  AS Specification,DTS.SpecificationCaption,DTS.SignatoryleftCaption,L.Remark AS LineRemark,
+   	--STC.Code AS SalesTaxProductCodes,
+   	(CASE WHEN H.ProcessId IN (26,28) THEN  STC.Code ELSE PSSTC.Code END) AS SalesTaxProductCodes ,
+   	--SDS.SalesTaxProductCodeCaption,
+   	(SELECT TOP 1 SalesTaxProductCodeCaption FROM web.SiteDivisionSettings WHERE H.DocDate BETWEEN StartDate AND IsNull(EndDate,getdate()) AND SiteId=H.SiteId AND DivisionId=H.DivisionId)  AS SalesTaxProductCodeCaption,
+	(CASE WHEN DTS.PrintProductGroup >0 THEN isnull(PG.ProductGroupName,'') ELSE '' END)+(CASE WHEN DTS.PrintProductdescription >0 THEN isnull(','+PD.Productdescription,'') ELSE '' END) AS ProductGroupName,
+	DTS.ProductGroupCaption,  
+	PU.ProductUidName,
+	DTS.ProductUidCaption,
+	Cost.CostCenterName,
+	DTS.CostCenterCaption,
+	
+	--isnull(CGPD.PrintingDescription,CGPD.ChargeGroupProductName) AS ChargeGroupProductName,
+	
+	--SalesTaxGroupPersonId
+	--CGP.ChargeGroupPersonName,
+	--Other Fields
+   		@CostCenterCnt AS CostCenterCnt,
+	Null SubReportProcList,
+	(CASE WHEN Isnull(H.Status,0)=0 OR Isnull(H.Status,0)=8 THEN 'Provisional ' +isnull(DT.PrintTitle,DT.DocumentTypeName) ELSE isnull(PrintTitle,DT.DocumentTypeName) END) AS ReportTitle, 
+	'Std_StockIssue_Print.rdl' AS ReportName,			
+	SalesTaxGroupProductCaption	
+	FROM Web.StockHeaders H WITH (Nolock)
+	LEFT JOIN web.DocumentTypes DT WITH (Nolock) ON DT.DocumentTypeId=H.DocTypeId
+	LEFT JOIN Web._DocumentTypeSettings DTS WITH (Nolock) ON DTS.DocumentTypeId=DT.DocumentTypeId	
+	LEFT JOIN web.ViewDivisionCompany VDC WITH (Nolock) ON VDC.DivisionId=H.DivisionId
+	LEFT JOIN Web.Sites SI WITH (Nolock) ON SI.SiteId=H.SiteId
+	LEFT JOIN Web.Divisions DIV WITH (Nolock) ON DIV.DivisionId=H.DivisionId	
+	LEFT JOIN Web.Companies Com ON Com.CompanyId = DIV.CompanyId
+	LEFT JOIN Web.Cities CC WITH (Nolock) ON CC.CityId=Com.CityId
+	LEFT JOIN Web.States CS WITH (Nolock) ON CS.StateId=CC.StateId
+	LEFT JOIN Web.Processes PS WITH (Nolock) ON PS.ProcessId=H.ProcessId  	
+    LEFT JOIN Web.SalesTaxProductCodes PSSTC WITH (Nolock) ON PSSTC.SalesTaxProductCodeId=PS.SalesTaxProductCodeId	
+	LEFT JOIN Web.People P WITH (Nolock) ON P.PersonID=H.PersonId
+	LEFT JOIN Web.Std_PersonRegistrations SPR WITH (Nolock) ON SPR.CustomerId=H.PersonId
+	LEFT JOIN web.Godowns G WITH (Nolock) ON G.GodownId=H.GodownId
+	LEFT JOIN web.Godowns F WITH (Nolock) ON F.GodownId=H.FromGodownId
+	LEFT JOIN (SELECT TOP 1 * FROM web.SiteDivisionSettings WHERE @DocDate BETWEEN StartDate AND IsNull(EndDate,getdate()) ORDER BY StartDate) SDS  ON H.DivisionId = SDS.DivisionId AND  H.SiteId = SDS.SiteId
+    LEFT JOIN (SELECT * FROM Web.PersonAddresses WITH (nolock) WHERE AddressType IS NULL) PA  ON PA.PersonId = P.PersonID 
+	LEFT JOIN Web.Cities C WITH (nolock) ON C.CityId = PA.CityId
+	LEFT JOIN Web.States S WITH (Nolock) ON S.StateId=C.StateId
+	LEFT JOIN Web.Stocklines L WITH (Nolock) ON L.StockHeaderId=H.StockHeaderId
+	LEFT JOIN Web.ProductUids PU WITH (Nolock) ON PU.ProductUIDId=L.ProductUidId
+	LEFT JOIN Web.CostCenters COST WITH (nolock) ON COST.CostCenterId=L.CostCenterId
+	LEFT JOIN web.Products PD WITH (Nolock) ON PD.ProductId=L.ProductId
+	LEFT JOIN web.ProductGroups PG WITH (Nolock) ON PG.ProductGroupId=PD.ProductGroupid
+	LEFT JOIN Web.SalesTaxProductCodes STC WITH (Nolock) ON STC.SalesTaxProductCodeId= IsNull(PD.SalesTaxProductCodeId, Pg.DefaultSalesTaxProductCodeId)
+	LEFT JOIN Web.Dimension1 D1 WITH (Nolock) ON D1.Dimension1Id=L.Dimension1Id
+	LEFT JOIN web.Dimension2 D2 WITH (Nolock) ON D2.Dimension2Id=L.Dimension2Id
+	LEFT JOIN web.Dimension3 D3 WITH (Nolock) ON D3.Dimension3Id=L.Dimension3Id
+	LEFT JOIN Web.Dimension4 D4 WITH (nolock) ON D4.Dimension4Id=L.Dimension4Id
+	LEFT JOIN web.Units U WITH (Nolock) ON U.UnitId=PD.UnitId	
+	--LEFT JOIN web.ChargeGroupProducts CGPD WITH (Nolock) ON L.SalesTaxGroupProductId = CGPD.ChargeGroupProductId	
+   	WHERE H.StockHeaderId=" + item + @"
+   	ORDER BY L.Sr";
+
+            ListofQuery QryMain = new ListofQuery();
+            QryMain.Query = QueryMain;
+            QryMain.QueryName = nameof(QueryMain);
+            DocumentPrintData.Add(QryMain);
+
+
+            String QueryGatePass;
+            QueryGatePass = @"SELECT JOH.StockHeaderId, H.GatePassHeaderId,  DT.DocumentTypeShortName +'-'+ H.DocNo AS DocNo, H.DocDate,  H.Remark, P.Name AS PersonName, G.GodownName,  
+                L.GatePassLineId, L.Product, L.Specification, L.Qty, U.UnitName, U.DecimalPlaces,
+                ' " + SH.DocNo + @"' AS ReferenceDocNo,'GatePassPrint.rdl'  AS ReportName, 'Gate Pass' AS ReportTitle,
+                NULL AS SubReportProcList,
+                DTS.SignatoryleftCaption,
+                DTS.SignatoryMiddleCaption,
+                DTS.SignatoryRightCaption    
+                FROM Web.StockHeaders JOH
+                LEFT JOIN  Web.GatePassHeaders H ON JOH.GatePassHeaderId = H.GatePassHeaderId 
+                LEFT JOIN web.Godowns G ON G.GodownId = H.GodownId 
+                LEFT JOIN web.People P ON P.PersonID  = H.PersonID 
+                LEFT JOIN [Web].DocumentTypes DT WITH (nolock) ON DT.DocumentTypeId = H.DocTypeId 
+                LEFT JOIN web._DocumentTypeSettings DTS WITH (Nolock) ON DTS.DocumentTypeId=H.DocTypeId 
+                LEFT JOIN web.GatePassLines L ON L.GatePassHeaderId = H.GatePassHeaderId 
+                LEFT JOIN web.Units U ON U.UnitId = L.UnitId 
+                WHERE JOH.StockHeaderId = " + item + @" ";
+
+
+            ListofQuery QryGatePass = new ListofQuery();
+            QryGatePass.Query = QueryGatePass;
+            QryGatePass.QueryName = nameof(QueryGatePass);
+            DocumentPrintData.Add(QryGatePass);
+
+
+            return DocumentPrintData;
 
         }
 

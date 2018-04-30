@@ -846,7 +846,7 @@ namespace Jobs.Controllers
                     LedgerHeaderViewModel.DocNo = pd.DocNo;
                     LedgerHeaderViewModel.DivisionId = pd.DivisionId;
                     LedgerHeaderViewModel.SiteId = pd.SiteId;
-                    LedgerHeaderViewModel.Narration = "";
+                    LedgerHeaderViewModel.Narration = _JobInvoiceReturnHeaderService.GetNarration(pd.JobInvoiceReturnHeaderId);
                     LedgerHeaderViewModel.Remark = pd.Remark;
                     LedgerHeaderViewModel.ExchangeRate = pd.ExchangeRate;
                     LedgerHeaderViewModel.CreatedBy = pd.CreatedBy;

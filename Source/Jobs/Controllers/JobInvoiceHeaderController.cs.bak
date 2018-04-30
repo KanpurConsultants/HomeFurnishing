@@ -1527,7 +1527,7 @@ namespace Jobs.Controllers
                                 if (Settings.SqlProcDocumentPrint==null || Settings.SqlProcDocumentPrint =="")
                                 {
                                     JobInvoiceHeaderRDL cr = new JobInvoiceHeaderRDL();
-                                    drp.CreateRDLFile("DocPrint_JobInvoice", cr.DocPrint_JobInvoice());
+                                    drp.CreateRDLFile("Std_JobInvoice_Print", cr.Create_Std_JobInvoice_Print());
                                     List<ListofQuery> QueryList = new List<ListofQuery>();
                                     QueryList = DocumentPrintData(item);
                                     Pdf = drp.DocumentPrint_New(QueryList, User.Identity.Name);
@@ -1542,7 +1542,7 @@ namespace Jobs.Controllers
                                 if (Settings.SqlProcDocumentPrint_AfterSubmit == null || Settings.SqlProcDocumentPrint_AfterSubmit == "")
                                 {
 									JobInvoiceHeaderRDL cr = new JobInvoiceHeaderRDL();
-                                    drp.CreateRDLFile("DocPrint_JobInvoice", cr.DocPrint_JobInvoice());
+                                    drp.CreateRDLFile("Std_JobInvoice_Print", cr.Create_Std_JobInvoice_Print());
                                     List<ListofQuery> QueryList = new List<ListofQuery>();
                                     QueryList = DocumentPrintData(item);
                                     Pdf = drp.DocumentPrint_New(QueryList, User.Identity.Name);
@@ -1557,7 +1557,7 @@ namespace Jobs.Controllers
                                 if (Settings.SqlProcDocumentPrint_AfterApprove == null || Settings.SqlProcDocumentPrint_AfterApprove == "")
                                 {
            							JobInvoiceHeaderRDL cr = new JobInvoiceHeaderRDL();
-                                    drp.CreateRDLFile("DocPrint_JobInvoice", cr.DocPrint_JobInvoice());
+                                    drp.CreateRDLFile("Std_JobInvoice_Print", cr.Create_Std_JobInvoice_Print());
                                     List<ListofQuery> QueryList = new List<ListofQuery>();
                                     QueryList = DocumentPrintData(item);
                                     Pdf = drp.DocumentPrint_New(QueryList, User.Identity.Name);
@@ -1685,7 +1685,7 @@ P.Mobile AS PartyMobileNo,	SPR.*,
 	--Other Fields
 	@UnitDealCnt  AS DealUnitCnt,		
 	(CASE WHEN Isnull(H.Status,0)=0 OR Isnull(H.Status,0)=8 THEN 'Provisional ' +isnull(DT.PrintTitle,DT.DocumentTypeName) ELSE isnull(DT.PrintTitle,DT.DocumentTypeName) END) AS ReportTitle, 
-	'DocPrint_JobInvoice.rdl' AS ReportName,		
+	'StdDocPrint_JobInvoice.rdl' AS ReportName,		
 	SalesTaxGroupProductCaption,
 	SDS.SalesTaxProductCodeCaption
 	FROM Web.JobInvoiceHeaders H WITH (Nolock)

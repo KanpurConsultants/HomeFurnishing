@@ -36,6 +36,7 @@ namespace Service
         int PrevId(int id);
         string GetMaxDocNo();
         IQueryable<ComboBoxResult> GetCustomPerson(int Id, string term);
+        string GetNarration(int SaleInvoiceReturnHeaderId);
     }
 
     public class SaleInvoiceReturnHeaderService : ISaleInvoiceReturnHeaderService
@@ -304,6 +305,56 @@ namespace Service
         public Task<SaleInvoiceReturnHeader> FindAsync(int id)
         {
             throw new NotImplementedException();
+        }
+
+        public string GetNarration(int SaleInvoiceReturnHeaderId)
+        {
+            string Narration = "";
+
+            var SaleInvoiceReturnHeader_Data = (from H in db.SaleInvoiceReturnHeader
+                                                join L in db.SaleInvoiceReturnLine on H.SaleInvoiceReturnHeaderId equals L.SaleInvoiceReturnHeaderId into SaleInvoiceReturnLineTable
+                                                from SaleInvoiceReturnLineTab in SaleInvoiceReturnLineTable.DefaultIfEmpty()
+                                                join P in db.Persons on H.BuyerId equals P.PersonID into PersonTable from PersonTab in PersonTable.DefaultIfEmpty()
+                                                where H.SaleInvoiceReturnHeaderId == SaleInvoiceReturnHeaderId
+                                                select new
+                                                {
+                                                    DocTypeId = H.DocTypeId,
+                                                    SaleToBuyerName = PersonTab.Name,
+                                                    InvoiceNo = SaleInvoiceReturnLineTab.SaleInvoiceLine.SaleInvoiceHeader.DocNo,
+                                                    ProductName = SaleInvoiceReturnLineTab.SaleInvoiceLine.SaleDispatchLine.PackingLine.Product.ProductName,
+                                                    ProductGroupName = SaleInvoiceReturnLineTab.SaleInvoiceLine.SaleDispatchLine.PackingLine.Product.ProductGroup.ProductGroupName,
+                                                    ProductUidName = SaleInvoiceReturnLineTab.SaleInvoiceLine.SaleDispatchLine.PackingLine.ProductUid.ProductUidName,
+                                                    Qty = SaleInvoiceReturnLineTab.Qty,
+                                                    Rate = SaleInvoiceReturnLineTab.Rate,
+                                                    Amount = SaleInvoiceReturnLineTab.Amount,
+                                                }).FirstOrDefault();
+
+            var SaleInvoiceReturnHeaderCharges_Data = (from Hc in db.SaleInvoiceReturnHeaderCharge
+                                                       where Hc.HeaderTableId == SaleInvoiceReturnHeaderId
+                                                       && Hc.Charge.ChargeName == "Net Amount"
+                                                       select new
+                                                       {
+                                                           NetAmount = Hc.Amount
+                                                       }).FirstOrDefault();
+
+
+
+            if (SaleInvoiceReturnHeader_Data != null)
+            {
+                var Narration_Temp = (from H in db.Narration where H.DocTypeId == SaleInvoiceReturnHeader_Data.DocTypeId select new { Narration = H.NarrationName }).FirstOrDefault();
+
+                if (Narration_Temp != null)
+                    Narration = Narration_Temp.Narration.Replace("<CustomerName>", SaleInvoiceReturnHeader_Data.SaleToBuyerName)
+                                            .Replace("<InvoiceNo>", SaleInvoiceReturnHeader_Data.InvoiceNo)
+                                            .Replace("<ProductName>", SaleInvoiceReturnHeader_Data.ProductName)
+                                            .Replace("<ProductGroupName>", SaleInvoiceReturnHeader_Data.ProductGroupName)
+                                            .Replace("<ProductUidName>", SaleInvoiceReturnHeader_Data.ProductUidName)
+                                            .Replace("<Qty>", SaleInvoiceReturnHeader_Data.Qty.ToString())
+                                            .Replace("<Rate>", SaleInvoiceReturnHeader_Data.Rate.ToString())
+                                            .Replace("<Amount>", SaleInvoiceReturnHeader_Data.Amount.ToString())
+                                            .Replace("<NetAmount>", SaleInvoiceReturnHeaderCharges_Data.NetAmount.ToString());
+            }
+            return Narration;
         }
     }
 }

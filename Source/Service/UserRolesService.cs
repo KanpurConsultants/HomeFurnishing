@@ -336,10 +336,21 @@ namespace Service
                 }
                 else
                 {
-                    return (from t in ((ApplicationDbContext)_context).Roles 
-                            where t.Name == "Admin"
-                            group t by t.Id into g
-                            select g.Max(m => m.Name)).ToList();
+                    if (RoleNameList.Contains("SysAdmin"))
+                    {
+                        return (from t in ((ApplicationDbContext)_context).Roles
+                                where t.Name == "Admin" || t.Name == "SysAdmin"
+                                group t by t.Id into g
+                                select g.Max(m => m.Name)).ToList();
+                    }
+                    else
+                    {
+                        return (from t in ((ApplicationDbContext)_context).Roles
+                                where t.Name == "Admin"
+                                group t by t.Id into g
+                                select g.Max(m => m.Name)).ToList();
+
+                    }
                 }
             }
         }

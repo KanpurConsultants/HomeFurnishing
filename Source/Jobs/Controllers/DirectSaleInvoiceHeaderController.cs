@@ -357,7 +357,7 @@ namespace Jobs.Controllers
                 {
                     if (pta.DataType == "Number")
                         if (pta.Value != null)
-                            if (pta.Value.All(char.IsDigit) == false)
+                            if (pta.Value.Replace(".","").All(char.IsDigit) == false)
                                 ModelState.AddModelError("", pta.Name + " should be a numeric value.");
 
                 }
@@ -1675,7 +1675,7 @@ namespace Jobs.Controllers
             LedgerHeaderViewModel.DocNo = pd.DocNo;
             LedgerHeaderViewModel.DivisionId = pd.DivisionId;
             LedgerHeaderViewModel.SiteId = pd.SiteId;
-            LedgerHeaderViewModel.Narration = "";
+            LedgerHeaderViewModel.Narration = _SaleInvoiceHeaderService.GetNarration(pd.SaleInvoiceHeaderId);
             LedgerHeaderViewModel.Remark = pd.Remark;
             LedgerHeaderViewModel.ExchangeRate = pd.ExchangeRate;
             LedgerHeaderViewModel.CreatedBy = pd.CreatedBy;
@@ -2498,6 +2498,8 @@ EXEC(@Qry);	";
             var DispatchLine = new SaleDispatchLineService(_unitOfWork).GetSaleDispatchLineList(SaleDispatchHeader.SaleDispatchHeaderId);
 
 
+            List<LineChargeRates> LineChargeRates = new List<LineChargeRates>();
+
             var SaleInvoiceSettings = new SaleInvoiceSettingService(_unitOfWork).GetSaleInvoiceSettingForDocument(SaleInvoiceHeader.DocTypeId, SaleInvoiceHeader.DivisionId, SaleInvoiceHeader.SiteId);
             int InvoiceRetHeaderDocTypeId = 0;
 
@@ -2525,6 +2527,8 @@ EXEC(@Qry);	";
                                            join packtab in db.PackingLine on tab1.PackingLineId equals packtab.PackingLineId
                                            join product in db.Product on p.ProductId equals product.ProductId into table2
                                            from tab2 in table2.DefaultIfEmpty()
+                                           join B in db.BusinessEntity on tab.SaleToBuyerId equals B.PersonID into BusinessEntityTable
+                                           from BusinessEntityTab in BusinessEntityTable.DefaultIfEmpty()
                                            where p.SaleInvoiceHeaderId == SaleInvoiceHeader.SaleInvoiceHeaderId
                                            && p.BalanceQty > 0
                                            select new SaleInvoiceReturnLineViewModel
@@ -2550,6 +2554,8 @@ EXEC(@Qry);	";
                                                DiscountPer = linetab.DiscountPer,
                                                DiscountAmount = linetab.DiscountAmount,
                                                ProductUidName = packtab.ProductUid.ProductUidName,
+                                               SalesTaxGroupPersonId = BusinessEntityTab.SalesTaxGroupPartyId,
+                                               SalesTaxGroupProductId = linetab.SalesTaxGroupProductId
                                            }).ToList();
                 
                 if (SaleInvoiceLineList.Sum(i => i.InvoiceBalQty) > 0)
@@ -2581,6 +2587,9 @@ EXEC(@Qry);	";
                     InvoiceRetHeader.SiteId = SaleInvoiceHeader.SiteId;
                     InvoiceRetHeader.DivisionId = SaleInvoiceHeader.DivisionId;
                     InvoiceRetHeader.BuyerId = SaleInvoiceHeader.SaleToBuyerId;
+                    InvoiceRetHeader.SalesTaxGroupPersonId = SaleInvoiceHeader.SalesTaxGroupPersonId;
+
+
                     //InvoiceRetHeader.CurrencyId = SaleInvoiceHeader.CurrencyId;
                     InvoiceRetHeader.ReasonId = svm.ReasonId;
                     InvoiceRetHeader.Remark = svm.Remark;
@@ -2629,6 +2638,7 @@ EXEC(@Qry);	";
                             line.UnitConversionMultiplier = item.UnitConversionMultiplier;
                             line.Amount = item.Amount;
 
+                            line.SalesTaxGroupProductId = item.SalesTaxGroupProductId;
                             line.Remark = item.Remark;
                             line.CreatedDate = DateTime.Now;
                             line.ModifiedDate = DateTime.Now;
@@ -2731,6 +2741,16 @@ EXEC(@Qry);	";
                             new SaleInvoiceReturnLineService(_unitOfWork).Create(line);
 
                             LineList.Add(new LineDetailListViewModel { Amount = line.Amount, Rate = line.Rate, LineTableId = line.SaleInvoiceReturnLineId, HeaderTableId = item.SaleInvoiceReturnHeaderId, PersonID = InvoiceRetHeader.BuyerId, DealQty = line.DealQty });
+
+                            List<CalculationProductViewModel> ChargeRates = new CalculationProductService(_unitOfWork).GetChargeRates(CalculationId, InvoiceRetHeader.DocTypeId, InvoiceRetHeader.SiteId, InvoiceRetHeader.DivisionId,
+                                Settings.ProcessId ?? 0, item.SalesTaxGroupPersonId, item.SalesTaxGroupProductId).ToList();
+                            if (ChargeRates != null)
+                            {
+                                LineChargeRates.Add(new LineChargeRates { LineId = line.SaleInvoiceReturnLineId, ChargeRates = ChargeRates });
+                            }
+
+
+
                             Gpk++;
                             pk++;
 
@@ -2738,9 +2758,26 @@ EXEC(@Qry);	";
                         }
                     }
 
+
+                    var LineListWithReferences = (from p in LineList
+                                                  join t3 in LineChargeRates on p.LineTableId equals t3.LineId into LineChargeRatesTable
+                                                  from LineChargeRatesTab in LineChargeRatesTable.DefaultIfEmpty()
+                                                  orderby p.LineTableId
+                                                  select new LineDetailListViewModel
+                                                  {
+                                                      Amount = p.Amount,
+                                                      DealQty = p.DealQty,
+                                                      HeaderTableId = p.HeaderTableId,
+                                                      LineTableId = p.LineTableId,
+                                                      PersonID = p.PersonID,
+                                                      Rate = p.Rate,
+                                                      CostCenterId = p.CostCenterId,
+                                                      ChargeRates = LineChargeRatesTab.ChargeRates,
+                                                  }).ToList();
+
                     if (CalculationId != null)
                     {
-                        new ChargesCalculationService(_unitOfWork).CalculateCharges(LineList, InvoiceRetHeader.SaleInvoiceReturnHeaderId, (int)CalculationId, null, out LineCharges, out HeaderChargeEdit, out HeaderCharges, "Web.SaleInvoiceReturnHeaderCharges", "Web.SaleInvoiceReturnLineCharges", out PersonCount, InvoiceRetHeader.DocTypeId, InvoiceRetHeader.SiteId, InvoiceRetHeader.DivisionId);
+                        new ChargesCalculationService(_unitOfWork).CalculateCharges(LineListWithReferences, InvoiceRetHeader.SaleInvoiceReturnHeaderId, (int)CalculationId, null, out LineCharges, out HeaderChargeEdit, out HeaderCharges, "Web.SaleInvoiceReturnHeaderCharges", "Web.SaleInvoiceReturnLineCharges", out PersonCount, InvoiceRetHeader.DocTypeId, InvoiceRetHeader.SiteId, InvoiceRetHeader.DivisionId);
                     }
 
                     // Saving Charges
@@ -2841,6 +2878,8 @@ EXEC(@Qry);	";
                 JsonRequestBehavior = JsonRequestBehavior.AllowGet
             };
         }
+
+        
 
 
 

@@ -44,10 +44,72 @@ namespace Service
                 SqlParameter SqlParameterDepartmentId = new SqlParameter("@DepartmentId", (vm.DepartmentId == null) ? DBNull.Value : (object)vm.DepartmentId);
                 SqlParameter SqlParameterWagesPayType = new SqlParameter("@WagesPayType", (vm.WagesPayType == null) ? DBNull.Value : (object)vm.WagesPayType);
 
-
-                mQry = @"SELECT 0 As SalaryHeaderId, E.EmployeeId, P.Name+','+P.Suffix AS EmployeeName, Convert(int,P.Code) AS Code, Convert(Decimal(18,4),DAY(EOMONTH(@DocDate))) - IsNull(VSunday.NoOfSundays,0) AS Days, 0.00 AS Additions, 0.00 AS Deductions, 
+                if (vm.WagesPayType =="Jobwork")
+                    mQry = @"SELECT 0 As SalaryHeaderId, E.PersonID AS EmployeeId, E.Name+','+E.Suffix AS EmployeeName, Convert(int,E.Code) AS Code, 1.00 AS Days, 0.00 as BasicPay, 0.00 AS Additions, 0.00 AS Deductions, 
                         IsNull(VLoan.LoanEMI,0) AS LoanEMI, IsNull(VAdvance.Advance,0) AS Advance, @DocDate As DocDate, 
-                        @DocTypeId As DocTypeId, @Remark As HeaderRemark, Convert(Decimal(18,4),DAY(EOMONTH(@DocDate))) - IsNull(VSunday.NoOfSundays,0) AS MonthDays
+                        @DocTypeId As DocTypeId, @WagesPayType AS WagesPayType, @Remark As HeaderRemark, Convert(Decimal(18,4),DAY(EOMONTH(@DocDate))) - IsNull(VSunday.NoOfSundays,0) AS MonthDays
+                        FROM Web.People E
+                        LEFT JOIN web.DocumentTypes DT ON DT.DocumentTypeId = E.DocTypeId 
+                        LEFT JOIN 
+                        (
+                            SELECT L.EmployeeId
+                            FROM Web.SalaryLines L 
+                            LEFT JOIN Web.SalaryHeaders H ON L.SalaryHeaderId = H.SalaryHeaderId
+                            WHERE H.DocDate = @DocDate 
+                        ) AS VSalaryLine ON E.PersonID = VSalaryLine.EmployeeId
+                        LEFT JOIN (
+                            SELECT Count(*) AS NoOfSundays
+                            FROM master..spt_values 
+                            WHERE TYPE ='p' AND DATEDIFF(d, Convert(DATETIME,DATEADD(DAY,1,EOMONTH(@DocDate,-1))),Convert(DATETIME,EOMONTH(@DocDate))) >= number 
+                            AND DATENAME(w,Convert(DATETIME,DATEADD(DAY,1,EOMONTH(@DocDate,-1)))+number) = 'Sunday'
+                        ) As VSunday On 1 = 1
+                        LEFT JOIN (
+	                        SELECT E.PersonID, Sum(CASE WHEN IsNull(L.AmtDr,0) - IsNull(VAdj.AdjustedAmount,0) < LL.BaseRate
+	                        THEN IsNull(L.AmtDr,0) - IsNull(VAdj.AdjustedAmount,0)
+	                        ELSE LL.BaseRate END) AS LoanEMI, Min(L.LedgerId) As LoanLedgerId
+	                        FROM Web.People E
+	                        LEFT JOIN Web.LedgerAccounts A ON E.PersonID = A.PersonId
+	                        LEFT JOIN Web.Ledgers L ON A.LedgerAccountId = L.LedgerAccountId
+	                        LEFT JOIN Web.LedgerLines LL ON L.LedgerLineId = LL.LedgerLineId
+	                        LEFT JOIN Web.LedgerHeaders H ON L.LedgerHeaderId = H.LedgerHeaderId
+	                        LEFT JOIN Web.DocumentTypes D ON H.DocTypeId = D.DocumentTypeId
+	                        LEFT JOIN (
+		                        SELECT La.DrLedgerId, Sum(La.Amount) AS AdjustedAmount
+		                        FROM Web.LedgerAdjs La
+		                        GROUP BY La.DrLedgerId
+	                        ) AS VAdj ON L.LedgerId = VAdj.DrLedgerId
+	                        WHERE D.DocumentTypeName = '" + Jobs.Constants.DocumentType.DocumentTypeConstants.Loans.DocumentTypeName + "'" + @"
+                            AND IsNull(L.AmtDr,0) - IsNull(VAdj.AdjustedAmount,0) > 0
+	                        GROUP BY E.PersonID
+                        ) AS VLoan ON E.PersonID = VLoan.PersonID
+                        LEFT JOIN (
+	                        SELECT E.PersonID, Sum(IsNull(L.AmtDr,0) - IsNull(VAdj.AdjustedAmount,0)) AS Advance, Min(L.LedgerId) As LoanLedgerId
+	                        FROM Web.People E
+	                        LEFT JOIN Web.LedgerAccounts A ON E.PersonID = A.PersonId
+	                        LEFT JOIN Web.Ledgers L ON A.LedgerAccountId = L.LedgerAccountId
+	                        LEFT JOIN Web.LedgerLines LL ON L.LedgerLineId = LL.LedgerLineId
+	                        LEFT JOIN Web.LedgerHeaders H ON L.LedgerHeaderId = H.LedgerHeaderId
+	                        LEFT JOIN Web.DocumentTypes D ON H.DocTypeId = D.DocumentTypeId
+	                        LEFT JOIN (
+		                        SELECT La.DrLedgerId, Sum(La.Amount) AS AdjustedAmount
+		                        FROM Web.LedgerAdjs La
+		                        GROUP BY La.DrLedgerId
+	                        ) AS VAdj ON L.LedgerId = VAdj.DrLedgerId
+	                        WHERE D.DocumentTypeName = '" + Jobs.Constants.DocumentType.DocumentTypeConstants.Advances.DocumentTypeName + "'" + @"
+                            AND IsNull(L.AmtDr,0) - IsNull(VAdj.AdjustedAmount,0) > 0
+	                        GROUP BY E.PersonID
+                        ) AS VAdvance ON E.PersonID = VAdvance.PersonID
+                        WHERE isnull(E.IsActive,1) =1 AND DT.DocumentTypeName = 'Job Worker'" +
+        (vm.DepartmentId != null ? " AND E.PersonId IN (SELECT DISTINCT  PP.PersonId " +
+" FROM web.Processes P " +
+" LEFT JOIN web.PersonProcesses PP ON PP.ProcessId = P.ProcessId " +
+" WHERE PP.PersonId IS NOT NULL " +
+" AND P.DepartmentId IN (SELECT Items FROM [dbo].[Split] (@DepartmentId, ',')) ) " : "") +
+        " AND VSalaryLine.EmployeeId IS NULL Order By E.Name+','+E.Suffix ";
+                else
+                mQry = @"SELECT 0 As SalaryHeaderId, E.PersonID AS EmployeeId, P.Name+','+P.Suffix AS EmployeeName, Convert(int,P.Code) AS Code, Convert(Decimal(18,4),DAY(EOMONTH(@DocDate))) - IsNull(VSunday.NoOfSundays,0) AS Days, Isnull(E.BasicSalary,0) as BasicPay, 0.00 AS Additions, 0.00 AS Deductions, 
+                        IsNull(VLoan.LoanEMI,0) AS LoanEMI, IsNull(VAdvance.Advance,0) AS Advance, @DocDate As DocDate, 
+                        @DocTypeId As DocTypeId, @WagesPayType AS WagesPayType, @Remark As HeaderRemark, Convert(Decimal(18,4),DAY(EOMONTH(@DocDate))) - IsNull(VSunday.NoOfSundays,0) AS MonthDays
                         FROM Web.Employees E
                         LEFT JOIN Web.People P ON E.PersonID = P.PersonID
                         LEFT JOIN (
@@ -111,12 +173,71 @@ namespace Service
                 SqlParameter SqlParameterSalaryHeaderId = new SqlParameter("@SalaryHeaderId", vm.SalaryHeaderId.ToString());
                 SqlParameter SqlParameterDocDate = new SqlParameter("@DocDate", vm.DocDate.ToString());
 
-                mQry = @"SELECT H.SalaryHeaderId, E.EmployeeId, P.Name+','+ P.Suffix AS EmployeeName, Convert(int,P.Code) AS Code, L.Days AS Days, 0.00 AS Additions, 0.00 AS Deductions, 
-                        IsNull(VLoan.LoanEMI,0) AS LoanEMI, IsNull(VAdvance.Advance,0) AS Advance, Convert(nvarchar,H.DocDate) As DocDate, 
-                        H.DocTypeId As DocTypeId, H.Remark As HeaderRemark, Convert(Decimal(18,4),DAY(EOMONTH(H.DocDate))) - IsNull(VSunday.NoOfSundays,0) AS MonthDays
+                if (vm.WagesPayType == "Jobwork")
+                    mQry = @"SELECT 0 As SalaryHeaderId, E.PersonID AS EmployeeId, E.Name+','+E.Suffix AS EmployeeName, Convert(int,E.Code) AS Code, 1.00 AS Days, 0.00 as BasicPay, 0.00 AS Additions, 0.00 AS Deductions, 
+                        IsNull(VLoan.LoanEMI,0) AS LoanEMI, IsNull(VAdvance.Advance,0) AS Advance, Convert(nvarchar,H.DocDate) As DocDate,                         
+                        H.DocTypeId As DocTypeId, H.WagesPayType WagesPayType, H.Remark As HeaderRemark, Convert(Decimal(18,4),DAY(EOMONTH(H.DocDate))) - IsNull(VSunday.NoOfSundays,0) AS MonthDays
                         FROM Web.SalaryHeaders H
                         LEFT JOIN Web.SalaryLines L on H.SalaryHeaderId = L.SalaryHeaderId
-                        LEFT JOIN Web.Employees E On L.EmployeeId = E.EmployeeId
+                        LEFT JOIN Web.People E On L.EmployeeId = E.PersonID
+                        LEFT JOIN web.DocumentTypes DT ON DT.DocumentTypeId = E.DocTypeId 
+                        LEFT JOIN 
+                        (
+                            SELECT L.EmployeeId
+                            FROM Web.SalaryLines L 
+                            LEFT JOIN Web.SalaryHeaders H ON L.SalaryHeaderId = H.SalaryHeaderId
+                            WHERE H.DocDate = @DocDate 
+                        ) AS VSalaryLine ON E.PersonID = VSalaryLine.EmployeeId
+                        LEFT JOIN (
+                            SELECT Count(*) AS NoOfSundays
+                            FROM master..spt_values 
+                            WHERE TYPE ='p' AND DATEDIFF(d, Convert(DATETIME,DATEADD(DAY,1,EOMONTH(@DocDate,-1))),Convert(DATETIME,EOMONTH(@DocDate))) >= number 
+                            AND DATENAME(w,Convert(DATETIME,DATEADD(DAY,1,EOMONTH(@DocDate,-1)))+number) = 'Sunday'
+                        ) As VSunday On 1 = 1
+                        LEFT JOIN (
+	                        SELECT E.PersonID, Sum(CASE WHEN IsNull(L.AmtDr,0) - IsNull(VAdj.AdjustedAmount,0) < LL.BaseRate
+	                        THEN IsNull(L.AmtDr,0) - IsNull(VAdj.AdjustedAmount,0)
+	                        ELSE LL.BaseRate END) AS LoanEMI, Min(L.LedgerId) As LoanLedgerId
+	                        FROM Web.People E
+	                        LEFT JOIN Web.LedgerAccounts A ON E.PersonID = A.PersonId
+	                        LEFT JOIN Web.Ledgers L ON A.LedgerAccountId = L.LedgerAccountId
+	                        LEFT JOIN Web.LedgerLines LL ON L.LedgerLineId = LL.LedgerLineId
+	                        LEFT JOIN Web.LedgerHeaders H ON L.LedgerHeaderId = H.LedgerHeaderId
+	                        LEFT JOIN Web.DocumentTypes D ON H.DocTypeId = D.DocumentTypeId
+	                        LEFT JOIN (
+		                        SELECT La.DrLedgerId, Sum(La.Amount) AS AdjustedAmount
+		                        FROM Web.LedgerAdjs La
+		                        GROUP BY La.DrLedgerId
+	                        ) AS VAdj ON L.LedgerId = VAdj.DrLedgerId
+	                        WHERE D.DocumentTypeName = '" + Jobs.Constants.DocumentType.DocumentTypeConstants.Loans.DocumentTypeName + "'" + @"
+                            AND IsNull(L.AmtDr,0) - IsNull(VAdj.AdjustedAmount,0) > 0
+	                        GROUP BY E.PersonID
+                        ) AS VLoan ON E.PersonID = VLoan.PersonID
+                        LEFT JOIN (
+	                        SELECT E.PersonID, Sum(IsNull(L.AmtDr,0) - IsNull(VAdj.AdjustedAmount,0)) AS Advance, Min(L.LedgerId) As LoanLedgerId
+	                        FROM Web.People E
+	                        LEFT JOIN Web.LedgerAccounts A ON E.PersonID = A.PersonId
+	                        LEFT JOIN Web.Ledgers L ON A.LedgerAccountId = L.LedgerAccountId
+	                        LEFT JOIN Web.LedgerLines LL ON L.LedgerLineId = LL.LedgerLineId
+	                        LEFT JOIN Web.LedgerHeaders H ON L.LedgerHeaderId = H.LedgerHeaderId
+	                        LEFT JOIN Web.DocumentTypes D ON H.DocTypeId = D.DocumentTypeId
+	                        LEFT JOIN (
+		                        SELECT La.DrLedgerId, Sum(La.Amount) AS AdjustedAmount
+		                        FROM Web.LedgerAdjs La
+		                        GROUP BY La.DrLedgerId
+	                        ) AS VAdj ON L.LedgerId = VAdj.DrLedgerId
+	                        WHERE D.DocumentTypeName = '" + Jobs.Constants.DocumentType.DocumentTypeConstants.Advances.DocumentTypeName + "'" + @"
+                            AND IsNull(L.AmtDr,0) - IsNull(VAdj.AdjustedAmount,0) > 0
+	                        GROUP BY E.PersonID
+                        ) AS VAdvance ON E.PersonID = VAdvance.PersonID
+                        Where L.SalaryHeaderId = @SalaryHeaderId ";
+                else
+                    mQry = @"SELECT H.SalaryHeaderId, E.PersonID as EmployeeId, P.Name+','+ P.Suffix AS EmployeeName, Convert(int,P.Code) AS Code, L.Days AS Days, Isnull(E.BasicSalary,0) as BasicPay,  0.00 AS Additions, 0.00 AS Deductions, 
+                        IsNull(VLoan.LoanEMI,0) AS LoanEMI, IsNull(VAdvance.Advance,0) AS Advance, Convert(nvarchar,H.DocDate) As DocDate, 
+                        H.DocTypeId As DocTypeId, null WagesPayType, H.Remark As HeaderRemark, Convert(Decimal(18,4),DAY(EOMONTH(H.DocDate))) - IsNull(VSunday.NoOfSundays,0) AS MonthDays
+                        FROM Web.SalaryHeaders H
+                        LEFT JOIN Web.SalaryLines L on H.SalaryHeaderId = L.SalaryHeaderId
+                        LEFT JOIN Web.Employees E On L.EmployeeId = E.PersonID
                         LEFT JOIN Web.People P ON E.PersonID = P.PersonID
                         LEFT JOIN (
                             SELECT Count(*) AS NoOfSundays
@@ -227,11 +348,13 @@ namespace Service
     {
         public int EmployeeId { get; set; }
         public string EmployeeName { get; set; }
+        public string DocDate { get; set; }
         public int Code { get; set; }
         public int DocTypeId { get; set; }
-        public string DocDate { get; set; }
+        public string WagesPayType { get; set; }
         public Decimal MonthDays { get; set; }
         public Decimal Days { get; set; }
+        public Decimal BasicPay { get; set; }
         public Decimal Additions { get; set; }
         public Decimal Deductions { get; set; }
         public Decimal LoanEMI { get; set; }

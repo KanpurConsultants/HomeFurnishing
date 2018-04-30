@@ -280,6 +280,9 @@ namespace Jobs.Controllers
                         saleinvoiceheaderdetail.Status = (int)StatusConstants.Modified;
                     }
 
+                    bool IsBillToPartyChanges = false;
+                    if (saleinvoiceheaderdetail.BillToBuyerId != vm.BillToBuyerId)
+                        IsBillToPartyChanges = true;
 
                     saleinvoiceheaderdetail.BillToBuyerId = vm.BillToBuyerId;
                     saleinvoiceheaderdetail.SaleToBuyerId = vm.SaleToBuyerId;
@@ -293,6 +296,24 @@ namespace Jobs.Controllers
                     saleinvoiceheaderdetail.ModifiedDate = DateTime.Now;
                     saleinvoiceheaderdetail.ModifiedBy = User.Identity.Name;
                     _SaleInvoiceHeaderService.Update(saleinvoiceheaderdetail);
+
+                    if (IsBillToPartyChanges == true)
+                    {
+                        var LineCharges = (from L in db.SaleInvoiceLineCharge where L.HeaderTableId == vm.SaleInvoiceHeaderId select L).ToList();
+                        foreach (var item in LineCharges)
+                        {
+                            item.PersonID = saleinvoiceheaderdetail.BillToBuyerId;
+                            new SaleInvoiceLineChargeService(_unitOfWork).Update(item);
+                        }
+
+                        var HeaderCharges = (from L in db.SaleInvoiceHeaderCharge where L.HeaderTableId == vm.SaleInvoiceHeaderId select L).ToList();
+                        foreach (var item in HeaderCharges)
+                        {
+                            item.PersonID = saleinvoiceheaderdetail.BillToBuyerId;
+                            new SaleInvoiceHeaderChargeService(_unitOfWork).Update(item);
+                        }
+                    }
+
 
 
                     LogList.Add(new LogTypeViewModel

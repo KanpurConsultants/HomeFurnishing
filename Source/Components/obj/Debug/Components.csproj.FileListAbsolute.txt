@@ -136,4 +136,3 @@ D:\Kanpur Consultants\HomeFurnishing\Source\Components\bin\Debug\Microsoft.AspNe
 D:\Kanpur Consultants\HomeFurnishing\Source\Components\bin\Debug\log4net.xml
 D:\Kanpur Consultants\HomeFurnishing\Source\Components\obj\Debug\Components.dll
 D:\Kanpur Consultants\HomeFurnishing\Source\Components\obj\Debug\Components.pdb
-D:\Kanpur Consultants\HomeFurnishing\Source\Components\obj\Debug\Components.csprojResolveAssemblyReference.cache

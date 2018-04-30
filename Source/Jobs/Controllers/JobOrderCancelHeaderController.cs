@@ -1343,20 +1343,46 @@ namespace Jobs.Controllers
 
                             if (pd.Status == (int)StatusConstants.Drafted || pd.Status == (int)StatusConstants.Modified || pd.Status == (int)StatusConstants.Import)
                             {
-                                //LogAct(item.ToString());
-                                Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint, User.Identity.Name, item);
+                                if (Settings.SqlProcDocumentPrint == null || Settings.SqlProcDocumentPrint == "")
+                                {
+                                    JobOrderCancelHeaderRDL cr = new JobOrderCancelHeaderRDL();
+                                    drp.CreateRDLFile("Std_JobOrderCancel_Print", cr.Create_Std_JobOrderCancel_Print());
+                                    List<ListofQuery> QueryList = new List<ListofQuery>();
+                                    QueryList = DocumentPrintData(item);
+                                    Pdf = drp.DocumentPrint_New(QueryList, User.Identity.Name);
+                                }
+                                else
+                                    Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint, User.Identity.Name, item);
 
                                 PdfStream.Add(Pdf);
                             }
                             else if (pd.Status == (int)StatusConstants.Submitted || pd.Status == (int)StatusConstants.ModificationSubmitted)
                             {
-                                Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint_AfterSubmit, User.Identity.Name, item);
+                                if (Settings.SqlProcDocumentPrint == null || Settings.SqlProcDocumentPrint == "")
+                                {
+                                    JobOrderCancelHeaderRDL cr = new JobOrderCancelHeaderRDL();
+                                    drp.CreateRDLFile("Std_JobOrderCancel_Print", cr.Create_Std_JobOrderCancel_Print());
+                                    List<ListofQuery> QueryList = new List<ListofQuery>();
+                                    QueryList = DocumentPrintData(item);
+                                    Pdf = drp.DocumentPrint_New(QueryList, User.Identity.Name);
+                                }
+                                else
+                                    Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint_AfterSubmit, User.Identity.Name, item);
 
                                 PdfStream.Add(Pdf);
                             }
                             else if (pd.Status == (int)StatusConstants.Approved)
                             {
-                                Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint_AfterApprove, User.Identity.Name, item);
+                                if (Settings.SqlProcDocumentPrint == null || Settings.SqlProcDocumentPrint == "")
+                                {
+                                    JobOrderCancelHeaderRDL cr = new JobOrderCancelHeaderRDL();
+                                    drp.CreateRDLFile("Std_JobOrderCancel_Print", cr.Create_Std_JobOrderCancel_Print());
+                                    List<ListofQuery> QueryList = new List<ListofQuery>();
+                                    QueryList = DocumentPrintData(item);
+                                    Pdf = drp.DocumentPrint_New(QueryList, User.Identity.Name);
+                                }
+                                else
+                                    Pdf = drp.DirectDocumentPrint(Settings.SqlProcDocumentPrint_AfterApprove, User.Identity.Name, item);
                                 PdfStream.Add(Pdf);
                             }
                         }
@@ -1381,6 +1407,110 @@ namespace Jobs.Controllers
 
             }
             return Json(new { success = "Error", data = "No Records Selected." }, JsonRequestBehavior.AllowGet);
+
+        }
+
+        private List<ListofQuery> DocumentPrintData(int item)
+        {
+            StockHeader SH = new StockHeaderService(_unitOfWork).Find(item);
+
+            List<ListofQuery> DocumentPrintData = new List<ListofQuery>();
+            String QueryMain;
+
+            QueryMain = @"DECLARE @DocDate DATETIME
+    SET @DocDate = (SELECT DocDate FROM Web.JobOrderCancelHeaders WHERE JobOrderCancelHeaderId = " + item + @") 
+  
+  
+	  
+	DECLARE @UnitDealCnt INT
+    SELECT
+    @UnitDealCnt = sum(CASE WHEN UnitId != DealunitId THEN 1 ELSE 0 END)
+    FROM Web.JobOrderCancelLines L
+    LEFT JOIN Web.JobOrderLines JOL ON JOL.JobOrderLineId = L.JobOrderLineId
+    WHERE L.JobOrderCancelHeaderId = " + item + @"
+
+    SELECT
+    --Header Table Fields
+    H.JobOrderCancelHeaderId,H.DocTypeId,H.DocNo,DocIdCaption + ' No' AS DocIdCaption,
+      H.SiteId,H.DivisionId,H.DocDate,DTS.DocIdCaption + ' Date' AS DocIdCaptionDate, DocIdCaption+'Due Date' AS DocIdCaptionDueDate, Pp.Name AS OrderBy,	(CASE WHEN JOS.isVisibleProcessHeader > 0 THEN PS.ProcessName ELSE NULL END) AS ProcessName
+       , H.Remark,DT.DocumentTypeShortName,
+	H.ModifiedBy + ' ' + Replace(replace(convert(NVARCHAR, H.ModifiedDate, 106), ' ', '/'), '/20', '/') + substring(convert(NVARCHAR, H.ModifiedDate), 13, 7) AS ModifiedBy,
+         H.ModifiedDate,(CASE WHEN Isnull(H.Status, 0)= 0 OR Isnull(H.Status, 0)= 8 THEN 0 ELSE 1 END)  AS Status,
+             (CASE WHEN SPR.[Party GST NO] IS NULL THEN 'Yes' ELSE 'No' END ) AS ReverseCharge,
+             VDC.CompanyName,R.ReasonName,
+	--Godown Detail
+    G.GodownName,
+	--Person Detail
+    P.Name AS PartyName, DTS.PartyCaption AS  PartyCaption, P.Suffix AS PartySuffix,	
+	isnull(PA.Address, '') + ' ' + isnull(C.CityName, '') + ',' + isnull(PA.ZipCode, '') + (CASE WHEN isnull(CS.StateName, '') <> isnull(S.StateName, '') AND SPR.[Party GST NO]
+        IS NOT NULL THEN ',State : '+isnull(S.StateName,'')+(CASE WHEN S.StateCode IS NULL THEN '' ELSE ', Code : '+S.StateCode END)    ELSE '' END ) AS PartyAddress,
+isnull(S.StateName, '') AS PartyStateName, isnull(S.StateCode, '') AS PartyStateCode,
+
+P.Mobile AS PartyMobileNo,	SPR.*,
+	--Plan Detail
+    JOH.DocNo AS PlanNo,DTS.ContraDocTypeCaption,
+	--Caption Fields
+    DTS.SignatoryMiddleCaption,DTS.SignatoryRightCaption,
+	--Line Table
+    PD.ProductName,DTS.ProductCaption,U.UnitName,U.DecimalPlaces,DU.UnitName AS DealUnitName,DTS.DealQtyCaption,DU.DecimalPlaces AS DealDecimalPlaces,
+    isnull(L.Qty,0) AS Qty,
+    D1.Dimension1Name,DTS.Dimension1Caption,D2.Dimension2Name,DTS.Dimension2Caption,D3.Dimension3Name,DTS.Dimension3Caption,D4.Dimension4Name,DTS.Dimension4Caption,
+   (CASE WHEN DTS.PrintSpecification >0 THEN JOL.Specification ELSE '' END)  AS Specification, DTS.SpecificationCaption,DTS.SignatoryleftCaption,L.Remark AS LineRemark,
+	--STC.Code AS SalesTaxProductCodes,
+	(CASE WHEN H.ProcessId IN(26,28) THEN STC.Code ELSE PSSTC.Code END)  AS SalesTaxProductCodes,
+    (SELECT TOP 1 SalesTaxProductCodeCaption FROM web.SiteDivisionSettings WHERE H.DocDate BETWEEN StartDate AND IsNull(EndDate, getdate()) AND SiteId = H.SiteId AND DivisionId = H.DivisionId)  AS SalesTaxProductCodeCaption,
+       (CASE WHEN DTS.PrintProductGroup > 0 THEN isnull(PG.ProductGroupName, '') ELSE '' END)+(CASE WHEN DTS.PrintProductdescription >0 THEN isnull(','+PD.Productdescription,'') ELSE '' END) AS ProductGroupName,
+         DTS.ProductGroupCaption,   
+	NULL AS SubReportProcList,
+	(CASE WHEN Isnull(H.Status,0)=0 OR Isnull(H.Status,0)=8 THEN 'Provisional ' +isnull(DT.PrintTitle, DT.DocumentTypeName) ELSE isnull(DT.PrintTitle, DT.DocumentTypeName) END) AS ReportTitle,
+  	'Std_JobOrderCancel_Print.rdl' AS ReportName,
+      SalesTaxGroupProductCaption
+    FROM Web.JobOrderCancelHeaders H WITH (Nolock)
+    LEFT JOIN web.DocumentTypes DT WITH(Nolock) ON DT.DocumentTypeId=H.DocTypeId
+   LEFT JOIN Web._DocumentTypeSettings DTS WITH (Nolock) ON DTS.DocumentTypeId=DT.DocumentTypeId
+   LEFT JOIN Web.JobOrderSettings JOS WITH (Nolock) ON JOS.DocTypeId=DT.DocumentTypeId AND H.Siteid= JOS.Siteid AND H.DivisionId= JOS.DivisionId
+    LEFT JOIN web.ViewDivisionCompany VDC WITH (Nolock) ON VDC.DivisionId=H.DivisionId
+   LEFT JOIN Web.Sites SI WITH (Nolock) ON SI.SiteId=H.SiteId
+   LEFT JOIN Web.Divisions DIV WITH (Nolock) ON DIV.DivisionId=H.DivisionId
+   LEFT JOIN Web.Companies Com ON Com.CompanyId = DIV.CompanyId
+    LEFT JOIN Web.Cities CC WITH (Nolock) ON CC.CityId=Com.CityId
+   LEFT JOIN Web.States CS WITH (Nolock) ON CS.StateId=CC.StateId
+   LEFT JOIN Web.Processes PS WITH (Nolock) ON PS.ProcessId=H.ProcessId
+   LEFT JOIN Web.SalesTaxProductCodes PSSTC WITH (Nolock) ON PSSTC.SalesTaxProductCodeId=PS.SalesTaxProductCodeId
+   LEFT JOIN Web.People P WITH (Nolock) ON P.PersonID=H.JobWorkerId
+   LEFT JOIN web.Godowns G WITH (Nolock) ON G.GodownId=H.GodownId
+   LEFT JOIN Web.Std_PersonRegistrations SPR WITH (Nolock) ON SPR.CustomerId=H.JobWorkerId
+   LEFT JOIN web.Reasons R WITH (Nolock) ON R.ReasonId=H.ReasonId
+   LEFT JOIN (SELECT TOP 1 * FROM web.SiteDivisionSettings WHERE @DocDate BETWEEN StartDate AND IsNull(EndDate, getdate()) ORDER BY StartDate) SDS ON H.DivisionId = SDS.DivisionId AND  H.SiteId = SDS.SiteId
+   LEFT JOIN(SELECT* FROM Web.PersonAddresses WITH (nolock) WHERE AddressType IS NULL) PA ON PA.PersonId = P.PersonID
+LEFT JOIN Web.Cities C WITH (nolock) ON C.CityId = PA.CityId
+LEFT JOIN Web.States S WITH (Nolock) ON S.StateId=C.StateId
+LEFT JOIN web.People Pp WITH (Nolock) ON Pp.PersonID=H.OrderById
+LEFT JOIN Web.JobOrderCancelLines L WITH (Nolock) ON H.JobOrderCancelHeaderId=L.JobOrderCancelHeaderId
+LEFT JOIN Web.JobOrderLines JOL WITH (Nolock) ON JOL.JoborderLineId=L.JobOrderLineId
+LEFT JOIN Web.JobOrderHeaders JOH WITH (Nolock) ON JOH.JoborderheaderId=JOL.joborderheaderId
+LEFT JOIN web.Products PD WITH (Nolock) ON PD.ProductId=JOL.ProductId
+LEFT JOIN web.ProductGroups PG WITH (Nolock) ON PG.ProductGroupId=PD.ProductGroupid
+LEFT JOIN Web.SalesTaxProductCodes STC WITH (Nolock) ON STC.SalesTaxProductCodeId= IsNull(PD.SalesTaxProductCodeId, Pg.DefaultSalesTaxProductCodeId)
+    LEFT JOIN Web.Dimension1 D1 WITH(Nolock) ON D1.Dimension1Id=JOL.Dimension1Id
+   LEFT JOIN web.Dimension2 D2 WITH (Nolock) ON D2.Dimension2Id=JOL.Dimension2Id
+   LEFT JOIN web.Dimension3 D3 WITH (Nolock) ON D3.Dimension3Id=JOL.Dimension3Id
+   LEFT JOIN Web.Dimension4 D4 WITH (nolock) ON D4.Dimension4Id=JOL.Dimension4Id
+   LEFT JOIN web.Units U WITH (Nolock) ON U.UnitId=PD.UnitId
+   LEFT JOIN web.Units DU WITH (Nolock) ON DU.UnitId=JOL.DealUnitId
+      WHERE H.JobOrderCancelHeaderId= " + item + @"
+    ORDER BY L.Sr";
+
+           ListofQuery QryMain = new ListofQuery();
+            QryMain.Query = QueryMain;
+            QryMain.QueryName = nameof(QueryMain);
+            DocumentPrintData.Add(QryMain);
+
+
+
+
+
+            return DocumentPrintData;
 
         }
 

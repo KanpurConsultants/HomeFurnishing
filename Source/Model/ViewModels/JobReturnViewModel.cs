@@ -92,6 +92,8 @@ namespace Model.ViewModel
 
         [Display(Name = "Qty"), Required]
         public Decimal Qty { get; set; }
+        [Display(Name = "Loss Qty")]
+        public decimal LossQty { get; set; }
         public int ProductId { get; set; }
         public string ProductName { get; set; }
         public int? Dimension1Id { get; set; }

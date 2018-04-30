@@ -46,7 +46,7 @@ namespace Jobs.Controllers
 
         public ActionResult Index()
         {
-            var Narration = _NarrationService.GetNarrationList().ToList();
+            var Narration = _NarrationService.GetNarrationListForIndex().ToList();
             return View(Narration);           
         }
 
@@ -321,4 +321,6 @@ namespace Jobs.Controllers
             base.Dispose(disposing);
         }
     }
+
+
 }

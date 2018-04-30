@@ -153,7 +153,7 @@ namespace Jobs.Controllers
                     temp.isVisibleHeaderJobWorker = pt.isVisibleHeaderJobWorker;
                     temp.isPostedInStock = pt.isPostedInStock;
                     temp.filterDocTypeCostCenter = pt.filterDocTypeCostCenter;
-                    
+                    temp.JobReturnDocTypeId = pt.JobReturnDocTypeId;
                     temp.SqlProcConsumption = pt.SqlProcConsumption;
                     temp.isPostedInStockProcess = pt.isPostedInStockProcess;
                     temp.isPostedInStockVirtual = pt.isPostedInStockVirtual;
@@ -200,6 +200,8 @@ namespace Jobs.Controllers
                     temp.isGenerateProductUid = pt.isGenerateProductUid;
                     temp.DocumentPrintReportHeaderId = pt.DocumentPrintReportHeaderId;
 
+
+                    temp.JobInvoiceReturnDocTypeId = pt.JobInvoiceReturnDocTypeId;
                     temp.SalesTaxGroupPersonId = pt.SalesTaxGroupPersonId;
                     temp.SqlProcDocumentPrint = pt.SqlProcDocumentPrint;
                     temp.DocumentPrint = pt.DocumentPrint;
@@ -362,6 +364,7 @@ namespace Jobs.Controllers
                     temp.isMandatoryJobReceive = pt.isMandatoryJobReceive;
                     temp.SqlProcGenProductUID = pt.SqlProcGenProductUID;
                     temp.SqlProcProductUidHelpList = pt.SqlProcProductUidHelpList;
+                    temp.JobReturnDocTypeId = pt.JobReturnDocTypeId;
                     temp.isPostedInStock = pt.isPostedInStock;
                     temp.isVisibleLoss = pt.isVisibleLoss;
                     temp.SqlProcConsumption = pt.SqlProcConsumption;
@@ -405,6 +408,7 @@ namespace Jobs.Controllers
                     temp.isVisibleProductGroup_Index = pt.isVisibleProductGroup_Index;
 
 
+                    temp.JobInvoiceReturnDocTypeId = pt.JobInvoiceReturnDocTypeId;
                     temp.DocumentPrintReportHeaderId = pt.DocumentPrintReportHeaderId;
                     temp.SqlProcDocumentPrint = pt.SqlProcDocumentPrint;
                     temp.DocumentPrint = pt.DocumentPrint;
@@ -561,6 +565,7 @@ namespace Jobs.Controllers
                     temp.isVisibleLoss = pt.isVisibleLoss;
                     temp.SqlProcConsumption = pt.SqlProcConsumption;
                     temp.SqlProcProductUidHelpList = pt.SqlProcProductUidHelpList;
+                    temp.JobReturnDocTypeId = pt.JobReturnDocTypeId;
                     temp.JobReceiveDocTypeId = pt.JobReceiveDocTypeId;
                     temp.isVisibleHeaderJobWorker = pt.isVisibleHeaderJobWorker;
                     temp.isPostedInStockProcess = pt.isPostedInStockProcess;
@@ -596,7 +601,7 @@ namespace Jobs.Controllers
                     temp.isVisibleProduct_Index = pt.isVisibleProduct_Index;
                     temp.isVisibleProductGroup_Index = pt.isVisibleProductGroup_Index;
 
-
+                    temp.JobInvoiceReturnDocTypeId = pt.JobInvoiceReturnDocTypeId;
                     temp.SqlProcDocumentPrint = pt.SqlProcDocumentPrint;
                     temp.DocumentPrint = pt.DocumentPrint;
                     temp.isAutoCreateJobReceive = pt.isAutoCreateJobReceive;
@@ -765,6 +770,7 @@ namespace Jobs.Controllers
                     temp.isVisibleLoss = pt.isVisibleLoss;
                     temp.SqlProcConsumption = pt.SqlProcConsumption;
                     temp.SqlProcProductUidHelpList = pt.SqlProcProductUidHelpList;
+                    temp.JobReturnDocTypeId = pt.JobReturnDocTypeId;
                     temp.isPostedInStockProcess = pt.isPostedInStockProcess;
                     temp.isPostedInStockVirtual = pt.isPostedInStockVirtual;
                     temp.isVisibleDimension1 = pt.isVisibleDimension1;
@@ -798,7 +804,7 @@ namespace Jobs.Controllers
                     temp.isVisibleProduct_Index = pt.isVisibleProduct_Index;
                     temp.isVisibleProductGroup_Index = pt.isVisibleProductGroup_Index;
 
-
+                    temp.JobInvoiceReturnDocTypeId = pt.JobInvoiceReturnDocTypeId;
                     temp.SqlProcDocumentPrint = pt.SqlProcDocumentPrint;
                     temp.DocumentPrint = pt.DocumentPrint;
                     temp.isAutoCreateJobReceive = pt.isAutoCreateJobReceive;

@@ -427,7 +427,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Controllers\JobInvoiceHeaderrdl.cs" />
+    <Compile Include="Controllers\JobOrderCancelHeaderrdl.cs" />
     <Compile Include="Controllers\JobOrderHeaderrdl.cs" />
+    <Compile Include="Controllers\JobReceiveHeaderrdl.cs" />
+    <Compile Include="Controllers\LedgerHeaderrdl.cs" />
     <Compile Include="Controllers\MailboxController.cs" />
     <Compile Include="Controllers\LedgerWizardController.cs" />
     <Compile Include="Controllers\SalaryWizardController.cs" />
@@ -751,6 +754,7 @@
     <Compile Include="Controllers\SalaryLineController.cs" />
     <Compile Include="Controllers\SalarySettingsController.cs" />
     <Compile Include="Controllers\SaleInvoiceHeaderrdl.cs" />
+    <Compile Include="Controllers\StockHeaderRDL.cs" />
     <Compile Include="Controllers\UserRolesNewController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Controllers\ProductCustomGroupHeaderController.cs" />
@@ -4906,19 +4910,6 @@
     <Content Include="Views\Unit\Edit.cshtml" />
     <Content Include="Views\Unit\Index.cshtml" />
     <Content Include="Views\Unit\_Reason.cshtml" />
-    <Content Include="Views\DirectPurchaseInvoiceHeader\Create.cshtml" />
-    <Content Include="Views\DirectPurchaseInvoiceHeader\Detail.cshtml" />
-    <Content Include="Views\DirectPurchaseInvoiceHeader\DocumentTypeList.cshtml" />
-    <Content Include="Views\DirectPurchaseInvoiceHeader\Index.cshtml" />
-    <Content Include="Views\DirectPurchaseInvoiceHeader\_Reason.cshtml" />
-    <Content Include="Views\DirectPurchaseInvoiceLine\Create.cshtml" />
-    <Content Include="Views\DirectPurchaseInvoiceLine\_Create.cshtml" />
-    <Content Include="Views\DirectPurchaseInvoiceLine\_CreateForIndent.cshtml" />
-    <Content Include="Views\DirectPurchaseInvoiceLine\_Edit.cshtml" />
-    <Content Include="Views\DirectPurchaseInvoiceLine\_Filters.cshtml" />
-    <Content Include="Views\DirectPurchaseInvoiceLine\_IndentFilters.cshtml" />
-    <Content Include="Views\DirectPurchaseInvoiceLine\_IndentResults.cshtml" />
-    <Content Include="Views\DirectPurchaseInvoiceLine\_Results.cshtml" />
     <Content Include="Views\MaterialPlanCancelHeader\Create.cshtml" />
     <Content Include="Views\MaterialPlanCancelHeader\Delete.cshtml" />
     <Content Include="Views\MaterialPlanCancelHeader\Details.cshtml" />
@@ -5328,6 +5319,10 @@
     <Content Include="Views\Mailbox\Read.cshtml" />
     <Content Include="Views\StockExchange\_ResultsReceiveProductBom.cshtml" />
     <Content Include="Views\LedgerWizard\LedgerWizard.cshtml" />
+    <Content Include="Views\JobInvoiceReceiveHeader\_InvoiceReturn.cshtml" />
+    <Content Include="Views\Narration\_Reason.cshtml" />
+    <Content Include="Views\Narration\Create.cshtml" />
+    <Content Include="Views\Narration\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

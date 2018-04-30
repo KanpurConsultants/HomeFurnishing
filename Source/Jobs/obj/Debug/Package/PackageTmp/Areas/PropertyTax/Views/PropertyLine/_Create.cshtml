@@ -1,0 +1,528 @@
+﻿@model Model.ViewModels.PropertyLineViewModel
+
+<style type="text/css">
+    .cusleftnormal {
+        border-bottom-left-radius: 0pc !important;
+        border-top-left-radius: 0px !important;
+    }
+
+    .cusrightnormal {
+        border-bottom-right-radius: 0px !important;
+        border-top-right-radius: 0px !important;
+    }
+</style>
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> @ViewBag.DocNo</span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("_CreatePost", "PropertyLine", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        {
+
+            @Html.ValidationLog((string)TempData["CSEXCL"])
+            <div class="form-horizontal modal-body">
+                @Html.AntiForgeryToken()
+
+                @Html.HiddenFor(model => model.PersonId)
+                @Html.HiddenFor(m => m.ProductBuyerId)
+                @Html.HiddenFor(m => m.OldARV)
+
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="row">
+                    
+
+
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ProductId, "Construction Type", new { @class = "control-label col-xs-4 " })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.ProductId, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.ProductId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Description, "Description", new { @class = "control-label col-xs-4 " })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.Description, new { @class = "form-control col-xs-7 " })
+                                @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.DateOfConsutruction, "Construction Date", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.DateOfConsutruction, "{0:dd/MMMM/yyyy}", new { @class = "datepicker form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.DateOfConsutruction, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.WEF, "Effective From", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.WEF, "{0:dd/MMMM/yyyy}", new { @class = "datepicker form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.WEF, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Dimension1Id, "Property Type", new { @class = "control-label col-xs-4 " })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.Dimension1Id, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.Dimension1Id, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    @*<div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.DiscountTypeId, "Discount Type", new { @class = "control-label col-xs-4 " })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.DiscountTypeId, new { @class = "form-control col-xs-7" })
+                                @Html.ValidationMessageFor(model => model.DiscountTypeId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>*@
+
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.DiscountTypeId, "Discount Type", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-4" style="padding-right:0px;">
+                                @Html.TextBoxFor(model => model.DiscountTypeId, new { @class = "form-control col-xs-3 required cusrightnormal number" })
+                                @Html.ValidationMessageFor(model => model.DiscountTypeId, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="col-xs-3" style="padding-left:0px">
+                                @Html.TextBoxFor(m => m.DiscountRate, new { @class = "form-control col-xs-2 cusleftnormal", @readonly = "true" })
+                            </div>
+                        </div>
+                    </div>
+
+                    
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.PropertyArea, "Property Area", new { @class = "control-label col-xs-4 " })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.PropertyArea, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.PropertyArea, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.CoveredArea, "Covered Area", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.CoveredArea, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.CoveredArea, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.GarageArea, "Garage Area", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.GarageArea, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.GarageArea, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.BalconyArea, "Balcony Area", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.BalconyArea, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.BalconyArea, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                    <div class="col-md-6" style="display:none">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.TaxableArea, "Taxable Area", new { @class = "control-label col-xs-4 " })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.TaxableArea, new { @class = "form-control col-xs-7" })
+                                @Html.ValidationMessageFor(model => model.TaxableArea, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ARV, "ARV", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.ARV, new { @class = "form-control col-xs-7 " })
+                                @Html.ValidationMessageFor(model => model.ARV, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6" style="display:@(Model.ProductBuyerId != 0 ?"":"none")">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.NewWEF, "New Effective From", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.NewWEF, "{0:dd/MMMM/yyyy}", new { @class = "datepicker form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.NewWEF, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6" style="display:@(Model.ProductBuyerId != 0 ?"":"none")">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ModifyRemark, "Modify Remark", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.ModifyRemark, new { @class = "form-control col-xs-7 " })
+                                @Html.ValidationMessageFor(model => model.ModifyRemark, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.TaxAmount, "Tax Amount", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-4" style="padding-right:0px;">
+                                @Html.TextBoxFor(model => model.TaxAmount, new { @class = "form-control col-xs-3 required cusrightnormal number", @readonly = "true" })
+                                @Html.ValidationMessageFor(model => model.TaxPercentage, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="col-xs-1" style="padding-left:0px;">
+                                @Html.LabelFor(model => model.TaxPercentage, "@", new { @class = "control-label col-xs-4" })
+                            </div>
+                            <div class="col-xs-2" style="padding-left:0px">
+                                @Html.TextBoxFor(m => m.TaxPercentage, new { @class = "form-control col-xs-2 cusleftnormal", @readonly = "true" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.WaterTaxAmount, "Water Tax Amount", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-4" style="padding-right:0px;">
+                                @Html.TextBoxFor(model => model.WaterTaxAmount, new { @class = "form-control col-xs-3 required cusrightnormal number", @readonly = "true" })
+                                @Html.ValidationMessageFor(model => model.WaterTaxPercentage, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="col-xs-1" style="padding-left:0px;">
+                                @Html.LabelFor(model => model.WaterTaxPercentage, "@", new { @class = "control-label col-xs-4" })
+                            </div>
+                            <div class="col-xs-2" style="padding-left:0px">
+                                @Html.TextBoxFor(m => m.WaterTaxPercentage, new { @class = "form-control col-xs-2 cusleftnormal", @readonly = "true" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6" >
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.TenantName, "Tenant Name", new { @class = "control-label col-xs-4 " })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.TenantName, new { @class = "form-control col-xs-7" })
+                                @Html.ValidationMessageFor(model => model.TenantName, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.BillingType, "Billing Type", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.BillingType, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.BillingType, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.IsRented, "Is Rented", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.CheckBoxFor(m => m.IsRented, new { @class = "checkbox col-xs-1" })
+                                @Html.ValidationMessageFor(model => model.IsRented, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+
+                <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                    @if (ViewBag.LineMode == "Edit" || ViewBag.LineMode == "Create")
+                    {
+                        <button class="btn custom left" name="Command:Edit" type="submit" id="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-floppy-disk black"></span> </h2></button>}
+                    @if (ViewBag.LineMode == "Delete")
+                    {
+                        <button class="btn custom" name="Command:Delete" id="delete" type="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-trash black"></span> </h2></button>}
+
+                </div>
+
+            </div>
+
+        }
+    </div>
+</div>
+
+
+
+
+
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        CustomSelectFunction($("#ProductId"), '/ComboHelpList/GetProducts', '/ComboHelpList/SetSingleProducts', ' ', false, 0);
+        CustomSelectFunction($("#Dimension1Id"), '/ComboHelpList/GetDimension1', '/ComboHelpList/SetSingleDimension1', ' ', false, 0);
+        CustomSelectFunction($("#DiscountTypeId"), '/ComboHelpList/GetDiscountType', '/ComboHelpList/SetSingleDiscountType', ' ', false, 0);
+        CustomSelectFunction($("#BillingType"), '/ComboHelpList/GetBillingType', '/ComboHelpList/SetSingleBillingType', ' ', false, 0);
+
+
+        $('.datepicker').datepicker({
+            format: 'dd/MM/yyyy',
+            "setDate": new Date(),
+            "autoclose": true
+
+        })
+
+
+        if ($("#TaxableArea").val() > 0)
+        {
+            $('#ARV').attr('readonly','true');
+        }
+        else{
+            $('#ARV').removeAttr('readonly');
+        }
+
+        var DocID = $('#PersonId', '.modal-body').val();
+
+
+        var IsSaved=false;
+        var ValidationCount=0;
+
+        $('#modform').bind('submit',function(event){
+
+            if(!IsSaved)
+            {
+                if(!ValidateData())
+                {
+                    return false;
+                }
+                IsSaved=true;
+                $('button:submit').attr('disabled','disabled');
+                return IsSaved;
+            }
+            else
+            {
+                return false;
+            }
+
+
+        });
+
+        function ValidateData() {
+            var ValidationMessage = "";
+
+            //Client Side Validaion.....
+
+            return  (ValidationMessage=="");
+
+        }
+
+
+        $("#DiscountTypeId").change(function(){
+            Validate_DiscountType();
+        });
+
+
+
+
+        function Validate_DiscountType() {
+            var ProcessProgress = $("#Prod Order detail loading progress");
+            ProcessProgress.show();
+            if ($("#DiscountTypeId").val() != "")
+            {
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.Action("GetDiscountTypeDetailJson"))",
+                    data: { DiscountTypeId: $("#DiscountTypeId").val()},
+                success: function (data) {
+                    if (data != null)
+                    {
+                        $("#DiscountRate").val(data.Rate);
+                    }
+                    else{
+                        $("#DiscountRate").val(0);
+                    }
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert('Failed to retrieve Prod Order details.' + thrownError);
+                    ProcessProgress.hide();
+                }
+                });
+            }
+            else 
+            {
+                $("#DiscountRate").val(0);
+            }
+        }
+
+
+
+
+
+
+        $("#ProductId").select2('focus');
+
+        $('.datepicker').datepicker({
+            format: 'dd/MM/yyyy',
+            "setDate": new Date(),
+            "autoclose": true
+
+        })
+
+        var id=@Model.PersonId;
+
+        
+        var ProductBuyerId=@Model.ProductBuyerId;
+        if(ProductBuyerId>0)
+        {
+            $("#WEF").attr('readonly','true');
+        }
+
+
+        $('#delete','.modal-content').click(function (e) {
+            if(id>0)
+            {
+                var url = '/PropertyLine/DeletePost';
+                $('form#modform').attr('action',url);
+
+                return;
+            }
+            else
+            {
+                return false;
+            }
+        })
+    });
+
+
+
+</script>
+
+@if (ViewBag.LineMode == "Edit" || ViewBag.LineMode == "Create" || ViewBag.LineMode == "Delete")
+{
+
+    <script type="text/javascript">
+
+        $(function(){
+
+            //$("#Rate,#Amount,#Qty,#TestingQty,#DocQty,#ExcessQty").keyup(Calculation);
+
+
+            function CalculateARV() {
+                var ProcessProgress = $("#Prod Order detail loading progress");
+                ProcessProgress.show();
+                if ($("#ProductId").val() != "")
+                {
+                    $.ajax({
+                        cache: false,
+                        type: "POST",
+                        url: "@(Url.Action("GetARVJson"))",
+                        data: { Ward: $("#GodownId").val(), RoadType: $("#PersonRateGroupId").val(), ConstructionType: $("#ProductId").val(), 
+                            PropertyType: $("#Dimension1Id").val(), DiscountType: $("#DiscountTypeId").val(), CoveredArea: $("#CoveredArea").val(),
+                            BalconyArea: $("#BalconyArea").val(), GarageArea: $("#GarageArea").val(), 
+                            IsRented: $("#IsRented").prop('checked'), DateOfConstruction: $("#DateOfConsutruction").val(),WEF: $("#WEF").val()},
+                    success: function (data) {
+                        if (data != null)
+                        {
+                            $("#ARV").val(data);
+                        }
+                        else{
+                            $("#ARV").val(0);
+                        }
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to retrieve Prod Order details.' + thrownError);
+                        ProcessProgress.hide();
+                    }
+                });
+            }
+            else 
+            {
+                    $("#ARV").val(0);
+            }
+        }
+
+            $("#CoveredArea,#GarageArea,#BalconyArea").keyup(Calculation);
+            $("#ProductId,#Dimension1Id,#IsRented").change(Calculation);
+
+
+            function Calculation() {
+                //CalculateARV()
+
+                var CoveredArea = 0;
+                var GarageArea = 0;
+                var BalconyArea = 0;
+
+                if ($("#CoveredArea").val() !=null && $("#CoveredArea").val() !="")
+                {
+                    CoveredArea = $("#CoveredArea").val();
+                }
+
+                if ($("#GarageArea").val() !=null && $("#GarageArea").val() !="")
+                {
+                    GarageArea = $("#GarageArea").val();
+                }
+
+                if ($("#BalconyArea").val() !=null && $("#BalconyArea").val() !="")
+                {
+                    BalconyArea = $("#BalconyArea").val();
+                }
+
+                $("#TaxableArea").val(parseFloat(CoveredArea) + parseFloat(GarageArea) + parseFloat(BalconyArea));
+
+                if ($("#TaxableArea").val() > 0)
+                {
+                    $('#ARV').attr('readonly','true');
+                    CalculateARV();
+                }
+                else{
+                    $('#ARV').removeAttr('readonly');
+                }
+            }
+        })
+    </script>
+}
+
+@if ((ViewBag.LineMode != "Create") && (ViewBag.LineMode != "Edit") && (ViewBag.LineMode != "Delete"))
+{
+    <script type="text/javascript">
+
+        RemoveFields();
+
+        function RemoveFields(){
+            //Disabling input fields
+            $(':input','.modal-body').attr('disabled','disabled');
+        }
+
+
+    </script>
+}

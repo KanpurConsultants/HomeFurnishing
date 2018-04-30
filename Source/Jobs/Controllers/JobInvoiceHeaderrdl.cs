@@ -15,7 +15,7 @@ namespace Jobs.Controllers
     public class JobInvoiceHeaderRDL
     {
 
-        public string Create_StdDocPrint_JobInvoice()
+        public string Create_Std_JobInvoice_Print()
         {
             string StringCode = "";
             StringCode = @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -3047,7 +3047,7 @@ namespace Jobs.Controllers
           </TablixMembers>
         </TablixRowHierarchy>
         <DataSetName>DsMain</DataSetName>
-        <Top>7.09041in</Top>
+        <Top>7.46541in</Top>
         <Left>0.03452in</Left>
         <Height>0.22917in</Height>
         <Width>7.75167in</Width>
@@ -5455,6 +5455,19 @@ namespace Jobs.Controllers
           </Border>
         </Style>
       </Tablix>
+      <Rectangle Name=""Rectangle2"">
+        <KeepTogether>true</KeepTogether>
+        <Top>4.23961in</Top>
+        <Left>0.04907in</Left>
+        <Height>1.06944in</Height>
+        <Width>4.45729in</Width>
+        <ZIndex>10</ZIndex>
+        <Style>
+          <Border>
+            <Style>None</Style>
+          </Border>
+        </Style>
+      </Rectangle>
       <Tablix Name=""Tablix11"">
         <TablixBody>
           <TablixColumns>
@@ -6292,10 +6305,13 @@ namespace Jobs.Controllers
         </TablixRowHierarchy>
         <DataSetName>DsGSTSummary</DataSetName>
         <Top>4.23961in</Top>
-        <Left>0.12375in</Left>
+        <Left>0.0538in</Left>
         <Height>1in</Height>
         <Width>4.45256in</Width>
-        <ZIndex>10</ZIndex>
+        <ZIndex>11</ZIndex>
+        <Visibility>
+          <Hidden>=iif(First(Fields!ChargeGroupProductName.Value, ""DsMain"")="""",true,false)</Hidden>
+        </Visibility>
         <Style>
           <Border>
             <Style>None</Style>
@@ -6303,10 +6319,10 @@ namespace Jobs.Controllers
         </Style>
       </Tablix>
     </ReportItems>
-    <Height>7.36013in</Height>
+    <Height>7.72471in</Height>
     <Style />
   </Body>
-  <Width>7.81549in</Width>
+  <Width>7.80832in</Width>
   <Page>
     <PageHeader>
       <Height>0.58333in</Height>

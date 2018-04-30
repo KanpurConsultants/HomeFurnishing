@@ -129,6 +129,10 @@ namespace Module
             AddFields("Products", "ProductCategoryId", "INT", "ProductCategories");
             AddFields("Products", "SaleRate", " Decimal(18,4)");
 
+            AddFields("Processes", "DepartmentId", "INT", "Departments");
+            AddFields("SalaryLines", "BasicSalary", " Decimal(18,4)");
+            AddFields("SalaryHeaders", "WagesPayType", "NVARCHAR (20)");
+
             AddFields("ProductTypeSettings", "isVisibleProductDescription", "BIT");
             AddFields("ProductTypeSettings", "isVisibleProductSpecification", "BIT");
             AddFields("ProductTypeSettings", "isVisibleProductCategory", "BIT");
@@ -3687,6 +3691,12 @@ namespace Module
 
 
             AddFields("ReportHeaders", "IsHideHeaderDetail", "BIT");
+
+            AddFields("JobInvoiceSettings", "JobInvoiceReturnDocTypeId", "Int","DocumentTypes");
+
+            AddFields("Narrations", "DocTypeId", "Int","DocumentTypes");
+
+
 
 
             ReCreateProcedures();

@@ -109,6 +109,8 @@ namespace Model.ViewModel
         public int? SalesTaxGroupPersonId { get; set; }
         public string SalesTaxGroupPersonName { get; set; }
 
+        public int? JobInvoiceReturnDocTypeId { get; set; }
+
         public int? JobReceiveDocTypeId { get; set; }
         public string JobReceiveDocTypeName { get; set; }
         public int? AmountRoundOff { get; set; }

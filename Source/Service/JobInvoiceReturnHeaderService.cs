@@ -32,6 +32,7 @@ namespace Service
         int NextId(int id);
         int PrevId(int id);
         IQueryable<ComboBoxResult> GetCustomPerson(int Id, string term, int? ProcessId = null);
+        string GetNarration(int JobInvoiceReturnHeaderId);
     }
 
     public class JobInvoiceReturnHeaderService : IJobInvoiceReturnHeaderService
@@ -307,6 +308,55 @@ namespace Service
               );
 
             return list;
+        }
+
+        public string GetNarration(int JobInvoiceReturnHeaderId)
+        {
+            string Narration = "";
+
+            var JobInvoiceReturnHeader_Data = (from H in db.JobInvoiceReturnHeader
+                                                join L in db.JobInvoiceReturnLine on H.JobInvoiceReturnHeaderId equals L.JobInvoiceReturnHeaderId into JobInvoiceReturnLineTable
+                                                from JobInvoiceReturnLineTab in JobInvoiceReturnLineTable.DefaultIfEmpty()
+                                                where H.JobInvoiceReturnHeaderId == JobInvoiceReturnHeaderId
+                                                select new
+                                                {
+                                                    DocTypeId = H.DocTypeId,
+                                                    JobWorkerName = H.JobWorker.Person.Name,
+                                                    InvoiceNo = JobInvoiceReturnLineTab.JobInvoiceLine.JobInvoiceHeader.DocNo,
+                                                    ProductName = JobInvoiceReturnLineTab.JobInvoiceLine.JobReceiveLine.Product.ProductName,
+                                                    ProductGroupName = JobInvoiceReturnLineTab.JobInvoiceLine.JobReceiveLine.Product.ProductGroup.ProductGroupName,
+                                                    ProductUidName = JobInvoiceReturnLineTab.JobInvoiceLine.JobReceiveLine.ProductUid.ProductUidName,
+                                                    Qty = JobInvoiceReturnLineTab.Qty,
+                                                    Rate = JobInvoiceReturnLineTab.Rate,
+                                                    Amount = JobInvoiceReturnLineTab.Amount,
+                                                }).FirstOrDefault();
+
+            var JobInvoiceReturnHeaderCharges_Data = (from Hc in db.JobInvoiceReturnHeaderCharge
+                                                       where Hc.HeaderTableId == JobInvoiceReturnHeaderId
+                                                       && Hc.Charge.ChargeName == "Net Amount"
+                                                       select new
+                                                       {
+                                                           NetAmount = Hc.Amount
+                                                       }).FirstOrDefault();
+
+
+
+            if (JobInvoiceReturnHeader_Data != null)
+            {
+                var Narration_Temp = (from H in db.Narration where H.DocTypeId == JobInvoiceReturnHeader_Data.DocTypeId select new { Narration = H.NarrationName }).FirstOrDefault();
+
+                if (Narration_Temp != null)
+                    Narration = Narration_Temp.Narration.Replace("<JobWorkerName>", JobInvoiceReturnHeader_Data.JobWorkerName)
+                                            .Replace("<InvoiceNo>", JobInvoiceReturnHeader_Data.InvoiceNo)
+                                            .Replace("<ProductName>", JobInvoiceReturnHeader_Data.ProductName)
+                                            .Replace("<ProductGroupName>", JobInvoiceReturnHeader_Data.ProductGroupName)
+                                            .Replace("<ProductUidName>", JobInvoiceReturnHeader_Data.ProductUidName)
+                                            .Replace("<Qty>", JobInvoiceReturnHeader_Data.Qty.ToString())
+                                            .Replace("<Rate>", JobInvoiceReturnHeader_Data.Rate.ToString())
+                                            .Replace("<Amount>", JobInvoiceReturnHeader_Data.Amount.ToString())
+                                            .Replace("<NetAmount>", JobInvoiceReturnHeaderCharges_Data.NetAmount.ToString());
+            }
+            return Narration;
         }
 
         public void Dispose()

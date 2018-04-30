@@ -9,6 +9,7 @@ using System;
 using Model;
 using System.Threading.Tasks;
 using Data.Models;
+using Model.ViewModels;
 
 namespace Service
 {
@@ -23,6 +24,7 @@ namespace Service
         void Update(Narration pt);
         Narration Add(Narration pt);
         IEnumerable<Narration> GetNarrationList();
+        IEnumerable<NarrationIndexViewModel> GetNarrationListForIndex();
 
         // IEnumerable<Narration> GetNarrationList(int buyerId);
         Task<IEquatable<Narration>> GetAsync();
@@ -102,6 +104,21 @@ namespace Service
 
             return pt;
         }
+
+        public IEnumerable<NarrationIndexViewModel> GetNarrationListForIndex()
+        {
+            var pt = from H in db.Narration
+                     orderby H.DocType.DocumentTypeName
+                     select new NarrationIndexViewModel
+                     {
+                         NarrationId = H.NarrationId,
+                         NarrationName = H.NarrationName,
+                         DocumentTypeName = H.DocType.DocumentTypeName
+                     };
+
+            return pt;
+        }
+
         public IEnumerable<string> GetNarrationNames()
         {
             return (from p in db.Narration
@@ -175,4 +192,6 @@ namespace Service
             throw new NotImplementedException();
         }
     }
+
+
 }

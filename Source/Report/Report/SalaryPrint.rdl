@@ -3245,7 +3245,7 @@
                     </TablixMember>
                     <TablixMember>
                       <Visibility>
-                        <Hidden>=iif(Fields!DepartmentName.Value="All",false,true)</Hidden>
+                        <Hidden>=iif(Fields!DepartmentName.Value="Multiple",false,true)</Hidden>
                       </Visibility>
                       <KeepWithGroup>Before</KeepWithGroup>
                     </TablixMember>
@@ -4855,7 +4855,7 @@
                   <Width>5.13898in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>2.07349in</Width>
+                  <Width>2.16724in</Width>
                 </TablixColumn>
               </TablixColumns>
               <TablixRows>
@@ -5646,7 +5646,7 @@
             <Top>6.2368in</Top>
             <Left>0.06743in</Left>
             <Height>1.11043in</Height>
-            <Width>10.30589in</Width>
+            <Width>10.39964in</Width>
             <ZIndex>5</ZIndex>
             <Style>
               <Border>

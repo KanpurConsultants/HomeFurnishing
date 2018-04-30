@@ -876,6 +876,16 @@ namespace Jobs.Controllers
                 return RedirectToAction("DetailInformation", new { id = id, IndexType = IndexType });
             }
 
+            var JobInvoiceReturn = db.JobInvoiceReturnLine.Where(i => i.JobInvoiceLine.JobInvoiceHeaderId == id).FirstOrDefault();
+            if (JobInvoiceReturn != null)
+            {
+                pt.ReturnNature = (from H in db.JobInvoiceReturnHeader where H.JobInvoiceReturnHeaderId == JobInvoiceReturn.JobInvoiceReturnHeaderId select new { DocTypeNature = H.DocType.Nature }).FirstOrDefault().DocTypeNature;
+                if (pt.ReturnNature == TransactionNatureConstants.Credit)
+                    pt.AdditionalInfo = "Credit Note is generated for this invoice.";
+                else
+                    pt.AdditionalInfo = "Invoice is cancelled.";
+            }
+
 
             if (pt.JobReceiveHeaderId != null)
             {
@@ -1929,6 +1939,260 @@ namespace Jobs.Controllers
 
         }
 
+        private List<ListofQuery> DocumentPrintData(int item)
+        {
+
+            List<ListofQuery> DocumentPrintData = new List<ListofQuery>();
+            String QueryMain;
+            QueryMain = @"DECLARE @TotalAmount DECIMAL 
+SET @TotalAmount = (SELECT Max(Amount) FROM Web.JobInvoiceHeaderCharges WHERE HeaderTableId = " + item + @" AND ChargeId = 34 ) 
+ 
+DECLARE @ReturnAmount DECIMAL
+DECLARE @DebitAmount DECIMAL
+DECLARE @CreaditAmount DECIMAL
+	  
+SELECT 
+@ReturnAmount=sum(CASE WHEN CT.ChargeTypeName IN ('Amount','CGST','SGST','IGST') AND JIRH.Nature='Return' THEN isnull(H.Amount,0) ELSE 0 END ),
+@DebitAmount=sum(CASE WHEN JIRH.Nature='Debit Note' AND C.ChargeName='Net Amount' THEN isnull(H.Amount,0) ELSE 0 END ),
+@CreaditAmount=sum(CASE WHEN JIRH.Nature='Credit Note' AND C.ChargeName='Net Amount' THEN isnull(H.Amount,0) ELSE 0 END )
+FROM Web.JobInvoiceReturnLineCharges H
+LEFT JOIN Web.ChargeTypes CT WITH (Nolock) ON CT.ChargeTypeId=H.ChargeTypeId
+LEFT JOIN web.Charges C WITH (Nolock) ON C.ChargeId=H.ChargeId
+LEFT JOIN Web.JobInvoiceReturnLines JIRL WITH (Nolock) ON JIRL.JobInvoiceReturnLineId=H.LineTableId
+LEFT JOIN Web.JobInvoiceLines JIL WITH (Nolock) ON JIL.JobInvoiceLineId=JIRL.JobInvoiceLineId
+LEFT JOIN Web.JobInvoiceReturnHeaders JIRH WITH (Nolock) ON JIRH.JobInvoiceReturnHeaderId=JIRL.JobInvoiceReturnHeaderId
+WHERE JIL.JobInvoiceHeaderId=" + item + @"
+	  
+SET @TotalAmount=isnull(@TotalAmount,0)-isnull(@ReturnAmount,0)-isnull(@DebitAmount,0)+isnull(@CreaditAmount,0)
+	  
+	  	  
+DECLARE @UnitDealCnt INT	
+SELECT 
+@UnitDealCnt=sum(CASE WHEN JOL.UnitId != JOL.DealunitId THEN 1 ELSE 0 END )
+FROM Web.JobInvoiceLines L WITH (Nolock) 
+LEFT JOIN web.JobReceiveLines JRL WITH (Nolock) ON JRL.JobReceiveLineId=L.JobReceiveLineId
+LEFT JOIN Web.JobOrderLines JOL WITH (Nolock) ON JOL.JobOrderLineId=JRL.JobOrderLineId
+WHERE L.JobInvoiceHeaderId=" + item + @"
+  
+	
+DECLARE @DocDate DATETIME
+DECLARE @Site INT 
+DECLARE @Division INT 
+SELECT  @DocDate=DocDate,@Site=SiteId,@Division=DivisionId FROM Web.JobInvoiceHeaders WHERE JobInvoiceHeaderId=" + item + @"
+
+	
+	
+SELECT	H.JobInvoiceHeaderId,H.DocTypeId,H.DocNo,DocIdCaption+' No' AS DocIdCaption ,
+H.SiteId,H.DivisionId,H.DocDate,DTS.DocIdCaption +' Date' AS DocIdCaptionDate ,	
+H.JobWorkerDocNo AS PartyDocNo,	DTS.PartyCaption +' Doc No' AS PartyDocCaption,format(H.JobWorkerDocDate,'dd/MMM/yy') AS PartyDocDate,
+DTS.PartyCaption +' Doc Date' AS PartyDocDateCaption,H.CreditDays,H.Remark,DT.DocumentTypeShortName,	
+H.ModifiedBy +' ' + Replace(replace(convert(NVARCHAR, H.ModifiedDate, 106), ' ', '/'),'/20','/') + substring (convert(NVARCHAR,H.ModifiedDate),13,7) AS ModifiedBy,
+H.ModifiedDate,(CASE WHEN Isnull(H.Status,0)=0 OR Isnull(H.Status,0)=8 THEN 0 ELSE 1 END)  AS Status,
+CUR.Name AS CurrencyName,(CASE WHEN SPR.[Party GST NO] IS NULL THEN 'Yes' ELSE 'No' END ) AS ReverseCharge,
+VDC.CompanyName,P.Name AS PartyName, DTS.PartyCaption AS  PartyCaption, P.Suffix AS PartySuffix,	
+isnull(PA.Address,'')+' '+isnull(C.CityName,'')+','+isnull(PA.ZipCode,'')+(CASE WHEN isnull(CS.StateName,'') <> isnull(S.StateName,'') AND SPR.[Party GST NO] IS NOT NULL THEN ',State : '+isnull(S.StateName,'')+(CASE WHEN S.StateCode IS NULL THEN '' ELSE ', Code : '+S.StateCode END)    ELSE '' END ) AS PartyAddress,
+isnull(S.StateName,'') AS PartyStateName,isnull(S.StateCode,'') AS PartyStateCode,	
+P.Mobile AS PartyMobileNo,	SPR.*,
+	--Plan Detail
+	JRH.DocNo  AS PlanNo,DTS.ContraDocTypeCaption,
+	--Caption Fields	
+	DTS.SignatoryMiddleCaption,DTS.SignatoryRightCaption,
+	--Line Table
+	PD.ProductName,DTS.ProductCaption,U.UnitName,U.DecimalPlaces,DU.UnitName AS DealUnitName,DTS.DealQtyCaption,DU.DecimalPlaces AS DealDecimalPlaces,
+	isnull(L.Qty,0) AS Qty,isnull(L.Rate,0) AS Rate,isnull(L.Amount,0) AS Amount,isnull(L.DealQty,0) AS DealQty,
+	D1.Dimension1Name,DTS.Dimension1Caption,D2.Dimension2Name,DTS.Dimension2Caption,D3.Dimension3Name,DTS.Dimension3Caption,D4.Dimension4Name,DTS.Dimension4Caption,
+    DTS.SpecificationCaption,DTS.SignatoryleftCaption,L.Remark AS LineRemark,
+	--L.DiscountPer AS DiscountPer,L.DiscountAmt AS DiscountAmt,
+	Convert(DECIMAL(18,2),L.RateDiscountPer) AS DiscountPer,Convert(DECIMAL(18,2),L.RateDiscountAmt) AS DiscountAmt,
+	--STC.Code AS SalesTaxProductCodes,
+	(CASE WHEN H.ProcessId IN (26,28) THEN  STC.Code ELSE PSSTC.Code END)  AS SalesTaxProductCodes ,
+	(CASE WHEN DTS.PrintProductGroup >0 THEN isnull(PG.ProductGroupName,'') ELSE '' END)+(CASE WHEN DTS.PrintProductdescription >0 THEN isnull(','+PD.Productdescription,'') ELSE '' END) AS ProductGroupName,
+	DTS.ProductGroupCaption,isnull(CGPD.PrintingDescription,CGPD.ChargeGroupProductName) AS ChargeGroupProductName,
+	
+   --Receive Lines
+	 DTS.ProductUidCaption,PU.ProductUidName,
+	(CASE WHEN isnull(JRL.LossQty,0) >0 THEN isnull(JRL.LossQty,0) ELSE NULL END)  AS LossQty,
+	(CASE WHEN isnull(JRL.Qty,0) <> isnull(L.Qty,0) THEN CASE WHEN isnull(JRL.Qty,0) <> 0 THEN isnull(JRL.Qty,0) ELSE NULL END   ELSE NULL END) AS RecQty,
+	JRL.LotNo AS LotNo, 
+	(CASE WHEN DTS.PrintSpecification >0 THEN   JRL.Specification ELSE '' END)  AS Specification,
+	--Formula Fields
+	isnull(@TotalAmount,0) AS NetAmount,  
+	isnull(@ReturnAmount,0) AS ReturnAmount,
+	isnull(@DebitAmount,0) AS DebitAmount,
+	isnull(@CreaditAmount,0) AS CreaditAmount,   	
+	--SalesTaxGroupPersonId
+	CGP.ChargeGroupPersonName,
+	--Other Fields
+	@UnitDealCnt  AS DealUnitCnt,		
+	(CASE WHEN Isnull(H.Status,0)=0 OR Isnull(H.Status,0)=8 THEN 'Provisional ' +isnull(DT.PrintTitle,DT.DocumentTypeName) ELSE isnull(DT.PrintTitle,DT.DocumentTypeName) END) AS ReportTitle, 
+	'StdDocPrint_JobInvoice.rdl' AS ReportName,		
+	SalesTaxGroupProductCaption,
+	SDS.SalesTaxProductCodeCaption
+	FROM Web.JobInvoiceHeaders H WITH (Nolock)
+	LEFT JOIN web.DocumentTypes DT WITH (Nolock) ON DT.DocumentTypeId=H.DocTypeId
+	LEFT JOIN Web._DocumentTypeSettings DTS WITH (Nolock) ON DTS.DocumentTypeId=DT.DocumentTypeId
+	LEFT JOIN Web.JobInvoiceSettings JIS WITH (Nolock) ON JIS.DocTypeId=DT.DocumentTypeId AND JIS.SiteId =H.siteid AND H.DivisionId=JIS.DivisionId
+	LEFT JOIN web.ViewDivisionCompany VDC WITH (Nolock) ON VDC.DivisionId=H.DivisionId
+	LEFT JOIN Web.Sites SI WITH (Nolock) ON SI.SiteId=H.SiteId
+	LEFT JOIN Web.Divisions DIV WITH (Nolock) ON DIV.DivisionId=H.DivisionId	
+	LEFT JOIN Web.Companies Com ON Com.CompanyId = DIV.CompanyId
+	LEFT JOIN Web.Cities CC WITH (Nolock) ON CC.CityId=Com.CityId
+	LEFT JOIN Web.States CS WITH (Nolock) ON CS.StateId=CC.StateId
+	LEFT JOIN Web.Processes PS WITH (Nolock) ON PS.ProcessId=H.ProcessId
+	LEFT JOIN Web.SalesTaxProductCodes PSSTC WITH (Nolock) ON PSSTC.SalesTaxProductCodeId=PS.SalesTaxProductCodeId
+	LEFT JOIN Web.People P WITH (Nolock) ON P.PersonID=H.JobWorkerId
+	LEFT JOIN (SELECT TOP 1 * FROM web.SiteDivisionSettings WHERE @DocDate BETWEEN StartDate AND IsNull(EndDate,getdate()) AND SiteId=@Site AND DivisionId=@Division ORDER BY StartDate) SDS  ON H.DivisionId = SDS.DivisionId AND H.SiteId = SDS.SiteId	
+   	LEFT JOIN (SELECT * FROM Web.PersonAddresses WITH (nolock) WHERE AddressType IS NULL) PA ON PA.PersonId = P.PersonID 
+	LEFT JOIN Web.Cities C WITH (nolock) ON C.CityId = PA.CityId
+	LEFT JOIN Web.States S WITH (Nolock) ON S.StateId=C.StateId
+	LEFT JOIN web.ChargeGroupPersons CGP WITH (Nolock) ON CGP.ChargeGroupPersonId=H.SalesTaxGroupPersonId
+	LEFT JOIN Web.Currencies CUR WITH (Nolock) ON CUR.Id=H.CurrencyId
+  	LEFT JOIN Web.JobInvoiceLines L WITH (Nolock) ON L.JobInvoiceHeaderId=H.JobInvoiceHeaderId
+	LEFT JOIN Web.JobReceiveLines JRL WITH (Nolock) ON JRL.JobReceiveLineId=L.JobReceiveLineId
+	LEFT JOIN web.ProductUids PU WITH (Nolock) ON PU.ProductUidId=JRL.ProductUidId	
+	LEFT JOIN Web.JobReceiveHeaders JRH WITH (Nolock) ON JRH.JobReceiveHeaderId=JRL.JobReceiveHeaderId
+	LEFT JOIN Web.JobOrderLines JOL WITH (Nolock) ON JOL.JobOrderLineId=JRL.JobOrderLineId
+   	LEFT JOIN Web.ProdOrderLines POl WITH (Nolock) ON POl.ProdOrderLineId=JOL.ProdOrderLineId
+    LEFT JOIN Web.ProdOrderHeaders POH WITH (Nolock) ON POH.ProdOrderHeaderId=POL.ProdOrderHeaderId
+	LEFT JOIN web.Products PD WITH (Nolock) ON PD.ProductId=isnull(JOL.ProductId,JRL.ProductId)
+	LEFT JOIN web.ProductGroups PG WITH (Nolock) ON PG.ProductGroupId=PD.ProductGroupid
+	LEFT JOIN Web.SalesTaxProductCodes STC WITH (Nolock) ON STC.SalesTaxProductCodeId= IsNull(PD.SalesTaxProductCodeId, Pg.DefaultSalesTaxProductCodeId)
+	LEFT JOIN Web.Dimension1 D1 WITH (Nolock) ON D1.Dimension1Id=JOL.Dimension1Id
+	LEFT JOIN web.Dimension2 D2 WITH (Nolock) ON D2.Dimension2Id=JOL.Dimension2Id
+	LEFT JOIN web.Dimension3 D3 WITH (Nolock) ON D3.Dimension3Id=JOL.Dimension3Id
+	LEFT JOIN Web.Dimension4 D4 WITH (nolock) ON D4.Dimension4Id=JOL.Dimension4Id
+	LEFT JOIN web.Units U WITH (Nolock) ON U.UnitId=PD.UnitId
+	LEFT JOIN web.Units DU WITH (Nolock) ON DU.UnitId=JOL.DealUnitId
+	LEFT JOIN Web.Std_PersonRegistrations SPR WITH (Nolock) ON SPR.CustomerId=H.JobWorkerId
+	LEFT JOIN web.ChargeGroupProducts CGPD WITH (Nolock) ON L.SalesTaxGroupProductId = CGPD.ChargeGroupProductId	
+   	WHERE H.JobInvoiceHeaderId=" + item + @"
+   	ORDER BY L.Sr";
+
+            ListofQuery QryMain = new ListofQuery();
+            QryMain.Query = QueryMain;
+            QryMain.QueryName = nameof(QueryMain);
+            DocumentPrintData.Add(QryMain);
+
+
+            String QueryCalculation;
+            QueryCalculation = @"DECLARE @StrGrossAmount AS NVARCHAR(50)  
+DECLARE @StrBasicExciseDuty AS NVARCHAR(50)  
+DECLARE @StrExciseECess AS NVARCHAR(50)  
+DECLARE @StrExciseHECess AS NVARCHAR(50)  
+
+DECLARE @StrSalesTaxTaxableAmt AS NVARCHAR(50)  
+DECLARE @StrVAT AS NVARCHAR(50)  
+DECLARE @StrSAT AS NVARCHAR(50) 
+DECLARE @StrCST AS NVARCHAR(50) 
+
+SET @StrGrossAmount = 'Gross Amount'
+SET @StrBasicExciseDuty = 'Basic Excise Duty'
+SET @StrExciseECess ='Excise ECess'
+SET @StrExciseHECess = 'Excise HECess'
+
+SET @StrSalesTaxTaxableAmt = 'Sales Tax Taxable Amt'
+SET @StrVAT = 'VAT'
+SET @StrSAT = 'SAT'
+SET @StrCST = 'CST'
+
+DECLARE @Qry NVARCHAR(Max);
+SET @Qry = '
+		DECLARE @GrossAmount AS DECIMAL 
+		DECLARE @BasicExciseDutyAmount AS DECIMAL 
+		DECLARE @SalesTaxTaxableAmt AS DECIMAL 
+		
+		SELECT @GrossAmount = sum ( CASE WHEN C.ChargeName = ''' + @StrGrossAmount + ''' THEN  H.Amount  ELSE 0 END ) ,
+		@BasicExciseDutyAmount = sum( CASE WHEN C.ChargeName = ''' + @StrBasicExciseDuty + ''' THEN  H.Amount  ELSE 0 END ) ,
+		@SalesTaxTaxableAmt = sum( CASE WHEN C.ChargeName = ''' + @StrSalesTaxTaxableAmt + ''' THEN  H.Amount  ELSE 0 END )
+		FROM web.jobInvoiceheadercharges H
+		LEFT JOIN web.ChargeTypes CT ON CT.ChargeTypeId = H.ChargeTypeId 
+		LEFT JOIN web.Charges C ON C.ChargeId = H.ChargeId 
+		WHERE H.Amount <> 0 AND H.HeaderTableId	= ' + Convert(Varchar," + item + @" ) + '
+		GROUP BY H.HeaderTableId
+		
+		
+		SELECT H.Id, H.HeaderTableId, H.Sr, C.ChargeName, H.Amount, H.ChargeTypeId,  CT.ChargeTypeName, 
+		--CASE WHEN C.ChargeName = ''Vat'' THEN ( H.Amount*100/ @GrossAmount ) ELSE H.Rate End  AS Rate,
+		CASE 
+		WHEN @SalesTaxTaxableAmt>0 And C.ChargeName IN ( ''' + @StrVAT + ''',''' + @StrSAT + ''',''' + @StrCST+ ''')  THEN ( H.Amount*100/ @SalesTaxTaxableAmt   ) 
+		WHEN @GrossAmount>0 AND C.ChargeName IN ( ''' + @StrBasicExciseDuty + ''')  THEN ( H.Amount*100/ @GrossAmount   ) 
+		WHEN  @BasicExciseDutyAmount>0 AND  C.ChargeName IN ( ''' + @StrExciseECess + ''', ''' +@StrExciseHECess+ ''')  THEN ( H.Amount*100/ @BasicExciseDutyAmount   ) 
+		ELSE 0 End  AS Rate,
+		''StdDocPrintSub_CalculationHeader.rdl'' AS ReportName,
+		''Transaction Charges'' AS ReportTitle     
+		FROM  web.jobInvoiceheadercharges  H
+		LEFT JOIN web.ChargeTypes CT ON CT.ChargeTypeId = H.ChargeTypeId 
+		LEFT JOIN web.Charges C ON C.ChargeId = H.ChargeId 
+		WHERE  ( isnull(H.ChargeTypeId,0) <> ''4'' OR C.ChargeName = ''Net Amount'') AND H.Amount <> 0
+--WHERE  1=1
+		AND H.HeaderTableId	= ' + Convert(Varchar," + item + @"  ) + ''
+		
+	--PRINT @Qry; 	
+	
+	DECLARE @TmpData TABLE
+	(
+	id BIGINT,
+	HeaderTableId INT,
+	Sr INT,
+	ChargeName NVARCHAR(50),
+	Amount DECIMAL(18,4),
+	ChargeTypeId INT,
+	ChargeTypeName NVARCHAR(50),
+	Rate DECIMAL(38,20),
+	ReportName nVarchar(255),
+	ReportTitle nVarchar(255)
+	);
+	
+	
+	Insert Into @TmpData EXEC(@Qry)
+	SELECT id,HeaderTableId,Sr,ChargeName,Amount,ChargeTypeId,ChargeTypeName,Rate,ReportName 
+	FROM @TmpData
+	ORDER BY Sr	";
+
+
+            ListofQuery QryCalculation = new ListofQuery();
+            QryCalculation.Query = QueryCalculation;
+            QryCalculation.QueryName = nameof(QueryCalculation);
+            DocumentPrintData.Add(QryCalculation);
+
+
+            String QueryGSTSummary;
+            QueryGSTSummary = @"DECLARE @Qry NVARCHAR(Max);
+
+SET @Qry = '
+SELECT  
+--CASE WHEN PS.ProcessName IN (''Purchase'',''Sale'') THEN isnull(STGP.PrintingDescription,STGP.ChargeGroupProductName) ELSE PS.GSTPrintDesc END as ChargeGroupProductName, 
+isnull(STGP.PrintingDescription,STGP.ChargeGroupProductName) as ChargeGroupProductName, 
+Sum(CASE WHEN ct.ChargeTypeName =''Sales Taxable Amount'' THEN lc.Amount ELSE 0 End) AS TaxableAmount,
+Sum(CASE WHEN ct.ChargeTypeName =''IGST'' THEN lc.Amount ELSE 0 End) AS IGST,
+Sum(CASE WHEN ct.ChargeTypeName =''CGST'' THEN lc.Amount ELSE 0 End) AS CGST,
+Sum(CASE WHEN ct.ChargeTypeName =''SGST'' THEN lc.Amount ELSE 0 End) AS SGST,
+Sum(CASE WHEN ct.ChargeTypeName =''GST Cess'' THEN lc.Amount ELSE 0 End) AS GSTCess,
+''StdDocPrintSub_GSTSummary.rdl'' AS ReportName
+FROM Web.JobInvoiceLines L
+LEFT JOIN Web.JobInvoiceLineCharges LC ON L.JobInvoiceLineId = LC.LineTableId 
+LEFT JOIN web.jobInvoiceheaders H ON H.JobInvoiceHeaderId = L.JobInvoiceHeaderId
+LEFT JOIN Web.Processes PS WITH (Nolock) ON PS.ProcessId=H.ProcessId
+LEFT JOIN Web.Charges C ON C.ChargeId=LC.ChargeId
+LEFT JOIN web.ChargeTypes CT ON LC.ChargeTypeId = CT.ChargeTypeId 
+LEFT JOIN web.ChargeGroupProducts STGP ON L.SalesTaxGroupProductId = STGP.ChargeGroupProductId
+WHERE L.JobInvoiceHeaderId =" + item + @" 
+GROUP BY isnull(STGP.PrintingDescription,STGP.ChargeGroupProductName)
+--GROUP BY CASE WHEN PS.ProcessName IN (''Purchase'',''Sale'') THEN isnull(STGP.PrintingDescription,STGP.ChargeGroupProductName) ELSE PS.GSTPrintDesc END '
+
+--PRINT @Qry;
+EXEC(@Qry);	";
+
+
+            ListofQuery QryGSTSummary = new ListofQuery();
+            QryGSTSummary.Query = QueryGSTSummary;
+            QryGSTSummary.QueryName = nameof(QueryGSTSummary);
+            DocumentPrintData.Add(QryGSTSummary);
+
+            return DocumentPrintData;
+
+        }
+
         public ActionResult GetCustomPerson(string searchTerm, int pageSize, int pageNum, int filter, int? filter2)//DocTypeId
         {
             var Query = _JobInvoiceHeaderService.GetCustomPerson(filter, searchTerm, filter2);
@@ -1992,5 +2256,379 @@ namespace Jobs.Controllers
             }
             base.Dispose(disposing);
         }
+
+        [HttpGet]
+        public ActionResult _CreateInvoiceReturn(int id)
+        {
+            JobInvoiceReturn JobInvoiceReturn = new JobInvoiceReturn();
+            JobInvoiceReturn.JobInvoiceHeaderId = id;
+            ViewBag.ReasonList = new ReasonService(_unitOfWork).GetReasonList(TransactionDocCategoryConstants.JobInvoiceReturn).ToList();
+            JobInvoiceReturn.DocDate = DateTime.Now;
+            return PartialView("_InvoiceReturn", JobInvoiceReturn);
+        }
+
+        [HttpPost]
+        //[ValidateAntiForgeryToken]
+        public ActionResult _CreateInvoiceReturnPost(JobInvoiceReturn svm)
+        {
+            int Cnt = 0;
+            int Serial = 0;
+            int pk = 0;
+            int Gpk = 0;
+            int PersonCount = 0;
+            bool HeaderChargeEdit = false;
+
+            JobInvoiceHeader JobInvoiceHeader = new JobInvoiceHeaderService(_unitOfWork).Find(svm.JobInvoiceHeaderId);
+            JobReceiveHeader JobReceiveHeader = new JobReceiveHeaderService(_unitOfWork).Find(JobInvoiceHeader.JobReceiveHeaderId ?? 0);
+            var DispatchLine = new JobReceiveLineService(_unitOfWork).GetJobReceiveLineList(JobReceiveHeader.JobReceiveHeaderId);
+            List<LineChargeRates> LineChargeRates = new List<LineChargeRates>();
+
+            var JobInvoiceSettings = new JobInvoiceSettingsService(_unitOfWork).GetJobInvoiceSettingsForDocument(JobInvoiceHeader.DocTypeId, JobInvoiceHeader.DivisionId, JobInvoiceHeader.SiteId);
+            int InvoiceRetHeaderDocTypeId = 0;
+
+            if (JobInvoiceSettings.JobInvoiceReturnDocTypeId == null)
+            {
+                string message = "Invoice Return Document Type is not difined in settings.";
+                ModelState.AddModelError("", message);
+                return PartialView("_InvoiceReturn", svm);
+            }
+            else
+            {
+                InvoiceRetHeaderDocTypeId = (int)JobInvoiceSettings.JobInvoiceReturnDocTypeId;
+            }
+
+
+            if (ModelState.IsValid)
+            {
+                var JobInvoiceLineList = (from p in db.ViewJobInvoiceBalance
+                                          join l in db.JobInvoiceLine on p.JobInvoiceLineId equals l.JobInvoiceLineId into linetable
+                                          from linetab in linetable.DefaultIfEmpty()
+                                          join t in db.JobInvoiceHeader on p.JobInvoiceHeaderId equals t.JobInvoiceHeaderId into table
+                                          from tab in table.DefaultIfEmpty()
+                                          join t1 in db.JobReceiveLine on p.JobReceiveLineId equals t1.JobReceiveLineId into table1
+                                          from tab1 in table1.DefaultIfEmpty()
+                                          join product in db.Product on tab1.ProductId equals product.ProductId into table2
+                                          from tab2 in table2.DefaultIfEmpty()
+                                          where p.JobInvoiceHeaderId == JobInvoiceHeader.JobInvoiceHeaderId
+                                          && p.BalanceQty > 0
+                                          select new JobInvoiceReturnLineViewModel
+                                          {
+                                              Dimension1Name = tab1.Dimension1.Dimension1Name,
+                                              Dimension2Name = tab1.Dimension2.Dimension2Name,
+                                              Specification = tab1.Specification,
+                                              InvoiceBalQty = p.BalanceQty,
+                                              Qty = p.BalanceQty,
+                                              JobInvoiceHeaderDocNo = tab.DocNo,
+                                              ProductName = tab2.ProductName,
+                                              ProductId = p.ProductId,
+                                              JobInvoiceLineId = p.JobInvoiceLineId,
+                                              UnitId = tab2.UnitId,
+                                              UnitConversionMultiplier = tab1.UnitConversionMultiplier,
+                                              DealUnitId = linetab.DealUnitId,
+                                              Rate = linetab.Rate,
+                                              Amount = linetab.Amount,
+                                              unitDecimalPlaces = tab2.Unit.DecimalPlaces,
+                                              DealunitDecimalPlaces = linetab.DealUnit.DecimalPlaces,
+                                              DiscountPer = linetab.RateDiscountPer,
+                                              ProductUidName = tab1.ProductUid.ProductUidName,
+                                              SalesTaxGroupProductId = linetab.SalesTaxGroupProductId
+                                          }).ToList();
+
+                if (JobInvoiceLineList.Sum(i => i.InvoiceBalQty) > 0)
+                {
+                    JobInvoiceSettings Settings = new JobInvoiceSettingsService(_unitOfWork).GetJobInvoiceSettingsForDocument(InvoiceRetHeaderDocTypeId, JobInvoiceHeader.DivisionId, JobInvoiceHeader.SiteId);
+
+                    JobReturnHeader GoodsRetHeader = new JobReturnHeader();
+                    GoodsRetHeader.DocTypeId = (int)Settings.JobReturnDocTypeId;
+                    GoodsRetHeader.DocDate = svm.DocDate;
+                    GoodsRetHeader.DocNo = new DocumentTypeService(_unitOfWork).FGetNewDocNo("DocNo", ConfigurationManager.AppSettings["DataBaseSchema"] + ".JobReturnHeaders", GoodsRetHeader.DocTypeId, svm.DocDate, JobInvoiceHeader.DivisionId, JobInvoiceHeader.SiteId);
+                    GoodsRetHeader.SiteId = JobInvoiceHeader.SiteId;
+                    GoodsRetHeader.DivisionId = JobInvoiceHeader.DivisionId;
+                    GoodsRetHeader.ProcessId = JobInvoiceHeader.ProcessId;
+                    GoodsRetHeader.JobWorkerId = (int)JobInvoiceHeader.JobWorkerId;
+                    GoodsRetHeader.ReasonId = svm.ReasonId;
+                    GoodsRetHeader.GodownId = JobReceiveHeader.GodownId;
+                    GoodsRetHeader.Remark = svm.Remark;
+                    GoodsRetHeader.CreatedDate = DateTime.Now;
+                    GoodsRetHeader.ModifiedDate = DateTime.Now;
+                    GoodsRetHeader.CreatedBy = User.Identity.Name;
+                    GoodsRetHeader.ModifiedBy = User.Identity.Name;
+                    GoodsRetHeader.ObjectState = Model.ObjectState.Added;
+                    //new JobReturnHeaderService(_unitOfWork).Create(GoodsRetHeader);
+                    db.JobReturnHeader.Add(GoodsRetHeader);
+
+                    JobInvoiceReturnHeader InvoiceRetHeader = new JobInvoiceReturnHeader();
+                    InvoiceRetHeader.DocTypeId = InvoiceRetHeaderDocTypeId;
+                    InvoiceRetHeader.DocDate = svm.DocDate;
+                    InvoiceRetHeader.DocNo = new DocumentTypeService(_unitOfWork).FGetNewDocNo("DocNo", ConfigurationManager.AppSettings["DataBaseSchema"] + ".JobInvoiceReturnHeaders", InvoiceRetHeader.DocTypeId, svm.DocDate, JobInvoiceHeader.DivisionId, JobInvoiceHeader.SiteId);
+                    InvoiceRetHeader.JobWorkerId = (int)JobInvoiceHeader.JobWorkerId;
+                    InvoiceRetHeader.SiteId = JobInvoiceHeader.SiteId;
+                    InvoiceRetHeader.DivisionId = JobInvoiceHeader.DivisionId;
+                    InvoiceRetHeader.ProcessId = JobInvoiceHeader.ProcessId;
+                    InvoiceRetHeader.ReasonId = svm.ReasonId;
+                    InvoiceRetHeader.Remark = svm.Remark ?? "Cancellation";
+                    InvoiceRetHeader.Nature = TransactionNatureConstants.Return;
+                    InvoiceRetHeader.CreatedDate = DateTime.Now;
+                    InvoiceRetHeader.ModifiedDate = DateTime.Now;
+                    InvoiceRetHeader.CreatedBy = User.Identity.Name;
+                    InvoiceRetHeader.ModifiedBy = User.Identity.Name;
+                    InvoiceRetHeader.JobReturnHeaderId = GoodsRetHeader.JobReturnHeaderId;
+                    InvoiceRetHeader.SalesTaxGroupPersonId = JobInvoiceHeader.SalesTaxGroupPersonId;
+                    InvoiceRetHeader.ObjectState = Model.ObjectState.Added;
+                    //new JobInvoiceReturnHeaderService(db).Create(InvoiceRetHeader);
+                    db.JobInvoiceReturnHeader.Add(InvoiceRetHeader);
+
+                    int CalculationId = (int)Settings.CalculationId;
+
+                    List<LineDetailListViewModel> LineList = new List<LineDetailListViewModel>();
+                    List<HeaderChargeViewModel> HeaderCharges = new List<HeaderChargeViewModel>();
+                    List<LineChargeViewModel> LineCharges = new List<LineChargeViewModel>();
+
+
+                    foreach (var item in JobInvoiceLineList)
+                    {
+                        decimal balqty = (from p in db.ViewJobInvoiceBalance
+                                          where p.JobInvoiceLineId == item.JobInvoiceLineId
+                                          select p.BalanceQty).FirstOrDefault();
+
+
+                        if (item.Qty > 0 && item.Qty <= balqty)
+                        {
+                            JobInvoiceReturnLine line = new JobInvoiceReturnLine();
+                            //var receipt = new JobReceiveLineService(_unitOfWork).Find(item.JobReceiveLineId );
+
+
+                            line.JobInvoiceReturnHeaderId = InvoiceRetHeader.JobInvoiceReturnHeaderId;
+                            line.JobInvoiceLineId = item.JobInvoiceLineId;
+                            line.Qty = item.Qty;
+                            line.Sr = Serial++;
+                            line.Rate = item.Rate;
+                            line.DealQty = item.UnitConversionMultiplier * item.Qty;
+                            line.DealUnitId = item.DealUnitId;
+                            line.UnitConversionMultiplier = item.UnitConversionMultiplier;
+                            line.Amount = item.Amount;
+
+                            line.SalesTaxGroupProductId = item.SalesTaxGroupProductId;
+                            line.Remark = item.Remark;
+                            line.CreatedDate = DateTime.Now;
+                            line.ModifiedDate = DateTime.Now;
+                            line.CreatedBy = User.Identity.Name;
+                            line.ModifiedBy = User.Identity.Name;
+                            line.JobInvoiceReturnLineId = pk;
+
+
+                            JobReturnLine GLine = Mapper.Map<JobInvoiceReturnLine, JobReturnLine>(line);
+                            GLine.JobReceiveLineId = new JobInvoiceLineService(_unitOfWork).Find(line.JobInvoiceLineId).JobReceiveLineId;
+                            GLine.JobReturnHeaderId = GoodsRetHeader.JobReturnHeaderId;
+                            GLine.JobReturnLineId = Gpk;
+                            GLine.Qty = line.Qty;
+                            GLine.ObjectState = Model.ObjectState.Added;
+
+
+                            JobReceiveLine JobReceiveLine = new JobReceiveLineService(_unitOfWork).Find(GLine.JobReceiveLineId);
+
+                            StockViewModel StockViewModel = new StockViewModel();
+
+
+                            if (Cnt == 0)
+                            {
+                                StockViewModel.StockHeaderId = GoodsRetHeader.StockHeaderId ?? 0;
+                            }
+                            else
+                            {
+                                if (GoodsRetHeader.StockHeaderId != null && GoodsRetHeader.StockHeaderId != 0)
+                                {
+                                    StockViewModel.StockHeaderId = (int)GoodsRetHeader.StockHeaderId;
+                                }
+                                else
+                                {
+                                    StockViewModel.StockHeaderId = -1;
+                                }
+
+                            }
+
+                            StockViewModel.StockId = -Cnt;
+
+                            StockViewModel.DocHeaderId = GoodsRetHeader.JobReturnHeaderId;
+                            StockViewModel.DocLineId = JobReceiveLine.JobReceiveLineId;
+                            StockViewModel.DocTypeId = GoodsRetHeader.DocTypeId;
+                            StockViewModel.StockHeaderDocDate = GoodsRetHeader.DocDate;
+                            StockViewModel.StockDocDate = GoodsRetHeader.DocDate;
+                            StockViewModel.DocNo = GoodsRetHeader.DocNo;
+                            StockViewModel.DivisionId = GoodsRetHeader.DivisionId;
+                            StockViewModel.SiteId = GoodsRetHeader.SiteId;
+                            StockViewModel.CurrencyId = null;
+                            StockViewModel.PersonId = GoodsRetHeader.JobWorkerId;
+                            StockViewModel.ProductId = JobReceiveLine.ProductId;
+                            StockViewModel.ProductUidId = JobReceiveLine.ProductUidId;
+                            StockViewModel.HeaderFromGodownId = null;
+                            StockViewModel.HeaderGodownId = null;
+                            StockViewModel.HeaderProcessId = Settings.ProcessId;
+                            StockViewModel.GodownId = GoodsRetHeader.GodownId;
+                            StockViewModel.Remark = svm.Remark;
+                            StockViewModel.Status = 0;
+                            StockViewModel.ProcessId = null;
+                            StockViewModel.LotNo = null;
+                            StockViewModel.CostCenterId = null;
+                            StockViewModel.Qty_Iss = 0;
+                            StockViewModel.Qty_Rec = GLine.Qty;
+                            StockViewModel.Rate = null;
+                            StockViewModel.ExpiryDate = null;
+                            StockViewModel.Specification = JobReceiveLine.Specification;
+                            StockViewModel.Dimension1Id = JobReceiveLine.Dimension1Id;
+                            StockViewModel.Dimension2Id = JobReceiveLine.Dimension2Id;
+                            StockViewModel.CreatedBy = User.Identity.Name;
+                            StockViewModel.CreatedDate = DateTime.Now;
+                            StockViewModel.ModifiedBy = User.Identity.Name;
+                            StockViewModel.ModifiedDate = DateTime.Now;
+
+                            string StockPostingError = "";
+                            StockPostingError = new StockService(_unitOfWork).StockPostDB(ref StockViewModel, ref db);
+
+                            if (StockPostingError != "")
+                            {
+                                string message = StockPostingError;
+                                ModelState.AddModelError("", message);
+                                return PartialView("_InvoiceReturn", svm);
+                            }
+
+
+                            if (Cnt == 0)
+                            {
+                                GoodsRetHeader.StockHeaderId = StockViewModel.StockHeaderId;
+                            }
+
+
+                            GLine.StockId = StockViewModel.StockId;
+
+
+                            //new JobReturnLineService(_unitOfWork).Create(GLine);
+                            GLine.ObjectState = Model.ObjectState.Added;
+                            db.JobReturnLine.Add(GLine);
+
+
+                            line.JobReturnLineId = GLine.JobReturnLineId;
+                            line.ObjectState = Model.ObjectState.Added;
+                            //new JobInvoiceReturnLineService(db).Create(line);
+                            db.JobInvoiceReturnLine.Add(line);
+
+                            LineList.Add(new LineDetailListViewModel { Amount = line.Amount, Rate = line.Rate, LineTableId = line.JobInvoiceReturnLineId, HeaderTableId = item.JobInvoiceReturnHeaderId, PersonID = InvoiceRetHeader.JobWorkerId, DealQty = line.DealQty });
+
+                            List<CalculationProductViewModel> ChargeRates = new CalculationProductService(_unitOfWork).GetChargeRates(CalculationId, InvoiceRetHeader.DocTypeId, InvoiceRetHeader.SiteId, InvoiceRetHeader.DivisionId,
+                                    Settings.ProcessId, InvoiceRetHeader.SalesTaxGroupPersonId, item.SalesTaxGroupProductId).ToList();
+                            if (ChargeRates != null)
+                            {
+                                LineChargeRates.Add(new LineChargeRates { LineId = line.JobInvoiceReturnLineId, ChargeRates = ChargeRates });
+                            }
+
+
+                            Gpk++;
+                            pk++;
+
+                            Cnt = Cnt + 1;
+                        }
+                    }
+
+                    var LineListWithReferences = (from p in LineList
+                                                  join t3 in LineChargeRates on p.LineTableId equals t3.LineId into LineChargeRatesTable
+                                                  from LineChargeRatesTab in LineChargeRatesTable.DefaultIfEmpty()
+                                                  orderby p.LineTableId
+                                                  select new LineDetailListViewModel
+                                                  {
+                                                      Amount = p.Amount,
+                                                      DealQty = p.DealQty,
+                                                      HeaderTableId = p.HeaderTableId,
+                                                      LineTableId = p.LineTableId,
+                                                      PersonID = p.PersonID,
+                                                      Rate = p.Rate,
+                                                      CostCenterId = p.CostCenterId,
+                                                      ChargeRates = LineChargeRatesTab.ChargeRates,
+                                                  }).ToList();
+
+                    if (CalculationId != null)
+                    {
+                        new ChargesCalculationService(_unitOfWork).CalculateCharges(LineListWithReferences, InvoiceRetHeader.JobInvoiceReturnHeaderId, (int)CalculationId, null, out LineCharges, out HeaderChargeEdit, out HeaderCharges, "Web.JobInvoiceReturnHeaderCharges", "Web.JobInvoiceReturnLineCharges", out PersonCount, InvoiceRetHeader.DocTypeId, InvoiceRetHeader.SiteId, InvoiceRetHeader.DivisionId);
+                    }
+
+                    // Saving Charges
+                    foreach (var item in LineCharges)
+                    {
+                        JobInvoiceReturnLineCharge PoLineCharge = Mapper.Map<LineChargeViewModel, JobInvoiceReturnLineCharge>(item);
+                        PoLineCharge.HeaderTableId = InvoiceRetHeader.JobInvoiceReturnHeaderId;
+                        PoLineCharge.ObjectState = Model.ObjectState.Added;
+                        new JobInvoiceReturnLineChargeService(db).Create(PoLineCharge);
+                    }
+
+
+                    //Saving Header charges
+                    for (int i = 0; i < HeaderCharges.Count(); i++)
+                    {
+                        JobInvoiceReturnHeaderCharge POHeaderCharge = Mapper.Map<HeaderChargeViewModel, JobInvoiceReturnHeaderCharge>(HeaderCharges[i]);
+                        POHeaderCharge.HeaderTableId = InvoiceRetHeader.JobInvoiceReturnHeaderId;
+                        POHeaderCharge.PersonID = InvoiceRetHeader.JobWorkerId;
+                        POHeaderCharge.ObjectState = Model.ObjectState.Added;
+                        new JobInvoiceReturnHeaderChargeService(db).Create(POHeaderCharge);
+                    }
+
+                    try
+                    {
+                        //_unitOfWork.Save();
+                        db.SaveChanges();
+                    }
+                    catch (Exception ex)
+                    {
+                        string message = _exception.HandleException(ex);
+                        ModelState.AddModelError("", message);
+                        return PartialView("_InvoiceReturn", svm);
+                    }
+
+                    LogActivity.LogActivityDetail(LogVm.Map(new ActiivtyLogViewModel
+                    {
+                        DocTypeId = JobInvoiceHeader.DocTypeId,
+                        DocId = InvoiceRetHeader.JobInvoiceReturnHeaderId,
+                        ActivityType = (int)ActivityTypeContants.MultipleCreate,
+                        DocNo = JobInvoiceHeader.DocNo,
+                        DocDate = JobInvoiceHeader.DocDate,
+                        DocStatus = JobInvoiceHeader.Status,
+                    }));
+
+
+                    try
+                    {
+                        StockHeader StockHeader = new StockHeaderService(_unitOfWork).Find((int)GoodsRetHeader.StockHeaderId);
+                        StockHeader.DocHeaderId = GoodsRetHeader.JobReturnHeaderId;
+                        new StockHeaderService(_unitOfWork).Update(StockHeader);
+                        _unitOfWork.Save();
+                    }
+                    catch (Exception ex)
+                    {
+                        string message = _exception.HandleException(ex);
+                    }
+
+                    return Json(new { success = true, Url = "/JobInvoiceReturnHeader/Submit/" + InvoiceRetHeader.JobInvoiceReturnHeaderId });
+                }
+            }
+            else
+            {
+                string message = "Balance is 0 for this invoice.";
+                ModelState.AddModelError("", message);
+                return PartialView("_InvoiceReturn", svm);
+            }
+            return PartialView("_InvoiceReturn", svm);
+        }
+
+        public ActionResult _InvoiceReturnSubmit(int id)
+        {
+            return Redirect(System.Configuration.ConfigurationManager.AppSettings["JobDomain"] + "/JobInvoiceReturnHeader/Submit/" + id);
+        }
+    }
+
+    public class JobInvoiceReturn
+    {
+        public int JobInvoiceHeaderId { get; set; }
+        public DateTime DocDate { get; set; }
+        public int ReasonId { get; set; }
+        public string ReasonName { get; set; }
+        public string Remark { get; set; }
     }
 }

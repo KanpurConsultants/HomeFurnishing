@@ -39,6 +39,7 @@ namespace Service
         PersonViewModel GetJobWorkerDetail(int id);
         IEnumerable<DocumentTypeHeaderAttributeViewModel> GetDocumentHeaderAttribute(int id);
 		IEnumerable<PrintViewModel> JobInvoicePrint(string HeaderId,string UserName);
+        string GetNarration(int JobInvoiceHeaderId);
     }
 
     public class JobInvoiceHeaderService : IJobInvoiceHeaderService
@@ -682,6 +683,53 @@ namespace Service
                        };
 
             return temp;
+        }
+
+        public string GetNarration(int JobInvoiceHeaderId)
+        {
+            string Narration = "";
+
+            var JobInvoiceHeader_Data = (from H in db.JobInvoiceHeader
+                                          join L in db.JobInvoiceLine on H.JobInvoiceHeaderId equals L.JobInvoiceHeaderId into JobInvoiceLineTable
+                                          from JobInvoiceLineTab in JobInvoiceLineTable.DefaultIfEmpty()
+                                          where H.JobInvoiceHeaderId == JobInvoiceHeaderId
+                                          select new
+                                          {
+                                              DocTypeId = H.DocTypeId,
+                                              JobWorkerName = H.JobWorker.Name,
+                                              ProductName = JobInvoiceLineTab.JobReceiveLine.Product.ProductName,
+                                              ProductUidName = JobInvoiceLineTab.JobReceiveLine.ProductUid.ProductUidName,
+                                              ProductGroupName = JobInvoiceLineTab.JobReceiveLine.Product.ProductGroup.ProductGroupName,
+                                              Qty = JobInvoiceLineTab.Qty,
+                                              Rate = JobInvoiceLineTab.Rate,
+                                              Amount = JobInvoiceLineTab.Amount,
+                                          }).FirstOrDefault();
+
+            var JobInvoiceHeaderCharges_Data = (from Hc in db.JobInvoiceHeaderCharges
+                                                 where Hc.HeaderTableId == JobInvoiceHeaderId
+                                                 && Hc.Charge.ChargeName == "Net Amount"
+                                                 select new
+                                                 {
+                                                     NetAmount = Hc.Amount
+                                                 }).FirstOrDefault();
+
+
+
+            if (JobInvoiceHeader_Data != null)
+            {
+                var Narration_Temp = (from H in db.Narration where H.DocTypeId == JobInvoiceHeader_Data.DocTypeId select new { Narration = H.NarrationName }).FirstOrDefault();
+
+                if (Narration_Temp != null)
+                    Narration = Narration_Temp.Narration.Replace("<JobWorkerName>", JobInvoiceHeader_Data.JobWorkerName)
+                                            .Replace("<ProductName>", JobInvoiceHeader_Data.ProductName)
+                                            .Replace("<ProductGroupName>", JobInvoiceHeader_Data.ProductGroupName)
+                                            .Replace("<ProductUidName>", JobInvoiceHeader_Data.ProductUidName)
+                                            .Replace("<Qty>", JobInvoiceHeader_Data.Qty.ToString())
+                                            .Replace("<Rate>", JobInvoiceHeader_Data.Rate.ToString())
+                                            .Replace("<Amount>", JobInvoiceHeader_Data.Amount.ToString())
+                                            .Replace("<NetAmount>", JobInvoiceHeaderCharges_Data.NetAmount.ToString());
+            }
+            return Narration;
         }
 
         public void Dispose()

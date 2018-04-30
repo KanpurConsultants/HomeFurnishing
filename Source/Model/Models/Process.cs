@@ -35,6 +35,10 @@ namespace Model.Models
         public int AccountId { get; set; }
         public virtual LedgerAccount Account { get; set; }
 
+        [ForeignKey("Department"), Display(Name = "Department")]
+        public int? DepartmentId { get; set; }
+        public virtual Department Department { get; set; }
+
         [Display(Name = "Is Affected Stock ?")]
         public Boolean IsAffectedStock { get; set; }
 

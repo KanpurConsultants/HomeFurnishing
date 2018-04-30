@@ -1346,6 +1346,12 @@ namespace Jobs.Controllers
                             }
 
                         }
+
+                        if (pd.Status ==1)
+                        pd.IsDocumentPrinted = true;
+                        pd.ObjectState = Model.ObjectState.Modified;
+                        db.SalaryHeader.Add(pd);
+                        db.SaveChanges();
                     }
 
                     PdfMerger pm = new PdfMerger();

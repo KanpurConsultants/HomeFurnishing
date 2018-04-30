@@ -89,7 +89,7 @@ namespace Model.ViewModel
         public DateTime DocDate { get; set; }
         public int DocTypeId { get; set; }
         public int HeaderLedgerAccountId { get; set; }
-        public int? DepartmentId { get; set; }
+        public string DepartmentId { get; set; }
         public string DepartmentName { get; set; }
         public string WagesPayType { get; set; }
         public string Remark { get; set; }

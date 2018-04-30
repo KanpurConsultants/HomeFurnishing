@@ -26,6 +26,7 @@ namespace Service
         Task<Employee> FindAsync(int id);
         Employee GetEmployeeByName(string Name);
         Employee Find(int id);
+        Employee FindByPersonId(int PersonId);
         EmployeeViewModel GetEmployeeViewModel(int id);
         int NextId(int id);
         int PrevId(int id);
@@ -58,6 +59,13 @@ namespace Service
         public Employee Find(int id)
         {
             return _unitOfWork.Repository<Employee>().Find(id);
+        }
+
+        public Employee FindByPersonId(int PersonId)
+        {
+
+            return _unitOfWork.Repository<Employee>().Query().Get().Where(m => m.PersonID == PersonId).FirstOrDefault(); 
+
         }
 
         public Employee Create(Employee Employee)

@@ -54,6 +54,7 @@ namespace Jobs.Controllers
             List<SelectListItem> WagesPayTypeList = new List<SelectListItem>();
             WagesPayTypeList.Add(new SelectListItem { Text = "Daily", Value = "Daily" });
             WagesPayTypeList.Add(new SelectListItem { Text = "Monthly", Value = "Monthly" });
+            WagesPayTypeList.Add(new SelectListItem { Text = "Jobwork", Value = "Jobwork" });
             ViewBag.WagesPayTypeList = WagesPayTypeList;
 
             vm.SalaryHeaderId = SalaryHeaderId ?? 0;
@@ -62,6 +63,7 @@ namespace Jobs.Controllers
                 SalaryHeader Header = db.SalaryHeader.Find(vm.SalaryHeaderId);
                 vm.DocDate = Header.DocDate;
                 vm.Remark = Header.Remark;
+                vm.WagesPayType = Header.WagesPayType;
             }
 
 
@@ -83,14 +85,14 @@ namespace Jobs.Controllers
         {
             int DivisionId = (int)System.Web.HttpContext.Current.Session["DivisionId"];
             int SiteId = (int)System.Web.HttpContext.Current.Session["SiteId"];
-
+            string SalaryDocNo = "";
 
             if (SalaryDataList.Count > 0)
             {
                 if (SalaryDataList.FirstOrDefault().SalaryHeaderId != null && SalaryDataList.FirstOrDefault().SalaryHeaderId > 0)
                 {
                     var HeaderRecord = db.SalaryHeader.Find(SalaryDataList.FirstOrDefault().SalaryHeaderId);
-
+                    SalaryDocNo = HeaderRecord.DocNo;
                     var LineRecords = (from L in db.SalaryLine where L.SalaryHeaderId == HeaderRecord.SalaryHeaderId select L).ToList();
                     var LineChargeRecords = (from Lc in db.SalaryLineCharge where Lc.HeaderTableId == HeaderRecord.SalaryHeaderId select Lc).ToList();
                     var HeaderChargeRecords = (from Hc in db.SalaryHeaderCharge where Hc.HeaderTableId == HeaderRecord.SalaryHeaderId select Hc).ToList();
@@ -125,10 +127,11 @@ namespace Jobs.Controllers
                 SalaryHeader Header = new SalaryHeader();
                 Header.DocDate = DocDate;
                 Header.DocTypeId = DocTypeId;
-                Header.DocNo = DocNo;
+                Header.DocNo = SalaryDocNo == "" ? DocNo : SalaryDocNo;
                 Header.DivisionId = DivisionId;
                 Header.SiteId = SiteId;
                 Header.Remark = Remark;
+                Header.WagesPayType = SalaryDataList.FirstOrDefault().WagesPayType;
                 Header.CreatedDate = DateTime.Now;
                 Header.CreatedBy = User.Identity.Name;
                 Header.ModifiedDate = DateTime.Now;
@@ -139,12 +142,13 @@ namespace Jobs.Controllers
                 int i = 0;
                 foreach (var SalaryData in SalaryDataList)
                 {
-                    if (SalaryData.Days > 0)
+                    if (SalaryData.Days > 0 && SalaryData.BasicPay > 0)
                     {
                         SalaryLine Line = new SalaryLine();
                         Line.SalaryLineId = i--;
                         Line.SalaryHeaderId = Header.SalaryHeaderId;
                         Line.EmployeeId = SalaryData.EmployeeId;
+                        Line.BasicSalary = SalaryData.BasicPay;
                         Line.Days = SalaryData.Days;
                         Line.OtherAddition = SalaryData.Additions;
                         Line.OtherDeduction = SalaryData.Deductions;
@@ -156,71 +160,82 @@ namespace Jobs.Controllers
                         Line.ModifiedBy = User.Identity.Name;
                         Line.ObjectState = Model.ObjectState.Added;
 
+                        Employee E = new EmployeeService(_unitOfWork).FindByPersonId(Line.EmployeeId);
 
-                        var EmployeeChargesList = (from H in db.EmployeeCharge where H.HeaderTableId == Line.EmployeeId select H).OrderBy(m => m.Sr).ToList();
-                        string WagesPayType = (from E in db.Employee where E.EmployeeId == Line.EmployeeId select E).FirstOrDefault().WagesPayType;
+                        int EId = E == null ? 0 : E.EmployeeId;
+
+                        var EmployeeChargesList = (from H in db.EmployeeCharge where H.HeaderTableId == EId select H).OrderBy(m => m.Sr).ToList();
+                        //string WagesPayType = (from E in db.Employee where E.EmployeeId == Line.EmployeeId select E).FirstOrDefault().WagesPayType;
+                        string WagesPayType = SalaryData.WagesPayType;
 
                         Decimal TotalAmount = 0;
-                        int j = 0, Sr = 0;
-                        foreach (var EmployeeCharge in EmployeeChargesList)
+                        if (EmployeeChargesList.Count == 0)
                         {
-                            SalaryLineCharge LineCharge = new SalaryLineCharge();
-                            LineCharge.Id = j--;
-                            LineCharge.HeaderTableId = Header.SalaryHeaderId;
-                            LineCharge.LineTableId = Line.SalaryLineId;
-                            LineCharge.Sr = Sr++;
-                            LineCharge.ChargeId = EmployeeCharge.ChargeId;
-                            LineCharge.AddDeduct = EmployeeCharge.AddDeduct;
-                            LineCharge.AffectCost = EmployeeCharge.AffectCost;
-                            LineCharge.ChargeTypeId = EmployeeCharge.ChargeTypeId;
-                            LineCharge.CalculateOnId = EmployeeCharge.CalculateOnId;
-                            LineCharge.PersonID = EmployeeCharge.PersonID;
-                            LineCharge.LedgerAccountDrId = EmployeeCharge.LedgerAccountDrId;
-                            LineCharge.LedgerAccountCrId = EmployeeCharge.LedgerAccountCrId;
-                            LineCharge.ContraLedgerAccountId = EmployeeCharge.ContraLedgerAccountId;
-                            LineCharge.CostCenterId = EmployeeCharge.CostCenterId;
-                            LineCharge.RateType = EmployeeCharge.RateType;
-                            LineCharge.IncludedInBase = EmployeeCharge.IncludedInBase;
-                            LineCharge.ParentChargeId = EmployeeCharge.ParentChargeId;
-                            LineCharge.Rate = EmployeeCharge.Rate;
-
-                            string ChargeName = db.Charge.Find(EmployeeCharge.ChargeId).ChargeName;
-
-                            if (ChargeName == "Basic Salary")
+                            Line.NetPayable = (Line.BasicSalary) + (Line.OtherAddition ?? 0) - (Line.OtherDeduction ?? 0) - (Line.LoanEMI ?? 0) - (Line.Advance ?? 0);
+                        }
+                        else
+                        {
+                            int j = 0, Sr = 0;
+                            foreach (var EmployeeCharge in EmployeeChargesList)
                             {
-                                if (WagesPayType == "Daily")
-                                    LineCharge.Amount = EmployeeCharge.Amount * Line.Days;
+                                SalaryLineCharge LineCharge = new SalaryLineCharge();
+                                LineCharge.Id = j--;
+                                LineCharge.HeaderTableId = Header.SalaryHeaderId;
+                                LineCharge.LineTableId = Line.SalaryLineId;
+                                LineCharge.Sr = Sr++;
+                                LineCharge.ChargeId = EmployeeCharge.ChargeId;
+                                LineCharge.AddDeduct = EmployeeCharge.AddDeduct;
+                                LineCharge.AffectCost = EmployeeCharge.AffectCost;
+                                LineCharge.ChargeTypeId = EmployeeCharge.ChargeTypeId;
+                                LineCharge.CalculateOnId = EmployeeCharge.CalculateOnId;
+                                LineCharge.PersonID = EmployeeCharge.PersonID;
+                                LineCharge.LedgerAccountDrId = EmployeeCharge.LedgerAccountDrId;
+                                LineCharge.LedgerAccountCrId = EmployeeCharge.LedgerAccountCrId;
+                                LineCharge.ContraLedgerAccountId = EmployeeCharge.ContraLedgerAccountId;
+                                LineCharge.CostCenterId = EmployeeCharge.CostCenterId;
+                                LineCharge.RateType = EmployeeCharge.RateType;
+                                LineCharge.IncludedInBase = EmployeeCharge.IncludedInBase;
+                                LineCharge.ParentChargeId = EmployeeCharge.ParentChargeId;
+                                LineCharge.Rate = EmployeeCharge.Rate;
+
+                                string ChargeName = db.Charge.Find(EmployeeCharge.ChargeId).ChargeName;
+
+                                if (ChargeName == "Basic Salary")
+                                {
+                                    if (WagesPayType == "Daily")
+                                        LineCharge.Amount = EmployeeCharge.Amount * Line.Days;
+                                    else
+                                        LineCharge.Amount = (EmployeeCharge.Amount * Line.Days / SalaryData.MonthDays);
+                                }
+                                else if (ChargeName == "Net Salary")
+                                {
+                                    LineCharge.Amount = TotalAmount;
+                                }
                                 else
-                                    LineCharge.Amount = (EmployeeCharge.Amount * Line.Days / SalaryData.MonthDays);
-                            }
-                            else if (ChargeName == "Net Salary")
-                            {
-                                LineCharge.Amount = TotalAmount;
-                            }
-                            else
-                            {
-                                LineCharge.Amount = EmployeeCharge.Amount;
-                            }
-                            if (LineCharge.AddDeduct == 0)
-                                TotalAmount = TotalAmount - LineCharge.Amount ?? 0;
-                            else if (LineCharge.AddDeduct == 1)
-                                TotalAmount = TotalAmount + LineCharge.Amount ?? 0;
+                                {
+                                    LineCharge.Amount = EmployeeCharge.Amount;
+                                }
+                                if (LineCharge.AddDeduct == 0)
+                                    TotalAmount = TotalAmount - LineCharge.Amount ?? 0;
+                                else if (LineCharge.AddDeduct == 1)
+                                    TotalAmount = TotalAmount + LineCharge.Amount ?? 0;
 
 
-                            LineCharge.DealQty = 0;
-                            LineCharge.IsVisible = EmployeeCharge.IsVisible;
-                            LineCharge.IncludedCharges = EmployeeCharge.IncludedCharges;
-                            LineCharge.IncludedChargesCalculation = EmployeeCharge.IncludedChargesCalculation;
-                            LineCharge.IsVisibleLedgerAccountDr = false;
-                            LineCharge.filterLedgerAccountGroupsDrId = null;
-                            LineCharge.filterLedgerAccountGroupsCrId = null;
-                            LineCharge.OMSId = EmployeeCharge.OMSId;
-                            LineCharge.ObjectState = Model.ObjectState.Added;
-                            db.SalaryLineCharge.Add(LineCharge);
+                                LineCharge.DealQty = 0;
+                                LineCharge.IsVisible = EmployeeCharge.IsVisible;
+                                LineCharge.IncludedCharges = EmployeeCharge.IncludedCharges;
+                                LineCharge.IncludedChargesCalculation = EmployeeCharge.IncludedChargesCalculation;
+                                LineCharge.IsVisibleLedgerAccountDr = false;
+                                LineCharge.filterLedgerAccountGroupsDrId = null;
+                                LineCharge.filterLedgerAccountGroupsCrId = null;
+                                LineCharge.OMSId = EmployeeCharge.OMSId;
+                                LineCharge.ObjectState = Model.ObjectState.Added;
+                                db.SalaryLineCharge.Add(LineCharge);
 
-                            Charge NetSalaryCharge = (from C in db.Charge where C.ChargeName == "Net Salary" select C).FirstOrDefault();
-                            if (NetSalaryCharge != null && LineCharge.ChargeId == NetSalaryCharge.ChargeId)
-                                Line.NetPayable = (LineCharge.Amount ?? 0) + (Line.OtherAddition ?? 0) - (Line.OtherDeduction ?? 0) - (Line.LoanEMI ?? 0) - (Line.Advance ?? 0);
+                                Charge NetSalaryCharge = (from C in db.Charge where C.ChargeName == "Net Salary" select C).FirstOrDefault();
+                                if (NetSalaryCharge != null && LineCharge.ChargeId == NetSalaryCharge.ChargeId)
+                                    Line.NetPayable = (LineCharge.Amount ?? 0) + (Line.OtherAddition ?? 0) - (Line.OtherDeduction ?? 0) - (Line.LoanEMI ?? 0) - (Line.Advance ?? 0);
+                            }
                         }
 
                         db.SalaryLine.Add(Line);
