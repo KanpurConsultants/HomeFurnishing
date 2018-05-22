@@ -201,6 +201,48 @@ namespace Jobs.Areas.Rug.Controllers
             return Redirect(ReturnUrl);
         }
 
+        public ActionResult DyeingOrder_OnSubmit(int Id, string ReturnUrl)
+        {
+            JobOrderHeader JobOrderHeader = new JobOrderHeaderService(_unitOfWork).Find(Id);
+
+            string ConnectionString = (string)System.Web.HttpContext.Current.Session["DefaultConnectionString"];
+
+            int MainSitid = new SiteService(_unitOfWork).FindBySiteCode("Main").SiteId;
+            try
+            {
+                DataSet ds = new DataSet();
+                using (SqlConnection sqlConnection = new SqlConnection(ConnectionString))
+                {
+                    sqlConnection.Open();
+
+
+                    using (SqlCommand cmd = new SqlCommand("" + ConfigurationManager.AppSettings["DataBaseSchema"] + ".sp_PostRequisitionForDyeingOrder"))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Connection = sqlConnection;
+                        cmd.Parameters.AddWithValue("@JobOrderHeaderId", Id);
+                        cmd.CommandTimeout = 1000;
+                        cmd.ExecuteNonQuery();
+                    }
+
+
+                }
+
+            }
+
+            catch (Exception ex)
+            {
+                JobOrderHeader.Status = (int)StatusConstants.Drafted;
+                new JobOrderHeaderService(_unitOfWork).Update(JobOrderHeader);
+                _unitOfWork.Save();
+                throw ex;
+            }
+
+
+
+            return Redirect(ReturnUrl);
+        }
+
         public ActionResult JobOrder_OnApprove(int Id, string ReturnUrl)
         {
             JobOrderHeader H = new JobOrderHeaderService(_unitOfWork).Find(Id);

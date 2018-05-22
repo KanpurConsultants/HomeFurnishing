@@ -640,6 +640,8 @@ namespace Service
                                 PackingDocNo = tab.DocNo,
                                 ProductName = tab2.ProductName,
                                 ProductId = p.ProductId,
+                                ProductUidName = tabPU.ProductUidName,
+                                ProductUidId = tab1.ProductUidId,
                                 SaleInvoiceHeaderId = vm.SaleInvoiceHeaderId,
                                 PackingLineId = p.PackingLineId,
                                 SaleOrderLineId = tab1.SaleOrderLineId,

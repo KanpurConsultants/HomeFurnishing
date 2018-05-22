@@ -1417,6 +1417,14 @@ namespace Jobs.Controllers
             LedgerHeader Header = new LedgerHeaderService(_unitOfWork).Find(Line.LedgerHeaderId);
             LedgerToAdjustViewModel_Single s = new LedgerToAdjustViewModel_Single();
 
+            List<SelectListItem> DrCr = new List<SelectListItem>();
+            DrCr.Add(new SelectListItem { Text = NatureConstants.Debit, Value = NatureConstants.Debit });
+            DrCr.Add(new SelectListItem { Text = NatureConstants.Credit, Value = NatureConstants.Credit });
+
+            ViewBag.DrCrList = new SelectList(DrCr, "Value", "Text");
+
+
+
             s.LedgerLineId = id;
             s.LedgerAccountId = Line.LedgerAccountId;
             s.LedgerHeaderId = Line.LedgerHeaderId;
@@ -1438,7 +1446,10 @@ namespace Jobs.Controllers
                 s.LedgerId = temp.LedgerId;
                 s.Amount = temp.Amount;
                 s.BalanceAmount = temp.BalanceAmount;
-                s.DrCr = temp.DrCr;
+                if (temp.DrCr == "Cr")
+                    s.DrCr = "Dr";
+                else
+                    s.DrCr = "Cr";
             }
             
             var settings = new LedgerSettingService(_unitOfWork).GetLedgerSettingForDocument(Header.DocTypeId, Header.DivisionId, Header.SiteId);
@@ -1502,9 +1513,9 @@ namespace Jobs.Controllers
             return PartialView("_LedgerAdj_Single", s);
         }
 
-        public ActionResult GetLedgerIds_Adusted(string searchTerm, int pageSize, int pageNum, int? filter, string filter2, int filter3)//DocTypeId
+        public ActionResult GetLedgerIds_Adusted(string searchTerm, int pageSize, int pageNum, int? filter, string filter2, int filter3, int filter4)//DocTypeId
         {
-            var Query = new LedgerLineService(_unitOfWork).GetLedgerIds_Adusted(filter, filter2, filter3, searchTerm);
+            var Query = new LedgerLineService(_unitOfWork).GetLedgerIds_Adusted(filter, filter2, filter3, filter4, searchTerm);
             var temp = Query.Skip(pageSize * (pageNum - 1))
                 .Take(pageSize)
                 .ToList();
@@ -1557,14 +1568,14 @@ namespace Jobs.Controllers
         {
             if (svm.BalanceAmount < svm.AdjustedAmount)
             {
-                string message = "Adjusted Amount is geated then balance amount.";
+                string message = "Adjusted Amount is greater then balance amount.";
                 TempData["CSEXCL"] += message;
                 return PartialView("_LedgerAdj_Single", svm);
             }
 
             if (svm.BalanceAmount_Adjusted < svm.AdjustedAmount)
             {
-                string message = "Adjusted Amount is geated then selected bill balance amount.";
+                string message = "Adjusted Amount is greater then selected bill balance amount.";
                 TempData["CSEXCL"] += message;
                 return PartialView("_LedgerAdj_Single", svm);
             }

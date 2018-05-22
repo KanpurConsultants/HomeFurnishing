@@ -269,6 +269,7 @@ namespace Jobs.Controllers
 
                     account.LedgerAccountName = person.Name;
                     account.LedgerAccountSuffix = person.Suffix;
+                    account.LedgerAccountGroupId = EmployeeVm.LedgerAccountGroupId;
                     account.CreatedDate = DateTime.Now;
                     account.ModifiedDate = DateTime.Now;
                     account.CreatedBy = User.Identity.Name;
@@ -529,6 +530,7 @@ namespace Jobs.Controllers
                     _PersonAddressService.Update(personaddress);
 
                     account.LedgerAccountName = person.Name;
+                    account.LedgerAccountGroupId = EmployeeVm.LedgerAccountGroupId;
                     account.IsActive = person.IsActive;
                     account.LedgerAccountSuffix = person.Suffix;
                     account.ModifiedDate = DateTime.Now;

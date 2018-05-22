@@ -218,6 +218,7 @@ namespace Service
                                                                           DealUnitId = L.DealUnitId,
                                                                           DealUnitName = DeliveryUnitTab.UnitName,
                                                                           DealQty = L.DealQty,
+                                                                          LotNo =L.LotNo,
                                                                           BaleNo = L.BaleNo,
                                                                           GrossWeight = L.GrossWeight,
                                                                           NetWeight = L.NetWeight,

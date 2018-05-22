@@ -160,14 +160,14 @@
                                     <div class="col-xs-6">
                                         @if (Model.JobOrderSettings.isMandatoryCostCenter)
                                         {
-                                            @Html.TextBoxFor(m => m.CostCenterId, new { @class = "form-control col-xs-6 required" })
+                                            @Html.TextBoxFor(m => m.CostCenterName, new { @class = "form-control col-xs-6 required" })
                                         }
                                         else
                                         {
-                                            @Html.TextBoxFor(m => m.CostCenterId, new { @class = "form-control col-xs-6" })
+                                            @Html.TextBoxFor(m => m.CostCenterName, new { @class = "form-control col-xs-6" })
                                         }
 
-                                        @Html.ValidationMessageFor(m => m.CostCenterId, "", new { @class = "text-danger" })
+                                        @Html.ValidationMessageFor(m => m.CostCenterName, "", new { @class = "text-danger" })
                                     </div>
                                 </div>
                             </div>

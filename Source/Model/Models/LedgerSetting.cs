@@ -91,6 +91,14 @@ namespace Model.Models
         public int? WizardMenuId { get; set; }
         public virtual Menu WizardMenu { get; set; }
 
+        [ForeignKey("Calculation")]
+        public int? CalculationId { get; set; }
+        public virtual Calculation Calculation { get; set; }
+
+        public bool? isVisibleQty { get; set; }
+        public bool? isVisibleDealQty { get; set; }
+        public bool? isVisibleRate { get; set; }
+        public bool? isVisibleSpecification { get; set; }
 
         public bool? isAllowedDuplicatePrint { get; set; }
         public bool? isPrintinLetterhead { get; set; }

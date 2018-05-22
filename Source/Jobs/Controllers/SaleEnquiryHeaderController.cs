@@ -390,6 +390,19 @@ namespace Jobs.Controllers
                     temp.ModifiedBy = User.Identity.Name;
                     _SaleEnquiryHeaderService.Update(temp);
 
+                    SaleOrderHeader ExistingSaleOrder = new SaleOrderHeaderService(_unitOfWork).Find_ByReferenceDocId(temp.SaleEnquiryHeaderId, temp.DocTypeId);
+
+                    if (ExistingSaleOrder != null)
+                    {
+                        ExistingSaleOrder.ModifiedBy = User.Identity.Name;
+                        ExistingSaleOrder.ModifiedDate = DateTime.Now;
+                        ExistingSaleOrder.Remark = temp.Remark;
+                        ExistingSaleOrder.DocDate = temp.DocDate;
+                        ExistingSaleOrder.DueDate = temp.DueDate;
+                        ExistingSaleOrder.ObjectState = Model.ObjectState.Added;
+                        new SaleOrderHeaderService(_unitOfWork).Update(ExistingSaleOrder);
+                    }
+
                     LogList.Add(new LogTypeViewModel
                     {
                         ExObj = ExRec,

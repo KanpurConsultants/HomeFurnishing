@@ -1,0 +1,95 @@
+﻿@model Model.ViewModels.SalaryLineReferenceSummaryViewModel
+@using Core.Common
+
+
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Reference @ViewBag.DocNo </span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("_PersonProductUidPost", "SaleEnquiryLine", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        {
+
+
+            @Html.AntiForgeryToken()
+
+
+            <div class="form-horizontal modal-body">
+
+                @*<div class="row" style="padding-right:15px; margin-top:15px">*@
+
+                <div class="panel panel-default" id="grid">
+
+                    <div class="panel-heading headrow" style="background-image: -webkit-linear-gradient(top, #428bca 0%, #428bca 50%);color:white">
+                        <div class="row grid-head">
+                            <div class="text-left block" style="width: 5%; ">
+                                Srl.
+                            </div>
+                            <div class="block" style="width: 95%;">
+                                <div class="row">
+                                    <div class="block" style="width: 40%;">
+                                        Reference Type
+                                    </div>
+                                    <div class="block" style="width: 40%;">
+                                        Reference No
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    <div class="panel-info">
+                        @{int count = 0;
+                        }
+
+                        @for (int i = 0; i < Model.SalaryLineReferenceSummaryVM.Count(); i++)
+                        {
+                            count++;
+
+                            <div class="row crow" style="margin:0px; padding: 0px;padding-top:5px;padding-bottom:5px;">
+                                @Html.HiddenFor(m => Model.SalaryLineReferenceSummaryVM[i].SalaryLineId)
+
+                                <div class="block" style="width:5%">
+                                    @count
+                                </div>
+
+                                <div class="block"  style="width:95%">
+                                    <div class="row">
+                                        <div class="block" style="width:40%">
+                                            @Html.TextBoxFor(m => Model.SalaryLineReferenceSummaryVM[i].DocumentTypeName, "", new { @class = "form-control" })
+                                            @Html.ValidationMessageFor(m => Model.SalaryLineReferenceSummaryVM[i].DocumentTypeName, "", new { @class = "text-danger" })
+                                        </div>
+
+                                        <div class="block" style="width:40%">
+                                            @Html.TextBoxFor(m => Model.SalaryLineReferenceSummaryVM[i].DocumentNo, "", new { @class = "form-control" })
+                                            @Html.ValidationMessageFor(m => Model.SalaryLineReferenceSummaryVM[i].DocumentNo, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+
+                            <hr style="margin:1px" />
+
+                        }
+
+
+                    </div>
+                </div>
+
+
+            </div>
+
+                            }
+    </div>
+</div>
+
+
+

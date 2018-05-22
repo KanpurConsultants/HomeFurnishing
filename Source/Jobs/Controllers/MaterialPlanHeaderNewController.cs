@@ -286,6 +286,8 @@ namespace Jobs.Controllers
                         ExistingProdOrder.ModifiedBy = User.Identity.Name;
                         ExistingProdOrder.ModifiedDate = DateTime.Now;
                         ExistingProdOrder.Remark = temp.Remark;
+                        ExistingProdOrder.DocDate = temp.DocDate;
+                        ExistingProdOrder.DueDate = temp.DueDate;
                         ExistingProdOrder.ObjectState = Model.ObjectState.Added;
                         new ProdOrderHeaderService(_unitOfWork).Update(ExistingProdOrder);
                     }

@@ -347,7 +347,8 @@ namespace Service
                               select new SaleInvoiceLineViewModel
                               {
                                   PackingLineId = L.PackingLineId,
-                                  LotNo = PackingHeaderTab.DocNo,
+                                  //LotNo = PackingHeaderTab.DocNo,
+                                  LotNo = L.LotNo,
                                   GodownId = PackingHeaderTab.GodownId,
                                   SalesTaxGroupProductId = ProductTab.SalesTaxGroupProductId,
                                   SaleOrderLineId = L.SaleOrderLineId,

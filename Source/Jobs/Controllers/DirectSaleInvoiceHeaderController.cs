@@ -751,6 +751,8 @@ namespace Jobs.Controllers
                 vm.ReturnNature = (from H in db.SaleInvoiceReturnHeader where H.SaleInvoiceReturnHeaderId == SaleInvoiceReturn.SaleInvoiceReturnHeaderId select new { DocTypeNature = H.DocType.Nature }).FirstOrDefault().DocTypeNature;
                 if (vm.ReturnNature == TransactionNatureConstants.Credit)
                     vm.AdditionalInfo = "Credit Note is generated for this invoice.";
+                else if (vm.ReturnNature == TransactionNatureConstants.Debit)
+                    vm.AdditionalInfo = "Debit Note is generated for this invoice.";
                 else
                     vm.AdditionalInfo = "Invoice is cancelled.";
             }
@@ -2002,7 +2004,7 @@ LEFT JOIN web.Dimension2 D2 WITH (Nolock) ON D2.Dimension2Id=PL.Dimension2Id
 LEFT JOIN web.Dimension3 D3 WITH (Nolock) ON D3.Dimension3Id=PL.Dimension3Id
 LEFT JOIN Web.Dimension4 D4 WITH (nolock) ON D4.Dimension4Id=PL.Dimension4Id
 LEFT JOIN web.Units U WITH (Nolock) ON U.UnitId=PD.UnitId
-LEFT JOIN web.Units DU WITH (Nolock) ON DU.UnitId=POL.DealUnitId
+LEFT JOIN web.Units DU WITH (Nolock) ON DU.UnitId=PL.DealUnitId
 LEFT JOIN Web.Std_PersonRegistrations SPR WITH (Nolock) ON SPR.CustomerId=H.BillToBuyerId
 LEFT JOIN web.ChargeGroupProducts CGPD WITH (Nolock) ON L.SalesTaxGroupProductId = CGPD.ChargeGroupProductId
 LEFT JOIN
@@ -2157,7 +2159,7 @@ LEFT JOIN web.Dimension2 D2 WITH (Nolock) ON D2.Dimension2Id=PL.Dimension2Id
 LEFT JOIN web.Dimension3 D3 WITH (Nolock) ON D3.Dimension3Id=PL.Dimension3Id
 LEFT JOIN Web.Dimension4 D4 WITH (nolock) ON D4.Dimension4Id=PL.Dimension4Id
 LEFT JOIN web.Units U WITH (Nolock) ON U.UnitId=PD.UnitId
-LEFT JOIN web.Units DU WITH (Nolock) ON DU.UnitId=POL.DealUnitId
+LEFT JOIN web.Units DU WITH (Nolock) ON DU.UnitId=PL.DealUnitId
 LEFT JOIN Web.Std_PersonRegistrations SPR WITH (Nolock) ON SPR.CustomerId=H.BillToBuyerId
 LEFT JOIN web.ChargeGroupProducts CGPD WITH (Nolock) ON L.SalesTaxGroupProductId = CGPD.ChargeGroupProductId
 WHERE H.SaleInvoiceHeaderId= " + item + @"

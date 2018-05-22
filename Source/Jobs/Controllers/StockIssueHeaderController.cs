@@ -1783,7 +1783,7 @@ namespace Jobs.Controllers
                                     if (Settings.SqlProcDocumentPrint == null || Settings.SqlProcDocumentPrint == "")
                                     {
                                         StockHeaderRDL cr = new StockHeaderRDL();
-                                        drp.CreateRDLFile("Std_StockIssue_Print", cr.Create_Std_StockIssue_Print());
+                                        drp.CreateRDLFile("Std_StockIssue_Print", cr.Create_Std_StockIssue_Print_Lanscape());
                                         List<ListofQuery> QueryList = new List<ListofQuery>();
                                         QueryList = DocumentPrintData(item);
                                         Pdf = drp.DocumentPrint_New(QueryList, User.Identity.Name);
@@ -1798,7 +1798,7 @@ namespace Jobs.Controllers
                                     if (Settings.SqlProcDocumentPrint == null || Settings.SqlProcDocumentPrint == "")
                                     {
                                         StockHeaderRDL cr = new StockHeaderRDL();
-                                        drp.CreateRDLFile("Std_StockIssue_Print", cr.Create_Std_StockIssue_Print());
+                                        drp.CreateRDLFile("Std_StockIssue_Print", cr.Create_Std_StockIssue_Print_Lanscape());
                                         List<ListofQuery> QueryList = new List<ListofQuery>();
                                         QueryList = DocumentPrintData(item);
                                         Pdf = drp.DocumentPrint_New(QueryList, User.Identity.Name);
@@ -1813,7 +1813,7 @@ namespace Jobs.Controllers
                                     if (Settings.SqlProcDocumentPrint == null || Settings.SqlProcDocumentPrint == "")
                                     {
                                         StockHeaderRDL cr = new StockHeaderRDL();
-                                        drp.CreateRDLFile("Std_StockIssue_Print", cr.Create_Std_StockIssue_Print());
+                                        drp.CreateRDLFile("Std_StockIssue_Print", cr.Create_Std_StockIssue_Print_Lanscape());
                                         List<ListofQuery> QueryList = new List<ListofQuery>();
                                         QueryList = DocumentPrintData(item);
                                         Pdf = drp.DocumentPrint_New(QueryList, User.Identity.Name);

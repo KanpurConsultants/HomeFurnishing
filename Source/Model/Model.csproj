@@ -127,6 +127,8 @@
     <Compile Include="Models\EmployeeCharge.cs" />
     <Compile Include="Models\JobOrderBomMaterialIssue.cs" />
     <Compile Include="Models\EmployeeLineCharge.cs" />
+    <Compile Include="Models\LedgerHeaderCharge.cs" />
+    <Compile Include="Models\LedgerLineCharge.cs" />
     <Compile Include="Models\SalaryLineCharge.cs" />
     <Compile Include="Models\SalaryHeaderCharge.cs" />
     <Compile Include="Models\SalaryLine.cs" />
@@ -151,6 +153,7 @@
     <Compile Include="Models\Religion.cs" />
     <Compile Include="Models\RolesDocTypeProcess.cs" />
     <Compile Include="Models\RolesDocType.cs" />
+    <Compile Include="Models\SalaryLineReference.cs" />
     <Compile Include="Models\SaleQuotationHeaderAttributes.cs" />
     <Compile Include="Models\DivisionSettings.cs" />
     <Compile Include="Models\SalarySettings.cs" />
@@ -294,6 +297,7 @@
     <Compile Include="ViewModels\FinancialDisplayViewModel.cs" />
     <Compile Include="ViewModels\RolesControllerActionViewModel.cs" />
     <Compile Include="ViewModels\SalaryHeaderViewModel.cs" />
+    <Compile Include="ViewModels\SalaryLineReferenceViewModel.cs" />
     <Compile Include="ViewModels\SalaryLineViewModel.cs" />
     <Compile Include="ViewModels\SalarySettingsViewModel.cs" />
     <Compile Include="ViewModels\SiteViewModel.cs" />

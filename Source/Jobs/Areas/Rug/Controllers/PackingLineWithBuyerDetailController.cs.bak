@@ -2556,7 +2556,10 @@ namespace Jobs.Areas.Rug.Controllers
                             BalanceQty = p.BalanceQty,
                             LotNo = p.LotNo,
                             FromProcessId = StockTab.ProcessId,
-                            FromProcessName = StockTab.Process.ProcessName
+                            FromProcessName = StockTab.Process.ProcessName,
+                            CurrenctGodownId = PUTab.CurrenctGodownId,
+                            Status = PUTab.Status
+
                         }).FirstOrDefault();
 
             if (temp != null)

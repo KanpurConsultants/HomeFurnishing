@@ -16,6 +16,7 @@ using Reports.Controllers;
 using Reports.Reports;
 using System.Configuration;
 using Model.ViewModels;
+using System.Data.SqlClient;
 using Jobs.Helpers;
 
 namespace Jobs.Controllers
@@ -145,6 +146,11 @@ namespace Jobs.Controllers
                 return View("~/Views/Shared/InValidSettings.cshtml");
             }
             vm.MaterialPlanSettings = Mapper.Map<MaterialPlanSettings, MaterialPlanSettingsViewModel>(settings);
+
+            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, id, null, this.ControllerContext.RouteData.Values["controller"].ToString(), "Create") == false)
+            {
+                return View("~/Views/Shared/PermissionDenied.cshtml").Warning("You don't have permission to do this task.");
+            }
 
             if (string.IsNullOrEmpty(vm.MaterialPlanSettings.PlanType))
                 TempData["CSEXC"] += "Please configure PlanType";
@@ -363,6 +369,10 @@ namespace Jobs.Controllers
                 return HttpNotFound();
             }
 
+            if (pt.Status != (int)StatusConstants.Drafted)
+                if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, pt.DocTypeId, null, this.ControllerContext.RouteData.Values["controller"].ToString(), "Edit") == false)
+                    return RedirectToAction("DetailInformation", new { id = id, IndexType = IndexType }).Warning("You don't have permission to do this task.");
+
             #region DocTypeTimeLineValidation
             try
             {
@@ -452,6 +462,11 @@ namespace Jobs.Controllers
             if (MaterialPlanHeader == null)
             {
                 return HttpNotFound();
+            }
+
+            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, MaterialPlanHeader.DocTypeId, null, this.ControllerContext.RouteData.Values["controller"].ToString(), "Remove") == false)
+            {
+                return PartialView("~/Views/Shared/PermissionDenied_Modal.cshtml").Warning("You don't have permission to do this task.");
             }
 
             #region DocTypeTimeLineValidation
@@ -749,6 +764,11 @@ namespace Jobs.Controllers
 
                 var Settings = new MaterialPlanLineService(_unitOfWork).GetMaterialPlanSettingsForDocument(DocTypeId, DivisionId, SiteId);
 
+                if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, DocTypeId, null, this.ControllerContext.RouteData.Values["controller"].ToString(), "GeneratePrints") == false)
+                {
+                    return View("~/Views/Shared/PermissionDenied.cshtml").Warning("You don't have permission to do this task.");
+                }
+
                 string ReportSql = "";
 
                 if (Settings.DocumentPrintReportHeaderId.HasValue)
@@ -927,9 +947,14 @@ namespace Jobs.Controllers
 
         public ActionResult Submit(int id, string IndexType, string TransactionType)
         {
-            #region DocTypeTimeLineValidation
-
             MaterialPlanHeader s = db.MaterialPlanHeader.Find(id);
+
+            if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, s.DocTypeId, null, this.ControllerContext.RouteData.Values["controller"].ToString(), "Submit") == false)
+            {
+                return View("~/Views/Shared/PermissionDenied.cshtml").Warning("You don't have permission to do this task.");
+            }
+
+            #region DocTypeTimeLineValidation
 
             try
             {
@@ -965,6 +990,8 @@ namespace Jobs.Controllers
 
                 if (User.Identity.Name == pd.ModifiedBy || UserRoles.Contains("Admin"))
                 {
+                    SqlParameter SqlMaterialPlanHeaderId = new SqlParameter("@MaterialPlanHeaderId", Id);
+                    db.Database.SqlQuery<int>("" + ConfigurationManager.AppSettings["DataBaseSchema"] + ".sp_UpdateMaterialPlanForSaleOrder @MaterialPlanHeaderId", SqlMaterialPlanHeaderId).FirstOrDefault();
 
 
                     pd.Status = (int)StatusConstants.Submitted;

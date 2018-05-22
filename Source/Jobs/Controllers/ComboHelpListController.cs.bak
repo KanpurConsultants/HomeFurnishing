@@ -1257,7 +1257,23 @@ namespace Jobs.Controllers
         }
 
 
+        public JsonResult SetSingleEmployee_New(int Ids)
+        {
+            ComboBoxResult EmployeeJson = new ComboBoxResult();
 
+            var employee = (from b in db.Employee
+                                      where b.EmployeeId == Ids
+                                      select new 
+                                      {
+                                          EmployeeId = b.EmployeeId,
+                                          Name = b.Person.Name
+                                      }).FirstOrDefault();
+
+            EmployeeJson.id = employee.EmployeeId.ToString();
+            EmployeeJson.text = employee.Name;
+
+            return Json(EmployeeJson);
+        }
 
 
 
@@ -1920,32 +1936,32 @@ namespace Jobs.Controllers
             return Json(ProductJson);
         }
 
-        public ActionResult GetDocumentType(string searchTerm, int pageSize, int pageNum)
-        {
-            //Get the paged results and the total count of the results for this query. ProductCacheKeyHint
-            var productCacheKeyHint = "DocumentTypeCacheKeyHint";
+        //public ActionResult GetDocumentType(string searchTerm, int pageSize, int pageNum)
+        //{
+        //    //Get the paged results and the total count of the results for this query. ProductCacheKeyHint
+        //    var productCacheKeyHint = "DocumentTypeCacheKeyHint";
 
-            //THis statement has been changed because GetProductHelpList was calling again and again. 
+        //    //THis statement has been changed because GetProductHelpList was calling again and again. 
 
-            AutoCompleteComboBoxRepositoryAndHelper ar = new AutoCompleteComboBoxRepositoryAndHelper(cbl.GetDocumentTypeHelpList(), productCacheKeyHint, RefreshData.RefreshProductData);
-            //AutoCompleteComboBoxRepositoryAndHelper ar = new AutoCompleteComboBoxRepositoryAndHelper(null, productCacheKeyHint);
+        //    AutoCompleteComboBoxRepositoryAndHelper ar = new AutoCompleteComboBoxRepositoryAndHelper(cbl.GetDocumentTypeHelpList(), productCacheKeyHint, RefreshData.RefreshProductData);
+        //    //AutoCompleteComboBoxRepositoryAndHelper ar = new AutoCompleteComboBoxRepositoryAndHelper(null, productCacheKeyHint);
 
-            if (RefreshData.RefreshProductData == true) { RefreshData.RefreshProductData = false; }
+        //    if (RefreshData.RefreshProductData == true) { RefreshData.RefreshProductData = false; }
 
 
-            List<ComboBoxList> prodLst = ar.GetListForComboBox(searchTerm, pageSize, pageNum);
-            int prodCount = ar.GetCountForComboBox(searchTerm, pageSize, pageNum);
+        //    List<ComboBoxList> prodLst = ar.GetListForComboBox(searchTerm, pageSize, pageNum);
+        //    int prodCount = ar.GetCountForComboBox(searchTerm, pageSize, pageNum);
 
-            //Translate the attendees into a format the select2 dropdown expects
-            ComboBoxPagedResult pagedAttendees = ar.TranslateToComboBoxFormat(prodLst, prodCount);
+        //    //Translate the attendees into a format the select2 dropdown expects
+        //    ComboBoxPagedResult pagedAttendees = ar.TranslateToComboBoxFormat(prodLst, prodCount);
 
-            //Return the data as a jsonp result
-            return new JsonpResult
-            {
-                Data = pagedAttendees,
-                JsonRequestBehavior = JsonRequestBehavior.AllowGet
-            };
-        }
+        //    //Return the data as a jsonp result
+        //    return new JsonpResult
+        //    {
+        //        Data = pagedAttendees,
+        //        JsonRequestBehavior = JsonRequestBehavior.AllowGet
+        //    };
+        //}
 
         public ActionResult GetDocumentType(string searchTerm, int pageSize, int pageNum)
         {
@@ -2067,14 +2083,12 @@ namespace Jobs.Controllers
         {
             ComboBoxResult TransporterJson = new ComboBoxResult();
 
-            PersonViewModel person = (from b in db.Transporter
-                                      join p in db.Persons on b.PersonID equals p.PersonID into PersonTable
-                                      from PersonTab in PersonTable.DefaultIfEmpty()
-                                      where b.PersonID == Ids
+            PersonViewModel person = (from p in db.Persons 
+                                      where p.PersonID == Ids
                                       select new PersonViewModel
                                       {
-                                          PersonID = b.PersonID,
-                                          Name = PersonTab.Name
+                                          PersonID = p.PersonID,
+                                          Name = p.Name 
                                       }).FirstOrDefault();
 
             TransporterJson.id = person.PersonID.ToString();
@@ -5734,6 +5748,55 @@ namespace Jobs.Controllers
                 {
                     id = prod.FirstOrDefault().DocumentTypeId.ToString(),
                     text = prod.FirstOrDefault().DocumentTypeName
+                });
+            }
+            return Json(ProductJson);
+        }
+
+        public JsonResult GetUnitConversionFors(string searchTerm, int pageSize, int pageNum)
+        {
+            var Query = cbl.GetUnitConversionFors(searchTerm);
+            var temp = Query.Skip(pageSize * (pageNum - 1)).Take(pageSize).ToList();
+
+            var count = Query.Count();
+
+            ComboBoxPagedResult Data = new ComboBoxPagedResult();
+            Data.Results = temp;
+            Data.Total = count;
+
+            return new JsonpResult
+            {
+                Data = Data,
+                JsonRequestBehavior = JsonRequestBehavior.AllowGet
+            };
+        }
+        public JsonResult SetSingleUnitConversionFor(int Ids)
+        {
+            ComboBoxResult UnitConversionForJson = new ComboBoxResult();
+
+            UnitConversionFor UnitConversionFor = (from b in db.UnitConversonFor
+                                       where b.UnitconversionForId == Ids
+                                       select b).FirstOrDefault();
+
+            UnitConversionForJson.id = UnitConversionFor.UnitconversionForId.ToString();
+            UnitConversionForJson.text = UnitConversionFor.UnitconversionForName;
+
+            return Json(UnitConversionForJson);
+        }
+        public JsonResult SetUnitConversionFor(string Ids)
+        {
+            string[] subStr = Ids.Split(',');
+            List<ComboBoxResult> ProductJson = new List<ComboBoxResult>();
+            for (int i = 0; i < subStr.Length; i++)
+            {
+                int temp = Convert.ToInt32(subStr[i]);
+                IEnumerable<UnitConversionFor> prod = from p in db.UnitConversonFor
+                                                      where p.UnitconversionForId == temp
+                                                 select p;
+                ProductJson.Add(new ComboBoxResult()
+                {
+                    id = prod.FirstOrDefault().UnitconversionForId.ToString(),
+                    text = prod.FirstOrDefault().UnitconversionForName
                 });
             }
             return Json(ProductJson);

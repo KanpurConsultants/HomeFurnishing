@@ -800,6 +800,14 @@ namespace Jobs.Controllers
                     {
                         ExObj = Mapper.Map<SalaryLine>(item),
                     });
+                    
+
+                        var SalaryLineReferenceRecords = (from Lc in db.SalaryLineReference where Lc.SalaryLineId == item.SalaryLineId select Lc).ToList();
+                        foreach (var item1 in SalaryLineReferenceRecords)
+                        {
+                            item1.ObjectState = Model.ObjectState.Deleted;
+                            db.SalaryLineReference.Remove(item1);
+                        }
 
 
 

@@ -35,6 +35,13 @@ namespace Model.ViewModel
         public bool isVisibleDrCr { get; set; }
         public bool isVisibleLineDrCr { get; set; }
 
+        public bool isVisibleQty { get; set; }
+        public bool isVisibleDealQty { get; set; }
+        public bool isVisibleRate { get; set; }
+        public bool isVisibleSpecification { get; set; }
+        public int? CalculationId { get; set; }
+        public string CalculationName { get; set; }
+
         public bool IsAutoDocNo { get; set; }
         public bool isVisibleAdjustmentType { get; set; }
         public bool isVisiblePaymentFor { get; set; }

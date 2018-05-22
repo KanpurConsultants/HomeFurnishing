@@ -704,6 +704,7 @@ namespace Jobs.Areas.Rug.Controllers
                     packingline.Remark = svm.Remark;
                     packingline.SealNo = svm.SealNo;
                     packingline.DealQty = svm.DealQty;
+                    packingline.UnitConversionMultiplier = svm.DealQty/svm.Qty;
                     packingline.RateRemark = svm.RateRemark;
                     packingline.ModifiedDate = DateTime.Now;
                     packingline.ModifiedBy = User.Identity.Name;

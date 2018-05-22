@@ -882,6 +882,8 @@ namespace Jobs.Controllers
                 pt.ReturnNature = (from H in db.JobInvoiceReturnHeader where H.JobInvoiceReturnHeaderId == JobInvoiceReturn.JobInvoiceReturnHeaderId select new { DocTypeNature = H.DocType.Nature }).FirstOrDefault().DocTypeNature;
                 if (pt.ReturnNature == TransactionNatureConstants.Credit)
                     pt.AdditionalInfo = "Credit Note is generated for this invoice.";
+                else if (pt.ReturnNature == TransactionNatureConstants.Debit)
+                    pt.AdditionalInfo = "Debit Note is generated for this invoice.";
                 else
                     pt.AdditionalInfo = "Invoice is cancelled.";
             }

@@ -171,6 +171,10 @@ namespace Service
                         ProductUidId = p.ProductUidId,
                         ProductUidName = p.ProductUid.ProductUidName,
                         LockReason = p.LockReason,
+                        Qty=(Decimal) p.Qty,
+                        DealQty= (Decimal)p.DealQty,
+                        Rate= (Decimal)p.Rate,
+                        Specification=p.Specification,
                         DrCr = p.DrCr
                     }).FirstOrDefault();
         }

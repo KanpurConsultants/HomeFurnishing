@@ -55,6 +55,8 @@ namespace Jobs.Controllers
             WagesPayTypeList.Add(new SelectListItem { Text = "Daily", Value = "Daily" });
             WagesPayTypeList.Add(new SelectListItem { Text = "Monthly", Value = "Monthly" });
             WagesPayTypeList.Add(new SelectListItem { Text = "Jobwork", Value = "Jobwork" });
+            WagesPayTypeList.Add(new SelectListItem { Text = "Jobwork_ByVoucher", Value = "Jobwork_ByVoucher" });
+            WagesPayTypeList.Add(new SelectListItem { Text = "Jobwork_ByInvoice", Value = "Jobwork_ByInvoice" });
             ViewBag.WagesPayTypeList = WagesPayTypeList;
 
             vm.SalaryHeaderId = SalaryHeaderId ?? 0;
@@ -87,6 +89,7 @@ namespace Jobs.Controllers
             int SiteId = (int)System.Web.HttpContext.Current.Session["SiteId"];
             string SalaryDocNo = "";
 
+            int T = 0;
             if (SalaryDataList.Count > 0)
             {
                 if (SalaryDataList.FirstOrDefault().SalaryHeaderId != null && SalaryDataList.FirstOrDefault().SalaryHeaderId > 0)
@@ -96,6 +99,7 @@ namespace Jobs.Controllers
                     var LineRecords = (from L in db.SalaryLine where L.SalaryHeaderId == HeaderRecord.SalaryHeaderId select L).ToList();
                     var LineChargeRecords = (from Lc in db.SalaryLineCharge where Lc.HeaderTableId == HeaderRecord.SalaryHeaderId select Lc).ToList();
                     var HeaderChargeRecords = (from Hc in db.SalaryHeaderCharge where Hc.HeaderTableId == HeaderRecord.SalaryHeaderId select Hc).ToList();
+                    
 
                     foreach (var item in LineChargeRecords)
                     {
@@ -105,6 +109,13 @@ namespace Jobs.Controllers
 
                     foreach (var item in LineRecords)
                     {
+                        var SalaryLineReferenceRecords = (from Lc in db.SalaryLineReference where Lc.SalaryLineId == item.SalaryLineId select Lc).ToList();
+                        foreach (var item1 in SalaryLineReferenceRecords)
+                        {
+                            item1.ObjectState = Model.ObjectState.Deleted;
+                            db.SalaryLineReference.Remove(item1);
+                        }
+
                         item.ObjectState = Model.ObjectState.Deleted;
                         db.SalaryLine.Remove(item);
                     }
@@ -239,7 +250,28 @@ namespace Jobs.Controllers
                         }
 
                         db.SalaryLine.Add(Line);
+
+
+                        if (System.Web.HttpContext.Current.Session["SalaryLineReferenceList"] != null)
+                        {
+                            foreach (var SalaryLineReferenceVm in ((List<SalaryLineReferenceViewModel>)System.Web.HttpContext.Current.Session["SalaryLineReferenceList"]))
+                            {
+                                if (SalaryLineReferenceVm.PersonId == Line.EmployeeId)
+                                {
+                                    SalaryLineReference SalaryLineReference = new SalaryLineReference();
+                                    SalaryLineReference.SalaryLineId = Line.SalaryLineId;
+                                    SalaryLineReference.ReferenceDocTypeId = SalaryLineReferenceVm.ReferenceDocTypeId;
+                                    SalaryLineReference.ReferenceDocId = SalaryLineReferenceVm.ReferenceDocId;
+                                    SalaryLineReference.ReferenceDocLineId = SalaryLineReferenceVm.ReferenceDocLineId;
+                                    SalaryLineReference.ObjectState = Model.ObjectState.Added;
+                                    db.SalaryLineReference.Add(SalaryLineReference);
+                                    T = T + 1;
+                                }
+                            }
+                        }
+
                     }
+
                 }
 
 

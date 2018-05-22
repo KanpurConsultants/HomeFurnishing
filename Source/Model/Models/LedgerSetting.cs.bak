@@ -93,6 +93,7 @@ namespace Model.Models
 
 
         public bool? isAllowedDuplicatePrint { get; set; }
+        public bool? isPrintinLetterhead { get; set; }
 
         [ForeignKey("CancelDocType"), Display(Name = "Cancel Type")]
         public int? CancelDocTypeId { get; set; }

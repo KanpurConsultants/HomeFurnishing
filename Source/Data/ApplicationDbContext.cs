@@ -456,6 +456,8 @@ namespace Data.Models
         public DbSet<SaleInvoiceReturnLineCharge> SaleInvoiceReturnLineCharge { get; set; }
 
         //Job Models
+        public DbSet<LedgerHeaderCharge> LedgerHeaderCharges { get; set; }
+        public DbSet<LedgerLineCharge> LedgerLineCharge { get; set; }
         public DbSet<PersonProcess> PersonProcess { get; set; }
         public DbSet<ProductProcess> ProductProcess { get; set; }
         public DbSet<JobOrderHeader> JobOrderHeader { get; set; }
@@ -465,6 +467,7 @@ namespace Data.Models
         public DbSet<JobOrderLine> JobOrderLine { get; set; }
         public DbSet<JobOrderLineCharge> JobOrderLineCharge { get; set; }
         public DbSet<JobInvoiceLineCharge> JobInvoiceLineCharge { get; set; }
+        public DbSet<SalaryLineReference> SalaryLineReference { get; set; }
         public DbSet<JobInvoiceAmendmentHeaderCharge> JobInvoiceAmendmentHeaderCharge { get; set; }
         public DbSet<JobInvoiceRateAmendmentLineCharge> JobInvoiceRateAmendmentLineCharge { get; set; }
         public DbSet<JobOrderBom> JobOrderBom { get; set; }

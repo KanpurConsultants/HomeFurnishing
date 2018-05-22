@@ -2083,14 +2083,12 @@ namespace Jobs.Controllers
         {
             ComboBoxResult TransporterJson = new ComboBoxResult();
 
-            PersonViewModel person = (from b in db.Transporter
-                                      join p in db.Persons on b.PersonID equals p.PersonID into PersonTable
-                                      from PersonTab in PersonTable.DefaultIfEmpty()
-                                      where b.PersonID == Ids
+            PersonViewModel person = (from p in db.Persons 
+                                      where p.PersonID == Ids
                                       select new PersonViewModel
                                       {
-                                          PersonID = b.PersonID,
-                                          Name = PersonTab.Name
+                                          PersonID = p.PersonID,
+                                          Name = p.Name 
                                       }).FirstOrDefault();
 
             TransporterJson.id = person.PersonID.ToString();
@@ -2102,7 +2100,7 @@ namespace Jobs.Controllers
         public ActionResult GetRoutes(string searchTerm, int pageSize, int pageNum)
         {
             //Get the paged results and the total count of the results for this query. ProductCacheKeyHint
-            var productCacheKeyHint = ConfigurationManager.AppSettings["RouteCacheKeyHint"];
+            var productCacheKeyHint = "RouteCacheKeyHint";
 
             //THis statement has been changed because GetProductHelpList was calling again and again. 
 

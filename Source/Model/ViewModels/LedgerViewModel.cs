@@ -126,6 +126,13 @@ namespace Model.ViewModels
         public decimal AmountDr { get; set; }
         public string DrCr { get; set; }
 
+        public decimal Qty { get; set; }
+        public decimal DealQty { get; set; }
+        public decimal Rate { get; set; }
+
+        [Display(Name = "Specification"), MaxLength(10)]
+        public string Specification { get; set; }
+
         [MaxLength(250)]
         public string Narration { get; set; }
 
@@ -145,6 +152,23 @@ namespace Model.ViewModels
         public string Remark { get; set; }
         public LedgerSettingViewModel LedgerSetting { get; set; }
         public DocumentTypeSettingsViewModel DocumentTypeSettings { get; set; }
+
+        public List<LedgerLineCharge> linecharges { get; set; }
+        public List<LedgerHeaderCharge> footercharges { get; set; }
+
+        public int? CalculationId { get; set; }
+        public string CalculationName { get; set; }
+
+        public int DocTypeId { get; set; }
+        public string DocTypeName { get; set; }
+
+        [Display(Name = "Division"), Required]
+        public int DivisionId { get; set; }
+        public string DivisionName { get; set; }
+
+        [Display(Name = "Site"), Required]
+        public int SiteId { get; set; }
+        public string SiteName { get; set; }
 
         public int? ProductUidId { get; set; }
 

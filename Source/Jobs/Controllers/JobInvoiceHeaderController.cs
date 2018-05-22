@@ -1569,6 +1569,7 @@ namespace Jobs.Controllers
                         }
 
                         //JobInvoiceHeader temp = _JobInvoiceHeaderService.Find(item);
+                        if (pd.Status == 1)
                         pd.IsDocumentPrinted = true;
                         pd.ObjectState = Model.ObjectState.Modified;
                         //_JobInvoiceHeaderService.Update(temp);

@@ -1726,7 +1726,7 @@ namespace Jobs.Areas.Rug.Controllers
         {
             ProductUid PUS = new ProductUidService(_unitOfWork).Find(ProductUidName);
 
-            JobOrderLine JOL = new JobOrderLineService(_unitOfWork).Find((int)PUS.GenLineId);
+            JobOrderLine JOL = new JobOrderLineService(_unitOfWork).Find((int)PUS.LastTransactionLineId);
 
             JobOrderHeader JOH = new JobOrderHeaderService(_unitOfWork).Find(JOL.JobOrderHeaderId);
 
@@ -1972,7 +1972,8 @@ namespace Jobs.Areas.Rug.Controllers
 
 
                     vm.SiteId = MainBranchId;
-                    
+                    vm.DivisionId = MainDivisionId;
+
                     string DocNo = new DocumentTypeService(_unitOfWork).FGetNewDocNo("DocNo", ConfigurationManager.AppSettings["DataBaseSchema"] + ".JobReceiveHeaders", vm.DocTypeId, vm.DocDate, vm.DivisionId, vm.SiteId);
                     string[] tokens = DocNo.Split('-');
                     string Prefix = tokens[0];

@@ -34,7 +34,7 @@ namespace Service
         IEnumerable<LedgerLine> FindByLedgerHeader(int id);
         IQueryable<ComboBoxResult> GetLedgerAccounts(string term, string AccGroups, string ExcludeAccGroups, string Process);
         IQueryable<ComboBoxResult> GetCostCenters(string term, string DocTypes, string Process);
-        IQueryable<ComboBoxResult> GetLedgerIds_Adusted(int? Id, string Nature, int filter3, string term);
+        IQueryable<ComboBoxResult> GetLedgerIds_Adusted(int? Id, string Nature, int filter3, int filter4, string term);
         LedgersViewModel GetLastTransactionDetail(int LedgerHeaderId);
     }
 
@@ -324,9 +324,16 @@ namespace Service
         }
 
 
-        public IQueryable<ComboBoxResult> GetLedgerIds_Adusted(int? Id, string Nature, int filter3, string term)
+        public IQueryable<ComboBoxResult> GetLedgerIds_Adusted(int? Id, string Nature, int filter3, int filter4, string term)
         {
+            string LedgerNature = "";
             var Header = new LedgerHeaderService(_unitOfWork).Find(filter3);
+
+            var LedgerData = new LedgerService(_unitOfWork).Find(filter4);
+            if (LedgerData.AmtCr != 0)
+                LedgerNature = "Cr";
+            else
+                LedgerNature = "Dr";
 
             int CurrentSiteId = (int)System.Web.HttpContext.Current.Session["SiteId"];
             int CurrentDivisionId = (int)System.Web.HttpContext.Current.Session["DivisionId"];
@@ -345,12 +352,12 @@ namespace Service
             else { ExcludeContraAccGroups = new string[] { "NA" }; }
 
 
+
             SqlParameter SqlParameterLedgerAccountId = new SqlParameter("@LedgerAccountId", Id);
             SqlParameter SqlParameterNature = new SqlParameter("@Nature", Nature);
+            SqlParameter SqlParameterLedgerNature = new SqlParameter("@LedgerNature", LedgerNature);
 
-
-            var PendingLedgerViewModel = db.Database.SqlQuery<PendingLedgerViewModel>("" + ConfigurationManager.AppSettings["DataBaseSchema"] + ".sp_GetLedgerToAdjust @LedgerAccountId, @Nature", SqlParameterLedgerAccountId, SqlParameterNature).ToList().AsQueryable();
-
+            var PendingLedgerViewModel = db.Database.SqlQuery<PendingLedgerViewModel>("" + ConfigurationManager.AppSettings["DataBaseSchema"] + ".sp_GetLedgerToAdjust @LedgerAccountId, @Nature, @LedgerNature", SqlParameterLedgerAccountId, SqlParameterNature, SqlParameterLedgerNature).ToList().AsQueryable();
 
             return (from p in PendingLedgerViewModel
                     where (string.IsNullOrEmpty(term) ? 1 == 1 : p.LedgerHeaderDocNo.ToLower().Contains(term.ToLower())

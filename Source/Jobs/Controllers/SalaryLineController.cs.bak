@@ -644,24 +644,27 @@ namespace Jobs.Controllers
                                    where L.ReferenceDocLineId == SalaryLine.SalaryLineId && L.ReferenceDocTypeId == header.DocTypeId
                                    select L).FirstOrDefault();
 
-                LedgerLine.ObjectState = Model.ObjectState.Deleted;
-                db.LedgerLine.Remove(LedgerLine);
-
-                IEnumerable<Ledger> LedgerList = (from L in db.Ledger where L.LedgerLineId == LedgerLine.LedgerLineId select L).ToList();
-                foreach(Ledger Ledger in LedgerList)
+                if (LedgerLine != null)
                 {
-                    IEnumerable<LedgerAdj> LedgerAdjList = (from L in db.LedgerAdj where L.CrLedgerId == Ledger.LedgerId select L).ToList();
+                    LedgerLine.ObjectState = Model.ObjectState.Deleted;
+                    db.LedgerLine.Remove(LedgerLine);
 
-                    foreach(LedgerAdj LedgerAdj in LedgerAdjList)
+                    IEnumerable<Ledger> LedgerList = (from L in db.Ledger where L.LedgerLineId == LedgerLine.LedgerLineId select L).ToList();
+                    foreach (Ledger Ledger in LedgerList)
                     {
-                        LedgerAdj.ObjectState = Model.ObjectState.Deleted;
-                        db.LedgerAdj.Remove(LedgerAdj);
+                        IEnumerable<LedgerAdj> LedgerAdjList = (from L in db.LedgerAdj where L.CrLedgerId == Ledger.LedgerId select L).ToList();
+
+                        foreach (LedgerAdj LedgerAdj in LedgerAdjList)
+                        {
+                            LedgerAdj.ObjectState = Model.ObjectState.Deleted;
+                            db.LedgerAdj.Remove(LedgerAdj);
+                        }
+
+                        Ledger.ObjectState = Model.ObjectState.Deleted;
+                        db.Ledger.Remove(Ledger);
                     }
 
-                    Ledger.ObjectState = Model.ObjectState.Deleted;
-                    db.Ledger.Remove(Ledger);
                 }
-
 
 
                 //_SalaryLineService.Delete(SalaryLine);

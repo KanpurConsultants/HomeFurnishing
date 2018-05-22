@@ -431,6 +431,8 @@
     <Compile Include="Controllers\JobOrderHeaderrdl.cs" />
     <Compile Include="Controllers\JobReceiveHeaderrdl.cs" />
     <Compile Include="Controllers\LedgerHeaderrdl.cs" />
+    <Compile Include="Controllers\LedgerHeader_WithCalculationController.cs" />
+    <Compile Include="Controllers\LedgerLine_WithCalculationController.cs" />
     <Compile Include="Controllers\MailboxController.cs" />
     <Compile Include="Controllers\LedgerWizardController.cs" />
     <Compile Include="Controllers\SalaryWizardController.cs" />

@@ -885,7 +885,20 @@ namespace Jobs.Areas.Rug.Controllers
                         db.SaleDispatchHeader.Add(saledispatchheader);
 
 
+                        PackingLine PL = new PackingLineService(_unitOfWork).Find(item.PackingLineId);
 
+                        if (PL.StockInId != null)
+                        {
+                            StockAdj Adj_IssQty = new StockAdj();
+                            Adj_IssQty.StockAdjId = -Cnt;
+                            Adj_IssQty.StockInId = (int)PL.StockReceiveId;
+                            Adj_IssQty.StockOutId = (int)StockViewModel.StockId;
+                            Adj_IssQty.DivisionId = saleinvoiceheaderdetail.DivisionId;
+                            Adj_IssQty.SiteId = saleinvoiceheaderdetail.SiteId;
+                            Adj_IssQty.AdjustedQty = item.Qty;
+                            Adj_IssQty.ObjectState = Model.ObjectState.Added;
+                            db.StockAdj.Add(Adj_IssQty);
+                        }
 
 
                         SaleDispatchLine saledispatchline = new SaleDispatchLine();

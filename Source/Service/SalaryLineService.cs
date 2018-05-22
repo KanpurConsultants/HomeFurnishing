@@ -26,6 +26,7 @@ namespace Service
         void Update(SalaryLine s);
         IQueryable<SalaryLineViewModel> GetSalaryLineListForIndex(int SalaryHeaderId);
         IEnumerable<SalaryLineViewModel> GetSalaryLineforDelete(int headerid);
+        IQueryable<SalaryLineReferenceIndexViewModel> GetSalaryLineReferenceList(int SalaryLineId);
 
         int GetMaxSr(int id);
 
@@ -121,6 +122,41 @@ namespace Service
                        };
             return temp;
         }
+
+        public IQueryable<SalaryLineReferenceIndexViewModel> GetSalaryLineReferenceList( int SalaryLineId)
+        {
+
+            var temp = from S in db.SalaryLineReference
+                       join L in db.SalaryLine on S.SalaryLineId equals L.SalaryLineId into LTable
+                       from LTab in LTable.DefaultIfEmpty()
+                       join H in db.SalaryHeader on LTab.SalaryHeaderId equals H.SalaryHeaderId into HTable
+                       from HTab in HTable.DefaultIfEmpty()
+                       join P in db.Persons on LTab.EmployeeId equals P.PersonID into PTable
+                       from PTab in PTable.DefaultIfEmpty()
+                       join DT in db.DocumentType  on S.ReferenceDocTypeId equals DT.DocumentTypeId into DTTable
+                       from DTTab in DTTable.DefaultIfEmpty()
+                       join LL in db.LedgerLine on S.ReferenceDocLineId equals LL.LedgerLineId into LLTable
+                       from LLTab in LLTable.DefaultIfEmpty()
+                       join LH in db.LedgerHeader on S.ReferenceDocId equals LH.LedgerHeaderId into LHTable
+                       from LHTab in LHTable.DefaultIfEmpty()
+                       where S.SalaryLineId == SalaryLineId 
+                       select new SalaryLineReferenceIndexViewModel
+                       {
+                           ReferenceDocLineId  = S.ReferenceDocLineId,
+                           ReferenceDocId = S.ReferenceDocId,
+                           ReferenceDocTypeId = S.ReferenceDocTypeId,
+                           SalaryLineId = S.SalaryLineId,
+                            DocumentTypeName=DTTab.DocumentTypeName,
+                            PersonName=PTab.Name,
+                            SalaryHeaderDocNo=HTab.DocNo,
+                            DocumentNo =LHTab.DocNo,
+
+                       };
+
+                return temp;
+
+        }
+
 
         public IEnumerable<SalaryLineViewModel> GetSalaryLineforDelete(int headerid)
         {

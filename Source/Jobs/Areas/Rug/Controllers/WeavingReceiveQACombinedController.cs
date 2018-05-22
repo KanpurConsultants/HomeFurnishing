@@ -1726,12 +1726,13 @@ namespace Jobs.Areas.Rug.Controllers
         {
             ProductUid PUS = new ProductUidService(_unitOfWork).Find(ProductUidName);
 
-            JobOrderLine JOL = new JobOrderLineService(_unitOfWork).Find((int)PUS.GenLineId);
+            JobOrderLine JOL = new JobOrderLineService(_unitOfWork).Find((int)PUS.LastTransactionLineId);
 
             JobOrderHeader JOH = new JobOrderHeaderService(_unitOfWork).Find(JOL.JobOrderHeaderId);
 
             var ProductUIDName = ProductUidName;
 
+           // where L.JobOrderLineId == (int)PUS.GenLineId && PUS.LastTransactionDocId == PUS.GenDocId && (int)PUS.LastTransactionDocTypeId == PUS.GenDocTypeId
             var temp = (from L in db.ViewJobOrderBalance
                         join Dl in db.JobOrderLine on L.JobOrderLineId equals Dl.JobOrderLineId into JobOrderLineTable
                         from JobOrderLineTab in JobOrderLineTable.DefaultIfEmpty()
@@ -1747,7 +1748,7 @@ namespace Jobs.Areas.Rug.Controllers
                         from Dimension1Tab in Dimension1Table.DefaultIfEmpty()
                         join D2 in db.Dimension2 on L.Dimension2Id equals D2.Dimension2Id into Dimension2Table
                         from Dimension2Tab in Dimension2Table.DefaultIfEmpty()
-                        where L.JobOrderLineId == (int)PUS.GenLineId && PUS.LastTransactionDocId == PUS.GenDocId && (int)PUS.LastTransactionDocTypeId == PUS.GenDocTypeId
+                        where L.JobOrderLineId == JOL.JobOrderLineId && PUS.LastTransactionDocId == JOH.JobOrderHeaderId && (int)PUS.LastTransactionDocTypeId == JOH.DocTypeId
                         select new JobOrderDetail
                         {
                             JobOrderHeaderDocNo = L.JobOrderNo,

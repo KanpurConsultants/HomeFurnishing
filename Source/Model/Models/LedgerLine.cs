@@ -54,6 +54,13 @@ namespace Model.Models
         public int ? ReferenceDocLineId { get; set; }
         public Decimal Amount { get; set; }
 
+        public Decimal? Qty { get; set; }
+        public Decimal? DealQty { get; set; }
+        public Decimal? Rate { get; set; }
+
+        [Display(Name = "Specification"), MaxLength(50)]
+        public string Specification { get; set; }
+
         [ForeignKey("ProductUid"), Display(Name = "ProductUid")]
         public int? ProductUidId { get; set; }
         public virtual ProductUid ProductUid { get; set; }

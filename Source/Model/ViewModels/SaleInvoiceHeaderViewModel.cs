@@ -62,6 +62,7 @@ namespace Model.ViewModels
 
         public Decimal? ExchangeRate { get; set; }
 
+        public Decimal? CreditDays { get; set; }
         public int Status { get; set; }
 
         [Display(Name = "BL No.")]

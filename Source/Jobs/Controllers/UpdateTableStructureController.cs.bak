@@ -129,6 +129,10 @@ namespace Module
             AddFields("Products", "ProductCategoryId", "INT", "ProductCategories");
             AddFields("Products", "SaleRate", " Decimal(18,4)");
 
+            AddFields("Processes", "DepartmentId", "INT", "Departments");
+            AddFields("SalaryLines", "BasicSalary", " Decimal(18,4)");
+            AddFields("SalaryHeaders", "WagesPayType", "NVARCHAR (20)");
+
             AddFields("ProductTypeSettings", "isVisibleProductDescription", "BIT");
             AddFields("ProductTypeSettings", "isVisibleProductSpecification", "BIT");
             AddFields("ProductTypeSettings", "isVisibleProductCategory", "BIT");
@@ -222,6 +226,10 @@ namespace Module
             AddFields("LedgerHeaders", "IsDocumentPrinted", "Bit");
             AddFields("LedgerSettings", "isAllowedDuplicatePrint", "BIT NOT NULL DEFAULT(1)");
             AddFields("LedgerSettings", "isPrintinLetterhead", "BIT");
+            AddFields("LedgerSettings", "isVisibleQty", "BIT NOT NULL DEFAULT(0)");
+            AddFields("LedgerSettings", "isVisibleDealQty", "BIT NOT NULL DEFAULT(0)");
+            AddFields("LedgerSettings", "isVisibleRate", "BIT NOT NULL DEFAULT(0)");
+            AddFields("LedgerSettings", "isVisibleSpecification", "BIT NOT NULL DEFAULT(0)");
             try
             {
                 if ((int)ExecuteScaler("SELECT Count(*) AS Cnt FROM INFORMATION_SCHEMA.Tables WHERE TABLE_NAME = 'SaleQuotationHeaders'") == 0)
@@ -382,6 +390,248 @@ namespace Module
                 RecordError(ex);
             }
 
+
+
+
+            try
+            {
+                if ((int)ExecuteScaler("SELECT Count(*) AS Cnt FROM INFORMATION_SCHEMA.Tables WHERE TABLE_NAME = 'LedgerHeaderCharges'") == 0)
+                {
+                    mQry = @"CREATE TABLE Web.LedgerHeaderCharges
+	                        (
+	                        Id                         INT IDENTITY NOT NULL,
+	                        HeaderTableId              INT NOT NULL,
+	                        Sr                         INT NOT NULL,
+	                        ChargeId                   INT NOT NULL,
+	                        AddDeduct                  TINYINT,
+	                        AffectCost                 BIT NOT NULL,
+	                        ChargeTypeId               INT,
+	                        ProductChargeId            INT,
+	                        CalculateOnId              INT,
+	                        PersonID                   INT,
+	                        LedgerAccountDrId          INT,
+	                        LedgerAccountCrId          INT,
+	                        ContraLedgerAccountId      INT,
+	                        CostCenterId               INT,
+	                        RateType                   TINYINT NOT NULL,
+	                        IncludedInBase             BIT NOT NULL,
+	                        ParentChargeId             INT,
+	                        Rate                       DECIMAL (18, 4),
+	                        Amount                     DECIMAL (18, 4),
+	                        IsVisible                  BIT NOT NULL,
+	                        OMSId                      NVARCHAR (50),
+	                        IncludedCharges            NVARCHAR (250),
+	                        IncludedChargesCalculation NVARCHAR (250),
+	                        CONSTRAINT [PK_Web.LedgerHeaderCharges] PRIMARY KEY (Id),
+	                        CONSTRAINT [FK_Web.LedgerHeaderCharges_Web.Charges_CalculateOnId] FOREIGN KEY (CalculateOnId) REFERENCES Web.Charges (ChargeId),
+	                        CONSTRAINT [FK_Web.LedgerHeaderCharges_Web.Charges_ChargeId] FOREIGN KEY (ChargeId) REFERENCES Web.Charges (ChargeId),
+	                        CONSTRAINT [FK_Web.LedgerHeaderCharges_Web.ChargeTypes_ChargeTypeId] FOREIGN KEY (ChargeTypeId) REFERENCES Web.ChargeTypes (ChargeTypeId),
+	                        CONSTRAINT [FK_Web.LedgerHeaderCharges_Web.LedgerAccounts_ContraLedgerAccountId] FOREIGN KEY (ContraLedgerAccountId) REFERENCES Web.LedgerAccounts (LedgerAccountId),
+	                        CONSTRAINT [FK_Web.LedgerHeaderCharges_Web.CostCenters_CostCenterId] FOREIGN KEY (CostCenterId) REFERENCES Web.CostCenters (CostCenterId),
+	                        CONSTRAINT [FK_Web.LedgerHeaderCharges_Web.LedgerHeaders_HeaderTableId] FOREIGN KEY (HeaderTableId) REFERENCES Web.LedgerHeaders (LedgerHeaderId),
+	                        CONSTRAINT [FK_Web.LedgerHeaderCharges_Web.LedgerAccounts_LedgerAccountCrId] FOREIGN KEY (LedgerAccountCrId) REFERENCES Web.LedgerAccounts (LedgerAccountId),
+	                        CONSTRAINT [FK_Web.LedgerHeaderCharges_Web.LedgerAccounts_LedgerAccountDrId] FOREIGN KEY (LedgerAccountDrId) REFERENCES Web.LedgerAccounts (LedgerAccountId),
+	                        CONSTRAINT [FK_Web.LedgerHeaderCharges_Web.Charges_ParentChargeId] FOREIGN KEY (ParentChargeId) REFERENCES Web.Charges (ChargeId),
+	                        CONSTRAINT [FK_Web.LedgerHeaderCharges_Web.People_PersonID] FOREIGN KEY (PersonID) REFERENCES Web.People (PersonID),
+	                        CONSTRAINT [FK_Web.LedgerHeaderCharges_Web.Charges_ProductChargeId] FOREIGN KEY (ProductChargeId) REFERENCES Web.Charges (ChargeId)
+	                        )
+
+
+                        CREATE INDEX [IX_HeaderTableId]
+	                        ON Web.LedgerHeaderCharges (HeaderTableId)
+
+
+                        CREATE INDEX [IX_ChargeId]
+	                        ON Web.LedgerHeaderCharges (ChargeId)
+
+
+                        CREATE INDEX [IX_ChargeTypeId]
+	                        ON Web.LedgerHeaderCharges (ChargeTypeId)
+
+
+                        CREATE INDEX [IX_ProductChargeId]
+	                        ON Web.LedgerHeaderCharges (ProductChargeId)
+
+
+                        CREATE INDEX [IX_CalculateOnId]
+	                        ON Web.LedgerHeaderCharges (CalculateOnId)
+
+
+                        CREATE INDEX [IX_PersonID]
+	                        ON Web.LedgerHeaderCharges (PersonID)
+
+
+                        CREATE INDEX [IX_LedgerAccountDrId]
+	                        ON Web.LedgerHeaderCharges (LedgerAccountDrId)
+
+
+                        CREATE INDEX [IX_LedgerAccountCrId]
+	                        ON Web.LedgerHeaderCharges (LedgerAccountCrId)
+
+
+                        CREATE INDEX [IX_ContraLedgerAccountId]
+	                        ON Web.LedgerHeaderCharges (ContraLedgerAccountId)
+
+
+                        CREATE INDEX [IX_CostCenterId]
+	                        ON Web.LedgerHeaderCharges (CostCenterId)
+
+
+                        CREATE INDEX [IX_ParentChargeId]
+	                        ON Web.LedgerHeaderCharges (ParentChargeId)
+
+
+
+                        ";
+                    ExecuteQuery(mQry);
+                }
+            }
+            catch (Exception ex)
+            {
+                RecordError(ex);
+            }
+
+
+            try
+            {
+                if ((int)ExecuteScaler("SELECT Count(*) AS Cnt FROM INFORMATION_SCHEMA.Tables WHERE TABLE_NAME = 'SalaryLineReferences'") == 0)
+                {
+                    mQry = @"
+                        CREATE TABLE Web.SalaryLineReferences
+	                    (
+	                    SalaryLineId                   INT NOT NULL,
+	                    ReferenceDocTypeId             INT,
+                        ReferenceDocId                 INT NOT NULL,
+	                    ReferenceDocLineId             INT NOT NULL,                  
+                        CONSTRAINT [PK_Web.SalaryLineReferences] PRIMARY KEY (SalaryLineId,ReferenceDocTypeId,ReferenceDocId,ReferenceDocLineId),
+	                    CONSTRAINT [FK_Web.SalaryLineReferences_Web.SalaryLines_SalaryLineIdId] FOREIGN KEY (SalaryLineId) REFERENCES Web.SalaryLines (SalaryLineId),
+	                    CONSTRAINT [FK_Web.SalaryLineReferences_Web.DocumentType_ReferenceDocTypeId] FOREIGN KEY (ReferenceDocTypeId) REFERENCES Web.DocumentTypes (DocumentTypeId)
+	                    )
+
+                    CREATE INDEX [IX_SalaryLineId]
+	                    ON Web.SalaryLineReferences (SalaryLineId)
+
+
+                    CREATE INDEX [IX_ReferenceDocTypeId]
+	                    ON Web.SalaryLineReferences (ReferenceDocTypeId)
+
+
+                    CREATE INDEX [IX_ReferenceDocId]
+	                    ON Web.SalaryLineReferences (ReferenceDocId)
+
+                    CREATE INDEX [IX_ReferenceDocLineId]
+	                    ON Web.SalaryLineReferences (ReferenceDocLineId)
+
+                        ";
+                    ExecuteQuery(mQry);
+                }
+            }
+            catch (Exception ex)
+            {
+                RecordError(ex);
+            }
+
+            try
+            {
+                if ((int)ExecuteScaler("SELECT Count(*) AS Cnt FROM INFORMATION_SCHEMA.Tables WHERE TABLE_NAME = 'LedgerLineCharges'") == 0)
+                {
+                    mQry = @"
+                        CREATE TABLE Web.LedgerLineCharges
+	                    (
+	                    Id                            INT IDENTITY NOT NULL,
+	                    LineTableId                   INT NOT NULL,
+	                    HeaderTableId                 INT NOT NULL,
+	                    Sr                            INT NOT NULL,
+	                    ChargeId                      INT NOT NULL,
+	                    AddDeduct                     TINYINT,
+	                    AffectCost                    BIT NOT NULL,
+	                    ChargeTypeId                  INT,
+	                    CalculateOnId                 INT,
+	                    PersonID                      INT,
+	                    LedgerAccountDrId             INT,
+	                    LedgerAccountCrId             INT,
+	                    ContraLedgerAccountId         INT,
+	                    CostCenterId                  INT,
+	                    RateType                      TINYINT NOT NULL,
+	                    IncludedInBase                BIT NOT NULL,
+	                    ParentChargeId                INT,
+	                    Rate                          DECIMAL (18, 4),
+	                    Amount                        DECIMAL (18, 4),
+	                    DealQty                       DECIMAL (18, 4),
+	                    IsVisible                     BIT NOT NULL,
+	                    OMSId                         NVARCHAR (50),
+	                    DeveloperNotes                NVARCHAR (250),
+	                    IncludedCharges               NVARCHAR (250),
+	                    IncludedChargesCalculation    NVARCHAR (250),
+	                    IsVisibleLedgerAccountDr      BIT,
+	                    IsVisibleLedgerAccountCr      BIT,
+	                    filterLedgerAccountGroupsDrId INT,
+	                    filterLedgerAccountGroupsCrId INT,
+	                    CONSTRAINT [PK_Web.LedgerLineCharges] PRIMARY KEY (Id),
+	                    CONSTRAINT [FK_Web.LedgerLineCharges_Web.LedgerAccountGroups_filterLedgerAccountGroupsDrId] FOREIGN KEY (filterLedgerAccountGroupsDrId) REFERENCES Web.LedgerAccountGroups (LedgerAccountGroupId),
+	                    CONSTRAINT [FK_Web.LedgerLineCharges_Web.LedgerAccountGroups_filterLedgerAccountGroupsCrId] FOREIGN KEY (filterLedgerAccountGroupsCrId) REFERENCES Web.LedgerAccountGroups (LedgerAccountGroupId),
+	                    CONSTRAINT [FK_Web.LedgerLineCharges_Web.Charges_CalculateOnId] FOREIGN KEY (CalculateOnId) REFERENCES Web.Charges (ChargeId),
+	                    CONSTRAINT [FK_Web.LedgerLineCharges_Web.Charges_ChargeId] FOREIGN KEY (ChargeId) REFERENCES Web.Charges (ChargeId),
+	                    CONSTRAINT [FK_Web.LedgerLineCharges_Web.ChargeTypes_ChargeTypeId] FOREIGN KEY (ChargeTypeId) REFERENCES Web.ChargeTypes (ChargeTypeId),
+	                    CONSTRAINT [FK_Web.LedgerLineCharges_Web.LedgerAccounts_ContraLedgerAccountId] FOREIGN KEY (ContraLedgerAccountId) REFERENCES Web.LedgerAccounts (LedgerAccountId),
+	                    CONSTRAINT [FK_Web.LedgerLineCharges_Web.CostCenters_CostCenterId] FOREIGN KEY (CostCenterId) REFERENCES Web.CostCenters (CostCenterId),
+	                    CONSTRAINT [FK_Web.LedgerLineCharges_Web.LedgerLines_LineTableId] FOREIGN KEY (LineTableId) REFERENCES Web.LedgerLines (LedgerLineId),
+	                    CONSTRAINT [FK_Web.LedgerLineCharges_Web.LedgerAccounts_LedgerAccountCrId] FOREIGN KEY (LedgerAccountCrId) REFERENCES Web.LedgerAccounts (LedgerAccountId),
+	                    CONSTRAINT [FK_Web.LedgerLineCharges_Web.LedgerAccounts_LedgerAccountDrId] FOREIGN KEY (LedgerAccountDrId) REFERENCES Web.LedgerAccounts (LedgerAccountId),
+	                    CONSTRAINT [FK_Web.LedgerLineCharges_Web.Charges_ParentChargeId] FOREIGN KEY (ParentChargeId) REFERENCES Web.Charges (ChargeId),
+	                    CONSTRAINT [FK_Web.LedgerLineCharges_Web.People_PersonID] FOREIGN KEY (PersonID) REFERENCES Web.People (PersonID)
+	                    )
+
+
+                    CREATE INDEX [IX_LineTableId]
+	                    ON Web.LedgerLineCharges (LineTableId)
+
+
+                    CREATE INDEX [IX_ChargeId]
+	                    ON Web.LedgerLineCharges (ChargeId)
+
+
+                    CREATE INDEX [IX_ChargeTypeId]
+	                    ON Web.LedgerLineCharges (ChargeTypeId)
+
+
+                    CREATE INDEX [IX_CalculateOnId]
+	                    ON Web.LedgerLineCharges (CalculateOnId)
+
+
+                    CREATE INDEX [IX_PersonID]
+	                    ON Web.LedgerLineCharges (PersonID)
+
+
+                    CREATE INDEX [IX_LedgerAccountDrId]
+	                    ON Web.LedgerLineCharges (LedgerAccountDrId)
+
+
+                    CREATE INDEX [IX_LedgerAccountCrId]
+	                    ON Web.LedgerLineCharges (LedgerAccountCrId)
+
+
+                    CREATE INDEX [IX_ContraLedgerAccountId]
+	                    ON Web.LedgerLineCharges (ContraLedgerAccountId)
+
+
+                    CREATE INDEX [IX_CostCenterId]
+	                    ON Web.LedgerLineCharges (CostCenterId)
+
+
+                    CREATE INDEX [IX_ParentChargeId]
+	                    ON Web.LedgerLineCharges (ParentChargeId)
+
+
+
+                        ";
+                    ExecuteQuery(mQry);
+                }
+            }
+            catch (Exception ex)
+            {
+                RecordError(ex);
+            }
 
 
             try
@@ -1224,6 +1474,10 @@ namespace Module
             AddFields("LedgerSettings", "PartyDocDateCaption", "nvarchar(50)");
 
             AddFields("JobReceiveLines", "Specification", "nvarchar(50)");
+            AddFields("LedgerLines", "Specification", "nvarchar(50)");
+            AddFields("LedgerLines", "Qty", " Decimal(18,4)");
+            AddFields("LedgerLines", "DealQty", " Decimal(18,4)");
+            AddFields("LedgerLines", "Rate", " Decimal(18,4)");
 
             AddFields("LedgerSettings", "isVisibleAdjustmentType", "BIT");
             AddFields("LedgerSettings", "isVisiblePaymentFor", "BIT");
@@ -2122,7 +2376,7 @@ namespace Module
             AddFields("JobReceiveHeaders", "JobWorkerDocDate", "DATETIME");
 
             AddFields("ProductUids", "SaleOrderLineId", "Int","SaleOrderLines");
-
+            AddFields("ProductUids", "ProdOrderLineId", "Int", "ProdOrderLines");
             AddFields("Menus", "AreaName", "nvarchar(50)");
 
 
@@ -3690,8 +3944,10 @@ namespace Module
 
             AddFields("JobInvoiceSettings", "JobInvoiceReturnDocTypeId", "Int","DocumentTypes");
 
+            AddFields("Narrations", "DocTypeId", "Int","DocumentTypes");
 
-            
+
+
 
             ReCreateProcedures();
             DataCorrection();

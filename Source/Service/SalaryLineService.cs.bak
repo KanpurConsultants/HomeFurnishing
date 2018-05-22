@@ -26,6 +26,7 @@ namespace Service
         void Update(SalaryLine s);
         IQueryable<SalaryLineViewModel> GetSalaryLineListForIndex(int SalaryHeaderId);
         IEnumerable<SalaryLineViewModel> GetSalaryLineforDelete(int headerid);
+        IQueryable<SalaryLineReferenceIndexViewModel> GetSalaryLineReferenceList(int SalaryLineId);
 
         int GetMaxSr(int id);
 
@@ -67,22 +68,24 @@ namespace Service
 
         public SalaryLineViewModel GetSalaryLine(int id)
         {
-            var temp = (from p in db.SalaryLine
-                        where p.SalaryLineId == id
+            var temp = (from S in db.SalaryLine
+                        join P in db.Persons on S.EmployeeId equals P.PersonID into PTable
+                        from PTab in PTable.DefaultIfEmpty()
+                        where S.SalaryLineId == id
                         select new SalaryLineViewModel
                         {
-                            SalaryLineId = p.SalaryLineId,
-                            SalaryHeaderId = p.SalaryHeaderId,
-                            EmployeeId = p.EmployeeId,
-                            EmployeeName = p.Employee.Person.Name,
-                            Days = p.Days,
-                            OtherAddition = p.OtherAddition,
-                            OtherDeduction = p.OtherDeduction,
-                            LoanEMI = p.LoanEMI,
-                            Advance = p.Advance,
-                            NetPayable = p.NetPayable,
-                            Remark = p.Remark,
-                            LockReason = p.LockReason,
+                            SalaryLineId = S.SalaryLineId,
+                            SalaryHeaderId = S.SalaryHeaderId,
+                            EmployeeId = S.EmployeeId,
+                            EmployeeName = PTab.Name,
+                            Days = S.Days,
+                            OtherAddition = S.OtherAddition,
+                            OtherDeduction = S.OtherDeduction,
+                            LoanEMI = S.LoanEMI,
+                            Advance = S.Advance,
+                            NetPayable = S.NetPayable,
+                            Remark = S.Remark,
+                            LockReason = S.LockReason,
                         }).FirstOrDefault();
 
             return temp;
@@ -98,21 +101,24 @@ namespace Service
 
         public IQueryable<SalaryLineViewModel> GetSalaryLineListForIndex(int SalaryHeaderId)
         {
-            var temp = from p in db.SalaryLine
-                       where p.SalaryHeaderId == SalaryHeaderId
-                       orderby p.Sr
+            var temp = from S in db.SalaryLine
+                       join P in db.Persons on S.EmployeeId equals P.PersonID into PTable
+                       from PTab in PTable.DefaultIfEmpty()
+                       where S.SalaryHeaderId == SalaryHeaderId
+                       orderby S.Sr
                        select new SalaryLineViewModel
                        {
-                           EmployeeName = p.Employee.Person.Name,
-                           Days = p.Days,
-                           OtherAddition = p.OtherAddition,
-                           OtherDeduction = p.OtherDeduction,
-                           LoanEMI = p.LoanEMI,
-                           Advance = p.Advance,
-                           NetPayable = p.NetPayable,
-                           Remark = p.Remark,
-                           SalaryHeaderId = p.SalaryHeaderId,
-                           SalaryLineId = p.SalaryLineId,
+                           EmployeeName = PTab.Name,
+                           Days = S.Days,
+                           BasicSalary=S.BasicSalary,
+                           OtherAddition = S.OtherAddition,
+                           OtherDeduction = S.OtherDeduction,
+                           LoanEMI = S.LoanEMI,
+                           Advance = S.Advance,
+                           NetPayable = S.NetPayable,
+                           Remark = S.Remark,
+                           SalaryHeaderId = S.SalaryHeaderId,
+                           SalaryLineId = S.SalaryLineId,
                        };
             return temp;
         }

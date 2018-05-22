@@ -73,6 +73,16 @@ namespace Jobs.Controllers
         }
 
 
+        [HttpGet]
+        public ActionResult _SalaryLineReferenceIndex(int id)
+        {
+            IQueryable<SalaryLineReferenceIndexViewModel> p = new SalaryLineService(_unitOfWork).GetSalaryLineReferenceList(id);
+            SalaryLineReferenceSummaryViewModel vm = new SalaryLineReferenceSummaryViewModel();
+            vm.SalaryLineReferenceSummaryVM = p.ToList();
+            ViewBag.DocNo = p.ToList().FirstOrDefault().SalaryHeaderDocNo +"-"+ p.ToList().FirstOrDefault().PersonName;
+            return PartialView("_SalaryLineReference", vm);
+        }
+
 
         private void PrepareViewBag(SalaryLineViewModel vm)
         {

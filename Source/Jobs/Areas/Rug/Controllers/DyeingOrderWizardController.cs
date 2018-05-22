@@ -235,6 +235,10 @@ namespace Jobs.Areas.Rug.Controllers
             PrepareViewBag();
             p.DocTypeId = DocTypeId;
             p.DocNo = new DocumentTypeService(_unitOfWork).FGetNewDocNo("DocNo", ConfigurationManager.AppSettings["DataBaseSchema"] + ".JobOrderHeaders", p.DocTypeId, p.DocDate, p.DivisionId, p.SiteId);
+            if (p.JobOrderSettings.isVisibleCostCenter)
+            {
+                p.CostCenterName = new JobOrderHeaderService(_unitOfWork).FGetJobOrderCostCenter(p.DocTypeId, p.DocDate, p.DivisionId, p.SiteId);
+            }
             return View(p);
         }
 
@@ -282,6 +286,10 @@ namespace Jobs.Areas.Rug.Controllers
             if (ModelState.IsValid && (TimePlanValidation || Continue))
             {
 
+                decimal OrderQty = 0;
+                decimal OrderDealQty = 0;
+                decimal BomQty = 0;
+
                 List<ProdOrderHeaderListViewModel> ProdOrderIds = (List<ProdOrderHeaderListViewModel>)System.Web.HttpContext.Current.Session["ConfirmProdOrderIds"];
                 bool CancelBalProdOrders = (bool)System.Web.HttpContext.Current.Session["CancelBalProdOrdrs"];
                 bool CreateDyeingOrder = ProdOrderIds.Any(m => m.Qty > 0);
@@ -309,8 +317,53 @@ namespace Jobs.Areas.Rug.Controllers
                                   select p).Any();
                 CancelBalProdOrders = (CancelBalProdOrders && CancelQty);
 
+                bool CostCenterGenerated = false;
+
                 if (CreateDyeingOrder)
                 {
+                    if (!string.IsNullOrEmpty(svm.CostCenterName))
+                    {
+
+                        var CostCenter = new CostCenterService(_unitOfWork).Find(svm.CostCenterName, svm.DivisionId, svm.SiteId, svm.DocTypeId);
+                        if (CostCenter != null)
+                        {
+                            s.CostCenterId = CostCenter.CostCenterId;
+                            if (s.CostCenterId.HasValue)
+                            {
+                                var costcen = new CostCenterService(_unitOfWork).Find(s.CostCenterId.Value);
+                                costcen.ProcessId = svm.ProcessId;
+                                new CostCenterService(_unitOfWork).Update(costcen);
+                            }
+                        }
+                        else
+                        {
+                            CostCenter Cs = new CostCenter();
+                            Cs.CostCenterName = svm.CostCenterName;
+                            Cs.DivisionId = svm.DivisionId;
+                            Cs.SiteId = svm.SiteId;
+                            Cs.DocTypeId = svm.DocTypeId;
+                            Cs.ProcessId = svm.ProcessId;
+                            Cs.LedgerAccountId = new LedgerAccountService(_unitOfWork).GetLedgerAccountByPersondId(svm.JobWorkerId).LedgerAccountId;
+                            Cs.CreatedBy = User.Identity.Name;
+                            Cs.ModifiedBy = User.Identity.Name;
+                            Cs.CreatedDate = DateTime.Now;
+                            Cs.ModifiedDate = DateTime.Now;
+                            Cs.IsActive = true;
+                            Cs.ReferenceDocNo = svm.DocNo;
+                            Cs.ReferenceDocTypeId = svm.DocTypeId;
+                            Cs.StartDate = svm.DocDate;
+                            Cs.ParentCostCenterId = new ProcessService(_unitOfWork).Find(svm.ProcessId).CostCenterId;
+                            Cs.ObjectState = Model.ObjectState.Added;
+                            new CostCenterService(_unitOfWork).Create(Cs);
+                            s.CostCenterId = Cs.CostCenterId;
+
+                            new CostCenterStatusService(_unitOfWork).CreateLineStatus(Cs.CostCenterId, ref db, false);
+
+                            CostCenterGenerated = true;
+                        }
+
+                    }
+
                     s.CreatedDate = DateTime.Now;
                     s.ModifiedDate = DateTime.Now;
                     s.ActualDueDate = s.DueDate;
@@ -558,6 +611,8 @@ namespace Jobs.Areas.Rug.Controllers
                             line.ModifiedBy = User.Identity.Name;
                             line.JobOrderLineId = pk;
                             line.Sr = pk;
+                            OrderQty += line.Qty;
+                            OrderDealQty += line.DealQty;
                             line.ObjectState = Model.ObjectState.Added;
                             new JobOrderLineService(_unitOfWork).Create(line);
 
@@ -588,6 +643,37 @@ namespace Jobs.Areas.Rug.Controllers
                 }
 
                 //new JobOrderHeaderService(_unitOfWork).Update(s);
+
+                if (CostCenterGenerated)
+                {
+                    ProdOrderLine POL = new ProdOrderLineService(_unitOfWork).Find(ProdOrderIds.FirstOrDefault().ProdOrderLineId);
+
+                    CostCenterStatusExtended Rec = new CostCenterStatusExtended();
+                    Rec.CostCenterId = s.CostCenterId.Value;
+                    Rec.ProductId = (int)POL.ProductId;
+                    Rec.Rate = ProdOrderIds.Min(m => m.Rate) > 0 ? ProdOrderIds.Min(m => m.Rate) : svm.Rate;
+                    Rec.OrderQty = Rec.OrderQty ?? 0 + OrderQty;
+                    Rec.OrderDealQty = Rec.OrderDealQty ?? 0 + OrderDealQty;
+                    //Rec.BOMQty = Rec.BOMQty ?? 0 + BomQty;
+
+                    new CostCenterStatusService(_unitOfWork).CreateLineStatusExtended(Rec);
+
+                }
+                else
+                {
+                    decimal StatExtRate = ProdOrderIds.Min(m => m.Rate) > 0 ? ProdOrderIds.Min(m => m.Rate) : svm.Rate;
+
+                    var CostCenterStatusExtended = db.CostCenterStatusExtended.Find(s.CostCenterId);
+                    CostCenterStatusExtended.Rate = (!CostCenterStatusExtended.Rate.HasValue || CostCenterStatusExtended.Rate == 0)
+                        ? StatExtRate
+                        : (CostCenterStatusExtended.Rate > StatExtRate ? StatExtRate : CostCenterStatusExtended.Rate);
+                    CostCenterStatusExtended.OrderQty = CostCenterStatusExtended.OrderQty ?? 0 + OrderQty;
+                    CostCenterStatusExtended.OrderDealQty = CostCenterStatusExtended.OrderDealQty ?? 0 + OrderDealQty;
+                    //CostCenterStatusExtended.BOMQty = CostCenterStatusExtended.BOMQty ?? 0 + BomQty;
+
+                    CostCenterStatusExtended.ObjectState = Model.ObjectState.Modified;
+                    _unitOfWork.Repository<CostCenterStatusExtended>().Update(CostCenterStatusExtended);
+                }
 
                 new ChargesCalculationService(_unitOfWork).CalculateCharges(LineList, s.JobOrderHeaderId, CalculationId, MaxLineId, out LineCharges, out HeaderChargeEdit, out HeaderCharges, "Web.JobOrderHeaderCharges", "Web.JobOrderLineCharges", out PersonCount, s.DocTypeId, s.SiteId, s.DivisionId);
 
@@ -625,7 +711,7 @@ namespace Jobs.Areas.Rug.Controllers
                 }
 
 
-
+                string Errormessage = "";
                 try
                 {
                     _unitOfWork.Save();
@@ -634,7 +720,30 @@ namespace Jobs.Areas.Rug.Controllers
                 catch (Exception ex)
                 {
                     string message = _exception.HandleException(ex);
+                    Errormessage = message;
                     ModelState.AddModelError("", message);
+                    PrepareViewBag();
+                    ViewBag.Mode = "Add";
+                    return View("Create", svm);
+
+                }
+
+                if (s.CostCenterId.HasValue && CostCenterGenerated)
+                {
+                    var CC = new CostCenterService(_unitOfWork).Find(s.CostCenterId.Value);
+                    CC.ReferenceDocId = s.JobOrderHeaderId;
+                    new CostCenterService(_unitOfWork).Update(CC);
+                }
+
+                try
+                {
+                    _unitOfWork.Save();
+                }
+
+                catch (Exception ex)
+                {
+                    Errormessage = _exception.HandleException(ex);
+                    ModelState.AddModelError("", Errormessage);
                     PrepareViewBag();
                     ViewBag.Mode = "Add";
                     return View("Create", svm);

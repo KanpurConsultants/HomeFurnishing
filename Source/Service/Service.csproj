@@ -130,6 +130,8 @@
     <Compile Include="Display_SaleOrderInventoryStatusService.cs" />
     <Compile Include="EmployeeChargeService.cs" />
     <Compile Include="EmployeeLineChargeService.cs" />
+    <Compile Include="LedgerHeaderChargeService.cs" />
+    <Compile Include="LedgerLineChargeService.cs" />
     <Compile Include="ReportGenerateService_New.cs" />
     <Compile Include="LedgerWizardService.cs" />
     <Compile Include="SalaryWizardService.cs" />
