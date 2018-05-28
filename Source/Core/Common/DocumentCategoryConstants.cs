@@ -244,7 +244,8 @@ namespace Core.Common
         public const string CarpetPurchaseGoodsReturn = "Carpet Purchase Goods Return";
         public const string CarpetPurchaseChallan = "Carpet Purchase Challan";
 
-
+        public const string ExpenseVoucher = "Expense Voucher";
+        public const string IncomeVoucher = "Income Voucher";
 
 
 

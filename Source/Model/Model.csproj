@@ -127,6 +127,7 @@
     <Compile Include="Models\EmployeeCharge.cs" />
     <Compile Include="Models\JobOrderBomMaterialIssue.cs" />
     <Compile Include="Models\EmployeeLineCharge.cs" />
+    <Compile Include="Models\LedgerSupplementary.cs" />
     <Compile Include="Models\LedgerHeaderCharge.cs" />
     <Compile Include="Models\LedgerLineCharge.cs" />
     <Compile Include="Models\SalaryLineCharge.cs" />

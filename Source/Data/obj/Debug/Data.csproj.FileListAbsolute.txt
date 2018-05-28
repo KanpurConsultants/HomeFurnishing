@@ -410,3 +410,4 @@ D:\Kanpur Consultants\HomeFurnishing\Source\Data\obj\Debug\Data.Migrations.Prope
 D:\Kanpur Consultants\HomeFurnishing\Source\Data\obj\Debug\Data.csproj.GenerateResource.Cache
 D:\Kanpur Consultants\HomeFurnishing\Source\Data\obj\Debug\Data.dll
 D:\Kanpur Consultants\HomeFurnishing\Source\Data\obj\Debug\Data.pdb
+D:\Kanpur Consultants\HomeFurnishing\Source\Data\obj\Debug\Data.Migrations.LedgerSupplmentry.resources

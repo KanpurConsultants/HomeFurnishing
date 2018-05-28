@@ -583,6 +583,7 @@ namespace Data.Models
         public DbSet<LedgerLineRefValue> LedgerLineRefValue { get; set; }
         public DbSet<Ledger> Ledger { get; set; }
         public DbSet<LedgerAdj> LedgerAdj { get; set; }
+        public DbSet<LedgerSupplementary> LedgerSupplementary { get; set; }
 
         //Scheme Models
         public DbSet<SchemeHeader> SchemeHeader { get; set; }

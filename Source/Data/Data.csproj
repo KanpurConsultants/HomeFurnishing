@@ -139,6 +139,10 @@
     <Compile Include="Migrations\201802050758131_PropertyTax.Designer.cs">
       <DependentUpon>201802050758131_PropertyTax.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201805220729060_LedgerSupplmentry.cs" />
+    <Compile Include="Migrations\201805220729060_LedgerSupplmentry.Designer.cs">
+      <DependentUpon>201805220729060_LedgerSupplmentry.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="NotificationApplicationDbContext.cs" />
     <Compile Include="Infrastructure\IStandardModelDbSets.cs" />
@@ -181,6 +185,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201802050758131_PropertyTax.resx">
       <DependentUpon>201802050758131_PropertyTax.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201805220729060_LedgerSupplmentry.resx">
+      <DependentUpon>201805220729060_LedgerSupplmentry.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

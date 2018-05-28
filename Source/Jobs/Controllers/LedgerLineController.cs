@@ -312,6 +312,7 @@ namespace Jobs.Controllers
                     LedgerLine.ReferenceDocTypeId = svm.ReferenceDocTypeId;
                     LedgerLine.ReferenceDocId = svm.ReferenceDocId;
                     LedgerLine.DrCr = svm.DrCr;
+                    LedgerLine.SupplementaryForLedgerId = svm.SupplementaryForLedgerId;
                     LedgerLine.CreatedDate = DateTime.Now;
                     LedgerLine.ModifiedDate = DateTime.Now;
                     LedgerLine.CreatedBy = User.Identity.Name;
@@ -426,6 +427,22 @@ namespace Jobs.Controllers
                             LedgerAdj.ObjectState = Model.ObjectState.Added;
                             db.LedgerAdj.Add(LedgerAdj);
                         }
+
+
+                        if (svm.SupplementaryForLedgerId != null)
+                        {
+                            LedgerSupplementary LedgerSupplementary = new LedgerSupplementary();
+                            LedgerSupplementary.LedgerId = (int)svm.SupplementaryForLedgerId; 
+                            LedgerSupplementary.SupplementaryLedgerId = Ledger.LedgerId;
+                            LedgerSupplementary.Amount = LedgerLine.Amount;
+                            LedgerSupplementary.CreatedDate = DateTime.Now;
+                            LedgerSupplementary.ModifiedDate = DateTime.Now;
+                            LedgerSupplementary.CreatedBy = User.Identity.Name;
+                            LedgerSupplementary.ModifiedBy = User.Identity.Name;
+                            LedgerSupplementary.ObjectState = Model.ObjectState.Added;
+                            db.LedgerSupplementary.Add(LedgerSupplementary);
+                        }
+
                         #endregion
 
                         #region ContraLedgerSave
@@ -527,6 +544,7 @@ namespace Jobs.Controllers
                     LedgerLine.DrCr = svm.DrCr;
                     LedgerLine.ReferenceDocTypeId = svm.ReferenceDocTypeId;
                     LedgerLine.ReferenceDocId = svm.ReferenceDocId;
+                    LedgerLine.SupplementaryForLedgerId = svm.SupplementaryForLedgerId;
                     LedgerLine.ModifiedDate = DateTime.Now;
                     LedgerLine.ModifiedBy = User.Identity.Name;
                     LedgerLine.ObjectState = Model.ObjectState.Modified;
@@ -643,6 +661,28 @@ namespace Jobs.Controllers
                             LedgerAdj.ObjectState = Model.ObjectState.Modified;
                             db.LedgerAdj.Add(LedgerAdj);
                         }
+
+                        var LedgerSuppExisting = (from L in db.LedgerSupplementary where L.SupplementaryLedgerId == Ledger.LedgerId select L).FirstOrDefault();
+                        if (LedgerSuppExisting != null)
+                        {
+                            LedgerSuppExisting.ObjectState = Model.ObjectState.Deleted;
+                            db.LedgerSupplementary.Remove(LedgerSuppExisting);
+                        }
+
+                        if (svm.SupplementaryForLedgerId != null)
+                        {
+                            LedgerSupplementary LedgerSupplementary = new LedgerSupplementary();
+                            LedgerSupplementary.LedgerId = (int)svm.SupplementaryForLedgerId; 
+                            LedgerSupplementary.SupplementaryLedgerId = Ledger.LedgerId;
+                            LedgerSupplementary.Amount = LedgerLine.Amount;
+                            LedgerSupplementary.CreatedDate = DateTime.Now;
+                            LedgerSupplementary.ModifiedDate = DateTime.Now;
+                            LedgerSupplementary.CreatedBy = User.Identity.Name;
+                            LedgerSupplementary.ModifiedBy = User.Identity.Name;
+                            LedgerSupplementary.ObjectState = Model.ObjectState.Added;
+                            db.LedgerSupplementary.Add(LedgerSupplementary);
+                        }
+
                         #endregion
 
                         #region ContraLedgerSave
@@ -964,6 +1004,15 @@ namespace Jobs.Controllers
                         LedgerAdj.ObjectState = Model.ObjectState.Deleted;
                         db.LedgerAdj.Remove(LedgerAdj);
                     }
+
+                    var LedgerSuppExisting = (from L in db.LedgerSupplementary where L.SupplementaryLedgerId == item.LedgerId select L).FirstOrDefault();
+                    if (LedgerSuppExisting != null)
+                    {
+                        LedgerSuppExisting.ObjectState = Model.ObjectState.Deleted;
+                        db.LedgerSupplementary.Remove(LedgerSuppExisting);
+                    }
+
+
                 }
 
                 foreach (var item in Ledgers)
@@ -1417,21 +1466,14 @@ namespace Jobs.Controllers
             LedgerHeader Header = new LedgerHeaderService(_unitOfWork).Find(Line.LedgerHeaderId);
             LedgerToAdjustViewModel_Single s = new LedgerToAdjustViewModel_Single();
 
-            List<SelectListItem> DrCr = new List<SelectListItem>();
-            DrCr.Add(new SelectListItem { Text = NatureConstants.Debit, Value = NatureConstants.Debit });
-            DrCr.Add(new SelectListItem { Text = NatureConstants.Credit, Value = NatureConstants.Credit });
-
-            ViewBag.DrCrList = new SelectList(DrCr, "Value", "Text");
-
-
-
             s.LedgerLineId = id;
             s.LedgerAccountId = Line.LedgerAccountId;
             s.LedgerHeaderId = Line.LedgerHeaderId;
             s.PartyDocDate_Adjusted = null;
 
             var temp = (from L in db.Ledger
-                        join Ld in db.ViewLedgerBalance on L.LedgerId equals Ld.LedgerId into LedgerBalanceTable from LedgerBalanceTab in LedgerBalanceTable.DefaultIfEmpty()
+                        join Ld in db.ViewLedgerBalance on L.LedgerId equals Ld.LedgerId into LedgerBalanceTable
+                        from LedgerBalanceTab in LedgerBalanceTable.DefaultIfEmpty()
                         where L.LedgerLineId == id && L.LedgerAccountId == Line.LedgerAccountId
                         select new
                         {
@@ -1446,12 +1488,9 @@ namespace Jobs.Controllers
                 s.LedgerId = temp.LedgerId;
                 s.Amount = temp.Amount;
                 s.BalanceAmount = temp.BalanceAmount;
-                if (temp.DrCr == "Cr")
-                    s.DrCr = "Dr";
-                else
-                    s.DrCr = "Cr";
+                s.DrCr = temp.DrCr;
             }
-            
+
             var settings = new LedgerSettingService(_unitOfWork).GetLedgerSettingForDocument(Header.DocTypeId, Header.DivisionId, Header.SiteId);
             s.LedgerSetting = Mapper.Map<LedgerSetting, LedgerSettingViewModel>(settings);
 
@@ -1513,9 +1552,29 @@ namespace Jobs.Controllers
             return PartialView("_LedgerAdj_Single", s);
         }
 
-        public ActionResult GetLedgerIds_Adusted(string searchTerm, int pageSize, int pageNum, int? filter, string filter2, int filter3, int filter4)//DocTypeId
+        public ActionResult GetLedgerIds_Adusted(string searchTerm, int pageSize, int pageNum, int? filter, string filter2, int filter3)//DocTypeId
         {
-            var Query = new LedgerLineService(_unitOfWork).GetLedgerIds_Adusted(filter, filter2, filter3, filter4, searchTerm);
+            var Query = new LedgerLineService(_unitOfWork).GetLedgerIds_Adusted(filter, filter2, filter3, searchTerm);
+            var temp = Query.Skip(pageSize * (pageNum - 1))
+                .Take(pageSize)
+                .ToList();
+
+            var count = Query.Count();
+
+            ComboBoxPagedResult Data = new ComboBoxPagedResult();
+            Data.Results = temp;
+            Data.Total = count;
+
+            return new JsonpResult
+            {
+                Data = Data,
+                JsonRequestBehavior = JsonRequestBehavior.AllowGet
+            };
+        }
+
+        public ActionResult GetLedgerIds_Supplementary(string searchTerm, int pageSize, int pageNum, int? filter, string filter2, int filter3)//DocTypeId
+        {
+            var Query = new LedgerLineService(_unitOfWork).GetLedgerIds_Supplementary(filter, filter2, filter3, searchTerm);
             var temp = Query.Skip(pageSize * (pageNum - 1))
                 .Take(pageSize)
                 .ToList();
@@ -1568,14 +1627,14 @@ namespace Jobs.Controllers
         {
             if (svm.BalanceAmount < svm.AdjustedAmount)
             {
-                string message = "Adjusted Amount is greater then balance amount.";
+                string message = "Adjusted Amount is geated then balance amount.";
                 TempData["CSEXCL"] += message;
                 return PartialView("_LedgerAdj_Single", svm);
             }
 
             if (svm.BalanceAmount_Adjusted < svm.AdjustedAmount)
             {
-                string message = "Adjusted Amount is greater then selected bill balance amount.";
+                string message = "Adjusted Amount is geated then selected bill balance amount.";
                 TempData["CSEXCL"] += message;
                 return PartialView("_LedgerAdj_Single", svm);
             }

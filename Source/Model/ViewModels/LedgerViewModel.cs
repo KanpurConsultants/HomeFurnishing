@@ -133,6 +133,10 @@ namespace Model.ViewModels
         [Display(Name = "Specification"), MaxLength(10)]
         public string Specification { get; set; }
 
+        [ForeignKey("SupplementaryForLedger"), Display(Name = "Supplementary For Ledger")]
+        public int? SupplementaryForLedgerId { get; set; }
+        public string SupplementaryForLedgerDocNo { get; set; }
+
         [MaxLength(250)]
         public string Narration { get; set; }
 

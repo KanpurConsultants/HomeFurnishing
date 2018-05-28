@@ -68,6 +68,9 @@ namespace Model.Models
         [Display(Name = "DrCr"), MaxLength(2)]
         public string DrCr { get; set; }
 
+        [Display(Name = "Supplementary For Ledger")]
+        public int? SupplementaryForLedgerId { get; set; }
+
         [Display(Name = "Remark")]
         public string Remark { get; set; }
 

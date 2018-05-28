@@ -1912,7 +1912,20 @@ namespace Jobs.Controllers
                 JsonRequestBehavior = JsonRequestBehavior.AllowGet
             };
         }
-        
+
+        public JsonResult GetPersonDetail(int PersonId)
+        {
+            var PersonDetail = (from B in db.BusinessEntity
+                                where B.PersonID == PersonId
+                                select new
+                                {
+                                    SalesTaxGroupPartyId = B.SalesTaxGroupPartyId,
+                                    SalesTaxGroupPartyName = B.SalesTaxGroupParty.ChargeGroupPersonName
+                                }).FirstOrDefault();
+
+            return Json(PersonDetail);
+        }
+
         protected override void Dispose(bool disposing)
         {
             if (!string.IsNullOrEmpty((string)TempData["CSEXC"]))

@@ -146,12 +146,14 @@ namespace Service
             //        }
             //            ).FirstOrDefault();
 
-            return (from p in db.LedgerLine
+            var LedgerLine =  (from p in db.LedgerLine
                     join Led in db.Ledger on p.ReferenceId equals Led.LedgerId into LedgerReferenceTable
                     from LedgerReferenceTab in LedgerReferenceTable.DefaultIfEmpty()
                     join t2 in db.LedgerHeader on LedgerReferenceTab.LedgerHeaderId equals t2.LedgerHeaderId into table2
                     from tab2 in table2.DefaultIfEmpty()
-                    where p.LedgerLineId == id
+                    join Ls in db.LedgerSupplementary on p.SupplementaryForLedgerId equals Ls.LedgerId into LedgerSupplementaryTable from LedgerSupplementaryTab in LedgerSupplementaryTable.DefaultIfEmpty()
+                    join Lsd in db.Ledger on LedgerSupplementaryTab.LedgerId equals Lsd.LedgerId into LsdTable from LsdTab in LsdTable.DefaultIfEmpty()
+                               where p.LedgerLineId == id
                     select new LedgersViewModel
                     {
                         Amount = p.Amount,
@@ -171,12 +173,29 @@ namespace Service
                         ProductUidId = p.ProductUidId,
                         ProductUidName = p.ProductUid.ProductUidName,
                         LockReason = p.LockReason,
-                        Qty=(Decimal) p.Qty,
-                        DealQty= (Decimal)p.DealQty,
-                        Rate= (Decimal)p.Rate,
+                        Qty=p.Qty ?? 0,
+                        DealQty= p.DealQty ?? 0,
+                        Rate= p.Rate ?? 0,
                         Specification=p.Specification,
-                        DrCr = p.DrCr
+                        DrCr = p.DrCr,
+                        SupplementaryForLedgerId = p.SupplementaryForLedgerId,
+                        SupplementaryForLedgerDocNo = LsdTab.LedgerHeader.DocNo
                     }).FirstOrDefault();
+
+            //var LedgerSupplimentry = (from L in db.Ledger 
+            //                          join Ls in db.LedgerSupplementary on L.LedgerId equals Ls.SupplementaryLedgerId into SupplementaryLedgerTable
+            //                          from SupplementaryLedgerTab in SupplementaryLedgerTable.DefaultIfEmpty()
+            //                          where L.LedgerLineId == id && SupplementaryLedgerTab.SupplementaryLedgerId != null
+            //                          select new
+            //                          {
+            //                              SupplementaryForLedgerId = (int?)SupplementaryLedgerTab.LedgerId ?? 0 
+            //                          }).FirstOrDefault();
+
+            //if (LedgerSupplimentry != null)
+            //    if (LedgerSupplimentry.SupplementaryForLedgerId != 0)
+            //        LedgerLine.SupplementaryForLedgerId = LedgerSupplimentry.SupplementaryForLedgerId;
+
+            return LedgerLine;
         }
 
         public void Delete(int id)

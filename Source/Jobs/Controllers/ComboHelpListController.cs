@@ -7278,7 +7278,23 @@ namespace Jobs.Controllers
 
 
 
+        public JsonResult SetSingleLedger(int Ids)
+        {
+            ComboBoxResult ProductJson = new ComboBoxResult();
 
+            var prod = from p in db.Ledger
+                       where p.LedgerId == Ids
+                       select new
+                       {
+                           LedgerId = p.LedgerId,
+                           LedgerDocNo = p.LedgerHeader.DocType.DocumentTypeShortName + "-" + p.LedgerHeader.DocNo
+                       };
+
+            ProductJson.id = prod.FirstOrDefault().LedgerId.ToString();
+            ProductJson.text = prod.FirstOrDefault().LedgerDocNo;
+
+            return Json(ProductJson);
+        }
 
         public JsonResult GetArea(string searchTerm, int pageSize, int pageNum)
         {
@@ -7458,6 +7474,10 @@ namespace Jobs.Controllers
 
             return Json(ProductJson);
         }
+
+        
+
+
     }
 }
 

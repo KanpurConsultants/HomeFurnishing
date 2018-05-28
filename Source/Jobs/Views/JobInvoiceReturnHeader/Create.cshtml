@@ -704,6 +704,39 @@
         CustomSelectFunctionWithMultipleFilters($("#JobWorkerId"), '/JobInvoiceReturnHeader/GetCustomPerson', '/ComboHelpList/SetSinglePerson', ' ', false, 0,$('#DocTypeId').val(),$('#ProcessId').val());
     });
 
+
+    $("#JobWorkerId").change(GetPersonDetail);
+
+    function GetPersonDetail()
+    {
+        if ($("#JobWorkerId").val() != 0 && $("#JobWorkerId").val() != null)
+        {
+            $.ajax({
+                cache: false,
+                async: false,
+                type: "POST",
+                url: "@(Url.Action("GetPersonDetail"))",
+                data: { PersonId: $("#JobWorkerId").val() },
+            success: function (data) {
+                if (data != null)
+                {
+                    (data.SalesTaxGroupPartyId == null) ? (1 == 1) : ($("#SalesTaxGroupPersonId").select2("data", { id: data.SalesTaxGroupPartyId, text: data.SalesTaxGroupPartyName }));
+                }
+                else {
+                    $("#SalesTaxGroupPersonId").select2("data", { id: '', text: '' })
+                }
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert('Failed to retrieve Person Detail.' + thrownError);
+                ProcessProgress.hide();
+            }
+        });
+    }
+    else {
+            $("#SalesTaxGroupPersonId").select2("data", { id: '', text: '' })
+        }
+    }
+
 </script>
 
 <script type="text/javascript">

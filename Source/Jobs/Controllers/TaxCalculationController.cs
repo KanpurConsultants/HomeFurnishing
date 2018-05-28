@@ -350,7 +350,34 @@ namespace Jobs.Controllers
             return Json(new { success = true });
         }
 
+        [HttpPost]
+        public ActionResult PostSIRCalculationFields(List<HeaderChargeViewModel> temp)
+        {
+            foreach (var item in temp)
+            {
+                var header = new SaleInvoiceReturnHeaderChargeService(_unitOfWork).Find(item.Id);
+                header.Rate = item.Rate;
+                header.Amount = item.Amount;
+                new SaleInvoiceReturnHeaderChargeService(_unitOfWork).Update(header);
+            }
 
+            try
+            {
+                _unitOfWork.Save();
+            }
+
+            catch (Exception ex)
+            {
+                string message = _exception.HandleException(ex);
+                ModelState.AddModelError("", message);
+
+                return PartialView("FooterChargeEdit", temp);
+
+            }
+
+
+            return Json(new { success = true });
+        }
 
         [HttpPost]
         public ActionResult PostEmpCalculationFields(List<HeaderChargeViewModel> temp)

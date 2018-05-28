@@ -37,7 +37,7 @@
                 @Html.HiddenFor(m => m.LedgerHeaderId)
                 @Html.HiddenFor(m => m.LedgerAccountId)
                 @Html.HiddenFor(m => m.LedgerId)
-                @*@Html.HiddenFor(model => model.DrCr)*@
+                @Html.HiddenFor(model => model.DrCr)
                 @Html.HiddenFor(m => m.BalanceAmount)
                 @Html.HiddenFor(m => m.Amount)
 
@@ -45,17 +45,6 @@
 
 
                 <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            @Html.LabelFor(model => model.DrCr, "Dr./Cr.", new { @class = "control-label col-md-4 col-sm-2 " })
-                            <div class="col-md-7 col-sm-10">
-                                @Html.DropDownListFor(m => m.DrCr, new SelectList(ViewBag.DrCrList as System.Collections.IEnumerable, "Value", "Text"), null , new { @class = "form-control col-xs-6 height" })
-                                @Html.ValidationMessageFor(model => model.DrCr, "", new { @class = "text-danger" })
-                            </div>
-                        </div>
-                    </div>
-
-
                     <div class="col-md-6">
                         <div class="form-group">
                             @Html.LabelFor(model => model.LedgerId_Adjusted, "Adjusted Bill", new { @class = "control-label col-md-4 col-sm-2 " })
@@ -212,17 +201,12 @@
     var TChqNo=parseInt($('#ChqNo').val());
 
     $(document).ready(function () {
-        //var Nature  =  '@Model.DrCr';
+        var Nature  =  '@Model.DrCr';
         //var Nature = '$("#DrCr").val()';
 
-        CustomSelectFunctionForLedgerId_Adjusted($("#LedgerId_Adjusted"), '/LedgerLine/GetLedgerIds_Adusted', '/ComboHelpList/SetSingleLedger', ' ', false, 0, $('#LedgerAccountId', '.modal-body').val(), $("#DrCr").val(), $('#LedgerHeaderId', '.modal-body').val(), $('#LedgerId', '.modal-body').val());
+        CustomSelectFunctionForLedgerId_Adjusted($("#LedgerId_Adjusted"), '/LedgerLine/GetLedgerIds_Adusted', '/ComboHelpList/SetSingleLedger', ' ', false, 0, $('#LedgerAccountId', '.modal-body').val(), Nature, $('#LedgerHeaderId', '.modal-body').val());
 
-        $("#DrCr").change(function () {
-            CustomSelectFunctionForLedgerId_Adjusted($("#LedgerId_Adjusted"), '/LedgerLine/GetLedgerIds_Adusted', '/ComboHelpList/SetSingleLedger', ' ', false, 0, $('#LedgerAccountId', '.modal-body').val(), $("#DrCr").val(), $('#LedgerHeaderId', '.modal-body').val(), $('#LedgerId', '.modal-body').val());
-        });
-
-
-        function CustomSelectFunctionForLedgerId_Adjusted(ElementId, GetAction, SetAction, placehold, IsMultiple, MinLength, filterid, filter2id, filter3id, filter4id) {
+        function CustomSelectFunctionForLedgerId_Adjusted(ElementId, GetAction, SetAction, placehold, IsMultiple, MinLength, filterid, filter2id, filter3id) {
             var geturl = GetAction;
             //The url we will send our get request to
             var attendeeUrl = GetAction;
@@ -251,7 +235,6 @@
                             filter: filterid,
                             filter2: filter2id,
                             filter3: filter3id,
-                            filter4: filter4id,
                         };
                     },
                     results: function (data, page) {

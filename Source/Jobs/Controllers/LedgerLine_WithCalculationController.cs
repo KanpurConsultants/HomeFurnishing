@@ -1631,9 +1631,9 @@ namespace Jobs.Controllers
             return PartialView("_LedgerAdj_Single", s);
         }
 
-        public ActionResult GetLedgerIds_Adusted(string searchTerm, int pageSize, int pageNum, int? filter, string filter2, int filter3, int filter4)//DocTypeId
+        public ActionResult GetLedgerIds_Adusted(string searchTerm, int pageSize, int pageNum, int? filter, string filter2, int filter3)//DocTypeId
         {
-            var Query = new LedgerLineService(_unitOfWork).GetLedgerIds_Adusted(filter, filter2, filter3, filter4, searchTerm);
+            var Query = new LedgerLineService(_unitOfWork).GetLedgerIds_Adusted(filter, filter2, filter3, searchTerm);
             var temp = Query.Skip(pageSize * (pageNum - 1))
                 .Take(pageSize)
                 .ToList();

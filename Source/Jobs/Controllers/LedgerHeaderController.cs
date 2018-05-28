@@ -835,7 +835,7 @@ namespace Jobs.Controllers
                                                             select L).FirstOrDefault().LedgerAccountId;
                         }
 
-
+                        int LederId_ToSave = 0;
                         foreach(var LedgerLine in LedgerLineList)
                         {
                             #region LedgerSave
@@ -862,7 +862,8 @@ namespace Jobs.Controllers
                             Ledger.ProductUidId = LedgerLine.ProductUidId;
                             Ledger.Narration = pd.Narration + LedgerLine.Remark;
                             Ledger.ObjectState = Model.ObjectState.Added;
-                            Ledger.LedgerId = 1;
+                            Ledger.LedgerId = LederId_ToSave - 1;
+                            LederId_ToSave = LederId_ToSave - 1;
                             db.Ledger.Add(Ledger);
 
                             if (LedgerLine.ReferenceId != null)
@@ -887,6 +888,32 @@ namespace Jobs.Controllers
                                 LedgerAdj.ModifiedBy = User.Identity.Name;
                                 LedgerAdj.ObjectState = Model.ObjectState.Added;
                                 db.LedgerAdj.Add(LedgerAdj);
+                            }
+
+                            var LedgerSuppExisting = (from L in db.LedgerSupplementary where L.SupplementaryLedger.LedgerHeaderId == Ledger.LedgerHeaderId select L).ToList();
+                            foreach(var item in LedgerSuppExisting)
+                            {
+                                item.ObjectState = Model.ObjectState.Deleted;
+                                db.LedgerSupplementary.Remove(item);
+                            }
+
+                            if (LedgerLine.SupplementaryForLedgerId != null)
+                            {
+                                var SupplementaryForLedgerData = db.Ledger.Find(LedgerLine.SupplementaryForLedgerId);
+                                if (LedgerLine.LedgerAccountId == SupplementaryForLedgerData.LedgerAccountId)
+                                {
+                                    LedgerSupplementary LedgerSupplementary = new LedgerSupplementary();
+                                    LedgerSupplementary.Id = -1;
+                                    LedgerSupplementary.LedgerId = (int)LedgerLine.SupplementaryForLedgerId;
+                                    LedgerSupplementary.SupplementaryLedgerId = Ledger.LedgerId;
+                                    LedgerSupplementary.Amount = LedgerLine.Amount;
+                                    LedgerSupplementary.CreatedDate = DateTime.Now;
+                                    LedgerSupplementary.ModifiedDate = DateTime.Now;
+                                    LedgerSupplementary.CreatedBy = User.Identity.Name;
+                                    LedgerSupplementary.ModifiedBy = User.Identity.Name;
+                                    LedgerSupplementary.ObjectState = Model.ObjectState.Added;
+                                    db.LedgerSupplementary.Add(LedgerSupplementary);
+                                }
                             }
                             #endregion
                         }

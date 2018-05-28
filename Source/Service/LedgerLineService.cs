@@ -34,7 +34,7 @@ namespace Service
         IEnumerable<LedgerLine> FindByLedgerHeader(int id);
         IQueryable<ComboBoxResult> GetLedgerAccounts(string term, string AccGroups, string ExcludeAccGroups, string Process);
         IQueryable<ComboBoxResult> GetCostCenters(string term, string DocTypes, string Process);
-        IQueryable<ComboBoxResult> GetLedgerIds_Adusted(int? Id, string Nature, int filter3, int filter4, string term);
+        IQueryable<ComboBoxResult> GetLedgerIds_Adusted(int? Id, string Nature, int filter3, string term);
         LedgersViewModel GetLastTransactionDetail(int LedgerHeaderId);
     }
 
@@ -324,16 +324,9 @@ namespace Service
         }
 
 
-        public IQueryable<ComboBoxResult> GetLedgerIds_Adusted(int? Id, string Nature, int filter3, int filter4, string term)
+        public IQueryable<ComboBoxResult> GetLedgerIds_Adusted(int? Id, string Nature, int filter3, string term)
         {
-            string LedgerNature = "";
             var Header = new LedgerHeaderService(_unitOfWork).Find(filter3);
-
-            var LedgerData = new LedgerService(_unitOfWork).Find(filter4);
-            if (LedgerData.AmtCr != 0)
-                LedgerNature = "Cr";
-            else
-                LedgerNature = "Dr";
 
             int CurrentSiteId = (int)System.Web.HttpContext.Current.Session["SiteId"];
             int CurrentDivisionId = (int)System.Web.HttpContext.Current.Session["DivisionId"];
@@ -352,12 +345,10 @@ namespace Service
             else { ExcludeContraAccGroups = new string[] { "NA" }; }
 
 
-
             SqlParameter SqlParameterLedgerAccountId = new SqlParameter("@LedgerAccountId", Id);
             SqlParameter SqlParameterNature = new SqlParameter("@Nature", Nature);
-            SqlParameter SqlParameterLedgerNature = new SqlParameter("@LedgerNature", LedgerNature);
 
-            var PendingLedgerViewModel = db.Database.SqlQuery<PendingLedgerViewModel>("" + ConfigurationManager.AppSettings["DataBaseSchema"] + ".sp_GetLedgerToAdjust @LedgerAccountId, @Nature, @LedgerNature", SqlParameterLedgerAccountId, SqlParameterNature, SqlParameterLedgerNature).ToList().AsQueryable();
+            var PendingLedgerViewModel = db.Database.SqlQuery<PendingLedgerViewModel>("" + ConfigurationManager.AppSettings["DataBaseSchema"] + ".sp_GetLedgerToAdjust @LedgerAccountId, @Nature", SqlParameterLedgerAccountId, SqlParameterNature).ToList().AsQueryable();
 
             return (from p in PendingLedgerViewModel
                     where (string.IsNullOrEmpty(term) ? 1 == 1 : p.LedgerHeaderDocNo.ToLower().Contains(term.ToLower())
@@ -392,6 +383,47 @@ namespace Service
             //            TextProp1 = "Balance Amount : " + p.BalanceAmount,
             //            TextProp2 = "Bill Amount : " + p.BillAmount
             //        }).ToList().AsQueryable();
+        }
+
+        public IQueryable<ComboBoxResult> GetLedgerIds_Supplementary(int? Id, string Nature, int filter3, string term)
+        {
+            var Header = new LedgerHeaderService(_unitOfWork).Find(filter3);
+
+            int CurrentSiteId = (int)System.Web.HttpContext.Current.Session["SiteId"];
+            int CurrentDivisionId = (int)System.Web.HttpContext.Current.Session["DivisionId"];
+
+            string DivId = "|" + CurrentDivisionId.ToString() + "|";
+            string SiteId = "|" + CurrentSiteId.ToString() + "|";
+
+            var Settings = new LedgerSettingService(_unitOfWork).GetLedgerSettingForDocument(Header.DocTypeId, Header.DivisionId, Header.SiteId);
+
+            string[] ContraAccGroups = null;
+            if (!string.IsNullOrEmpty(Settings.filterLedgerAccountGroupLines)) { ContraAccGroups = Settings.filterLedgerAccountGroupLines.Split(",".ToCharArray()); }
+            else { ContraAccGroups = new string[] { "NA" }; }
+
+            string[] ExcludeContraAccGroups = null;
+            if (!string.IsNullOrEmpty(Settings.filterExcludeLedgerAccountGroupLines)) { ExcludeContraAccGroups = Settings.filterExcludeLedgerAccountGroupLines.Split(",".ToCharArray()); }
+            else { ExcludeContraAccGroups = new string[] { "NA" }; }
+
+
+            SqlParameter SqlParameterLedgerAccountId = new SqlParameter("@LedgerAccountId", Id);
+            SqlParameter SqlParameterNature = new SqlParameter("@Nature", Nature);
+
+            var PendingLedgerViewModel = db.Database.SqlQuery<PendingLedgerViewModel>("" + ConfigurationManager.AppSettings["DataBaseSchema"] + ".sp_GetLedgerSupplementary @LedgerAccountId, @Nature", SqlParameterLedgerAccountId, SqlParameterNature).ToList().AsQueryable();
+
+            return (from p in PendingLedgerViewModel
+                    where (string.IsNullOrEmpty(term) ? 1 == 1 : p.LedgerHeaderDocNo.ToLower().Contains(term.ToLower())
+                    || string.IsNullOrEmpty(term) ? 1 == 1 : p.PartyDocNo.ToLower().Contains(term.ToLower())
+                    || string.IsNullOrEmpty(term) ? 1 == 1 : p.LedgerAccountName.ToLower().Contains(term.ToLower()))
+                    select new ComboBoxResult
+                    {
+                        id = p.LedgerId.ToString(),
+                        text = p.LedgerHeaderDocNo,
+                        AProp1 = p.LedgerAccountName,
+                        AProp2 = "Party Doc No : " + p.PartyDocNo + ", Party Doc Date : " + p.PartyDocDate,
+                        //TextProp1 = "Balance Amount : " + p.BalanceAmount,
+                        TextProp1 = "Bill Amount : " + p.BillAmount
+                    });
         }
 
         public LedgersViewModel GetLastTransactionDetail(int LedgerHeaderId)

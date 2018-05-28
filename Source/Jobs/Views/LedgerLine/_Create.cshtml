@@ -192,6 +192,16 @@
                         </div>
                     </div>
 
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.SupplementaryForLedgerId, "Supplementary For Bill No", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.SupplementaryForLedgerId, new { @class = "form-control col-xs-7 " })
+                                @Html.ValidationMessageFor(model => model.SupplementaryForLedgerId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
 
 
                     <div class="col-md-6">
@@ -235,11 +245,19 @@
         var Nature  =  '@(((string)ViewBag.Nature).ToUpper() == "CR" ? "Dr" : "Cr")'
 
 
+        var SupplementaryNature  =  '@((string)ViewBag.Nature)'
+        if (SupplementaryNature == '')
+            SupplementaryNature = $("#DrCr").val()
+
+
+
         CustomSelectFunction($("#LedgerAccountId"), '/LedgerLine/GetLedgerAccount', '/ComboHelpList/SetSingleAccount', ' ', false, 0,$('#LedgerHeaderId','.modal-body').val());
         CustomSelectFunction($("#CostCenterId"), '/LedgerLine/GetCostCenters', '/ComboHelpList/SetSingleCostCenter', ' ', false, 0,$('#LedgerHeaderId','.modal-body').val());
         CustomSelectFunctionForLedgerId_Adjusted($("#ReferenceId"), '/LedgerLine/GetLedgerIds_Adusted', '/ComboHelpList/SetSingleLedger', ' ', false, 0, $('#LedgerAccountId','.modal-body').val(),Nature, $('#LedgerHeaderId', '.modal-body').val());
         CustomSelectFunction($("#ReferenceDocTypeId"), '/ComboHelpList/GetDocumentType', '/ComboHelpList/SetDocumentType', ' ', false, 0);
         CustomSelectFunctionForReference($("#ReferenceDocId"), '/LedgerLine/GetReferenceDocIds', '/LedgerLine/SetSingleReferenceDocIds', ' ', false, 0,$("#ReferenceDocTypeId").val());
+
+        CustomSelectFunctionForLedgerId_Adjusted($("#SupplementaryForLedgerId"), '/LedgerLine/GetLedgerIds_Supplementary', '/ComboHelpList/SetSingleLedger', ' ', false, 0, $('#LedgerAccountId','.modal-body').val(),SupplementaryNature, $('#LedgerHeaderId', '.modal-body').val());
 
 
         $('.datepicker').datepicker({
@@ -252,6 +270,7 @@
         $('#LedgerAccountId').change(function()
         {
             CustomSelectFunctionForLedgerId_Adjusted($("#ReferenceId"), '/LedgerLine/GetLedgerIds_Adusted', '/ComboHelpList/SetSingleLedger', ' ', false, 0, $('#LedgerAccountId','.modal-body').val(),Nature, $('#LedgerHeaderId', '.modal-body').val());
+            CustomSelectFunctionForLedgerId_Adjusted($("#SupplementaryForLedgerId"), '/LedgerLine/GetLedgerIds_Supplementary', '/ComboHelpList/SetSingleLedger', ' ', false, 0, $('#LedgerAccountId','.modal-body').val(),SupplementaryNature, $('#LedgerHeaderId', '.modal-body').val());
         })
 
         $('#ReferenceDocTypeId').change(function()
@@ -319,16 +338,16 @@
             });
         }
 
-        function CustomSelectFunctionForReference(ElementId, GetAction, SetAction, placehold, IsMultiple,MinLength,filterid) 
+        function CustomSelectFunctionForReference(ElementId, GetAction, SetAction, placehold, IsMultiple,MinLength,filterid)
         {
             var geturl = GetAction;
             //The url we will send our get request to
             var attendeeUrl = GetAction;
             var pageSize = 20;
-    
+
             ElementId.select2(
             {
-        
+
                 placeholder: placehold,
                 //Does the user have to enter any data before sending the ajax request
                 minimumInputLength: MinLength,
@@ -407,28 +426,28 @@
                     type: "POST",
                     url: "@(Url.Action("GetLedgerIds_AdustedDetailJson"))",
                     data: { LedgerId: $("#ReferenceId").val() },
-                success: function (data) {
-                    if (data != null && data != "")
-                    {
-                        $("#Amount").val(data.BalanceAmount)
-                        $('#LedgerAccountId').select2("data",{id:data.LedgerAccountId,text:data.LedgerAccountName})
-                        $("#LedgerAccountId").attr('readonly','true');
+                    success: function (data) {
+                        if (data != null && data != "")
+                        {
+                            $("#Amount").val(data.BalanceAmount)
+                            $('#LedgerAccountId').select2("data",{id:data.LedgerAccountId,text:data.LedgerAccountName})
+                            $("#LedgerAccountId").attr('readonly','true');
+                        }
+                        else
+                        {
+                            $("#Amount").val(0);
+                            $('#LedgerAccountId').select2("data",{id:'',text:''})
+                            $("#LedgerAccountId").removeAttr('readonly');
+                        }
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to retrieve product details.' + thrownError);
                     }
-                    else
-                    {
-                        $("#Amount").val(0);
-                        $('#LedgerAccountId').select2("data",{id:'',text:''})
-                        $("#LedgerAccountId").removeAttr('readonly');
-                    }
-                },
-                error: function (xhr, ajaxOptions, thrownError) {
-                    alert('Failed to retrieve product details.' + thrownError);
-                }
-            });
+                });
+            }
         }
-    }
 
-        
+
 
         @*if(id>0)
         {
@@ -491,7 +510,7 @@
         })
 
 
-       
+
 
 
         function FetchRate(Id)
@@ -523,17 +542,17 @@
             if(PTAID && !isNaN(PTAID) && TChqNo && !isNaN(TChqNo))
             {
                 if(PTAID!=id)
-                {                     
-                    //var L=length(TChqNo)-length(parseInt(TChqNo))   
-                    //var str =''; 
-                    var TC = TChqNo + 1;                            
+                {
+                    //var L=length(TChqNo)-length(parseInt(TChqNo))
+                    //var str ='';
+                    var TC = TChqNo + 1;
                     //if(l>0)
                     //{
                     //    for (var i = 1; i < L; i++)
                     //    {
                     //        str+='0'
                     //    }
-                        
+
                     //}
                     //str=str+TC;
                     $('#ChqNo').val(TC);

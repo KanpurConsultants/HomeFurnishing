@@ -617,6 +617,8 @@ namespace Service
             int SiteId = (int)System.Web.HttpContext.Current.Session["SiteId"];
             int DivisionId = (int)System.Web.HttpContext.Current.Session["DivisionId"];
 
+            var DocTypeName = db.DocumentType.Find(DocTypeId).DocumentTypeName;
+
             var settings = new JobInvoiceSettingsService(_unitOfWork).GetJobInvoiceSettingsForDocument(DocTypeId, DivisionId, SiteId);
 
             string[] PersonRoles = null;
@@ -634,8 +636,8 @@ namespace Service
                         join pr in db.PersonRole on p.PersonID equals pr.PersonId into PersonRoleTable
                         from PersonRoleTab in PersonRoleTable.DefaultIfEmpty()
                         //where PersonProcessTab.ProcessId == settings.ProcessId
-                        where (ProcessId == null ? PersonProcessTab.ProcessId == settings.ProcessId : PersonProcessTab.ProcessId == ProcessId)
-                        && (string.IsNullOrEmpty(term) ? 1 == 1 : (p.Name.ToLower().Contains(term.ToLower()) || p.Code.ToLower().Contains(term.ToLower())))
+                        where (DocTypeName == TransactionDoctypeConstants.ExpenseVoucher ? 1 == 1 : (ProcessId == null ? PersonProcessTab.ProcessId == settings.ProcessId : PersonProcessTab.ProcessId == ProcessId))
+                        && (string.IsNullOrEmpty(term) ? 1 == 1 : (p.Name.ToLower().Contains(term.ToLower()) || p.Code.ToLower().Contains(term.ToLower()) || p.Suffix.ToLower().Contains(term.ToLower())))
                         && (string.IsNullOrEmpty(settings.filterPersonRoles) ? 1 == 1 : PersonRoles.Contains(PersonRoleTab.RoleDocTypeId.ToString()))
                         && BusinessEntityTab.DivisionIds.IndexOf(DivIdStr) != -1
                         && BusinessEntityTab.SiteIds.IndexOf(SiteIdStr) != -1

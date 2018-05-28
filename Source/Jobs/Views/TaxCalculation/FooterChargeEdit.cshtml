@@ -180,6 +180,29 @@
 }
 
 
+@if (ViewBag.ChargeType == TransactionDocCategoryConstants.SaleInvoiceReturn)
+{
+
+
+    <script type="text/javascript">
+
+        var headerid=@Model.FirstOrDefault().HeaderTableId;
+
+        LoadCalculationFooter(headerid,"Web.SaleInvoiceReturnHeaderCharges","Web.SaleInvoiceReturnLineCharges");
+
+
+        $(function(){
+            var url = '/TaxCalculation/PostSICalculationFields';
+            $('form#modform').attr('action',url);
+        })
+
+    </script>
+
+
+
+}
+
+
 @if (ViewBag.ChargeType == "Employee")
 {
 

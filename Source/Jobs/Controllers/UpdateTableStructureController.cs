@@ -3947,6 +3947,42 @@ namespace Module
 
             AddFields("Narrations", "DocTypeId", "Int","DocumentTypes");
 
+            AddFields("LedgerLines", "SupplementaryForLedgerId", "Int", "Ledgers");
+
+
+            try
+            {
+                if ((int)ExecuteScaler("SELECT Count(*) AS Cnt FROM INFORMATION_SCHEMA.Tables WHERE TABLE_NAME = 'LedgerSupplementaries'") == 0)
+                {
+                    mQry = @"CREATE TABLE Web.LedgerSupplementaries
+	                        (
+	                        Id                    INT IDENTITY NOT NULL,
+	                        LedgerId              INT NOT NULL,
+	                        SupplementaryLedgerId INT NOT NULL,
+	                        Amount                DECIMAL (18, 4) NOT NULL,
+	                        CreatedBy             NVARCHAR (max) NULL,
+	                        ModifiedBy            NVARCHAR (max) NULL,
+	                        CreatedDate           DATETIME NOT NULL,
+	                        ModifiedDate          DATETIME NOT NULL,
+	                        OMSId                 NVARCHAR (50) NULL,
+	                        CONSTRAINT [PK_Web.LedgerSupplementaries] PRIMARY KEY (Id),
+	                        CONSTRAINT [FK_Web.LedgerSupplementaries_Web.Ledgers_LedgerId] FOREIGN KEY (LedgerId) REFERENCES Web.Ledgers (LedgerId),
+	                        CONSTRAINT [FK_Web.LedgerSupplementaries_Web.Ledgers_SupplementaryLedgerId] FOREIGN KEY (SupplementaryLedgerId) REFERENCES Web.Ledgers (LedgerId)
+	                        )
+
+                        CREATE INDEX IX_LedgerId
+	                        ON Web.LedgerSupplementaries (LedgerId)
+
+                        CREATE INDEX IX_SupplementaryLedgerId
+	                        ON Web.LedgerSupplementaries (SupplementaryLedgerId)
+                         ";
+                    ExecuteQuery(mQry);
+                }
+            }
+            catch (Exception ex)
+            {
+                RecordError(ex);
+            }
 
 
 
