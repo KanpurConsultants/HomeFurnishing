@@ -66,6 +66,8 @@ namespace Jobs.App_Start
             //Property Tax
             container.RegisterType<ICollectionService, CollectionService>(new PerRequestLifetimeManager());
 
+
+
             container.RegisterType<IRepository<CollectionSettings>, Repository<CollectionSettings>>();
             container.RegisterType<ICollectionSettingsService, CollectionSettingsService>(new PerRequestLifetimeManager());
 
@@ -153,6 +155,8 @@ namespace Jobs.App_Start
             container.RegisterType<IRolesDocTypeService, RolesDocTypeService>(new PerRequestLifetimeManager());
             container.RegisterType<IRolePermissionService, RolePermissionService>(new PerRequestLifetimeManager());
             container.RegisterType<IUserRolesNewService, UserRolesNewService>(new PerRequestLifetimeManager());
+
+            container.RegisterType<IDisplay_StockBalanceService, Display_StockBalanceService>(new PerRequestLifetimeManager());
 
             container.RegisterType<IDisplay_SaleOrderInventoryStatusService, Display_SaleOrderInventoryStatusService>(new PerRequestLifetimeManager());
 

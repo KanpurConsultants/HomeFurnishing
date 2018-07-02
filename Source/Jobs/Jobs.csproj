@@ -426,6 +426,7 @@
     <Compile Include="Areas\Rug\Controllers\PackingSettingsController.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Controllers\Display_StockBalanceController .cs" />
     <Compile Include="Controllers\JobInvoiceHeaderrdl.cs" />
     <Compile Include="Controllers\JobOrderCancelHeaderrdl.cs" />
     <Compile Include="Controllers\JobOrderHeaderrdl.cs" />
@@ -435,6 +436,7 @@
     <Compile Include="Controllers\LedgerLine_WithCalculationController.cs" />
     <Compile Include="Controllers\MailboxController.cs" />
     <Compile Include="Controllers\LedgerWizardController.cs" />
+    <Compile Include="Controllers\TaxReturnController.cs" />
     <Compile Include="Controllers\SalaryWizardController.cs" />
     <Compile Include="Controllers\LedgerAccountMergingController.cs" />
     <Compile Include="Areas\Rug\Controllers\PersonMerging.cs">
@@ -3185,6 +3187,7 @@
     <Content Include="Scripts\DashboardV2.js" />
     <Content Include="Scripts\DisplayJobInvoiceSummary\DisplayJobInvoiceSummary.js" />
     <Content Include="Scripts\DisplaySaleOrderInventoryStatus\DisplaySaleOrderInventoryStatus.js" />
+    <Content Include="Scripts\DisplayStockBalance\DisplayStockBalance.js" />
     <Content Include="Scripts\Mailbox\Compose-menu.js" />
     <Content Include="Scripts\Mailbox\Compose.js" />
     <Content Include="Scripts\Mailbox\Inbox-menu.js" />
@@ -5325,6 +5328,8 @@
     <Content Include="Views\Narration\_Reason.cshtml" />
     <Content Include="Views\Narration\Create.cshtml" />
     <Content Include="Views\Narration\Index.cshtml" />
+    <Content Include="Views\TaxReturn\TaxReturn.cshtml" />
+    <Content Include="Views\Display_StockBalance\Display_StockBalance.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

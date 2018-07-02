@@ -128,6 +128,7 @@
     <Compile Include="DiscountTypeService.cs" />
     <Compile Include="Display_JobInvoiceSummaryService.cs" />
     <Compile Include="Display_SaleOrderInventoryStatusService.cs" />
+    <Compile Include="Display_StockBalanceService.cs" />
     <Compile Include="EmployeeChargeService.cs" />
     <Compile Include="EmployeeLineChargeService.cs" />
     <Compile Include="LedgerHeaderChargeService.cs" />

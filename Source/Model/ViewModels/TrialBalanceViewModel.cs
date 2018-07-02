@@ -116,4 +116,35 @@ namespace Model.ViewModel
         public string Value { get; set; }
     }
 
+    [Serializable()]
+    public class BalanceSheetViewModel
+    {
+        public int GRCode { get; set; }
+        public string GRName { get; set; }
+        public decimal? Debit { get; set; }
+        public decimal? Credit { get; set; }
+        public string GRCodeCredit { get; set; }
+        public string GRNameCredit { get; set; }
+        public string ReportType { get; set; }
+        public string OpenReportType { get; set; }
+
+        public decimal? TotalDebit { get; set; }
+        public decimal? TotalCredit { get; set; }
+    }
+
+    [Serializable()]
+    public class ProfitAndLossViewModel
+    {
+        public int GRCode { get; set; }
+        public string GRName { get; set; }
+        public decimal? Debit { get; set; }
+        public decimal? Credit { get; set; }
+        public string GRCodeCredit { get; set; }
+        public string GRNameCredit { get; set; }
+        public string ReportType { get; set; }
+        public string OpenReportType { get; set; }
+
+        public decimal? TotalDebit { get; set; }
+        public decimal? TotalCredit { get; set; }
+    }
 }

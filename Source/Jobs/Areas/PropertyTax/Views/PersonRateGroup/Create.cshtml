@@ -22,7 +22,7 @@
     @Html.AntiForgeryToken()
     @Html.HiddenFor(m => m.SiteId)
     @Html.HiddenFor(m => m.PersonRateGroupId)
-    @Html.HiddenFor(m => m.DocTypeId)
+    @*@Html.HiddenFor(m => m.DocTypeId)*@
 
     <div class="panel panel-default">
         <div class="panel-heading">
@@ -85,7 +85,7 @@
                     <a class="cbtn btn-circle glyphicon glyphicon-option-horizontal dropdown-toggle" aria-expanded="false" style="padding-top: 6px;padding-bottom: 6px;" href="#" data-toggle="dropdown" id="dropdownMenu1">
                     </a>
                     <ul class="dropdown-menu pull-right" aria-labelledby="dropdownMenu1">
-                        <li><a id="DocHistory" data-modal="" href="@Url.Action("GetHistory", "LogHistory", new { Ids = Model.PersonRateGroupId, DocTypeId = Model.DocTypeId })"><span class="glyphicon glyphicon-user"> </span> History</a></li>
+                        <li><a id="DocHistory" data-modal="" href="@Url.Action("GetHistory", "LogHistory", new { Ids = Model.PersonRateGroupId })"><span class="glyphicon glyphicon-user"> </span> History</a></li>
                         @*<li><a href="@Url.Action("Email", "PersonRateGroup")"><span class="glyphicon glyphicon-envelope"> </span> Email</a></li>*@
                         <li role="separator" class="divider"></li>
                         <li><a href="@Url.Action("Report", "PersonRateGroup")"><span class="glyphicon glyphicon-th"> </span> Report</a></li>

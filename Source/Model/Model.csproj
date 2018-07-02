@@ -294,6 +294,7 @@
     <Compile Include="ViewModels\PropertyLineViewModel.cs" />
     <Compile Include="ViewModels\PurchaseOrderLineDetailViewModel.cs" />
     <Compile Include="ViewModels\PurchaseOrderLineIndexViewModel.cs" />
+    <Compile Include="ViewModels\TaxReturnViewModel.cs" />
     <Compile Include="ViewModels\ReportLineViewModel.cs" />
     <Compile Include="ViewModels\FinancialDisplayViewModel.cs" />
     <Compile Include="ViewModels\RolesControllerActionViewModel.cs" />

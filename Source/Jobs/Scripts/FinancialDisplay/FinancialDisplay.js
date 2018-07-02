@@ -80,9 +80,20 @@ FinancialDisplay.controller('MainCtrl', ['$scope', '$log', '$http', 'uiGridConst
 
       $scope.ShowDetail = function () {
           var rowCol = $scope.gridApi.cellNav.getFocusedCell();
+
+          if ($("#ReportType").val() == "Balance Sheet" || $("#ReportType").val() == "Profit And Loss") {
+              if (rowCol.col.field == "GRName" || rowCol.col.field == "Debit")
+                  $("#LedgerAccountGroup").val(rowCol.row.entity.GRCode);
+              else if (rowCol.col.field == "GRNameCredit" || rowCol.col.field == "Credit")
+                  $("#LedgerAccountGroup").val(rowCol.row.entity.GRCodeCredit);
+          }
+          else {
+              $("#LedgerAccountGroup").val(rowCol.row.entity.LedgerAccountGroupId);
+              $("#LedgerAccount").val(rowCol.row.entity.LedgerAccountId);
+          }
+
           $("#ReportType").val(rowCol.row.entity.OpenReportType);
-          $("#LedgerAccountGroup").val(rowCol.row.entity.LedgerAccountGroupId);
-          $("#LedgerAccount").val(rowCol.row.entity.LedgerAccountId);
+
 
 
           if ($("#ReportType").val() != "") {
@@ -404,7 +415,6 @@ FinancialDisplay.controller('MainCtrl', ['$scope', '$log', '$http', 'uiGridConst
       $scope.BindData = function ()
       {
           $scope.myData = [];
-
 
           $.ajax({
               url: '/FinancialDisplay/FinancialDisplayFill/' + $(this).serialize(),
@@ -838,8 +848,91 @@ FinancialDisplay.controller('MainCtrl', ['$scope', '$log', '$http', 'uiGridConst
                           });
                       }
 
+                      else if ($("#ReportType").val() == "Balance Sheet") {
+
+                          var TotalAmtDr = 0;
+                          var TotalAmtCr = 0;
+                          if (result.Data != null) {
+                              TotalAmtDr = result.Data[0]["TotalDebit"];
+                              TotalAmtCr = result.Data[0]["TotalCredit"];
+                          }
+
+
+                          $scope.gridOptions.columnDefs.push({ field: 'GRCode', width: 50, visible: false });
+                          $scope.gridOptions.columnDefs.push({
+                              field: 'GRName', displayName: "Liabilities", width: 300, visible: true, cellClass: 'cell-text ', headerCellClass: 'header-text', enableSorting: false,
+                              cellTemplate: '<div class="ui-grid-cell-contents my-cell ng-binding ng-scope " ng-dblclick="grid.appScope.ShowDetail()"  ng-bind-html="COL_FIELD | trusted">  </div>',
+                          });
+                          $scope.gridOptions.columnDefs.push({
+                              field: 'Debit', width: 260, visible: true, displayName: "Amount", headerCellClass: 'text-right header-text',
+                              footerCellTemplate: '<div class="ui-grid-cell-contents" >' + TotalAmtDr + '</div>',
+                              aggregationHideLabel: true,
+                              footerCellClass: 'text-right ',
+                              cellClass: 'text-right cell-text ',
+                              enableSorting: false
+                          });
+                          $scope.gridOptions.columnDefs.push({ field: 'GRCodeCredit', width: 50, visible: false });
+                          $scope.gridOptions.columnDefs.push({
+                              field: 'GRNameCredit', displayName: "Assets", width: 300, visible: true, cellClass: 'cell-text ', headerCellClass: 'header-text', enableSorting: false,
+                              cellTemplate: '<div class="ui-grid-cell-contents my-cell ng-binding ng-scope " ng-dblclick="grid.appScope.ShowDetail()"  ng-bind-html="COL_FIELD | trusted">  </div>',
+                          });
+                          $scope.gridOptions.columnDefs.push({
+                              field: 'Credit', width: 260, visible: true, displayName: "Amount", headerCellClass: 'text-right header-text',
+                              footerCellTemplate: '<div class="ui-grid-cell-contents" >' + TotalAmtCr + '</div>',
+                              aggregationHideLabel: true,
+                              footerCellClass: 'text-right ',
+                              cellClass: 'text-right cell-text ',
+                              enableSorting: false
+                          });
+
+
+                      }
+
+                      else if ($("#ReportType").val() == "Profit And Loss") {
+
+                          var TotalAmtDr = 0;
+                          var TotalAmtCr = 0;
+                          if (result.Data != null) {
+                              TotalAmtDr = result.Data[0]["TotalDebit"];
+                              TotalAmtCr = result.Data[0]["TotalCredit"];
+                          }
+
+
+
+                          $scope.gridOptions.columnDefs.push({ field: 'GRCode', width: 50, visible: false });
+                          $scope.gridOptions.columnDefs.push({
+                              field: 'GRName', displayName: "Particulars", width: 300, visible: true, cellClass: 'cell-text ', headerCellClass: 'header-text', enableSorting: false,
+                              cellTemplate: '<div class="ui-grid-cell-contents my-cell ng-binding ng-scope " ng-dblclick="grid.appScope.ShowDetail()"  ng-bind-html="COL_FIELD | trusted">  </div>',
+                          });
+                          $scope.gridOptions.columnDefs.push({
+                              field: 'Debit', width: 260, visible: true, displayName: "Amount", headerCellClass: 'text-right header-text',
+                              footerCellTemplate: '<div class="ui-grid-cell-contents" >' + TotalAmtDr + '</div>',
+                              cellTemplate: '<div ng-if="row.entity.GRName != null"><div class="ui-grid-cell-contents my-cell ng-binding ng-scope " ng-bind-html="COL_FIELD | trusted"> {{row.entity.Debit}} </div></div>  <div ng-if="row.entity.GRName == null"><div style="font-weight:bold" class="ui-grid-cell-contents my-cell ng-binding ng-scope " ng-bind-html="COL_FIELD | trusted"> {{row.entity.Debit}} </div></div>',
+                              aggregationHideLabel: true,
+                              footerCellClass: 'text-right ',
+                              cellClass: 'text-right cell-text ',
+                              enableSorting: false
+                          });
+                          $scope.gridOptions.columnDefs.push({ field: 'GRCodeCredit', width: 50, visible: false });
+                          $scope.gridOptions.columnDefs.push({
+                              field: 'GRNameCredit', displayName: "Particulars", width: 300, visible: true, cellClass: 'cell-text ', headerCellClass: 'header-text', enableSorting: false,
+                              cellTemplate: '<div class="ui-grid-cell-contents my-cell ng-binding ng-scope " ng-dblclick="grid.appScope.ShowDetail()"  ng-bind-html="COL_FIELD | trusted">  </div>',
+                          });
+                          $scope.gridOptions.columnDefs.push({
+                              field: 'Credit', width: 260, visible: true, displayName: "Amount", headerCellClass: 'text-right header-text',
+                              footerCellTemplate: '<div class="ui-grid-cell-contents" >' + TotalAmtCr + '</div>',
+                              cellTemplate: '<div ng-if="row.entity.GRName != null"><div class="ui-grid-cell-contents my-cell ng-binding ng-scope " ng-bind-html="COL_FIELD | trusted"> {{row.entity.Credit}} </div></div>  <div ng-if="row.entity.GRName == null"><div style="font-weight:bold" class="ui-grid-cell-contents my-cell ng-binding ng-scope " ng-bind-html="COL_FIELD | trusted"> {{row.entity.Credit}} </div></div>',
+                              aggregationHideLabel: true,
+                              footerCellClass: 'text-right ',
+                              cellClass: 'text-right cell-text ',
+                              enableSorting: false
+                          });
+                      }
+
                       $scope.gridOptions.data = result.Data;
                       $scope.gridApi.grid.refresh();
+
+
                       
                    }
                   else if (!result.Success) {

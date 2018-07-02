@@ -561,7 +561,12 @@ namespace Jobs.Controllers
                     bool DocDateChanged = false;
                     List<LogTypeViewModel> LogList = new List<LogTypeViewModel>();
 
-                    JobInvoiceHeader temp = _JobInvoiceHeaderService.Find(pt.JobInvoiceHeaderId);                    
+                    JobInvoiceHeader temp = _JobInvoiceHeaderService.Find(pt.JobInvoiceHeaderId);
+
+                    bool IsBillToPartyChanged = false;
+                    if (vm.JobWorkerId != temp.JobWorkerId)
+                        IsBillToPartyChanged = true;
+
 
                     JobInvoiceHeader ExRec = new JobInvoiceHeader();
                     ExRec = Mapper.Map<JobInvoiceHeader>(temp);
@@ -685,6 +690,25 @@ namespace Jobs.Controllers
                             }
                         }
                     }
+
+
+                    if (IsBillToPartyChanged == true)
+                    {
+                        IEnumerable<JobInvoiceHeaderCharge> HeaderChargeList = (from Hc in db.JobInvoiceHeaderCharges where Hc.HeaderTableId == temp.JobInvoiceHeaderId select Hc).ToList();
+                        foreach (JobInvoiceHeaderCharge HeaderCharge in HeaderChargeList)
+                        {
+                            HeaderCharge.PersonID = vm.JobWorkerId;
+                            _unitOfWork.Repository<JobInvoiceHeaderCharge>().Update(HeaderCharge);
+                        }
+
+                        IEnumerable<JobInvoiceLineCharge> LineChargeList = (from Hc in db.JobInvoiceLineCharge where Hc.HeaderTableId == temp.JobInvoiceHeaderId select Hc).ToList();
+                        foreach (JobInvoiceLineCharge LineCharge in LineChargeList)
+                        {
+                            LineCharge.PersonID = vm.JobWorkerId;
+                            _unitOfWork.Repository<JobInvoiceLineCharge>().Update(LineCharge);
+                        }
+                    }
+
 
                     XElement Modifications = new ModificationsCheckService().CheckChanges(LogList);
 

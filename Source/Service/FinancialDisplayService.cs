@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Data.Models;
 using System.Data.SqlClient;
 using System.Configuration;
+using System.Data;
 
 namespace Service
 {
@@ -25,6 +26,8 @@ namespace Service
         IEnumerable<SubTrialBalanceViewModel> GetSubTrialBalance(FinancialDisplaySettings Settings);
         IEnumerable<SubTrialBalanceSummaryViewModel> GetSubTrialBalanceSummary(FinancialDisplaySettings Settings);
         IEnumerable<LedgerBalanceViewModel> GetLedgerBalance(FinancialDisplaySettings Settings);
+        IEnumerable<BalanceSheetViewModel> GetBalanceSheet(FinancialDisplaySettings Settings);
+        IEnumerable<ProfitAndLossViewModel> GetProfitAndLoss(FinancialDisplaySettings Settings);
     }
 
     public class FinancialDisplayService : IFinancialDisplayService
@@ -34,11 +37,11 @@ namespace Service
 
         public static TrialBalanceDetailViewModel TempVar = new TrialBalanceDetailViewModel();
 
-        
+
 
         public FinancialDisplayService(IUnitOfWorkForService unitOfWork)
         {
-            _unitOfWork = unitOfWork;            
+            _unitOfWork = unitOfWork;
         }
 
 
@@ -51,7 +54,7 @@ namespace Service
             var CostCenterSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "CostCenter" select H).FirstOrDefault();
             var IsIncludeZeroBalanceSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "IsIncludeZeroBalance" select H).FirstOrDefault();
             var IsIncludeOpeningSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "IsIncludeOpening" select H).FirstOrDefault();
-            
+
             var LedgerAccountGroupSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "LedgerAccountGroup" select H).FirstOrDefault();
 
 
@@ -82,7 +85,7 @@ namespace Service
                                         GROUP BY H.BaseLedgerAccountGroupId 
                                         Having (Sum(isnull(H.Opening,0)) <> 0 Or Sum(isnull(H.AmtDr,0)) <> 0 Or Sum(isnull(H.AmtCr,0)) <> 0 Or Sum(isnull(H.Balance,0)) <> 0) " +
                                         (IsIncludeZeroBalance == "False" ? " And Sum(isnull(H.Balance,0)) <> 0 " : "") +
-                
+
                                         @"UNION ALL 
                 
                                         SELECT H.LedgerAccountId AS LedgerAccountGroupId, LedgerAccountName AS LedgerAccountGroupName, 
@@ -313,70 +316,70 @@ namespace Service
             SqlParameter SqlParameterLedgerAccountGroup = new SqlParameter("@LedgerAccountGroup", !string.IsNullOrEmpty(LedgerAccountGroup) ? LedgerAccountGroup : (object)DBNull.Value);
 
 
-//            string mCondStr = "";
-//            if (SiteId != null) mCondStr = mCondStr + " AND LH.SiteId IN (SELECT Items FROM [dbo].[Split] (@Site, ','))";
-//            if (DivisionId != null) mCondStr = mCondStr + " AND LH.SiteId IN (SELECT Items FROM [dbo].[Split] (@Division, ','))";
-//            if (CostCenterId != null) mCondStr = mCondStr + " AND H.CostCenter IN (SELECT Items FROM [dbo].[Split] (@CostCenter, ','))";
-//            if (LedgerAccountGroup != null && LedgerAccountGroup != "") mCondStr = mCondStr + " AND LAG.LedgerAccountGroupId = @LedgerAccountGroup";
+            //            string mCondStr = "";
+            //            if (SiteId != null) mCondStr = mCondStr + " AND LH.SiteId IN (SELECT Items FROM [dbo].[Split] (@Site, ','))";
+            //            if (DivisionId != null) mCondStr = mCondStr + " AND LH.SiteId IN (SELECT Items FROM [dbo].[Split] (@Division, ','))";
+            //            if (CostCenterId != null) mCondStr = mCondStr + " AND H.CostCenter IN (SELECT Items FROM [dbo].[Split] (@CostCenter, ','))";
+            //            if (LedgerAccountGroup != null && LedgerAccountGroup != "") mCondStr = mCondStr + " AND LAG.LedgerAccountGroupId = @LedgerAccountGroup";
 
-//            string mOpeningDateCondStr = "";
-//            if (FromDate != null) mOpeningDateCondStr = mOpeningDateCondStr + " AND LH.DocDate < @FromDate ";
-
-
-//            string mDateCondStr = "";
-//            if (FromDate != null) mDateCondStr = mDateCondStr + " AND LH.DocDate >= @FromDate ";
-//            if (ToDate != null) mDateCondStr = mDateCondStr + " AND LH.DocDate <= @ToDate ";
+            //            string mOpeningDateCondStr = "";
+            //            if (FromDate != null) mOpeningDateCondStr = mOpeningDateCondStr + " AND LH.DocDate < @FromDate ";
 
 
-//            string mQry = @"SELECT VMain.LedgerAccountId,  max(LA.LedgerAccountName + ',' + LA.LedgerAccountSuffix )   AS LedgerAccountName, max(LAG.LedgerAccountGroupName) AS LedgerAccountGroupName, 
-//                            CASE WHEN abs(Sum(Isnull(VMain.Opening,0))) = 0 THEN NULL ELSE abs(Sum(Isnull(VMain.Opening,0))) END AS Opening, 
-//                            CASE WHEN Sum(Isnull(VMain.Opening,0)) = 0 THEN NULL ELSE Sum(Isnull(VMain.Opening,0)) END AS OpeningValue, 
-//                            CASE WHEN Sum(Isnull(VMain.Opening,0)) >= 0 THEN 'Dr' ELSE 'Cr' END AS OpeningDrCr, 
-//                            CASE WHEN Sum(isnull(Vmain.AmtDr,0)) = 0 THEN NULL ELSE Sum(isnull(Vmain.AmtDr,0)) END AS AmtDr, CASE WHEN sum(isnull(VMain.AmtCr,0)) = 0 THEN NULL ELSE sum(isnull(VMain.AmtCr,0)) END AS AmtCr,
-//                            abs(Sum(Isnull(VMain.Opening,0)) + Sum(isnull(Vmain.AmtDr,0)) - sum(isnull(VMain.AmtCr,0))) AS Balance,
-//                            Sum(Isnull(VMain.Opening,0)) + Sum(isnull(Vmain.AmtDr,0)) - sum(isnull(VMain.AmtCr,0)) AS BalanceValue,
-//                            CASE WHEN ( Sum(Isnull(VMain.Opening,0)) + Sum(isnull(Vmain.AmtDr,0)) - sum(isnull(VMain.AmtCr,0))) >= 0 THEN 'Dr' ELSE 'Cr' END AS BalanceDrCr,
-//                            'Sub Trial Balance' AS ReportType, 'Ledger' AS OpenReportType
-//                            FROM
-//                            (
-//                            SELECT H.LedgerAccountId ,  sum(isnull(H.AmtDr,0)) - sum(isnull(H.AmtCr,0)) AS Opening,
-//                            0 AS AmtDr,0 AS  AmtCr    
-//                            FROM web.LedgerHeaders LH  WITH (Nolock)
-//                            LEFT JOIN web.Ledgers H WITH (Nolock) ON LH.LedgerHeaderId = H.LedgerHeaderId 
-//                            LEFT JOIN web.LedgerAccounts LA  WITH (Nolock) ON LA.LedgerAccountId = H.LedgerAccountId 
-//                            LEFT JOIN web.LedgerAccountGroups LAG  WITH (Nolock) ON LAG.LedgerAccountGroupId = LA.LedgerAccountGroupId 
-//                            WHERE 1 = 1 
-//                            AND LH.DocDate < @ToDate " +
-//                            (SiteId != null ? " AND LH.SiteId IN (SELECT Items FROM [dbo].[Split] (@Site, ','))" : "") +
-//                            (DivisionId != null ? " AND LH.DivisionId IN (SELECT Items FROM [dbo].[Split] (@Division, ','))" : "") +
-//                            (CostCenterId != null ? " AND H.CostCenterId IN (SELECT Items FROM [dbo].[Split] (@CostCenter, ','))" : "") +
-//                            (LedgerAccountGroup != null ? " AND LAG.LedgerAccountGroupId = @LedgerAccountGroup " : "") +
-//                            (IsIncludeOpening == "False" ? " AND LH.DocDate >= @FromDate" : "") +
-//                            @" GROUP BY H.LedgerAccountId " +
-                            
-//                            @" UNION ALL 
-//
-//                            SELECT H.LedgerAccountId, 0 AS Opening,
-//                            sum(isnull(H.AmtDr,0)) AS AmtDr,sum(isnull(H.AmtCr,0)) AS AmtCr
-//                            FROM web.LedgerHeaders LH  WITH (Nolock)
-//                            LEFT JOIN  web.Ledgers H  WITH (Nolock) ON LH.LedgerHeaderId = H.LedgerHeaderId 
-//                            LEFT JOIN web.LedgerAccounts LA  WITH (Nolock) ON LA.LedgerAccountId = H.LedgerAccountId 
-//                            LEFT JOIN web.LedgerAccountGroups LAG  WITH (Nolock) ON LAG.LedgerAccountGroupId = LA.LedgerAccountGroupId 
-//                            WHERE 1 = 1 
-//                            AND LH.DocDate <= @ToDate " +
-//                            (SiteId != null ? " AND LH.SiteId IN (SELECT Items FROM [dbo].[Split] (@Site, ','))" : "") +
-//                            (DivisionId != null ? " AND LH.DivisionId IN (SELECT Items FROM [dbo].[Split] (@Division, ','))" : "") +
-//                            (CostCenterId != null ? " AND H.CostCenterId IN (SELECT Items FROM [dbo].[Split] (@CostCenter, ','))" : "") +
-//                            (LedgerAccountGroup != null ? " AND LAG.LedgerAccountGroupId = @LedgerAccountGroup " : "") +
-//                            (IsIncludeOpening == "False" ? " AND LH.DocDate >= @FromDate" : "") +
+            //            string mDateCondStr = "";
+            //            if (FromDate != null) mDateCondStr = mDateCondStr + " AND LH.DocDate >= @FromDate ";
+            //            if (ToDate != null) mDateCondStr = mDateCondStr + " AND LH.DocDate <= @ToDate ";
 
-//                            @" GROUP BY H.LedgerAccountId 
-//                            ) AS VMain
-//                            LEFT JOIN web.LedgerAccounts LA  WITH (Nolock) ON LA.LedgerAccountId = VMain.LedgerAccountId 
-//                            LEFT JOIN web.LedgerAccountGroups LAG  WITH (Nolock) ON LAG.LedgerAccountGroupId = LA.LedgerAccountGroupId 
-//                            Where 1=1 
-//                            GROUP BY VMain.LedgerAccountId
-//                            Order By max(LA.LedgerAccountName + ',' + LA.LedgerAccountSuffix) ";
+
+            //            string mQry = @"SELECT VMain.LedgerAccountId,  max(LA.LedgerAccountName + ',' + LA.LedgerAccountSuffix )   AS LedgerAccountName, max(LAG.LedgerAccountGroupName) AS LedgerAccountGroupName, 
+            //                            CASE WHEN abs(Sum(Isnull(VMain.Opening,0))) = 0 THEN NULL ELSE abs(Sum(Isnull(VMain.Opening,0))) END AS Opening, 
+            //                            CASE WHEN Sum(Isnull(VMain.Opening,0)) = 0 THEN NULL ELSE Sum(Isnull(VMain.Opening,0)) END AS OpeningValue, 
+            //                            CASE WHEN Sum(Isnull(VMain.Opening,0)) >= 0 THEN 'Dr' ELSE 'Cr' END AS OpeningDrCr, 
+            //                            CASE WHEN Sum(isnull(Vmain.AmtDr,0)) = 0 THEN NULL ELSE Sum(isnull(Vmain.AmtDr,0)) END AS AmtDr, CASE WHEN sum(isnull(VMain.AmtCr,0)) = 0 THEN NULL ELSE sum(isnull(VMain.AmtCr,0)) END AS AmtCr,
+            //                            abs(Sum(Isnull(VMain.Opening,0)) + Sum(isnull(Vmain.AmtDr,0)) - sum(isnull(VMain.AmtCr,0))) AS Balance,
+            //                            Sum(Isnull(VMain.Opening,0)) + Sum(isnull(Vmain.AmtDr,0)) - sum(isnull(VMain.AmtCr,0)) AS BalanceValue,
+            //                            CASE WHEN ( Sum(Isnull(VMain.Opening,0)) + Sum(isnull(Vmain.AmtDr,0)) - sum(isnull(VMain.AmtCr,0))) >= 0 THEN 'Dr' ELSE 'Cr' END AS BalanceDrCr,
+            //                            'Sub Trial Balance' AS ReportType, 'Ledger' AS OpenReportType
+            //                            FROM
+            //                            (
+            //                            SELECT H.LedgerAccountId ,  sum(isnull(H.AmtDr,0)) - sum(isnull(H.AmtCr,0)) AS Opening,
+            //                            0 AS AmtDr,0 AS  AmtCr    
+            //                            FROM web.LedgerHeaders LH  WITH (Nolock)
+            //                            LEFT JOIN web.Ledgers H WITH (Nolock) ON LH.LedgerHeaderId = H.LedgerHeaderId 
+            //                            LEFT JOIN web.LedgerAccounts LA  WITH (Nolock) ON LA.LedgerAccountId = H.LedgerAccountId 
+            //                            LEFT JOIN web.LedgerAccountGroups LAG  WITH (Nolock) ON LAG.LedgerAccountGroupId = LA.LedgerAccountGroupId 
+            //                            WHERE 1 = 1 
+            //                            AND LH.DocDate < @ToDate " +
+            //                            (SiteId != null ? " AND LH.SiteId IN (SELECT Items FROM [dbo].[Split] (@Site, ','))" : "") +
+            //                            (DivisionId != null ? " AND LH.DivisionId IN (SELECT Items FROM [dbo].[Split] (@Division, ','))" : "") +
+            //                            (CostCenterId != null ? " AND H.CostCenterId IN (SELECT Items FROM [dbo].[Split] (@CostCenter, ','))" : "") +
+            //                            (LedgerAccountGroup != null ? " AND LAG.LedgerAccountGroupId = @LedgerAccountGroup " : "") +
+            //                            (IsIncludeOpening == "False" ? " AND LH.DocDate >= @FromDate" : "") +
+            //                            @" GROUP BY H.LedgerAccountId " +
+
+            //                            @" UNION ALL 
+            //
+            //                            SELECT H.LedgerAccountId, 0 AS Opening,
+            //                            sum(isnull(H.AmtDr,0)) AS AmtDr,sum(isnull(H.AmtCr,0)) AS AmtCr
+            //                            FROM web.LedgerHeaders LH  WITH (Nolock)
+            //                            LEFT JOIN  web.Ledgers H  WITH (Nolock) ON LH.LedgerHeaderId = H.LedgerHeaderId 
+            //                            LEFT JOIN web.LedgerAccounts LA  WITH (Nolock) ON LA.LedgerAccountId = H.LedgerAccountId 
+            //                            LEFT JOIN web.LedgerAccountGroups LAG  WITH (Nolock) ON LAG.LedgerAccountGroupId = LA.LedgerAccountGroupId 
+            //                            WHERE 1 = 1 
+            //                            AND LH.DocDate <= @ToDate " +
+            //                            (SiteId != null ? " AND LH.SiteId IN (SELECT Items FROM [dbo].[Split] (@Site, ','))" : "") +
+            //                            (DivisionId != null ? " AND LH.DivisionId IN (SELECT Items FROM [dbo].[Split] (@Division, ','))" : "") +
+            //                            (CostCenterId != null ? " AND H.CostCenterId IN (SELECT Items FROM [dbo].[Split] (@CostCenter, ','))" : "") +
+            //                            (LedgerAccountGroup != null ? " AND LAG.LedgerAccountGroupId = @LedgerAccountGroup " : "") +
+            //                            (IsIncludeOpening == "False" ? " AND LH.DocDate >= @FromDate" : "") +
+
+            //                            @" GROUP BY H.LedgerAccountId 
+            //                            ) AS VMain
+            //                            LEFT JOIN web.LedgerAccounts LA  WITH (Nolock) ON LA.LedgerAccountId = VMain.LedgerAccountId 
+            //                            LEFT JOIN web.LedgerAccountGroups LAG  WITH (Nolock) ON LAG.LedgerAccountGroupId = LA.LedgerAccountGroupId 
+            //                            Where 1=1 
+            //                            GROUP BY VMain.LedgerAccountId
+            //                            Order By max(LA.LedgerAccountName + ',' + LA.LedgerAccountSuffix) ";
 
             string mPrimaryQry = @" WITH cteLedgerBalance AS
                                     ( 
@@ -541,7 +544,7 @@ namespace Service
 	                            LEFT JOIN  web.Ledgers H WITH (Nolock) ON LH.LedgerHeaderId = H.LedgerHeaderId 
 	                            LEFT JOIN web.LedgerAccounts LA  WITH (Nolock) ON LA.LedgerAccountId = H.LedgerAccountId 
 	                            WHERE H.LedgerAccountId IS NOT NULL " + mCondStr + mOpeningDateCondStr +
-	                            @" GROUP BY H.LedgerAccountId
+                                @" GROUP BY H.LedgerAccountId
 	 
 	                            UNION ALL 
 	
@@ -646,14 +649,14 @@ namespace Service
                                         Having (Sum(isnull(H.Opening,0)) <> 0 Or Sum(isnull(H.AmtDr,0)) <> 0 Or Sum(isnull(H.AmtCr,0)) <> 0 Or Sum(isnull(H.Balance,0)) <> 0) " +
                             (IsIncludeZeroBalance == "False" ? " And Sum(isnull(H.Balance,0)) <> 0 " : "") +
                             @" ORDER BY OrderByColumn ";
-            
+
             IEnumerable<TrialBalanceViewModel> TrialBalanceList = db.Database.SqlQuery<TrialBalanceViewModel>(mQry, SqlParameterSiteId, SqlParameterDivisionId, SqlParameterFromDate, SqlParameterToDate, SqlParameterCostCenter, SqlParameterLedgerAccountGroup).ToList();
 
             TotalAmtDr = TrialBalanceList.Sum(m => m.AmtDr) ?? 0;
             TotalAmtCr = TrialBalanceList.Sum(m => m.AmtCr) ?? 0;
 
 
-            LedgerAccountGroup = string.Join<string>(",", TrialBalanceList.Select(m => m.LedgerAccountGroupId.ToString())); 
+            LedgerAccountGroup = string.Join<string>(",", TrialBalanceList.Select(m => m.LedgerAccountGroupId.ToString()));
             //LedgerAccountGroup = string.Join<string>(",", db.LedgerAccountGroup.Select(m => m.LedgerAccountGroupId.ToString()));
             //LedgerAccountGroup = "27,1012";
             SqlParameter SqlParameterSiteId_Child = new SqlParameter("@Site", !string.IsNullOrEmpty(SiteId) ? SiteId : (object)DBNull.Value);
@@ -864,124 +867,124 @@ namespace Service
 
         }
 
-//        public IEnumerable<TrialBalanceDetailViewModel> GetTrialBalanceDetail(FinancialDisplaySettings Settings)
-//        {
-//            var SiteSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "Site" select H).FirstOrDefault();
-//            var DivisionSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "Division" select H).FirstOrDefault();
-//            var FromDateSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "FromDate" select H).FirstOrDefault();
-//            var ToDateSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "ToDate" select H).FirstOrDefault();
-//            var CostCenterSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "CostCenter" select H).FirstOrDefault();
-//            var LedgerAccountGroupSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "LedgerAccountGroup" select H).FirstOrDefault();
+        //        public IEnumerable<TrialBalanceDetailViewModel> GetTrialBalanceDetail(FinancialDisplaySettings Settings)
+        //        {
+        //            var SiteSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "Site" select H).FirstOrDefault();
+        //            var DivisionSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "Division" select H).FirstOrDefault();
+        //            var FromDateSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "FromDate" select H).FirstOrDefault();
+        //            var ToDateSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "ToDate" select H).FirstOrDefault();
+        //            var CostCenterSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "CostCenter" select H).FirstOrDefault();
+        //            var LedgerAccountGroupSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "LedgerAccountGroup" select H).FirstOrDefault();
 
 
-//            string SiteId = SiteSetting.Value;
-//            string DivisionId = DivisionSetting.Value;
-//            string FromDate = FromDateSetting.Value;
-//            string ToDate = ToDateSetting.Value;
-//            string CostCenterId = CostCenterSetting.Value;
-//            string LedgerAccountGroup = LedgerAccountGroupSetting.Value;
+        //            string SiteId = SiteSetting.Value;
+        //            string DivisionId = DivisionSetting.Value;
+        //            string FromDate = FromDateSetting.Value;
+        //            string ToDate = ToDateSetting.Value;
+        //            string CostCenterId = CostCenterSetting.Value;
+        //            string LedgerAccountGroup = LedgerAccountGroupSetting.Value;
 
 
-//            SqlParameter SqlParameterSiteId = new SqlParameter("@Site", !string.IsNullOrEmpty(SiteId) ? SiteId : (object)DBNull.Value);
-//            SqlParameter SqlParameterDivisionId = new SqlParameter("@Division", !string.IsNullOrEmpty(DivisionId) ? DivisionId : (object)DBNull.Value);
-//            SqlParameter SqlParameterFromDate = new SqlParameter("@FromDate", FromDate);
-//            SqlParameter SqlParameterToDate = new SqlParameter("@ToDate", ToDate);
-//            SqlParameter SqlParameterCostCenter = new SqlParameter("@CostCenter", CostCenterId);
-//            SqlParameter SqlParameterLedgerAccountGroup = new SqlParameter("@LedgerAccountGroup", LedgerAccountGroup);
+        //            SqlParameter SqlParameterSiteId = new SqlParameter("@Site", !string.IsNullOrEmpty(SiteId) ? SiteId : (object)DBNull.Value);
+        //            SqlParameter SqlParameterDivisionId = new SqlParameter("@Division", !string.IsNullOrEmpty(DivisionId) ? DivisionId : (object)DBNull.Value);
+        //            SqlParameter SqlParameterFromDate = new SqlParameter("@FromDate", FromDate);
+        //            SqlParameter SqlParameterToDate = new SqlParameter("@ToDate", ToDate);
+        //            SqlParameter SqlParameterCostCenter = new SqlParameter("@CostCenter", CostCenterId);
+        //            SqlParameter SqlParameterLedgerAccountGroup = new SqlParameter("@LedgerAccountGroup", LedgerAccountGroup);
 
 
-//            string mCondStr = "";
-//            if (SiteId != null) mCondStr = mCondStr + " AND LH.SiteId IN (SELECT Items FROM [dbo].[Split] (@Site, ','))";
-//            if (DivisionId != null) mCondStr = mCondStr + " AND LH.SiteId IN (SELECT Items FROM [dbo].[Split] (@Division, ','))";
-//            if (CostCenterId != null) mCondStr = mCondStr + " AND H.CostCenter IN (SELECT Items FROM [dbo].[Split] (@CostCenter, ','))";
-//            if (FromDate != null) mCondStr = mCondStr + " AND LH.DocDate >= @FromDate";
-//            if (ToDate != null) mCondStr = mCondStr + " AND LH.DocDate <= @ToDate";
-//            if (LedgerAccountGroup != null && LedgerAccountGroup != "") mCondStr = mCondStr + " AND LAG.LedgerAccountGroupId = @LedgerAccountGroup";
+        //            string mCondStr = "";
+        //            if (SiteId != null) mCondStr = mCondStr + " AND LH.SiteId IN (SELECT Items FROM [dbo].[Split] (@Site, ','))";
+        //            if (DivisionId != null) mCondStr = mCondStr + " AND LH.SiteId IN (SELECT Items FROM [dbo].[Split] (@Division, ','))";
+        //            if (CostCenterId != null) mCondStr = mCondStr + " AND H.CostCenter IN (SELECT Items FROM [dbo].[Split] (@CostCenter, ','))";
+        //            if (FromDate != null) mCondStr = mCondStr + " AND LH.DocDate >= @FromDate";
+        //            if (ToDate != null) mCondStr = mCondStr + " AND LH.DocDate <= @ToDate";
+        //            if (LedgerAccountGroup != null && LedgerAccountGroup != "") mCondStr = mCondStr + " AND LAG.LedgerAccountGroupId = @LedgerAccountGroup";
 
-//            string mBalanceCondStr = "";
-//            //if (IncludeZeroBalance != null) mCondStr = "HAVING sum(isnull(H.AmtDr,0))  <> sum(isnull(H.AmtCr,0))";
-
-
-//            string mQry = @"WITH CTE_LedgerBalance AS 
-//                            (
-//	                            SELECT LAG.LedgerAccountGroupId, max(LAG.LedgerAccountGroupName) AS LedgerAccountGroupName, Max(Lag.ParentLedgerAccountGroupId) AS ParentLedgerAccountGroupId,
-//	                            Sum(isnull(H.AmtDr,0)) - sum(isnull(H.AmtCr,0)) AS Balance
-//	                            FROM web.LedgerHeaders LH  WITH (Nolock)
-//	                            LEFT JOIN web.Ledgers H WITH (Nolock) ON LH.LedgerHeaderId = H.LedgerHeaderId 
-//	                            LEFT JOIN web.LedgerAccounts LA  WITH (Nolock) ON LA.LedgerAccountId = H.LedgerAccountId 
-//	                            LEFT JOIN web.LedgerAccountGroups LAG  WITH (Nolock) ON LAG.LedgerAccountGroupId = LA.LedgerAccountGroupId 
-//	                            WHERE LAG.LedgerAccountGroupId IS NOT NULL   AND LH.DocDate >=  '01/Apr/2017' 
-//	                            AND LH.DocDate <= '30/Sep/2017'
-//	                            --AND LAG.LedgerAccountGroupName LIKE '%Sundry Debtors%'
-//	                            GROUP BY LAG.LedgerAccountGroupId 
-//                            ),--SELECT CASE WHEN balance>0 THEN balance END AS dr FROM cte_LedgerBalance, 
-//                            CTE_LedgerAccountGroup AS 
-//                            (
-//	                            SELECT L.LedgerAccountGroupId AS BaseLedgerAccountGroupId, L.LedgerAccountGroupId, L.LedgerAccountGroupName, L.ParentLedgerAccountGroupId AS ParentLedgerAccountGroupId, 0 AS [level]
-//	                            FROM CTE_LedgerBalance L
-//	                            UNION ALL
-//	                            SELECT H.BaseLedgerAccountGroupId, L.LedgerAccountGroupId, L.LedgerAccountGroupName, L.ParentLedgerAccountGroupId, H.level + 1
-//	                            FROM CTE_LedgerAccountGroup H 
-//	                            INNER JOIN CTE_LedgerBalance L ON H.ParentLedgerAccountGroupId = L.LedgerAccountGroupId
-//                            ),
-//                            CTE_LedgerBalanceTotals AS 
-//                            (
-//	                            SELECT IsNull(Sum(VTotals.AmtDr),0) AS TotalAmtDr, IsNull(Sum(VTotals.AmtCr),0) AS TotalAmtCr
-//	                            FROM (
-//		                            SELECT L.LedgerAccountGroupId, Max(L.LedgerAccountGroupName) AS LedgerAccountGroupName, Max(L.ParentLedgerAccountGroupId) AS ParentLedgerAccountGroupId, 
-//		                            CASE WHEN Sum(isnull(Lb.Balance,0)) > 0 THEN Sum(isnull(Lb.Balance,0)) ELSE NULL  END AS AmtDr,
-//		                            CASE WHEN Sum(isnull(Lb.Balance,0)) < 0 THEN abs(Sum(isnull(Lb.Balance,0))) ELSE NULL END AS AmtCr
-//		                            FROM CTE_LedgerAccountGroup L 
-//		                            LEFT JOIN CTE_LedgerBalance Lb ON L.BaseLedgerAccountGroupId = Lb.LedgerAccountGroupId 
-//		                            WHERE L.ParentLedgerAccountGroupId IS NULL
-//		                            GROUP BY L.LedgerAccountGroupId
-//	                            ) AS VTotals
-//                            )
-//
-//                            SELECT L.LedgerAccountGroupId, Max(L.LedgerAccountGroupName)  AS LedgerAccountGroupName, Max(L.ParentLedgerAccountGroupId) AS ParentLedgerAccountGroupId, 
-//                            CASE WHEN Sum(isnull(Lb.Balance,0)) > 0 THEN Sum(isnull(Lb.Balance,0)) ELSE NULL  END AS AmtDr,
-//                            CASE WHEN Sum(isnull(Lb.Balance,0)) < 0 THEN abs(Sum(isnull(Lb.Balance,0))) ELSE NULL END AS AmtCr,
-//                            Max(IsNull(Lbt.TotalAmtDr,0)) AS TotalAmtDr, Max(IsNull(Lbt.TotalAmtCr,0)) AS TotalAmtCr,
-//                            'Trial Balance' AS ReportType, 'Sub Trial Balance' AS OpenReportType
-//                            FROM CTE_LedgerAccountGroup L 
-//                            LEFT JOIN CTE_LedgerBalance Lb ON L.BaseLedgerAccountGroupId = Lb.LedgerAccountGroupId 
-//                            LEFT JOIN CTE_LedgerBalanceTotals Lbt ON 1=1
-//                            GROUP BY L.LedgerAccountGroupId
-//
-//                            UNION ALL 
-//
-//                            SELECT LA.LedgerAccountId AS LedgerAccountGroupId, max(LA.LedgerAccountName) AS LedgerAccountGroupName, 
-//                            Max(LA.LedgerAccountGroupId) AS ParentLedgerAccountGroupId,
-//                            CASE WHEN sum(isnull(H.AmtDr,0)) - sum(isnull(H.AmtCr,0)) > 0 THEN sum(isnull(H.AmtDr,0)) - sum(isnull(H.AmtCr,0)) ELSE NULL  END AS AmtDr,
-//                            CASE WHEN sum(isnull(H.AmtDr,0)) - sum(isnull(H.AmtCr,0)) < 0 THEN abs(sum(isnull(H.AmtDr,0)) - sum(isnull(H.AmtCr,0))) ELSE NULL END AS AmtCr,
-//                            Max(IsNull(Lbt.TotalAmtDr,0)) AS TotalAmtDr, Max(IsNull(Lbt.TotalAmtCr,0)) AS TotalAmtCr,
-//                            'Trial Balance' AS ReportType, 'Ledger' AS OpenReportType
-//                            FROM web.LedgerHeaders LH  WITH (Nolock)
-//                            LEFT JOIN web.Ledgers H WITH (Nolock) ON LH.LedgerHeaderId = H.LedgerHeaderId 
-//                            LEFT JOIN web.LedgerAccounts LA  WITH (Nolock) ON LA.LedgerAccountId = H.LedgerAccountId 
-//                            LEFT JOIN CTE_LedgerBalanceTotals Lbt ON 1=1
-//                            LEFT JOIN (
-//	                            SELECT Ag.ParentLedgerAccountGroupId
-//	                            FROM Web.LedgerAccountGroups Ag
-//	                            WHERE Ag.ParentLedgerAccountGroupId IS NOT NULL
-//	                            GROUP BY Ag.ParentLedgerAccountGroupId
-//                            ) AS V1 ON La.LedgerAccountGroupId = V1.ParentLedgerAccountGroupId
-//                            WHERE LH.DocDate >=  '01/Apr/2017' 
-//                            AND LH.DocDate <= '30/Sep/2017'
-//                            AND V1.ParentLedgerAccountGroupId IS NOT NULL
-//                            GROUP BY LA.LedgerAccountId ";
+        //            string mBalanceCondStr = "";
+        //            //if (IncludeZeroBalance != null) mCondStr = "HAVING sum(isnull(H.AmtDr,0))  <> sum(isnull(H.AmtCr,0))";
 
 
-//            IEnumerable<TrialBalanceDetailViewModel> TrialBalanceDetailList = db.Database.SqlQuery<TrialBalanceDetailViewModel>(mQry, SqlParameterSiteId, SqlParameterDivisionId, SqlParameterFromDate, SqlParameterToDate, SqlParameterLedgerAccountGroup).ToList();
+        //            string mQry = @"WITH CTE_LedgerBalance AS 
+        //                            (
+        //	                            SELECT LAG.LedgerAccountGroupId, max(LAG.LedgerAccountGroupName) AS LedgerAccountGroupName, Max(Lag.ParentLedgerAccountGroupId) AS ParentLedgerAccountGroupId,
+        //	                            Sum(isnull(H.AmtDr,0)) - sum(isnull(H.AmtCr,0)) AS Balance
+        //	                            FROM web.LedgerHeaders LH  WITH (Nolock)
+        //	                            LEFT JOIN web.Ledgers H WITH (Nolock) ON LH.LedgerHeaderId = H.LedgerHeaderId 
+        //	                            LEFT JOIN web.LedgerAccounts LA  WITH (Nolock) ON LA.LedgerAccountId = H.LedgerAccountId 
+        //	                            LEFT JOIN web.LedgerAccountGroups LAG  WITH (Nolock) ON LAG.LedgerAccountGroupId = LA.LedgerAccountGroupId 
+        //	                            WHERE LAG.LedgerAccountGroupId IS NOT NULL   AND LH.DocDate >=  '01/Apr/2017' 
+        //	                            AND LH.DocDate <= '30/Sep/2017'
+        //	                            --AND LAG.LedgerAccountGroupName LIKE '%Sundry Debtors%'
+        //	                            GROUP BY LAG.LedgerAccountGroupId 
+        //                            ),--SELECT CASE WHEN balance>0 THEN balance END AS dr FROM cte_LedgerBalance, 
+        //                            CTE_LedgerAccountGroup AS 
+        //                            (
+        //	                            SELECT L.LedgerAccountGroupId AS BaseLedgerAccountGroupId, L.LedgerAccountGroupId, L.LedgerAccountGroupName, L.ParentLedgerAccountGroupId AS ParentLedgerAccountGroupId, 0 AS [level]
+        //	                            FROM CTE_LedgerBalance L
+        //	                            UNION ALL
+        //	                            SELECT H.BaseLedgerAccountGroupId, L.LedgerAccountGroupId, L.LedgerAccountGroupName, L.ParentLedgerAccountGroupId, H.level + 1
+        //	                            FROM CTE_LedgerAccountGroup H 
+        //	                            INNER JOIN CTE_LedgerBalance L ON H.ParentLedgerAccountGroupId = L.LedgerAccountGroupId
+        //                            ),
+        //                            CTE_LedgerBalanceTotals AS 
+        //                            (
+        //	                            SELECT IsNull(Sum(VTotals.AmtDr),0) AS TotalAmtDr, IsNull(Sum(VTotals.AmtCr),0) AS TotalAmtCr
+        //	                            FROM (
+        //		                            SELECT L.LedgerAccountGroupId, Max(L.LedgerAccountGroupName) AS LedgerAccountGroupName, Max(L.ParentLedgerAccountGroupId) AS ParentLedgerAccountGroupId, 
+        //		                            CASE WHEN Sum(isnull(Lb.Balance,0)) > 0 THEN Sum(isnull(Lb.Balance,0)) ELSE NULL  END AS AmtDr,
+        //		                            CASE WHEN Sum(isnull(Lb.Balance,0)) < 0 THEN abs(Sum(isnull(Lb.Balance,0))) ELSE NULL END AS AmtCr
+        //		                            FROM CTE_LedgerAccountGroup L 
+        //		                            LEFT JOIN CTE_LedgerBalance Lb ON L.BaseLedgerAccountGroupId = Lb.LedgerAccountGroupId 
+        //		                            WHERE L.ParentLedgerAccountGroupId IS NULL
+        //		                            GROUP BY L.LedgerAccountGroupId
+        //	                            ) AS VTotals
+        //                            )
+        //
+        //                            SELECT L.LedgerAccountGroupId, Max(L.LedgerAccountGroupName)  AS LedgerAccountGroupName, Max(L.ParentLedgerAccountGroupId) AS ParentLedgerAccountGroupId, 
+        //                            CASE WHEN Sum(isnull(Lb.Balance,0)) > 0 THEN Sum(isnull(Lb.Balance,0)) ELSE NULL  END AS AmtDr,
+        //                            CASE WHEN Sum(isnull(Lb.Balance,0)) < 0 THEN abs(Sum(isnull(Lb.Balance,0))) ELSE NULL END AS AmtCr,
+        //                            Max(IsNull(Lbt.TotalAmtDr,0)) AS TotalAmtDr, Max(IsNull(Lbt.TotalAmtCr,0)) AS TotalAmtCr,
+        //                            'Trial Balance' AS ReportType, 'Sub Trial Balance' AS OpenReportType
+        //                            FROM CTE_LedgerAccountGroup L 
+        //                            LEFT JOIN CTE_LedgerBalance Lb ON L.BaseLedgerAccountGroupId = Lb.LedgerAccountGroupId 
+        //                            LEFT JOIN CTE_LedgerBalanceTotals Lbt ON 1=1
+        //                            GROUP BY L.LedgerAccountGroupId
+        //
+        //                            UNION ALL 
+        //
+        //                            SELECT LA.LedgerAccountId AS LedgerAccountGroupId, max(LA.LedgerAccountName) AS LedgerAccountGroupName, 
+        //                            Max(LA.LedgerAccountGroupId) AS ParentLedgerAccountGroupId,
+        //                            CASE WHEN sum(isnull(H.AmtDr,0)) - sum(isnull(H.AmtCr,0)) > 0 THEN sum(isnull(H.AmtDr,0)) - sum(isnull(H.AmtCr,0)) ELSE NULL  END AS AmtDr,
+        //                            CASE WHEN sum(isnull(H.AmtDr,0)) - sum(isnull(H.AmtCr,0)) < 0 THEN abs(sum(isnull(H.AmtDr,0)) - sum(isnull(H.AmtCr,0))) ELSE NULL END AS AmtCr,
+        //                            Max(IsNull(Lbt.TotalAmtDr,0)) AS TotalAmtDr, Max(IsNull(Lbt.TotalAmtCr,0)) AS TotalAmtCr,
+        //                            'Trial Balance' AS ReportType, 'Ledger' AS OpenReportType
+        //                            FROM web.LedgerHeaders LH  WITH (Nolock)
+        //                            LEFT JOIN web.Ledgers H WITH (Nolock) ON LH.LedgerHeaderId = H.LedgerHeaderId 
+        //                            LEFT JOIN web.LedgerAccounts LA  WITH (Nolock) ON LA.LedgerAccountId = H.LedgerAccountId 
+        //                            LEFT JOIN CTE_LedgerBalanceTotals Lbt ON 1=1
+        //                            LEFT JOIN (
+        //	                            SELECT Ag.ParentLedgerAccountGroupId
+        //	                            FROM Web.LedgerAccountGroups Ag
+        //	                            WHERE Ag.ParentLedgerAccountGroupId IS NOT NULL
+        //	                            GROUP BY Ag.ParentLedgerAccountGroupId
+        //                            ) AS V1 ON La.LedgerAccountGroupId = V1.ParentLedgerAccountGroupId
+        //                            WHERE LH.DocDate >=  '01/Apr/2017' 
+        //                            AND LH.DocDate <= '30/Sep/2017'
+        //                            AND V1.ParentLedgerAccountGroupId IS NOT NULL
+        //                            GROUP BY LA.LedgerAccountId ";
 
-//            return TrialBalanceDetailList;
 
-//        }
+        //            IEnumerable<TrialBalanceDetailViewModel> TrialBalanceDetailList = db.Database.SqlQuery<TrialBalanceDetailViewModel>(mQry, SqlParameterSiteId, SqlParameterDivisionId, SqlParameterFromDate, SqlParameterToDate, SqlParameterLedgerAccountGroup).ToList();
+
+        //            return TrialBalanceDetailList;
+
+        //        }
 
 
 
 
-        public string GetQryForTrialBalance(string SiteId, string DivisionId, string FromDate, string ToDate ,
+        public string GetQryForTrialBalance(string SiteId, string DivisionId, string FromDate, string ToDate,
                             string CostCenterId, string IsIncludeZeroBalance, string IsIncludeOpening, string LedgerAccountGroup)
         {
 
@@ -1016,7 +1019,7 @@ namespace Service
                             (CostCenterId != null ? " AND L.CostCenterId IN (SELECT Items FROM [dbo].[Split] (@CostCenter, ','))" : "") +
                             (IsIncludeOpening == "False" ? " AND H.DocDate >= @FromDate" : "") +
                             @" GROUP BY LA.LedgerAccountGroupId " +
-                            //(IsIncludeZeroBalance == "False" ? " Having Sum(CASE WHEN H.DocDate <= @ToDate THEN L.AmtDr-L.AmtCr ELSE 0 END) <> 0 " : "") +
+                        //(IsIncludeZeroBalance == "False" ? " Having Sum(CASE WHEN H.DocDate <= @ToDate THEN L.AmtDr-L.AmtCr ELSE 0 END) <> 0 " : "") +
                         @") 
 
                     INSERT INTO @TempcteGroupBalance (LedgerAccountGroupId, LedgerAccountGroupName, ParentLedgerAccountGroupId, ParentLedgerAccountGroupName,
@@ -1068,58 +1071,58 @@ namespace Service
                                     ) ";
 
 
-//            mQry = @"WITH cteLedgerBalance AS
-//                                                (
-//                                                    SELECT L.LedgerAccountId, Max(LA.LedgerAccountName) AS LedgerAccountName,
-//                                                    Sum(CASE WHEN H.DocDate < @FromDate THEN L.AmtDr - L.AmtCr ELSE 0 END) AS Opening,
-//                                                    Sum(CASE WHEN H.DocDate > @FromDate AND H.DocDate <= @ToDate THEN L.AmtDr ELSE 0 END) AS AmtDr,
-//                                                    Sum(CASE WHEN H.DocDate > @FromDate AND H.DocDate <= @ToDate THEN L.AmtCr ELSE 0 END) AS AmtCr,
-//                                                    Sum(CASE WHEN H.DocDate <= @ToDate THEN L.AmtDr-L.AmtCr ELSE 0 END) AS Balance
-//                                                    FROM Web.LedgerHeaders H 
-//                                                    INNER JOIN web.Ledgers L ON L.LedgerHeaderId = H.LedgerHeaderId
-//                                                    LEFT JOIN web.LedgerAccounts LA ON L.LedgerAccountId = LA.LedgerAccountId
-//                                                    LEFT JOIN web.LedgerAccountGroups LAG ON LA.LedgerAccountGroupId = LAG.LedgerAccountGroupId  		
-//                                                    WHERE 1 = 1 " +
-//                                        (SiteId != null ? " AND H.SiteId IN (SELECT Items FROM [dbo].[Split] (@Site, ','))" : "") +
-//                                        (DivisionId != null ? " AND H.DivisionId IN (SELECT Items FROM [dbo].[Split] (@Division, ','))" : "") +
-//                                        (CostCenterId != null ? " AND L.CostCenterId IN (SELECT Items FROM [dbo].[Split] (@CostCenter, ','))" : "") +
+            //            mQry = @"WITH cteLedgerBalance AS
+            //                                                (
+            //                                                    SELECT L.LedgerAccountId, Max(LA.LedgerAccountName) AS LedgerAccountName,
+            //                                                    Sum(CASE WHEN H.DocDate < @FromDate THEN L.AmtDr - L.AmtCr ELSE 0 END) AS Opening,
+            //                                                    Sum(CASE WHEN H.DocDate > @FromDate AND H.DocDate <= @ToDate THEN L.AmtDr ELSE 0 END) AS AmtDr,
+            //                                                    Sum(CASE WHEN H.DocDate > @FromDate AND H.DocDate <= @ToDate THEN L.AmtCr ELSE 0 END) AS AmtCr,
+            //                                                    Sum(CASE WHEN H.DocDate <= @ToDate THEN L.AmtDr-L.AmtCr ELSE 0 END) AS Balance
+            //                                                    FROM Web.LedgerHeaders H 
+            //                                                    INNER JOIN web.Ledgers L ON L.LedgerHeaderId = H.LedgerHeaderId
+            //                                                    LEFT JOIN web.LedgerAccounts LA ON L.LedgerAccountId = LA.LedgerAccountId
+            //                                                    LEFT JOIN web.LedgerAccountGroups LAG ON LA.LedgerAccountGroupId = LAG.LedgerAccountGroupId  		
+            //                                                    WHERE 1 = 1 " +
+            //                                        (SiteId != null ? " AND H.SiteId IN (SELECT Items FROM [dbo].[Split] (@Site, ','))" : "") +
+            //                                        (DivisionId != null ? " AND H.DivisionId IN (SELECT Items FROM [dbo].[Split] (@Division, ','))" : "") +
+            //                                        (CostCenterId != null ? " AND L.CostCenterId IN (SELECT Items FROM [dbo].[Split] (@CostCenter, ','))" : "") +
             //                                        (IsIncludeOpening == "True" ? " AND H.DocDate >= @FromDate" : "") +
-//                                        @" And LA.LedgerAccountGroupId " + (LedgerAccountGroup != null && LedgerAccountGroup != "" ? " = @LedgerAccountGroup " : " Is Null ") +
-//                                        @" GROUP BY L.LedgerAccountId " +
-//                                        (IsIncludeZeroBalance == "False" ? " Having Sum(CASE WHEN H.DocDate <= @ToDate THEN L.AmtDr-L.AmtCr ELSE 0 END) <> 0 " : "") +
-//                                    @"),
-//                                            cteGroupBalance AS
-//                                                (
-//                                                    SELECT LA.LedgerAccountGroupId, Max(LAG.LedgerAccountGroupName) LedgerAccountGroupName, 
-//                                                    Max(LAG.ParentLedgerAccountGroupId) ParentLedgerAccountGroupId, Max(PLAG.LedgerAccountGroupName) AS ParentLedgerAccountGroupName, 
-//                                                    Sum(CASE WHEN H.DocDate < @FromDate THEN L.AmtDr-L.AmtCr ELSE 0 END) AS Opening,
-//                                                    Sum(CASE WHEN H.DocDate > @FromDate AND H.DocDate <= @ToDate THEN L.AmtDr ELSE 0 END) AS AmtDr,
-//                                                    Sum(CASE WHEN H.DocDate > @FromDate AND H.DocDate <= @ToDate THEN L.AmtCr ELSE 0 END) AS AmtCr,
-//                                                    Sum(CASE WHEN H.DocDate <= @ToDate THEN L.AmtDr-L.AmtCr ELSE 0 END) AS Balance
-//                                                    FROM Web.LedgerHeaders H 
-//                                                    INNER JOIN web.Ledgers L ON L.LedgerHeaderId = H.LedgerHeaderId
-//                                                    LEFT JOIN web.LedgerAccounts LA ON L.LedgerAccountId = LA.LedgerAccountId
-//                                                    LEFT JOIN web.LedgerAccountGroups LAG ON LA.LedgerAccountGroupId = LAG.LedgerAccountGroupId  		
-//                                                    LEFT JOIN web.LedgerAccountGroups PLAG ON PLAG.LedgerAccountGroupId = LAG.ParentLedgerAccountGroupId  		
-//                                                    WHERE 1=1 " +
-//                                        (SiteId != null ? " AND H.SiteId IN (SELECT Items FROM [dbo].[Split] (@Site, ','))" : "") +
-//                                        (DivisionId != null ? " AND H.DivisionId IN (SELECT Items FROM [dbo].[Split] (@Division, ','))" : "") +
-//                                        (CostCenterId != null ? " AND L.CostCenterId IN (SELECT Items FROM [dbo].[Split] (@CostCenter, ','))" : "") +
+            //                                        @" And LA.LedgerAccountGroupId " + (LedgerAccountGroup != null && LedgerAccountGroup != "" ? " = @LedgerAccountGroup " : " Is Null ") +
+            //                                        @" GROUP BY L.LedgerAccountId " +
+            //                                        (IsIncludeZeroBalance == "False" ? " Having Sum(CASE WHEN H.DocDate <= @ToDate THEN L.AmtDr-L.AmtCr ELSE 0 END) <> 0 " : "") +
+            //                                    @"),
+            //                                            cteGroupBalance AS
+            //                                                (
+            //                                                    SELECT LA.LedgerAccountGroupId, Max(LAG.LedgerAccountGroupName) LedgerAccountGroupName, 
+            //                                                    Max(LAG.ParentLedgerAccountGroupId) ParentLedgerAccountGroupId, Max(PLAG.LedgerAccountGroupName) AS ParentLedgerAccountGroupName, 
+            //                                                    Sum(CASE WHEN H.DocDate < @FromDate THEN L.AmtDr-L.AmtCr ELSE 0 END) AS Opening,
+            //                                                    Sum(CASE WHEN H.DocDate > @FromDate AND H.DocDate <= @ToDate THEN L.AmtDr ELSE 0 END) AS AmtDr,
+            //                                                    Sum(CASE WHEN H.DocDate > @FromDate AND H.DocDate <= @ToDate THEN L.AmtCr ELSE 0 END) AS AmtCr,
+            //                                                    Sum(CASE WHEN H.DocDate <= @ToDate THEN L.AmtDr-L.AmtCr ELSE 0 END) AS Balance
+            //                                                    FROM Web.LedgerHeaders H 
+            //                                                    INNER JOIN web.Ledgers L ON L.LedgerHeaderId = H.LedgerHeaderId
+            //                                                    LEFT JOIN web.LedgerAccounts LA ON L.LedgerAccountId = LA.LedgerAccountId
+            //                                                    LEFT JOIN web.LedgerAccountGroups LAG ON LA.LedgerAccountGroupId = LAG.LedgerAccountGroupId  		
+            //                                                    LEFT JOIN web.LedgerAccountGroups PLAG ON PLAG.LedgerAccountGroupId = LAG.ParentLedgerAccountGroupId  		
+            //                                                    WHERE 1=1 " +
+            //                                        (SiteId != null ? " AND H.SiteId IN (SELECT Items FROM [dbo].[Split] (@Site, ','))" : "") +
+            //                                        (DivisionId != null ? " AND H.DivisionId IN (SELECT Items FROM [dbo].[Split] (@Division, ','))" : "") +
+            //                                        (CostCenterId != null ? " AND L.CostCenterId IN (SELECT Items FROM [dbo].[Split] (@CostCenter, ','))" : "") +
             //                                        (IsIncludeOpening == "True" ? " AND H.DocDate >= @FromDate" : "") +
-//                                        @" And H.DocDate >= @FromDate
-//                                                    GROUP BY LA.LedgerAccountGroupId " +
-//                                        (IsIncludeZeroBalance == "False" ? " Having Sum(CASE WHEN H.DocDate <= @ToDate THEN L.AmtDr-L.AmtCr ELSE 0 END) <> 0 " : "") +
-//                                    @") ,
-//               	                            cteAcGroup as
-//                                                (
-//                                                    SELECT ag.LedgerAccountGroupId AS BaseLedgerAccountGroupId, ag.LedgerAccountGroupName AS BaseLedgerAccountGroupName, ag.LedgerAccountGroupId, ag.LedgerAccountGroupName, ag.ParentLedgerAccountGroupId, ag.ParentLedgerAccountGroupName, ag.Opening, ag.AmtDr, ag.AmtCr, ag.Balance, 0 AS Level   
-//                                                    FROM cteGroupBalance ag		
-//                                                    WHERE   ag.ParentLedgerAccountGroupId " + (LedgerAccountGroup != null && LedgerAccountGroup != "" ? " = @LedgerAccountGroup " : " Is Null ") +
-//                                        @"UNION ALL
-//                                                    SELECT cteAcGroup.BaseLedgerAccountGroupId, cteAcGroup.BaseLedgerAccountGroupName , ag.LedgerAccountGroupId, ag.LedgerAccountGroupName, ag.ParentLedgerAccountGroupId, ag.ParentLedgerAccountGroupName, ag.Opening, ag.AmtDr, ag.AmtCr, ag.Balance, LEVEL +1     
-//                                                    FROM cteGroupBalance ag
-//                                                    INNER JOIN cteAcGroup  ON cteAcGroup.LedgerAccountGroupId = Ag.ParentLedgerAccountGroupId 
-//                                                ) ";
+            //                                        @" And H.DocDate >= @FromDate
+            //                                                    GROUP BY LA.LedgerAccountGroupId " +
+            //                                        (IsIncludeZeroBalance == "False" ? " Having Sum(CASE WHEN H.DocDate <= @ToDate THEN L.AmtDr-L.AmtCr ELSE 0 END) <> 0 " : "") +
+            //                                    @") ,
+            //               	                            cteAcGroup as
+            //                                                (
+            //                                                    SELECT ag.LedgerAccountGroupId AS BaseLedgerAccountGroupId, ag.LedgerAccountGroupName AS BaseLedgerAccountGroupName, ag.LedgerAccountGroupId, ag.LedgerAccountGroupName, ag.ParentLedgerAccountGroupId, ag.ParentLedgerAccountGroupName, ag.Opening, ag.AmtDr, ag.AmtCr, ag.Balance, 0 AS Level   
+            //                                                    FROM cteGroupBalance ag		
+            //                                                    WHERE   ag.ParentLedgerAccountGroupId " + (LedgerAccountGroup != null && LedgerAccountGroup != "" ? " = @LedgerAccountGroup " : " Is Null ") +
+            //                                        @"UNION ALL
+            //                                                    SELECT cteAcGroup.BaseLedgerAccountGroupId, cteAcGroup.BaseLedgerAccountGroupName , ag.LedgerAccountGroupId, ag.LedgerAccountGroupName, ag.ParentLedgerAccountGroupId, ag.ParentLedgerAccountGroupName, ag.Opening, ag.AmtDr, ag.AmtCr, ag.Balance, LEVEL +1     
+            //                                                    FROM cteGroupBalance ag
+            //                                                    INNER JOIN cteAcGroup  ON cteAcGroup.LedgerAccountGroupId = Ag.ParentLedgerAccountGroupId 
+            //                                                ) ";
 
             return mQry;
         }
@@ -1403,6 +1406,513 @@ namespace Service
 
             return TrialBalanceSummaryViewModelCombind;
 
+        }
+
+        public IEnumerable<BalanceSheetViewModel> GetBalanceSheet(FinancialDisplaySettings Settings)
+        {
+            string StrCondition1 = "";
+            DataTable DTTemp = new DataTable();
+            Decimal DblDebit_Total = 0;
+            Decimal DblCredit_Total = 0;
+            int I = 0, J = 0;
+            Decimal DblNet_Profit_Loss = 0;
+            string mQry = "";
+            DataTable FGMain = new DataTable();
+            List<BalanceSheetViewModel> BalanceSheetViewModelList = new List<BalanceSheetViewModel>();
+
+            var SiteSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "Site" select H).FirstOrDefault();
+            var DivisionSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "Division" select H).FirstOrDefault();
+            var FromDateSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "FromDate" select H).FirstOrDefault();
+            var ToDateSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "ToDate" select H).FirstOrDefault();
+            var CostCenterSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "CostCenter" select H).FirstOrDefault();
+            var IsIncludeZeroBalanceSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "IsIncludeZeroBalance" select H).FirstOrDefault();
+            var IsIncludeOpeningSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "IsIncludeOpening" select H).FirstOrDefault();
+            var LedgerAccountGroupSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "LedgerAccountGroup" select H).FirstOrDefault();
+
+            string SiteId = SiteSetting.Value;
+            string DivisionId = DivisionSetting.Value;
+            string FromDate = FromDateSetting.Value;
+            string ToDate = ToDateSetting.Value;
+            string CostCenterId = CostCenterSetting.Value;
+            string IsIncludeZeroBalance = IsIncludeZeroBalanceSetting.Value;
+            string IsIncludeOpening = IsIncludeOpeningSetting.Value;
+            string LedgerAccountGroup = LedgerAccountGroupSetting.Value;
+
+
+            StrCondition1 = " Where H.DocDate <= '" + ToDate + "' ";
+            if (SiteId != null)
+                StrCondition1 = " And H.SiteId In ('" + SiteId + "') ";
+            if (DivisionId != null)
+                StrCondition1 = " And H.DivisionId In ('" + DivisionId + "') ";
+
+            //========== For Detail Section =======
+
+
+            mQry = @"SELECT (Case IsNull(AG1.LedgerAccountGroupId,'') When '' Then IsNull(AG.LedgerAccountGroupId,'') 
+                        Else IsNull(AG1.LedgerAccountGroupId, '') End)  As LedgerAccountGroupId,
+                        Max(Case IsNull(AG1.LedgerAccountGroupName, '') When '' Then IsNull(AG.LedgerAccountGroupName, '')
+                        Else IsNull(AG1.LedgerAccountGroupName, '') End)  As GName,
+                        (Case When(IsNull(Sum(LG.AmtDr), 0) - IsNull(Sum(LG.AmtCr), 0)) > 0 Then
+                        (IsNull(Sum(LG.AmtDr), 0) - IsNull(Sum(LG.AmtCr), 0)) Else 0 End) As AmtDr,
+                        (Case When(IsNull(Sum(LG.AmtCr), 0) - IsNull(Sum(LG.AmtDr), 0)) > 0 Then
+                        (IsNull(Sum(LG.AmtCr), 0) - IsNull(Sum(LG.AmtDr), 0)) Else 0 End) As AmtCr,
+                        Max(Case IsNull(AG1.LedgerAccountGroupId, '') When '' Then IsNull(AG.LedgerAccountGroupName, '') Else IsNull(AG1.LedgerAccountGroupName, '') End)  
+                        As ContraGroupName,
+                        Max(Case IsNull(AG1.LedgerAccountGroupId, '') When '' Then IsNull(AG.LedgerAccountGroupNature, '') Else IsNull(AG1.LedgerAccountGroupNature, '') End)   
+                        As GroupNature
+                        FROM Web.Ledgers LG
+                        LEFT JOIN Web.LedgerHeaders H On Lg.LedgerHeaderId = H.LedgerHeaderId
+                        LEFT Join Web.LedgerAccounts SG On LG.LedgerAccountId = SG.LedgerAccountId
+                        LEFT JOIN Web.LedgerAccountGroups AG On AG.LedgerAccountGroupId = SG.LedgerAccountGroupId
+                        --LEFT JOIN AcGroupPath AGP On AGP.LedgerAccountGroupId = AG.LedgerAccountGroupId
+                        --And AGP.SNo = &IntLevel &
+                        LEFT  JOIN Web.LedgerAccountGroups AG1 On AG1.LedgerAccountGroupId = AG.ParentLedgerAccountGroupId
+                        " + StrCondition1 + @"
+                        AND AG.LedgerAccountGroupNature In ('Asset', 'Liability') 
+                        GROUP By (Case IsNull(AG1.LedgerAccountGroupId, '') When '' Then IsNull(AG.LedgerAccountGroupId, '')
+                        ELSE IsNull(AG1.LedgerAccountGroupId, '') End) 
+                        HAVING(IsNull(Sum(LG.AmtDr), 0) - IsNull(Sum(LG.AmtCr), 0)) <> 0
+                        ORDER By Max(Case IsNull(AG1.LedgerAccountGroupName, '') When '' Then IsNull(AG.LedgerAccountGroupName, '')
+                        ELSE IsNull(AG1.LedgerAccountGroupName, '') End) ";
+
+
+
+
+            DTTemp = FillData(mQry).Tables[0];
+
+            FGMain.Columns.Add("GRCodeCredit");
+            FGMain.Columns.Add("GRNameCredit");
+            FGMain.Columns.Add("Credit");
+            FGMain.Columns.Add("GRCode");
+            FGMain.Columns.Add("GRName");
+            FGMain.Columns.Add("Debit");
+
+
+
+
+            DblDebit_Total = 0;
+            DblCredit_Total = 0;
+
+            for (I = 0; I <= DTTemp.Rows.Count - 1; I++)
+            {
+                //FGMain.Rows.Add();
+                if (Convert.ToDecimal(DTTemp.Rows[I]["AmtDr"]) > 0)
+                {
+                    J = FFindEmptyRow(ref FGMain, "GRCodeCredit");
+                    FGMain.Rows[J]["GRCodeCredit"] = DTTemp.Rows[I]["LedgerAccountGroupId"];
+                    if (DTTemp.Rows[I]["GroupNature"].ToString() == "Asset")
+                        FGMain.Rows[J]["GRNameCredit"] = DTTemp.Rows[I]["GName"];
+                    else
+                        FGMain.Rows[J]["GRNameCredit"] = DTTemp.Rows[I]["ContraGroupName"];
+                    FGMain.Rows[J]["Credit"] = DTTemp.Rows[I]["AmtDr"];
+                    DblCredit_Total = DblCredit_Total + Convert.ToDecimal(FGMain.Rows[J]["Credit"]);
+                }
+                else if (Convert.ToDecimal(DTTemp.Rows[I]["AmtCr"]) > 0)
+                {
+                    J = FFindEmptyRow(ref FGMain, "GRCode");
+                    FGMain.Rows[J]["GRCode"] = DTTemp.Rows[I]["LedgerAccountGroupId"];
+                    if (DTTemp.Rows[I]["GroupNature"].ToString() == "A")
+                        FGMain.Rows[J]["GRName"] = DTTemp.Rows[I]["GName"];
+                    else
+                        FGMain.Rows[J]["GRName"] = DTTemp.Rows[I]["ContraGroupName"];
+                    FGMain.Rows[J]["Debit"] = DTTemp.Rows[I]["AmtCr"];
+                    DblDebit_Total = DblDebit_Total + Convert.ToDecimal(FGMain.Rows[J]["Debit"]);
+                }
+                //FGMain.Rows[J]["GGR_SG"] = "Asset";
+            }
+
+            DTTemp.Clear();
+            DTTemp.Dispose();
+
+            Decimal DHSMain_DblClosingStock = 0;
+            if (DHSMain_DblClosingStock > 0)
+            {
+                J = 0;
+                FGMain.Rows[J]["GRNameCredit"] = "Closing Stock";
+                FGMain.Rows[J]["Credit"] = DHSMain_DblClosingStock;
+                DblCredit_Total = DblCredit_Total + DHSMain_DblClosingStock;
+            }
+
+            DTTemp = FGetTRDDataTable("",FromDate,ToDate, SiteId, DivisionId);
+
+            for (I = 0; I <= DTTemp.Rows.Count - 1; I++)
+            {
+                if (Convert.ToDecimal(DTTemp.Rows[I]["AmtDr"]) > 0)
+                    DblNet_Profit_Loss = DblNet_Profit_Loss - Convert.ToDecimal(DTTemp.Rows[I]["AmtDr"]);
+                else if (Convert.ToDecimal(DTTemp.Rows[I]["AmtCr"]) > 0)
+                    DblNet_Profit_Loss = DblNet_Profit_Loss - Convert.ToDecimal(DTTemp.Rows[I]["AmtCr"]);
+
+            }
+            DTTemp.Clear();
+            DTTemp.Dispose();
+
+            DTTemp = FGetTRDDataTable("Not", FromDate, ToDate, SiteId, DivisionId);
+
+            for (I = 0; I <= DTTemp.Rows.Count - 1; I++)
+            {
+                if (Convert.ToDecimal(DTTemp.Rows[I]["AmtDr"]) > 0)
+                    DblNet_Profit_Loss = DblNet_Profit_Loss - Convert.ToDecimal(DTTemp.Rows[I]["AmtDr"]);
+                else if (Convert.ToDecimal(DTTemp.Rows[I]["AmtCr"]) > 0)
+                    DblNet_Profit_Loss = DblNet_Profit_Loss - Convert.ToDecimal(DTTemp.Rows[I]["AmtCr"]);
+
+            }
+            DTTemp.Clear();
+            DTTemp.Dispose();
+
+            if (DblNet_Profit_Loss < 0)
+            {
+                J = FFindEmptyRow(ref FGMain,"GRNameCredit");
+                if (J < FFindEmptyRow(ref FGMain, "GRName"))
+                    J = FFindEmptyRow(ref FGMain, "GRName");
+                FGMain.Rows[J]["GRNameCredit"] = "Net Loss";
+                FGMain.Rows[J]["Credit"] = Math.Abs(DblNet_Profit_Loss);
+                DblCredit_Total = DblCredit_Total + Math.Abs(DblNet_Profit_Loss);
+            }
+            else if (DblNet_Profit_Loss > 0)
+            {
+                J = FFindEmptyRow(ref FGMain, "GRName");
+                if (J < FFindEmptyRow(ref FGMain, "GRNameCredit"))
+                    J = FFindEmptyRow(ref FGMain, "GRNameCredit");
+                FGMain.Rows[J]["GRName"] = "Net Profit";
+                FGMain.Rows[J]["Debit"] = Math.Abs(DblNet_Profit_Loss);
+                DblDebit_Total = DblDebit_Total + Math.Abs(DblNet_Profit_Loss);
+            }
+
+
+            if (DblDebit_Total - DblCredit_Total > Convert.ToDecimal(0.001))
+            {
+                J = FFindEmptyRow(ref FGMain, "GRNameCredit");
+                FGMain.Rows[J]["GRNameCredit"] = "Difference In Trial Balance";
+                FGMain.Rows[J]["Credit"] = DblDebit_Total - DblCredit_Total;
+                DblCredit_Total = DblCredit_Total + (DblDebit_Total - DblCredit_Total);
+            }
+            else if (DblCredit_Total - DblDebit_Total > Convert.ToDecimal(0.001))
+            {
+                J = FFindEmptyRow(ref FGMain, "GRName");
+                FGMain.Rows[J]["GRName"] = "Difference In Trial Balance";
+                FGMain.Rows[J]["Debit"] = DblCredit_Total - DblDebit_Total;
+                DblDebit_Total = DblDebit_Total + (DblCredit_Total - DblDebit_Total);
+            }
+
+            //FGMain.Rows.Add();
+            //FGMain.Rows[FGMain.Rows.Count - 1]["Debit"] = DblDebit_Total;
+            //FGMain.Rows[FGMain.Rows.Count - 1]["Credit"] = DblCredit_Total;
+
+
+            for (I = 0; I <= FGMain.Rows.Count - 1; I++)
+            {
+                BalanceSheetViewModel vm = new BalanceSheetViewModel();
+                if (FGMain.Rows[I]["GRCode"] != null && FGMain.Rows[I]["GRCode"] != System.DBNull.Value)
+                    vm.GRCode = Convert.ToInt32(FGMain.Rows[I]["GRCode"]);
+                if (FGMain.Rows[I]["GRName"] != null && FGMain.Rows[I]["GRName"] != System.DBNull.Value)
+                    vm.GRName = "<Strong>" + Convert.ToString(FGMain.Rows[I]["GRName"]) + "</Strong>";
+                if (FGMain.Rows[I]["Debit"] != null && FGMain.Rows[I]["Debit"] != System.DBNull.Value)
+                    vm.Debit = Convert.ToDecimal(FGMain.Rows[I]["Debit"]);
+                if (FGMain.Rows[I]["Credit"] != null && FGMain.Rows[I]["Credit"] != System.DBNull.Value)
+                    vm.Credit = Convert.ToDecimal(FGMain.Rows[I]["Credit"]);
+                if (FGMain.Rows[I]["GRCodeCredit"] != null && FGMain.Rows[I]["GRCodeCredit"] != System.DBNull.Value)
+                    vm.GRCodeCredit = Convert.ToString(FGMain.Rows[I]["GRCodeCredit"]);
+                if (FGMain.Rows[I]["GRNameCredit"] != null && FGMain.Rows[I]["GRNameCredit"] != System.DBNull.Value)
+                    vm.GRNameCredit = "<Strong>" + Convert.ToString(FGMain.Rows[I]["GRNameCredit"]) + "</Strong>";
+
+                vm.TotalDebit = DblDebit_Total;
+                vm.TotalCredit = DblCredit_Total;
+
+                vm.ReportType = "Balance Sheet";
+                vm.OpenReportType = "Trial Balance";
+
+                BalanceSheetViewModelList.Add(vm);
+            }
+
+            return BalanceSheetViewModelList;
+        }
+
+        
+
+        public DataSet FillData(string Qry)
+        {
+            DataSet DsTemp = new DataSet();
+            string ConnectionString = (string)System.Web.HttpContext.Current.Session["DefaultConnectionString"];
+
+            using (SqlConnection sqlConnection = new SqlConnection(ConnectionString))
+            {
+                sqlConnection.Open();
+                SqlCommand cmd = new SqlCommand(Qry);
+                SqlDataAdapter Da = new SqlDataAdapter(Qry, ConnectionString);
+                Da.Fill(DsTemp);
+            }
+
+            return DsTemp;
+        }
+
+        private int FFindEmptyRow(ref DataTable DtMain, string ColName, int IntFindFrom = 0)
+        {
+            int I;
+            bool BlnFlag = true;
+
+            for (I = IntFindFrom; I <= DtMain.Rows.Count - 1; I++)
+            {
+                if (Convert.ToString(DtMain.Rows[I][ColName]) == "" || DtMain.Rows[I][ColName] == null)
+                {
+                    BlnFlag = false;
+                    break;
+                }
+            }
+
+            if (BlnFlag == true)
+            {
+                DtMain.Rows.Add();
+                I = DtMain.Rows.Count - 1;
+            }
+
+            return I;
+        }
+
+        private DataTable FGetTRDDataTable(string ConditionVar, string FromDate, string ToDate, string SiteId, string DivisionId)
+        {
+            string StrCondition1 = "";
+            DataTable DTTemp;
+            string mQry = "";
+
+
+            StrCondition1 = " Where H.DocDate <= '" + ToDate + "' ";
+            if (SiteId != null)
+                StrCondition1 = " And H.SiteId In ('" + SiteId + "') ";
+            if (DivisionId != null)
+                StrCondition1 = " And H.DivisionId In ('" + DivisionId + "') ";
+            StrCondition1 += " And H.DocDate >= (Case When Ag.LedgerAccountGroupNature in ('Income','Expense') Then '" + FromDate + "' Else '1900/Jan/01' End) ";
+
+
+            mQry = @" Select (Case IsNull(AG1.LedgerAccountGroupId,'') When '' Then IsNull(AG.LedgerAccountGroupId,'') 
+                        Else IsNull(AG1.LedgerAccountGroupId,'') End)  As LedgerAccountGroupId, 
+                        Max(Case IsNull(AG1.LedgerAccountGroupName,'') When '' Then IsNull(AG.LedgerAccountGroupName,'') 
+                        Else IsNull(AG1.LedgerAccountGroupName,'') End)  As GName, 
+                        (Case When (IsNull(Sum(LG.AmtDr),0)-IsNull(Sum(LG.AmtCr),0))>0 Then  
+                        (IsNull(Sum(LG.AmtDr),0)-IsNull(Sum(LG.AmtCr),0)) Else 0 End) As AmtDr, 
+                        (Case When (IsNull(Sum(LG.AmtCr),0)-IsNull(Sum(LG.AmtDr),0))>0 Then 
+                        (IsNull(Sum(LG.AmtCr),0)-IsNull(Sum(LG.AmtDr),0)) Else 0 End) As AmtCr, 
+                        Max(AG.LedgerAccountGroupName) As ContraLedgerAccountGroupName,Max(AG.LedgerAccountGroupNature) As GroupNature 
+                        From Web.Ledgers  LG 
+                        LEFT JOIN Web.LedgerHeaders H On Lg.LedgerHeaderId = H.LedgerHeaderId
+                        Left Join Web.LedgerAccounts SG On LG.LedgerAccountId = SG.LedgerAccountId
+                        Left Join Web.LedgerAccountGroups AG On AG.LedgerAccountGroupId = SG.LedgerAccountGroupId
+                        --Left Join AcGroupPath AGP On AGP.LedgerAccountGroupId=AG.LedgerAccountGroupId And AGP.SNo= & IntLevel &  
+                        LEFT  JOIN Web.LedgerAccountGroups AG1 On AG1.LedgerAccountGroupId = AG.ParentLedgerAccountGroupId
+                        " + StrCondition1 + @"
+                        And AG.LedgerAccountGroupNature In ('Income','Expense') 
+                        And (AG.LedgerAccountNature " + ConditionVar + @" In ('Direct','Purchase','Sales') Or AG1.LedgerAccountNature " + ConditionVar + @" In ('Direct','Purchase','Sales')) 
+                        Group By (Case IsNull(AG1.LedgerAccountGroupId,'') When '' Then IsNull(AG.LedgerAccountGroupId,'') 
+                        Else IsNull(AG1.LedgerAccountGroupId,'') End) 
+                        Having (IsNull(Sum(LG.AmtDr),0)-IsNull(Sum(LG.AmtCr),0)) <> 0 
+                        Order By Max(Case IsNull(AG1.LedgerAccountGroupName,'') When '' Then IsNull(AG.LedgerAccountGroupName,'') 
+                        Else IsNull(AG1.LedgerAccountGroupName,'') End) ";
+
+
+            DTTemp = FillData(mQry).Tables[0];
+
+            return DTTemp;
+        }
+
+        public IEnumerable<ProfitAndLossViewModel> GetProfitAndLoss(FinancialDisplaySettings Settings)
+        {
+            DataTable DTTemp;
+            Decimal DblDebit_Total = 0;
+            Decimal DblCredit_Total = 0;
+            Decimal DblGrossProfit = 0;
+            Decimal DblNetProfit = 0;
+            int I, J, IntFindRowFrom;
+            string mQry = "";
+            DataTable FGMain = new DataTable();
+            List<ProfitAndLossViewModel> ProfitAndLossViewModelList = new List<ProfitAndLossViewModel>();
+
+            var SiteSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "Site" select H).FirstOrDefault();
+            var DivisionSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "Division" select H).FirstOrDefault();
+            var FromDateSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "FromDate" select H).FirstOrDefault();
+            var ToDateSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "ToDate" select H).FirstOrDefault();
+            var CostCenterSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "CostCenter" select H).FirstOrDefault();
+            var IsIncludeZeroBalanceSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "IsIncludeZeroBalance" select H).FirstOrDefault();
+            var IsIncludeOpeningSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "IsIncludeOpening" select H).FirstOrDefault();
+            var LedgerAccountGroupSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "LedgerAccountGroup" select H).FirstOrDefault();
+
+            string SiteId = SiteSetting.Value;
+            string DivisionId = DivisionSetting.Value;
+            string FromDate = FromDateSetting.Value;
+            string ToDate = ToDateSetting.Value;
+            string CostCenterId = CostCenterSetting.Value;
+            string IsIncludeZeroBalance = IsIncludeZeroBalanceSetting.Value;
+            string IsIncludeOpening = IsIncludeOpeningSetting.Value;
+            string LedgerAccountGroup = LedgerAccountGroupSetting.Value;
+
+
+            DTTemp = FGetTRDDataTable("", FromDate, ToDate, SiteId, DivisionId);
+
+            FGMain.Columns.Add("GRCodeCredit");
+            FGMain.Columns.Add("GRNameCredit");
+            FGMain.Columns.Add("Credit");
+            FGMain.Columns.Add("GRCode");
+            FGMain.Columns.Add("GRName");
+            FGMain.Columns.Add("Debit");
+
+            DblDebit_Total = 0;
+            DblCredit_Total = 0;
+
+            for (I = 0; I <= DTTemp.Rows.Count - 1; I++)
+            {
+                if (Convert.ToDecimal(DTTemp.Rows[I]["AmtCr"]) > 0)
+                {
+                    J = FFindEmptyRow(ref FGMain, "GRNameCredit");
+                    FGMain.Rows[J]["GRCodeCredit"] = DTTemp.Rows[I]["LedgerAccountGroupId"];
+                    if (DTTemp.Rows[I]["GroupNature"].ToString() == "Income")
+                        FGMain.Rows[J]["GRNameCredit"] = DTTemp.Rows[I]["GName"];
+                    else
+                        FGMain.Rows[J]["GRNameCredit"] = DTTemp.Rows[I]["ContraGroupName"];
+                    FGMain.Rows[J]["Credit"] = DTTemp.Rows[I]["AmtCr"];
+                    DblCredit_Total = DblCredit_Total + Convert.ToDecimal(DTTemp.Rows[I]["AmtCr"]);
+                }
+                else if (Convert.ToDecimal(DTTemp.Rows[I]["AmtDr"]) > 0)
+                {
+                    J = FFindEmptyRow(ref FGMain, "GRName");
+                    FGMain.Rows[J]["GRCode"] = DTTemp.Rows[I]["LedgerAccountGroupId"];
+                    if (DTTemp.Rows[I]["GroupNature"].ToString() == "Expense")
+                        FGMain.Rows[J]["GRName"] = DTTemp.Rows[I]["GName"];
+                    else
+                        FGMain.Rows[J]["GRName"] = DTTemp.Rows[I]["ContraGroupName"];
+                    FGMain.Rows[J]["Debit"] = DTTemp.Rows[I]["AmtDr"];
+                    DblDebit_Total = DblDebit_Total + Convert.ToDecimal(DTTemp.Rows[I]["AmtDr"]);
+                }
+            }
+
+            Decimal DHSMain_DblClosingStock = 0;
+            if (DHSMain_DblClosingStock > 0)
+            {
+                J = 0;
+                FGMain.Rows[J]["GRNameCredit"] = "Closing Stock";
+                FGMain.Rows[J]["Credit"] = DHSMain_DblClosingStock;
+                DblCredit_Total = DblCredit_Total + DHSMain_DblClosingStock;
+            }
+
+            DblGrossProfit = (DblDebit_Total - DblCredit_Total);
+
+            if(DblDebit_Total - DblCredit_Total > 0)
+            {
+                J = FFindEmptyRow(ref FGMain, "GRNameCredit");
+                FGMain.Rows[J]["GRNameCredit"] = "Gross Loss";
+                FGMain.Rows[J]["Credit"] = DblDebit_Total - DblCredit_Total;
+                DblCredit_Total = DblCredit_Total + (DblDebit_Total - DblCredit_Total);
+                DblDebit_Total = DblCredit_Total;
+            }
+            else if (DblCredit_Total - DblDebit_Total > 0)
+            {
+                J = FFindEmptyRow(ref FGMain, "GRNameCredit");
+                FGMain.Rows[J]["GRNameCredit"] = "Gross Profit";
+                FGMain.Rows[J]["Debit"] = DblDebit_Total - DblCredit_Total;
+                DblDebit_Total = DblDebit_Total + (DblCredit_Total - DblDebit_Total);
+                DblCredit_Total = DblDebit_Total;
+            }
+
+
+            if (DblDebit_Total > 0)
+            {
+                FGMain.Rows.Add();
+                FGMain.Rows[FGMain.Rows.Count - 1]["GRCode"] = "0";
+                FGMain.Rows.Add();
+                FGMain.Rows[FGMain.Rows.Count - 1]["Debit"] = DblDebit_Total;
+                FGMain.Rows[FGMain.Rows.Count - 1]["Credit"] = DblCredit_Total;
+                FGMain.Rows.Add();
+            }
+
+            IntFindRowFrom = FGMain.Rows.Count;
+            if (DblGrossProfit > 0)
+            {
+                J = FFindEmptyRow(ref FGMain, "GRNameCredit", IntFindRowFrom);
+                FGMain.Rows[J]["GRName"] = "Gross Loss";
+                FGMain.Rows[J]["Debit"] = Math.Abs(DblGrossProfit);
+            }
+            else
+            {
+                J = FFindEmptyRow(ref FGMain, "GRNameCredit", IntFindRowFrom);
+                FGMain.Rows[J]["GRName"] = "Gross Profit";
+                FGMain.Rows[J]["Credit"] = Math.Abs(DblGrossProfit);
+            }
+
+
+            DTTemp = FGetTRDDataTable("Not", FromDate, ToDate, SiteId, DivisionId);
+
+            DblDebit_Total = 0;
+            DblCredit_Total = 0;
+
+            for (I = 0; I <= DTTemp.Rows.Count - 1; I++)
+            {
+                if (Convert.ToDecimal(DTTemp.Rows[I]["AmtCr"]) > 0)
+                {
+                    J = FFindEmptyRow(ref FGMain, "GRNameCredit", IntFindRowFrom);
+                    FGMain.Rows[J]["GRCodeCredit"] = DTTemp.Rows[I]["LedgerAccountGroupId"];
+                    if (DTTemp.Rows[I]["GroupNature"].ToString() == "Income")
+                        FGMain.Rows[J]["GRNameCredit"] = DTTemp.Rows[I]["GName"];
+                    else
+                        FGMain.Rows[J]["GRNameCredit"] = DTTemp.Rows[I]["ContraGroupName"];
+                    FGMain.Rows[J]["Credit"] = DTTemp.Rows[I]["AmtCr"];
+                    DblCredit_Total = DblCredit_Total + Convert.ToDecimal(DTTemp.Rows[I]["AmtCr"]);
+                }
+                else if (Convert.ToDecimal(DTTemp.Rows[I]["AmtDr"]) > 0)
+                {
+                    J = FFindEmptyRow(ref FGMain, "GRName", IntFindRowFrom);
+                    FGMain.Rows[J]["GRCode"] = DTTemp.Rows[I]["LedgerAccountGroupId"];
+                    if (DTTemp.Rows[I]["GroupNature"].ToString() == "Expense")
+                        FGMain.Rows[J]["GRName"] = DTTemp.Rows[I]["GName"];
+                    else
+                        FGMain.Rows[J]["GRName"] = DTTemp.Rows[I]["ContraGroupName"];
+                    FGMain.Rows[J]["Debit"] = DTTemp.Rows[I]["AmtDr"];
+                    DblDebit_Total = DblDebit_Total + Convert.ToDecimal(DTTemp.Rows[I]["AmtDr"]);
+                }
+            }
+
+            DblNetProfit = DblGrossProfit + (DblDebit_Total - DblCredit_Total);
+            if (DblNetProfit > 0)
+            {
+                J = FFindEmptyRow(ref FGMain, "GRNameCredit", IntFindRowFrom);
+                FGMain.Rows[J]["GRNameCredit"] = "Net Loss";
+                FGMain.Rows[J]["Credit"] = Math.Abs(DblNetProfit);
+                DblCredit_Total = DblCredit_Total + Math.Abs(DblNetProfit);
+                DblDebit_Total = DblCredit_Total;
+            }
+            else if (DblNetProfit < 0)
+            {
+                J = FFindEmptyRow(ref FGMain, "GRName", IntFindRowFrom);
+                FGMain.Rows[J]["GRName"] = "Net Profit";
+                FGMain.Rows[J]["Debit"] = Math.Abs(DblNetProfit);
+                DblDebit_Total = DblDebit_Total + Math.Abs(DblNetProfit);
+                DblCredit_Total = DblDebit_Total;
+            }
+
+
+
+            for (I = 0; I <= FGMain.Rows.Count - 1; I++)
+            {
+                ProfitAndLossViewModel vm = new ProfitAndLossViewModel();
+                if (FGMain.Rows[I]["GRCode"] != null && FGMain.Rows[I]["GRCode"] != System.DBNull.Value)
+                    vm.GRCode = Convert.ToInt32(FGMain.Rows[I]["GRCode"]);
+                if (FGMain.Rows[I]["GRName"] != null && FGMain.Rows[I]["GRName"] != System.DBNull.Value)
+                    vm.GRName = "<Strong>" + Convert.ToString(FGMain.Rows[I]["GRName"]) + "</Strong>";
+                if (FGMain.Rows[I]["Debit"] != null && FGMain.Rows[I]["Debit"] != System.DBNull.Value)
+                    vm.Debit = Convert.ToDecimal(FGMain.Rows[I]["Debit"]);
+                if (FGMain.Rows[I]["Credit"] != null && FGMain.Rows[I]["Credit"] != System.DBNull.Value)
+                    vm.Credit = Convert.ToDecimal(FGMain.Rows[I]["Credit"]);
+                if (FGMain.Rows[I]["GRCodeCredit"] != null && FGMain.Rows[I]["GRCodeCredit"] != System.DBNull.Value)
+                    vm.GRCodeCredit = Convert.ToString(FGMain.Rows[I]["GRCodeCredit"]);
+                if (FGMain.Rows[I]["GRNameCredit"] != null && FGMain.Rows[I]["GRNameCredit"] != System.DBNull.Value)
+                    vm.GRNameCredit = "<Strong>" + Convert.ToString(FGMain.Rows[I]["GRNameCredit"]) + "</Strong>";
+
+                vm.TotalDebit = DblDebit_Total;
+                vm.TotalCredit = DblCredit_Total;
+
+                vm.ReportType = "Profit And Loss";
+                vm.OpenReportType = "Trial Balance";
+
+                ProfitAndLossViewModelList.Add(vm);
+            }
+
+            return ProfitAndLossViewModelList;
         }
 
 

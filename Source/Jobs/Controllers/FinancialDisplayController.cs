@@ -234,7 +234,29 @@ namespace Jobs.Controllers
                     }
                 }
             }
-            
+            else if (vm.ReportType == ReportType_BalanceSheet)
+            {
+                IEnumerable<BalanceSheetViewModel> BalanceSheet = _FinancialDisplayService.GetBalanceSheet(SettingParameter);
+
+                if (BalanceSheet != null)
+                {
+                    JsonResult json = Json(new { Success = true, Data = BalanceSheet.ToList() }, JsonRequestBehavior.AllowGet);
+                    json.MaxJsonLength = int.MaxValue;
+                    return json;
+                }
+            }
+            else if (vm.ReportType == ReportType_ProfitAndLoss)
+            {
+                IEnumerable<ProfitAndLossViewModel> ProfitAndLoss = _FinancialDisplayService.GetProfitAndLoss(SettingParameter);
+
+                if (ProfitAndLoss != null)
+                {
+                    JsonResult json = Json(new { Success = true, Data = ProfitAndLoss.ToList() }, JsonRequestBehavior.AllowGet);
+                    json.MaxJsonLength = int.MaxValue;
+                    return json;
+                }
+            }
+
 
             return Json(new { Success = true }, JsonRequestBehavior.AllowGet);
         }
@@ -432,6 +454,9 @@ namespace Jobs.Controllers
 
 
         
+
+
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)

@@ -244,10 +244,9 @@
     $(document).ready(function () {
         var Nature  =  '@(((string)ViewBag.Nature).ToUpper() == "CR" ? "Dr" : "Cr")'
 
-
-        var SupplementaryNature  =  '@((string)ViewBag.Nature)'
+        @*var SupplementaryNature  =  '@((string)ViewBag.Nature)'
         if (SupplementaryNature == '')
-            SupplementaryNature = $("#DrCr").val()
+            SupplementaryNature = $("#DrCr").val()*@
 
 
 
@@ -257,7 +256,7 @@
         CustomSelectFunction($("#ReferenceDocTypeId"), '/ComboHelpList/GetDocumentType', '/ComboHelpList/SetDocumentType', ' ', false, 0);
         CustomSelectFunctionForReference($("#ReferenceDocId"), '/LedgerLine/GetReferenceDocIds', '/LedgerLine/SetSingleReferenceDocIds', ' ', false, 0,$("#ReferenceDocTypeId").val());
 
-        CustomSelectFunctionForLedgerId_Adjusted($("#SupplementaryForLedgerId"), '/LedgerLine/GetLedgerIds_Supplementary', '/ComboHelpList/SetSingleLedger', ' ', false, 0, $('#LedgerAccountId','.modal-body').val(),SupplementaryNature, $('#LedgerHeaderId', '.modal-body').val());
+        CustomSelectFunctionForLedgerId_Adjusted($("#SupplementaryForLedgerId"), '/LedgerLine/GetLedgerIds_Supplementary', '/ComboHelpList/SetSingleLedger', ' ', false, 0, $('#LedgerAccountId','.modal-body').val(),Nature, $('#LedgerHeaderId', '.modal-body').val());
 
 
         $('.datepicker').datepicker({
