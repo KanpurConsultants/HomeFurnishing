@@ -153,6 +153,7 @@ namespace Jobs.Controllers
                 ViewBag.WizardId = settings.WizardMenuId;
                 ViewBag.IsPostedInStock = settings.isPostedInStock;
                 ViewBag.isVisibleCostCenter = settings.isVisibleCostCenter;
+				ViewBag.isVisibleProcessHeader = settings.isVisibleProcessHeader;
                 ViewBag.ImportMenuId = settings.ImportMenuId;
                 ViewBag.SqlProcDocumentPrint = settings.SqlProcDocumentPrint;
                 ViewBag.SqlProcGatePass = settings.SqlProcGatePass;
@@ -163,6 +164,26 @@ namespace Jobs.Controllers
 
         }
 
+
+        public ActionResult GetCustomPerson_WithProcess(string searchTerm, int pageSize, int pageNum, int filter, int? filter2)//DocTypeId
+        {
+            var Query = _JobOrderHeaderService.GetCustomPerson_WithProcess(filter, searchTerm, filter2);
+            var temp = Query.Skip(pageSize * (pageNum - 1))
+                .Take(pageSize)
+                .ToList();
+
+            var count = Query.Count();
+
+            ComboBoxPagedResult Data = new ComboBoxPagedResult();
+            Data.Results = temp;
+            Data.Total = count;
+
+            return new JsonpResult
+            {
+                Data = Data,
+                JsonRequestBehavior = JsonRequestBehavior.AllowGet
+            };
+        }
 
         [HttpGet]
         public ActionResult BarcodePrint(int id)
@@ -2985,31 +3006,32 @@ EXEC(@Qry);	";
             QryGSTSummary.QueryName = nameof(QueryGSTSummary);
             DocumentPrintData.Add(QryGSTSummary);
 
-            if (JOH.GatePassHeaderId != null)
-            {
+
+
                 String QueryGatePass;
-                QueryGatePass = @"SELECT H.GatePassHeaderId,  DT.DocumentTypeShortName +'-'+ H.DocNo AS DocNo, H.DocDate,  H.Remark, P.Name AS PersonName, G.GodownName,  
+                QueryGatePass = @"SELECT JOH.JobOrderHeaderId, H.GatePassHeaderId,  DT.DocumentTypeShortName +'-'+ H.DocNo AS DocNo, H.DocDate,  H.Remark, P.Name AS PersonName, G.GodownName,  
                 L.GatePassLineId, L.Product, L.Specification, L.Qty, U.UnitName, U.DecimalPlaces,
                 ' " + JOH.DocNo + @"' AS ReferenceDocNo,'GatePassPrint.rdl'  AS ReportName, 'Gate Pass' AS ReportTitle,
                 NULL AS SubReportProcList,
                 DTS.SignatoryleftCaption,
                 DTS.SignatoryMiddleCaption,
                 DTS.SignatoryRightCaption    
-                FROM Web.GatePassHeaders H
+                FROM Web.joborderheaders JOH
+                LEFT JOIN  Web.GatePassHeaders H ON JOH.GatePassHeaderId = H.GatePassHeaderId 
                 LEFT JOIN web.Godowns G ON G.GodownId = H.GodownId 
                 LEFT JOIN web.People P ON P.PersonID  = H.PersonID 
                 LEFT JOIN [Web].DocumentTypes DT WITH (nolock) ON DT.DocumentTypeId = H.DocTypeId 
                 LEFT JOIN web._DocumentTypeSettings DTS WITH (Nolock) ON DTS.DocumentTypeId=H.DocTypeId 
                 LEFT JOIN web.GatePassLines L ON L.GatePassHeaderId = H.GatePassHeaderId 
                 LEFT JOIN web.Units U ON U.UnitId = L.UnitId 
-                WHERE H.GatePassHeaderId = " + JOH.GatePassHeaderId + @" ";
+                WHERE JOH.JobOrderHeaderId = " + item + @" ";
 
 
                 ListofQuery QryGatePass = new ListofQuery();
                 QryGatePass.Query = QueryGatePass;
                 QryGatePass.QueryName = nameof(QueryGatePass);
                 DocumentPrintData.Add(QryGatePass);
-            }
+
             return DocumentPrintData;
 
         }

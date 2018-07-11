@@ -14,5 +14,9 @@ namespace Model.Models
         public int LineTableId { get; set; }
         public virtual SaleInvoiceReturnLine SaleInvoiceReturnLine { get; set; }
 
+        [ForeignKey("SaleInvoiceReturnHeader")]
+        public int HeaderTableId { get; set; }
+        public virtual SaleInvoiceReturnHeader SaleInvoiceReturnHeader { get; set; }
+
     }
 }

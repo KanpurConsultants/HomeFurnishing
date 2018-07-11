@@ -41,6 +41,7 @@ namespace Service
         string GetMaxDocNo();
         IEnumerable<WeavingReceiveWizardViewModel> GetJobOrdersForWeavingReceiveWizard(int DocTypeId);
         IQueryable<ComboBoxResult> GetCustomPerson(int Id, string term);
+		IQueryable<ComboBoxResult> GetCustomPerson_WithProcess(int Id, string term, int? ProcessId = null);
     }
 
     public class JobReceiveHeaderService : IJobReceiveHeaderService
@@ -152,6 +153,7 @@ namespace Service
                         DocNo = p.DocNo,
                         JobWorkerName = p.JobWorker.Name + ", " + p.JobWorker.Suffix + " [" + p.JobWorker.Code + "]",
                         DocTypeName = p.DocType.DocumentTypeName,
+						ProcessName =p.Process.ProcessName,
                         Remark = p.Remark,
                         Status=p.Status,
                         ModifiedBy=p.ModifiedBy,
@@ -387,6 +389,46 @@ namespace Service
             return list;
         }
 
+		public IQueryable<ComboBoxResult> GetCustomPerson_WithProcess(int Id, string term, int? ProcessId = null)
+        {
+            int DocTypeId = Id;
+            int SiteId = (int)System.Web.HttpContext.Current.Session["SiteId"];
+            int DivisionId = (int)System.Web.HttpContext.Current.Session["DivisionId"];
+
+            var settings = db.JobReceiveSettings.Where(m => m.DocTypeId == DocTypeId && m.DivisionId == DivisionId && m.SiteId == SiteId).FirstOrDefault();
+
+
+            string[] PersonRoles = null;
+            if (!string.IsNullOrEmpty(settings.filterPersonRoles)) { PersonRoles = settings.filterPersonRoles.Split(",".ToCharArray()); }
+            else { PersonRoles = new string[] { "NA" }; }
+
+            string DivIdStr = "|" + DivisionId.ToString() + "|";
+            string SiteIdStr = "|" + SiteId.ToString() + "|";
+
+            var list = (from p in db.Persons
+                        join bus in db.BusinessEntity on p.PersonID equals bus.PersonID into BusinessEntityTable
+                        from BusinessEntityTab in BusinessEntityTable.DefaultIfEmpty()
+                        join pp in db.PersonProcess on p.PersonID equals pp.PersonId into PersonProcessTable
+                        from PersonProcessTab in PersonProcessTable.DefaultIfEmpty()
+                        join pr in db.PersonRole on p.PersonID equals pr.PersonId into PersonRoleTable
+                        from PersonRoleTab in PersonRoleTable.DefaultIfEmpty()
+                        where (ProcessId == null ? 1 == 1 : PersonProcessTab.ProcessId == ProcessId)
+                        && (string.IsNullOrEmpty(term) ? 1 == 1 : (p.Name.ToLower().Contains(term.ToLower()) || p.Code.ToLower().Contains(term.ToLower())))
+                        && (string.IsNullOrEmpty(settings.filterPersonRoles) ? 1 == 1 : PersonRoles.Contains(PersonRoleTab.RoleDocTypeId.ToString()))
+                        && BusinessEntityTab.DivisionIds.IndexOf(DivIdStr) != -1
+                        && BusinessEntityTab.SiteIds.IndexOf(SiteIdStr) != -1
+                        && (p.IsActive == null ? 1 == 1 : p.IsActive == true)
+                        group new { p } by new { p.PersonID } into Result
+                        orderby Result.Max(m => m.p.Name)
+                        select new ComboBoxResult
+                        {
+                            id = Result.Key.PersonID.ToString(),
+                            text = Result.Max(m => m.p.Name + ", " + m.p.Suffix + " [" + m.p.Code + "]"),
+                        }
+              );
+
+            return list;
+        }
         public void Dispose()
         {
         }

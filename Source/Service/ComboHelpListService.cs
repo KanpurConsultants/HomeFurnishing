@@ -486,7 +486,7 @@ namespace Service
         }
         public IEnumerable<ComboBoxList> GetColoursHelList()
         {
-            IEnumerable<ComboBoxList> ProdCategoryList = db.Colour.OrderBy(m => m.ColourName).Select(m => new ComboBoxList
+            IEnumerable<ComboBoxList> ProdCategoryList = db.Colour.OrderBy(m => m.ColourName).Where (m=>m.IsActive==true).Select(m => new ComboBoxList
             {
                 Id = m.ColourId,
                 PropFirst = m.ColourName

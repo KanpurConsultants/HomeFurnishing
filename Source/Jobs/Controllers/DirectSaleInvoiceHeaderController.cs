@@ -528,6 +528,8 @@ namespace Jobs.Controllers
                     saledispatchheader.DocDate = vm.DocDate;
                     saledispatchheader.SaleToBuyerId = vm.SaleToBuyerId;
                     saledispatchheader.ShipToPartyAddress = vm.ShipToPartyAddress;
+					saledispatchheader.ShipMethodId = vm.ShipMethodId;
+                    saledispatchheader.DeliveryTermsId = vm.DeliveryTermsId;
                     saledispatchheader.Remark = vm.Remark;
                     saledispatchheader.ModifiedDate = DateTime.Now;
                     saledispatchheader.ModifiedBy = User.Identity.Name;
@@ -742,6 +744,7 @@ namespace Jobs.Controllers
             vm = Mapper.Map<SaleInvoiceHeader, DirectSaleInvoiceHeaderViewModel>(s);
             vm.SaleToBuyerId = DispactchHeader.SaleToBuyerId;
             vm.DeliveryTermsId = DispactchHeader.DeliveryTermsId;
+			vm.ShipMethodId = (int)DispactchHeader.ShipMethodId;
             vm.ShipToPartyAddress = DispactchHeader.ShipToPartyAddress;
             vm.GodownId = packingHeader.GodownId;
 
@@ -2786,6 +2789,8 @@ EXEC(@Qry);	";
                     foreach (var item in LineCharges)
                     {
                         SaleInvoiceReturnLineCharge PoLineCharge = Mapper.Map<LineChargeViewModel, SaleInvoiceReturnLineCharge>(item);
+                        PoLineCharge.HeaderTableId = InvoiceRetHeader.SaleInvoiceReturnHeaderId;
+                        PoLineCharge.PersonID = SaleInvoiceHeader.BillToBuyerId;
                         PoLineCharge.ObjectState = Model.ObjectState.Added;
                         new SaleInvoiceReturnLineChargeService(_unitOfWork).Create(PoLineCharge);
                     }
@@ -2797,6 +2802,10 @@ EXEC(@Qry);	";
                         SaleInvoiceReturnHeaderCharge POHeaderCharge = Mapper.Map<HeaderChargeViewModel, SaleInvoiceReturnHeaderCharge>(HeaderCharges[i]);
                         POHeaderCharge.HeaderTableId = InvoiceRetHeader.SaleInvoiceReturnHeaderId;
                         POHeaderCharge.PersonID = InvoiceRetHeader.BuyerId;
+
+                        if (SaleInvoiceHeader.BillToBuyerId != InvoiceRetHeader.BuyerId)
+                            POHeaderCharge.PersonID = SaleInvoiceHeader.BillToBuyerId;
+
                         POHeaderCharge.ObjectState = Model.ObjectState.Added;
                         new SaleInvoiceReturnHeaderChargeService(_unitOfWork).Create(POHeaderCharge);
                     }

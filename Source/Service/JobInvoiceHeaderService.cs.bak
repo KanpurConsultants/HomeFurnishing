@@ -39,6 +39,7 @@ namespace Service
         PersonViewModel GetJobWorkerDetail(int id);
         IEnumerable<DocumentTypeHeaderAttributeViewModel> GetDocumentHeaderAttribute(int id);
 		IEnumerable<PrintViewModel> JobInvoicePrint(string HeaderId,string UserName);
+        string GetNarration(int JobInvoiceHeaderId);
     }
 
     public class JobInvoiceHeaderService : IJobInvoiceHeaderService
@@ -128,6 +129,323 @@ namespace Service
                         ).FirstOrDefault();
         }
 
+        public IEnumerable<PrintViewModel> JobInvoicePrint(string HeaderId,string UserName)
+        {
+            string mQry;
+            int   SiteId = (int)System.Web.HttpContext.Current.Session["SiteId"];
+            int DivisionId = (int)System.Web.HttpContext.Current.Session["DivisionId"];            
+            SqlParameter SqlParameterHeaderId = new SqlParameter("@Id", !string.IsNullOrEmpty(HeaderId) ? HeaderId : (object)DBNull.Value);
+            
+            mQry = @" DECLARE @TotalAmount DECIMAL 
+	                SET @TotalAmount = (SELECT Max(Amount) FROM Web.JobInvoiceHeaderCharges WHERE HeaderTableId = @Id AND ChargeId = 34 ) 
+	 
+	                DECLARE @ReturnAmount DECIMAL
+	                DECLARE @DebitAmount DECIMAL
+	                DECLARE @CreaditAmount DECIMAL
+	  
+	                SELECT 
+	                @ReturnAmount=sum(CASE WHEN CT.ChargeTypeName IN ('Amount','CGST','SGST','IGST') AND JIRH.Nature='Return' THEN isnull(H.Amount,0) ELSE 0 END ),
+	                @DebitAmount=sum(CASE WHEN JIRH.Nature='Debit Note' AND C.ChargeName='Net Amount' THEN isnull(H.Amount,0) ELSE 0 END ),
+	                @CreaditAmount=sum(CASE WHEN JIRH.Nature='Credit Note' AND C.ChargeName='Net Amount' THEN isnull(H.Amount,0) ELSE 0 END )
+	                FROM Web.JobInvoiceReturnLineCharges H
+	                LEFT JOIN Web.ChargeTypes CT WITH (Nolock) ON CT.ChargeTypeId=H.ChargeTypeId
+	                LEFT JOIN web.Charges C WITH (Nolock) ON C.ChargeId=H.ChargeId
+	                LEFT JOIN Web.JobInvoiceReturnLines JIRL WITH (Nolock) ON JIRL.JobInvoiceReturnLineId=H.LineTableId
+	                LEFT JOIN Web.JobInvoiceLines JIL WITH (Nolock) ON JIL.JobInvoiceLineId=JIRL.JobInvoiceLineId
+	                LEFT JOIN Web.JobInvoiceReturnHeaders JIRH WITH (Nolock) ON JIRH.JobInvoiceReturnHeaderId=JIRL.JobInvoiceReturnHeaderId
+	                WHERE JIL.JobInvoiceHeaderId=@Id  
+	  
+	                SET @TotalAmount=isnull(@TotalAmount,0)-isnull(@ReturnAmount,0)-isnull(@DebitAmount,0)+isnull(@CreaditAmount,0)
+	  
+	  
+	  
+	  
+	  
+	                DECLARE @UnitDealCnt INT	
+	                SELECT 
+	                @UnitDealCnt=sum(CASE WHEN JOL.UnitId != JOL.DealunitId THEN 1 ELSE 0 END )
+	                FROM Web.JobInvoiceLines L WITH (Nolock) 
+	                LEFT JOIN web.JobReceiveLines JRL WITH (Nolock) ON JRL.JobReceiveLineId=L.JobReceiveLineId
+	                LEFT JOIN Web.JobOrderLines JOL WITH (Nolock) ON JOL.JobOrderLineId=JRL.JobOrderLineId
+	                WHERE L.JobInvoiceHeaderId=@Id
+  
+	
+	                DECLARE @DocDate DATETIME
+	                DECLARE @Site INT 
+	                DECLARE @Division INT 
+                    SELECT  @DocDate=DocDate,@Site=SiteId,@Division=DivisionId FROM Web.JobInvoiceHeaders WHERE JobInvoiceHeaderId=@Id
+
+	
+	
+	                SELECT 
+	                --Header Table Fields	
+	                H.JobInvoiceHeaderId AS HeaderTableId,H.DocTypeId,H.DocNo,DocIdCaption+' No' AS DocIdCaption ,
+	                H.SiteId,H.DivisionId,format(H.DocDate,'dd/MMM/yy') as DocDate,DTS.DocIdCaption +' Date' AS DocDateCaption ,	
+   	                H.JobWorkerDocNo AS PartyDocNo,	DTS.PartyCaption +' Doc No' AS PartyDocCaption,format(H.JobWorkerDocDate,'dd/MMM/yy') AS PartyDocDate,
+                    DTS.PartyCaption +' Doc Date' AS PartyDocDateCaption,H.CreditDays,isnull(H.Remark,' ') AS HeaderRemark,DT.DocumentTypeShortName,	
+	                H.ModifiedBy +' ' + Replace(replace(convert(NVARCHAR, H.ModifiedDate, 106), ' ', '/'),'/20','/') + substring (convert(NVARCHAR,H.ModifiedDate),13,7) AS ModifiedBy,
+	                format(H.ModifiedDate,'dd/MMM/yy') as ModifiedDate,(CASE WHEN Isnull(H.Status,0)=0 OR Isnull(H.Status,0)=8 THEN 0 ELSE 1 END)  AS Status,
+	                isnull(CUR.Name,'') AS CurrencyName,(CASE WHEN SPR.[Party GST NO] IS NULL THEN 'Yes' ELSE 'No' END ) AS ReverseChargeYN,
+	                VDC.CompanyName,P.Name AS PartyName, DTS.PartyCaption AS  PartyNameCaption, P.Suffix AS PartySuffix,' ' AS PartyPrefix,	
+	                isnull(PA.Address,'')+' '+isnull(C.CityName,'')+','+isnull(PA.ZipCode,'')+(CASE WHEN isnull(CS.StateName,'') <> isnull(S.StateName,'') AND SPR.[Party GST NO] IS NOT NULL THEN ',State : '+isnull(S.StateName,'')+(CASE WHEN S.StateCode IS NULL THEN '' ELSE ', Code : '+S.StateCode END)    ELSE '' END ) AS PartyAddress,
+	                isnull(S.StateName,'') AS PartyStateName,isnull(S.StateCode,'') AS PartyStateCode,	
+	                isnull(P.Mobile,'') AS PartyMobileNo,
+	                isnull(SPR.[Party TIN NO],'') AS PartyTinNo,isnull(SPR.[Party PAN NO],'') AS PartyPanNo,isnull(SPR.[Party AADHAR NO],'') AS PartyAadharNo,isnull(SPR.[Party GST NO],'') AS PartyGSTNo,isnull(SPR.[Party CST NO],'') AS PartCSTNo,
+	                --Plan Detail
+	                JRH.DocNo  AS ContraDocNo,DTS.ContraDocTypeCaption AS ContraDocTypeCaption,
+	                --Caption Fields	
+	                DTS.SignatoryleftCaption,DTS.SignatoryMiddleCaption,DTS.SignatoryRightCaption,
+	                --Line Table
+	                PD.ProductName,DTS.ProductCaption,U.UnitName,convert(int,U.DecimalPlaces) as DecimalPlaces,DU.UnitName AS DealUnitName,DTS.DealQtyCaption,convert(int,DU.DecimalPlaces) AS DealDecimalPlaces,
+	                isnull(L.Qty,0) AS Qty,isnull(L.Rate,0) AS Rate,isnull(L.Amount,0) AS Amount,isnull(L.DealQty,0) AS DealQty,
+	                D1.Dimension1Name,DTS.Dimension1Caption,D2.Dimension2Name,DTS.Dimension2Caption,D3.Dimension3Name,DTS.Dimension3Caption,D4.Dimension4Name,DTS.Dimension4Caption,
+                    DTS.SpecificationCaption,(CASE WHEN DTS.PrintSpecification >0 THEN   JRL.Specification ELSE '' END)  AS Specification,L.Remark AS LineRemark,
+	                --L.DiscountPer AS DiscountPer,L.DiscountAmt AS DiscountAmt,
+	                Convert(DECIMAL(18,2),L.RateDiscountPer) AS DiscountPer,Convert(DECIMAL(18,2),L.RateDiscountAmt) AS DiscountAmt,
+	                --STC.Code AS SalesTaxProductCodes,
+	                (CASE WHEN H.ProcessId IN (26,28) THEN  STC.Code ELSE PSSTC.Code END)  AS SalesTaxProductCodes ,
+	                (CASE WHEN DTS.PrintProductGroup >0 THEN isnull(PG.ProductGroupName,'') ELSE '' END)+(CASE WHEN DTS.PrintProductdescription >0 THEN isnull(','+PD.Productdescription,'') ELSE '' END) AS ProductGroupName,
+	                DTS.ProductGroupCaption,isnull(CGPD.PrintingDescription,isnull(CGPD.ChargeGroupProductName,' ')) AS ChargeGroupProductName,
+	
+                   --Receive Lines
+	                 DTS.ProductUidCaption,PU.ProductUidName,
+	                (CASE WHEN isnull(JRL.LossQty,0) >0 THEN isnull(JRL.LossQty,0) ELSE NULL END)  AS LossQty,
+	                (CASE WHEN isnull(JRL.Qty,0) <> isnull(L.Qty,0) THEN CASE WHEN isnull(JRL.Qty,0) <> 0 THEN isnull(JRL.Qty,0) ELSE NULL END   ELSE NULL END) AS RecQty,
+	                JRL.LotNo AS LotNo, 
+	
+	                --Formula Fields
+	                isnull(@TotalAmount,0) AS NetAmount,  
+	                isnull(@ReturnAmount,0) AS ReturnAmount,
+	                isnull(@DebitAmount,0) AS DebitAmount,
+	                isnull(@CreaditAmount,0) AS CreaditAmount,   	
+	                --SalesTaxGroupPersonId
+	                CGP.ChargeGroupPersonName,
+	                --Other Fields
+	                @UnitDealCnt  AS DealUnitCount,		
+	                (CASE WHEN Isnull(H.Status,0)=0 OR Isnull(H.Status,0)=8 THEN 'Provisional ' +isnull(DT.PrintTitle,DT.DocumentTypeName) ELSE isnull(DT.PrintTitle,DT.DocumentTypeName) END) AS ReportTitle, 
+                     SalesTaxGroupProductCaption,
+	                SDS.SalesTaxProductCodeCaption,'"+ UserName + @"' as PrintedBy,convert(varchar,getdate()) as PrintDate
+	                FROM Web.JobInvoiceHeaders H WITH (Nolock)
+	                LEFT JOIN web.DocumentTypes DT WITH (Nolock) ON DT.DocumentTypeId=H.DocTypeId
+	                LEFT JOIN Web._DocumentTypeSettings DTS WITH (Nolock) ON DTS.DocumentTypeId=DT.DocumentTypeId
+	                LEFT JOIN Web.JobInvoiceSettings JIS WITH (Nolock) ON JIS.DocTypeId=DT.DocumentTypeId AND JIS.SiteId =H.siteid AND H.DivisionId=JIS.DivisionId
+	                LEFT JOIN web.ViewDivisionCompany VDC WITH (Nolock) ON VDC.DivisionId=H.DivisionId
+	                LEFT JOIN Web.Sites SI WITH (Nolock) ON SI.SiteId=H.SiteId
+	                LEFT JOIN Web.Divisions DIV WITH (Nolock) ON DIV.DivisionId=H.DivisionId	
+	                LEFT JOIN Web.Companies Com ON Com.CompanyId = DIV.CompanyId
+	                LEFT JOIN Web.Cities CC WITH (Nolock) ON CC.CityId=Com.CityId
+	                LEFT JOIN Web.States CS WITH (Nolock) ON CS.StateId=CC.StateId
+	                LEFT JOIN Web.Processes PS WITH (Nolock) ON PS.ProcessId=H.ProcessId
+	                LEFT JOIN Web.SalesTaxProductCodes PSSTC WITH (Nolock) ON PSSTC.SalesTaxProductCodeId=PS.SalesTaxProductCodeId
+	                LEFT JOIN Web.People P WITH (Nolock) ON P.PersonID=H.JobWorkerId
+	                LEFT JOIN (SELECT TOP 1 * FROM web.SiteDivisionSettings WHERE @DocDate BETWEEN StartDate AND IsNull(EndDate,getdate()) AND SiteId=@Site AND DivisionId=@Division ORDER BY StartDate) SDS  ON H.DivisionId = SDS.DivisionId AND H.SiteId = SDS.SiteId	
+   	                LEFT JOIN (SELECT * FROM Web.PersonAddresses WITH (nolock) WHERE AddressType IS NULL) PA ON PA.PersonId = P.PersonID 
+	                LEFT JOIN Web.Cities C WITH (nolock) ON C.CityId = PA.CityId
+	                LEFT JOIN Web.States S WITH (Nolock) ON S.StateId=C.StateId
+	                LEFT JOIN web.ChargeGroupPersons CGP WITH (Nolock) ON CGP.ChargeGroupPersonId=H.SalesTaxGroupPersonId
+	                LEFT JOIN Web.Currencies CUR WITH (Nolock) ON CUR.Id=H.CurrencyId
+  	                LEFT JOIN Web.JobInvoiceLines L WITH (Nolock) ON L.JobInvoiceHeaderId=H.JobInvoiceHeaderId
+	                LEFT JOIN Web.JobReceiveLines JRL WITH (Nolock) ON JRL.JobReceiveLineId=L.JobReceiveLineId
+	                LEFT JOIN web.ProductUids PU WITH (Nolock) ON PU.ProductUidId=JRL.ProductUidId	
+	                LEFT JOIN Web.JobReceiveHeaders JRH WITH (Nolock) ON JRH.JobReceiveHeaderId=JRL.JobReceiveHeaderId
+	                LEFT JOIN Web.JobOrderLines JOL WITH (Nolock) ON JOL.JobOrderLineId=JRL.JobOrderLineId
+   	                LEFT JOIN Web.ProdOrderLines POl WITH (Nolock) ON POl.ProdOrderLineId=JOL.ProdOrderLineId
+                    LEFT JOIN Web.ProdOrderHeaders POH WITH (Nolock) ON POH.ProdOrderHeaderId=POL.ProdOrderHeaderId
+	                LEFT JOIN web.Products PD WITH (Nolock) ON PD.ProductId=isnull(JOL.ProductId,JRL.ProductId)
+	                LEFT JOIN web.ProductGroups PG WITH (Nolock) ON PG.ProductGroupId=PD.ProductGroupid
+	                LEFT JOIN Web.SalesTaxProductCodes STC WITH (Nolock) ON STC.SalesTaxProductCodeId= IsNull(PD.SalesTaxProductCodeId, Pg.DefaultSalesTaxProductCodeId)
+	                LEFT JOIN Web.Dimension1 D1 WITH (Nolock) ON D1.Dimension1Id=JOL.Dimension1Id
+	                LEFT JOIN web.Dimension2 D2 WITH (Nolock) ON D2.Dimension2Id=JOL.Dimension2Id
+	                LEFT JOIN web.Dimension3 D3 WITH (Nolock) ON D3.Dimension3Id=JOL.Dimension3Id
+	                LEFT JOIN Web.Dimension4 D4 WITH (nolock) ON D4.Dimension4Id=JOL.Dimension4Id
+	                LEFT JOIN web.Units U WITH (Nolock) ON U.UnitId=PD.UnitId
+	                LEFT JOIN web.Units DU WITH (Nolock) ON DU.UnitId=JOL.DealUnitId
+	                LEFT JOIN Web.Std_PersonRegistrations SPR WITH (Nolock) ON SPR.CustomerId=H.JobWorkerId
+	                LEFT JOIN web.ChargeGroupProducts CGPD WITH (Nolock) ON L.SalesTaxGroupProductId = CGPD.ChargeGroupProductId	
+   	                WHERE H.JobInvoiceHeaderId=@Id
+   	                ORDER BY L.Sr";
+
+            
+
+
+            IEnumerable<PrintViewModel> PrintJobinvocie = db.Database.SqlQuery<PrintViewModel>(mQry, SqlParameterHeaderId).ToList();
+            IEnumerable<PrintCalculationViewModel> Calculation=PrintCalculation(HeaderId, "Web.JobInvoiceHeaderCharges", "Web.JobInvoiceLineCharges", "Web.JobInvoiceLines");
+            IEnumerable<PrintCompanyViewModel> Companydetail = PrintCompany(SiteId, DivisionId);
+            IEnumerable<PrintGSTViewModel> GstDetail = PrintGST(HeaderId, "Web.JobInvoiceLines", "Web.JobInvoiceLineCharges", "L.JobInvoiceLineId","Web.JobInvoiceHeaders", "JobInvoiceHeaderId");
+
+            PrintJobinvocie.FirstOrDefault().CalculationHeader = Calculation.ToList();
+            PrintJobinvocie.FirstOrDefault().CompanyDetail = Companydetail.ToList();
+            PrintJobinvocie.FirstOrDefault().GstDetail = GstDetail.ToList();
+                        
+            return PrintJobinvocie;
+
+        }
+
+        public IEnumerable<PrintCalculationViewModel>PrintCalculation(string HeaderId, string HeadertableName,string LineChargesTableName,string LineTableName)
+        {
+            string mQry; 
+
+             SqlParameter SqlParameterHeaderId = new SqlParameter("@Id", !string.IsNullOrEmpty(HeaderId) ? HeaderId : (object)DBNull.Value);
+            SqlParameter SqlParameterHeaderTableName = new SqlParameter("@HeaderTableName", !string.IsNullOrEmpty(HeadertableName) ? HeadertableName : (object)DBNull.Value);
+            SqlParameter SqlParameterLineChargesTableName = new SqlParameter("@LineChargeTableName", !string.IsNullOrEmpty(LineChargesTableName) ? LineChargesTableName : (object)DBNull.Value);
+            SqlParameter SqlParameterLineTableName = new SqlParameter("@LineTableName", !string.IsNullOrEmpty(LineTableName) ? LineTableName : (object)DBNull.Value);
+
+            mQry = @"  DECLARE @StrGrossAmount AS NVARCHAR(50)  
+                        DECLARE @StrBasicExciseDuty AS NVARCHAR(50)  
+                        DECLARE @StrExciseECess AS NVARCHAR(50)  
+                        DECLARE @StrExciseHECess AS NVARCHAR(50)  
+
+                        DECLARE @StrSalesTaxTaxableAmt AS NVARCHAR(50)  
+                        DECLARE @StrVAT AS NVARCHAR(50)  
+                        DECLARE @StrSAT AS NVARCHAR(50) 
+                        DECLARE @StrCST AS NVARCHAR(50) 
+
+                        SET @StrGrossAmount = 'Gross Amount'
+                        SET @StrBasicExciseDuty = 'Basic Excise Duty'
+                        SET @StrExciseECess ='Excise ECess'
+                        SET @StrExciseHECess = 'Excise HECess'
+
+                        SET @StrSalesTaxTaxableAmt = 'Sales Tax Taxable Amt'
+                        SET @StrVAT = 'VAT'
+                        SET @StrSAT = 'SAT'
+                        SET @StrCST = 'CST'
+
+                        DECLARE @Qry NVARCHAR(Max);
+                        SET @Qry = '
+		                        DECLARE @GrossAmount AS DECIMAL 
+		                        DECLARE @BasicExciseDutyAmount AS DECIMAL 
+		                        DECLARE @SalesTaxTaxableAmt AS DECIMAL 
+		
+		                        SELECT @GrossAmount = sum ( CASE WHEN C.ChargeName = ''' + @StrGrossAmount + ''' THEN  H.Amount  ELSE 0 END ) ,
+		                        @BasicExciseDutyAmount = sum( CASE WHEN C.ChargeName = ''' + @StrBasicExciseDuty + ''' THEN  H.Amount  ELSE 0 END ) ,
+		                        @SalesTaxTaxableAmt = sum( CASE WHEN C.ChargeName = ''' + @StrSalesTaxTaxableAmt + ''' THEN  H.Amount  ELSE 0 END )
+		                        FROM ' + @HeaderTableName + ' H
+		                        LEFT JOIN web.ChargeTypes CT ON CT.ChargeTypeId = H.ChargeTypeId 
+		                        LEFT JOIN web.Charges C ON C.ChargeId = H.ChargeId 
+		                        WHERE H.Amount <> 0 AND H.HeaderTableId	= ' + Convert(Varchar,@Id ) + '
+		                        GROUP BY H.HeaderTableId
+		
+		
+		                        SELECT H.Id, H.HeaderTableId, H.Sr, C.ChargeName, H.Amount, H.ChargeTypeId,  CT.ChargeTypeName, 
+		                        --CASE WHEN C.ChargeName = ''Vat'' THEN ( H.Amount*100/ @GrossAmount ) ELSE H.Rate End  AS Rate,
+		                        CASE 
+		                        WHEN @SalesTaxTaxableAmt>0 And C.ChargeName IN ( ''' + @StrVAT + ''',''' + @StrSAT + ''',''' + @StrCST+ ''')  THEN ( H.Amount*100/ @SalesTaxTaxableAmt   ) 
+		                        WHEN @GrossAmount>0 AND C.ChargeName IN ( ''' + @StrBasicExciseDuty + ''')  THEN ( H.Amount*100/ @GrossAmount   ) 
+		                        WHEN  @BasicExciseDutyAmount>0 AND  C.ChargeName IN ( ''' + @StrExciseECess + ''', ''' +@StrExciseHECess+ ''')  THEN ( H.Amount*100/ @BasicExciseDutyAmount   ) 
+		                        ELSE 0 End  AS Rate,
+		                        ''StdDocPrintSub_CalculationHeader.rdl'' AS ReportName,
+		                        ''Transaction Charges'' AS ReportTitle     
+		                        FROM  ' + @HeaderTableName + '  H
+		                        LEFT JOIN web.ChargeTypes CT ON CT.ChargeTypeId = H.ChargeTypeId 
+		                        LEFT JOIN web.Charges C ON C.ChargeId = H.ChargeId 
+		                        WHERE  ( isnull(H.ChargeTypeId,0) <> ''4'' OR C.ChargeName = ''Net Amount'') AND H.Amount <> 0
+		                        AND H.HeaderTableId	= ' + Convert(Varchar,@Id ) + ''
+
+	                            DECLARE @TmpData TABLE
+	                            (
+	                            id INT,
+	                            HeaderTableId INT,
+	                            Sr INT,
+	                            ChargeName NVARCHAR(50),
+	                            Amount DECIMAL(18,4),
+	                            ChargeTypeId INT,
+	                            ChargeTypeName NVARCHAR(50),
+	                            Rate DECIMAL(38,20),
+	                            ReportName nVarchar(255),
+	                            ReportTitle nVarchar(255)
+	                            );
+	
+	
+	                            Insert Into @TmpData EXEC(@Qry)
+	                            SELECT id,HeaderTableId,Sr,ChargeName,Amount,ChargeTypeId,ChargeTypeName,Rate,ReportName ,
+	                            'STDDocPrintSub_GSTSummary ' + convert(NVARCHAR,@Id) + ', '+CHAR(39) +@LineTableName+CHAR(39)+', '+CHAR(39) + @LineChargeTableName +CHAR(39) AS SubReportProcList
+	                            FROM @TmpData
+	                            ORDER BY Sr	";
+
+
+
+            IEnumerable<PrintCalculationViewModel> PrintCalculation = db.Database.SqlQuery<PrintCalculationViewModel>(mQry, SqlParameterHeaderId, SqlParameterHeaderTableName, SqlParameterLineChargesTableName, SqlParameterLineTableName).ToList();
+
+
+            return PrintCalculation;
+
+        }
+
+        public IEnumerable<PrintCompanyViewModel> PrintCompany(int SiteId, int DivisionId)
+        {
+            string mQry;
+            SqlParameter SqlParameterSiteId = new SqlParameter("@SiteId", !string.IsNullOrEmpty(SiteId.ToString()) ? SiteId : (object)DBNull.Value);
+            SqlParameter SqlParameterDivisionId = new SqlParameter("@DivisionId", !string.IsNullOrEmpty(DivisionId.ToString()) ? DivisionId : (object)DBNull.Value);
+            
+            mQry = @"  SELECT (SELECT SiteCode  FROM Web.Sites WHERE SiteId = @SiteId) SiteName,
+                        D.DivisionName, C.CompanyName, C.Address AS CompanyAddress,
+                        CT.CityName+','+CNT.CountryName AS CompanyCity,C.Phone AS Phone, C.TinNo AS CompanyTinNo, C.CstNo AS CompanyCSTNo,
+                         C.Fax  AS CompanyFaxNo,
+                        ST.StateName,  C.LogoFolderName, C.LogoFileName, D.ReportHeaderTextRight1, D.ReportHeaderTextRight2,
+                        D.ReportHeaderTextRight3, D.ReportHeaderTextRight4 ,
+                        C.PanNo,
+                        C.IECNo,
+                        D.LogoBlob
+                        FROM web.Divisions  D
+                        LEFT JOIN Web.Companies C ON C.CompanyId = D.CompanyId
+                        LEFT JOIN web.Cities CT ON CT.CityId = C.CityId
+                        LEFT JOIN web.States ST ON ST.StateId = CT.StateId 
+                        LEFT JOIN web.Countries CNT ON CNT.CountryId = ST.CountryId
+                        WHERE D.DivisionId=@DivisionId ";
+
+
+
+            IEnumerable<PrintCompanyViewModel> PrintCompanydetail = db.Database.SqlQuery<PrintCompanyViewModel>(mQry, SqlParameterSiteId, SqlParameterDivisionId).ToList();
+
+
+            return PrintCompanydetail;
+
+        }
+        public IEnumerable<PrintGSTViewModel> PrintGST(string HeaderId,string LineTableName,string LineChargesTableName,string LineTableFieldName,string HeaderTableName,string HeaderFieldName)
+        {
+            string mQry;
+
+            SqlParameter SqlParameterHeaderId = new SqlParameter("@Id", !string.IsNullOrEmpty(HeaderId) ? HeaderId : (object)DBNull.Value);
+            SqlParameter SqlParameterLineTableName = new SqlParameter("@LineTableName", !string.IsNullOrEmpty(LineTableName) ? LineTableName : (object)DBNull.Value);
+            SqlParameter SqlParameterLineChargesTableName = new SqlParameter("@LineChargeTableName", !string.IsNullOrEmpty(LineChargesTableName) ? LineChargesTableName : (object)DBNull.Value);
+            SqlParameter SqlParameterLineTableFieldName = new SqlParameter("@LineTableFieldName", !string.IsNullOrEmpty(LineTableFieldName) ? LineTableFieldName : (object)DBNull.Value);
+            SqlParameter SqlParameterHeaderTableName = new SqlParameter("@HeaderTableName", !string.IsNullOrEmpty(HeaderTableName) ? HeaderTableName : (object)DBNull.Value);
+            SqlParameter SqlParameterHeaderFieldName = new SqlParameter("@HeaderFieldName", !string.IsNullOrEmpty(HeaderFieldName) ? HeaderFieldName : (object)DBNull.Value);
+
+
+            mQry = @"  DECLARE @Qry NVARCHAR(Max);
+                        SET @Qry = '
+                        SELECT  
+                        --CASE WHEN PS.ProcessName IN (''Purchase'',''Sale'') THEN isnull(STGP.PrintingDescription,STGP.ChargeGroupProductName) ELSE PS.GSTPrintDesc END as ChargeGroupProductName, 
+                        isnull(STGP.PrintingDescription,STGP.ChargeGroupProductName) as ChargeGroupProductName, 
+                        Sum(CASE WHEN ct.ChargeTypeName =''Sales Taxable Amount'' THEN lc.Amount ELSE 0 End) AS TaxableAmount,
+                        Sum(CASE WHEN ct.ChargeTypeName =''IGST'' THEN lc.Amount ELSE 0 End) AS IGST,
+                        Sum(CASE WHEN ct.ChargeTypeName =''CGST'' THEN lc.Amount ELSE 0 End) AS CGST,
+                        Sum(CASE WHEN ct.ChargeTypeName =''SGST'' THEN lc.Amount ELSE 0 End) AS SGST,
+                        Sum(CASE WHEN ct.ChargeTypeName =''GST Cess'' THEN lc.Amount ELSE 0 End) AS GSTCess,
+                        ''StdDocPrintSub_GSTSummary.rdl'' AS ReportName,
+                        NULL  AS SubReportProcList
+                        FROM '+@LineTableName +' L
+                        LEFT JOIN '+@LineChargeTableName+' LC ON '+@LineTableFieldName+' = LC.LineTableId 
+                        LEFT JOIN '+@HeaderTableName+' H ON H.'+@HeaderFieldName+' = L.'+@HeaderFieldName+'
+                        LEFT JOIN Web.Processes PS WITH (Nolock) ON PS.ProcessId=H.ProcessId
+                        LEFT JOIN Web.Charges C ON C.ChargeId=LC.ChargeId
+                        LEFT JOIN web.ChargeTypes CT ON LC.ChargeTypeId = CT.ChargeTypeId 
+                        LEFT JOIN web.ChargeGroupProducts STGP ON L.SalesTaxGroupProductId = STGP.ChargeGroupProductId
+                        WHERE L.'+@HeaderFieldName+' ='+ Convert(Varchar,@Id )+'
+                        GROUP BY isnull(STGP.PrintingDescription,STGP.ChargeGroupProductName)
+                        --GROUP BY CASE WHEN PS.ProcessName IN (''Purchase'',''Sale'') THEN isnull(STGP.PrintingDescription,STGP.ChargeGroupProductName) ELSE PS.GSTPrintDesc END '
+
+                        EXEC(@Qry); ";
+
+
+
+            IEnumerable<PrintGSTViewModel> PrintGSTdetail = db.Database.SqlQuery<PrintGSTViewModel>(mQry, SqlParameterHeaderId, SqlParameterLineTableName, SqlParameterLineChargesTableName, SqlParameterLineTableFieldName, SqlParameterHeaderTableName, SqlParameterHeaderFieldName).ToList();
+            
+            return PrintGSTdetail;
+
+        }
+
         public JobInvoiceHeader Add(JobInvoiceHeader pt)
         {
             _unitOfWork.Repository<JobInvoiceHeader>().Insert(pt);
@@ -193,6 +511,11 @@ namespace Service
 
             List<string> UserRoles = (List<string>)System.Web.HttpContext.Current.Session["Roles"];
 
+            int AdditionalChargesProductNatureId = 0;
+            var ProductNature = (from Pt in db.ProductNature where Pt.ProductNatureName == ProductNatureConstants.AdditionalCharges select Pt).FirstOrDefault();
+            if (ProductNature != null)
+                AdditionalChargesProductNatureId = ProductNature.ProductNatureId;
+
 
             var TempJobInvoiceHeaderCharges = from H in db.JobInvoiceHeader
                                                join Hc in db.JobInvoiceHeaderCharges on H.JobInvoiceHeaderId equals Hc.HeaderTableId into JobInvoiceHeaderChargesTable
@@ -206,10 +529,25 @@ namespace Service
                                                    NetAmount = JobInvoiceHeaderChargesTab.Amount
                                                };
 
+            var TempProductDetail = from H in db.JobInvoiceHeader
+                                    join L in db.JobInvoiceLine on H.JobInvoiceHeaderId equals L.JobInvoiceHeaderId into JobInvoiceLineTable
+                                    from JobInvoiceLineTab in JobInvoiceLineTable.DefaultIfEmpty()
+                                    where H.DivisionId == DivisionId && H.SiteId == SiteId && H.DocTypeId == id && JobInvoiceLineTab.JobReceiveLine.Product.ProductGroup.ProductType.ProductNatureId != AdditionalChargesProductNatureId && JobInvoiceLineTab.Qty != 0
+                                    group new { JobInvoiceLineTab } by new { JobInvoiceLineTab.JobInvoiceHeaderId } into Result
+                                    select new
+                                    {
+                                        JobInvoiceHeaderId = Result.Key.JobInvoiceHeaderId,
+                                        ProductUidName = Result.Max(i => i.JobInvoiceLineTab.JobReceiveLine.ProductUid.ProductUidName),
+                                        ProductName = Result.Max(i => i.JobInvoiceLineTab.JobReceiveLine.Product.ProductName),
+                                        ProductGroupName = Result.Max(i => i.JobInvoiceLineTab.JobReceiveLine.Product.ProductGroup.ProductGroupName),
+                                    };
+
 
             return (from p in db.JobInvoiceHeader
                     join Hc in TempJobInvoiceHeaderCharges on p.JobInvoiceHeaderId equals Hc.JobInvoiceHeaderId into JobInvoiceHeaderChargesTable
                     from JobInvoiceHeaderChargesTab in JobInvoiceHeaderChargesTable.DefaultIfEmpty()
+                    join Tp in TempProductDetail on p.JobInvoiceHeaderId equals Tp.JobInvoiceHeaderId into TempProductDetailTable
+                    from TempProductDetailTab in TempProductDetailTable.DefaultIfEmpty()
                     orderby p.DocDate descending, p.DocNo descending
                     where p.SiteId == SiteId && p.DivisionId == DivisionId && p.DocTypeId == id
                     select new JobInvoiceHeaderViewModel
@@ -230,6 +568,12 @@ namespace Service
                         Reviewed = (SqlFunctions.CharIndex(Uname, p.ReviewBy) > 0),
                         TotalQty = p.JobInvoiceLines.Sum(m => m.Qty),
                         TotalAmount = JobInvoiceHeaderChargesTab.NetAmount ?? (p.JobInvoiceLines.Sum(m => m.Amount)),
+						ProcessName=p.Process.ProcessName,
+                        ProductUidName = TempProductDetailTab.ProductUidName,
+                        ProductName = TempProductDetailTab.ProductName,
+                        ProductGroupName = TempProductDetailTab.ProductGroupName,
+
+
                         DecimalPlaces = (from o in p.JobInvoiceLines
                                          join rl in db.JobReceiveLine on o.JobReceiveLineId equals rl.JobReceiveLineId
                                          join ol in db.JobOrderLine on rl.JobOrderLineId equals ol.JobOrderLineId
@@ -273,6 +617,8 @@ namespace Service
             int SiteId = (int)System.Web.HttpContext.Current.Session["SiteId"];
             int DivisionId = (int)System.Web.HttpContext.Current.Session["DivisionId"];
 
+            var DocTypeName = db.DocumentType.Find(DocTypeId).DocumentTypeName;
+
             var settings = new JobInvoiceSettingsService(_unitOfWork).GetJobInvoiceSettingsForDocument(DocTypeId, DivisionId, SiteId);
 
             string[] PersonRoles = null;
@@ -290,8 +636,8 @@ namespace Service
                         join pr in db.PersonRole on p.PersonID equals pr.PersonId into PersonRoleTable
                         from PersonRoleTab in PersonRoleTable.DefaultIfEmpty()
                         //where PersonProcessTab.ProcessId == settings.ProcessId
-                        where (ProcessId == null ? PersonProcessTab.ProcessId == settings.ProcessId : PersonProcessTab.ProcessId == ProcessId)
-                        && (string.IsNullOrEmpty(term) ? 1 == 1 : (p.Name.ToLower().Contains(term.ToLower()) || p.Code.ToLower().Contains(term.ToLower())))
+                        where (DocTypeName == TransactionDoctypeConstants.ExpenseVoucher ? 1 == 1 : (ProcessId == null ? PersonProcessTab.ProcessId == settings.ProcessId : PersonProcessTab.ProcessId == ProcessId))
+                        && (string.IsNullOrEmpty(term) ? 1 == 1 : (p.Name.ToLower().Contains(term.ToLower()) || p.Code.ToLower().Contains(term.ToLower()) || p.Suffix.ToLower().Contains(term.ToLower())))
                         && (string.IsNullOrEmpty(settings.filterPersonRoles) ? 1 == 1 : PersonRoles.Contains(PersonRoleTab.RoleDocTypeId.ToString()))
                         && BusinessEntityTab.DivisionIds.IndexOf(DivIdStr) != -1
                         && BusinessEntityTab.SiteIds.IndexOf(SiteIdStr) != -1
@@ -339,6 +685,53 @@ namespace Service
                        };
 
             return temp;
+        }
+
+        public string GetNarration(int JobInvoiceHeaderId)
+        {
+            string Narration = "";
+
+            var JobInvoiceHeader_Data = (from H in db.JobInvoiceHeader
+                                          join L in db.JobInvoiceLine on H.JobInvoiceHeaderId equals L.JobInvoiceHeaderId into JobInvoiceLineTable
+                                          from JobInvoiceLineTab in JobInvoiceLineTable.DefaultIfEmpty()
+                                          where H.JobInvoiceHeaderId == JobInvoiceHeaderId
+                                          select new
+                                          {
+                                              DocTypeId = H.DocTypeId,
+                                              JobWorkerName = H.JobWorker.Name,
+                                              ProductName = JobInvoiceLineTab.JobReceiveLine.Product.ProductName,
+                                              ProductUidName = JobInvoiceLineTab.JobReceiveLine.ProductUid.ProductUidName,
+                                              ProductGroupName = JobInvoiceLineTab.JobReceiveLine.Product.ProductGroup.ProductGroupName,
+                                              Qty = JobInvoiceLineTab.Qty,
+                                              Rate = JobInvoiceLineTab.Rate,
+                                              Amount = JobInvoiceLineTab.Amount,
+                                          }).FirstOrDefault();
+
+            var JobInvoiceHeaderCharges_Data = (from Hc in db.JobInvoiceHeaderCharges
+                                                 where Hc.HeaderTableId == JobInvoiceHeaderId
+                                                 && Hc.Charge.ChargeName == "Net Amount"
+                                                 select new
+                                                 {
+                                                     NetAmount = Hc.Amount
+                                                 }).FirstOrDefault();
+
+
+
+            if (JobInvoiceHeader_Data != null)
+            {
+                var Narration_Temp = (from H in db.Narration where H.DocTypeId == JobInvoiceHeader_Data.DocTypeId select new { Narration = H.NarrationName }).FirstOrDefault();
+
+                if (Narration_Temp != null)
+                    Narration = Narration_Temp.Narration.Replace("<JobWorkerName>", JobInvoiceHeader_Data.JobWorkerName)
+                                            .Replace("<ProductName>", JobInvoiceHeader_Data.ProductName)
+                                            .Replace("<ProductGroupName>", JobInvoiceHeader_Data.ProductGroupName)
+                                            .Replace("<ProductUidName>", JobInvoiceHeader_Data.ProductUidName)
+                                            .Replace("<Qty>", JobInvoiceHeader_Data.Qty.ToString())
+                                            .Replace("<Rate>", JobInvoiceHeader_Data.Rate.ToString())
+                                            .Replace("<Amount>", JobInvoiceHeader_Data.Amount.ToString())
+                                            .Replace("<NetAmount>", JobInvoiceHeaderCharges_Data.NetAmount.ToString());
+            }
+            return Narration;
         }
 
         public void Dispose()

@@ -130,6 +130,7 @@
     <Compile Include="Models\LedgerSupplementary.cs" />
     <Compile Include="Models\LedgerHeaderCharge.cs" />
     <Compile Include="Models\LedgerLineCharge.cs" />
+    <Compile Include="Models\PaymentTerms.cs" />
     <Compile Include="Models\SalaryLineCharge.cs" />
     <Compile Include="Models\SalaryHeaderCharge.cs" />
     <Compile Include="Models\SalaryLine.cs" />

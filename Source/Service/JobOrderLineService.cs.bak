@@ -1553,6 +1553,9 @@ namespace Service
             if (!string.IsNullOrEmpty(settings.filterContraDivisions)) { contraDivisions = settings.filterContraDivisions.Split(",".ToCharArray()); }
             else { contraDivisions = new string[] { "NA" }; }
 
+			string[] ProductCategories = null;
+            if (!string.IsNullOrEmpty(settings.filterProductCategories)) { ProductCategories = settings.filterProductCategories.Split(",".ToCharArray()); }
+            else { ProductCategories = new string[] { "NA" }; }
             int CurrentSiteId = (int)System.Web.HttpContext.Current.Session["SiteId"];
             int CurrentDivisionId = (int)System.Web.HttpContext.Current.Session["DivisionId"];
 
@@ -1600,7 +1603,7 @@ namespace Service
                                     ((Dimension2Tab.Dimension2Name == null) ? "" : "," + Dimension2Tab.Dimension2Name) +
                                     ((Dimension3Tab.Dimension3Name == null) ? "" : "," + Dimension3Tab.Dimension3Name) +
                                     ((Dimension4Tab.Dimension4Name == null) ? "" : "," + Dimension4Tab.Dimension4Name) + 
-                                    ((p.LotNo == null) ? "" : "," + p.LotNo)
+                                    ((p.LotNo == null) ? "" : ",CN:" + p.LotNo)
                     });
         }
 

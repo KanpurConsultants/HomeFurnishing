@@ -72,17 +72,18 @@ namespace Model.Models
         [Display(Name = "Delivery Office"), MaxLength(20),Required]
         public string PaymentType { get; set; }
 
-        [ForeignKey("FromCity"), Display(Name = "From City"), Required]
-        public int FromCityId { get; set; }
+        [ForeignKey("FromCity"), Display(Name = "From City")]
+        public int ? FromCityId { get; set; }
         public virtual City FromCity { get; set; }
 
-        [ForeignKey("ToCity"), Display(Name = "To City"), Required]
-        public int ToCityId { get; set; }
+        [ForeignKey("ToCity"), Display(Name = "To City")]
+        public int ? ToCityId { get; set; }
         public virtual City ToCity { get; set; }
 
-        [ForeignKey("Route"), Display(Name = "Route"), Required]
-        public int RouteId { get; set; }
+        [ForeignKey("Route"), Display(Name = "Route")]
+        public int ? RouteId { get; set; }
         public virtual Route Route { get; set; }
+
 
         [Display(Name = "Product Description")]
         public string ProductDescription { get; set; }

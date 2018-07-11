@@ -102,6 +102,9 @@ namespace Jobs.App_Start
             container.RegisterType<IRepository<Religion>, Repository<Religion>>();
             container.RegisterType<IReligionService, ReligionService>(new PerRequestLifetimeManager());
 
+            
+            container.RegisterType<IDisplay_StockBalanceService, Display_StockBalanceService>(new PerRequestLifetimeManager());
+
             container.RegisterType<IRepository<Dimension1Extended>, Repository<Dimension1Extended>>();
 
             container.RegisterType<IRepository<ProductBuyerExtended>, Repository<ProductBuyerExtended>>();
@@ -156,7 +159,7 @@ namespace Jobs.App_Start
             container.RegisterType<IRolePermissionService, RolePermissionService>(new PerRequestLifetimeManager());
             container.RegisterType<IUserRolesNewService, UserRolesNewService>(new PerRequestLifetimeManager());
 
-            container.RegisterType<IDisplay_StockBalanceService, Display_StockBalanceService>(new PerRequestLifetimeManager());
+
 
             container.RegisterType<IDisplay_SaleOrderInventoryStatusService, Display_SaleOrderInventoryStatusService>(new PerRequestLifetimeManager());
 

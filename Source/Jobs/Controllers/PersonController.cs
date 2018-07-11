@@ -201,7 +201,13 @@ namespace Jobs.Controllers
                 return View(PersonVm).Danger("Combination of name and sufix is duplicate");
             }
 
-            
+            if (PersonVm.CityId == 0 || PersonVm.CityId == null)
+            {
+                PrepareViewBag(PersonVm.DocTypeId);
+                return View(PersonVm).Danger("City is required.");
+            }
+
+
             var settings = new PersonSettingsService(_unitOfWork).GetPersonSettingsForDocument(PersonVm.DocTypeId);
 
             if (settings != null)

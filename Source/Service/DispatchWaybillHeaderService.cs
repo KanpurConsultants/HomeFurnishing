@@ -75,7 +75,28 @@ namespace Service
            return _unitOfWork.Repository<DispatchWaybillHeader>().Find(id);
        }
 
-       public DispatchWaybillHeader FindByDocNo(string Docno, int DivisionId, int SiteId)
+       public IQueryable<ComboBoxResult> GetPendingSaleInvoiceToWaybill(string term)
+        {
+            var DivisionId = (int)System.Web.HttpContext.Current.Session["DivisionId"];
+            var SiteId = (int)System.Web.HttpContext.Current.Session["SiteId"];
+
+            var list = (from p in db.ViewSaleInvoiceBalanceForWaybill
+                        join b in db.Persons on p.SaleToBuyerId equals b.PersonID into bTable
+                        from bTab in bTable.DefaultIfEmpty()
+                        where 1==1
+                        && ((string.IsNullOrEmpty(term) ? 1 == 1 : p.DocNo.ToLower().Contains(term.ToLower()))
+                        || (string.IsNullOrEmpty(term) ? 1 == 1 : bTab.Code.Contains(term.ToLower())))
+                        orderby p.DocDate, p.DocNo
+                        select new ComboBoxResult
+                        {
+                            text = p.DocNo,
+                            id = p.SaleInvoiceHeaderId.ToString(),
+                            TextProp1 = bTab.Code 
+                        });
+            return list;
+        }
+
+        public DispatchWaybillHeader FindByDocNo(string Docno, int DivisionId, int SiteId)
        {
            return _unitOfWork.Repository<DispatchWaybillHeader>().Query().Get().Where(m => m.DocNo == Docno && m.DivisionId == DivisionId && m.SiteId == SiteId ).FirstOrDefault();
 

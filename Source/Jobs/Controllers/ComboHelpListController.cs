@@ -1990,6 +1990,32 @@ namespace Jobs.Controllers
             };
         }
 
+		public ActionResult GetDocumentType_ForSaleOrder(string searchTerm, int pageSize, int pageNum)
+        {
+            //Get the paged results and the total count of the results for this query. ProductCacheKeyHint
+            var productCacheKeyHint = "DocumentTypeCacheKeyHint";
+
+            //THis statement has been changed because GetProductHelpList was calling again and again. 
+
+            AutoCompleteComboBoxRepositoryAndHelper ar = new AutoCompleteComboBoxRepositoryAndHelper(cbl.GetDocumentTypeHelpList("Sale Order"), productCacheKeyHint, RefreshData.RefreshProductData);
+            //AutoCompleteComboBoxRepositoryAndHelper ar = new AutoCompleteComboBoxRepositoryAndHelper(null, productCacheKeyHint);
+
+            if (RefreshData.RefreshProductData == true) { RefreshData.RefreshProductData = false; }
+
+
+            List<ComboBoxList> prodLst = ar.GetListForComboBox(searchTerm, pageSize, pageNum);
+            int prodCount = ar.GetCountForComboBox(searchTerm, pageSize, pageNum);
+
+            //Translate the attendees into a format the select2 dropdown expects
+            ComboBoxPagedResult pagedAttendees = ar.TranslateToComboBoxFormat(prodLst, prodCount);
+
+            //Return the data as a jsonp result
+            return new JsonpResult
+            {
+                Data = pagedAttendees,
+                JsonRequestBehavior = JsonRequestBehavior.AllowGet
+            };
+        }
         public JsonResult SetDocumentType(string Ids)
         {
             string[] subStr = Ids.Split(',');

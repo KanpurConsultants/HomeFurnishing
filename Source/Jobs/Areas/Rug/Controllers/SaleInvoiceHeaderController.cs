@@ -307,12 +307,47 @@ namespace Jobs.Areas.Rug.Controllers
 
             ViewBag.ShipMethodList = new ShipMethodService(_unitOfWork).GetShipMethodList().ToList();
             ViewBag.DeliveryTermsList = new DeliveryTermsService(_unitOfWork).GetDeliveryTermsList().ToList();
+			ViewBag.PaymentTermsList = new PaymentTermsService(_unitOfWork).GetPaymentTermsList().ToList();
             ViewBag.BuyerList = new BuyerService(_unitOfWork).GetBuyerList().ToList();
             ViewBag.CurrencyList = new CurrencyService(_unitOfWork).GetCurrencyList().ToList();
 
 
         }
 
+        public JsonResult GetBillToBuyerJson(int BuyerId)
+        {
+
+            var temp = (from L in db.Persons
+                        join BE in db.BusinessEntity on L.PersonID equals BE.PersonID into BETable
+                        from BETab in BETable.DefaultIfEmpty()
+                        where L.PersonID == BuyerId 
+                        select new BuyerDetail
+                        {
+                            CreaditDays = BETab.CreaditDays,
+                            CreaditLimit = BETab.CreaditLimit
+                        }).FirstOrDefault();
+
+            
+            if (temp != null)
+            {
+
+                return Json(temp);
+            }
+            else
+            {
+                return null;
+            }
+
+
+        }
+
+
+        public class BuyerDetail
+        {
+            public Decimal ? CreaditDays { get; set; }
+            public Decimal ? CreaditLimit { get; set; }
+
+        }
         // GET: /SaleInvoiceHeader/Create
 
         public ActionResult Create(int id)//DocTypeId
@@ -478,7 +513,9 @@ namespace Jobs.Areas.Rug.Controllers
                     saleinvoiceheaderdetail.InsuranceRemark = svm.InsuranceRemark;
                     saleinvoiceheaderdetail.VehicleNo = svm.VehicleNo;
                     saleinvoiceheaderdetail.Deduction = svm.Deduction;
-
+					saleinvoiceheaderdetail.CreditDays = svm.CreditDays;
+                    saleinvoiceheaderdetail.CreditLimit = svm.CreditLimit;
+                    saleinvoiceheaderdetail.PaymentTermsId = svm.PaymentTermsId;
 
                     saleinvoiceheaderdetail.TransporterInformation = svm.TransporterInformation;
                     saleinvoiceheaderdetail.ModifiedDate = DateTime.Now;
@@ -830,6 +867,10 @@ namespace Jobs.Areas.Rug.Controllers
 
                 var SaleDispatchLine = (from L in db.SaleDispatchLine where L.SaleDispatchHeaderId == SaleInvoiceHeader.SaleDispatchHeaderId select L).ToList();
 
+
+                List<int> StockIdList = new List<int>();
+                List<int> StockProcessIdList = new List<int>();
+
                 foreach (var item in SaleDispatchLine)
                 {
 
@@ -837,6 +878,22 @@ namespace Jobs.Areas.Rug.Controllers
                     {
                         ExObj = item,
                     });
+
+
+                    if (item.StockId != null)
+                    {
+                        StockAdj Adj = (from L in db.StockAdj
+                                        where L.StockOutId == item.StockId
+                                        select L).FirstOrDefault();
+
+                        if (Adj != null)
+                        {
+                            Adj.ObjectState = Model.ObjectState.Deleted;
+                            db.StockAdj.Remove(Adj);
+                        }
+
+                        StockIdList.Add((int)item.StockId);
+                    }
 
                     item.ObjectState = Model.ObjectState.Deleted;
                     db.SaleDispatchLine.Attach(item);

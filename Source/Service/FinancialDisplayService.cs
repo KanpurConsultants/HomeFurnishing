@@ -1448,37 +1448,65 @@ namespace Service
             //========== For Detail Section =======
 
 
-            mQry = @"SELECT (Case IsNull(AG1.LedgerAccountGroupId,'') When '' Then IsNull(AG.LedgerAccountGroupId,'') 
-                        Else IsNull(AG1.LedgerAccountGroupId, '') End)  As LedgerAccountGroupId,
-                        Max(Case IsNull(AG1.LedgerAccountGroupName, '') When '' Then IsNull(AG.LedgerAccountGroupName, '')
-                        Else IsNull(AG1.LedgerAccountGroupName, '') End)  As GName,
-                        (Case When(IsNull(Sum(LG.AmtDr), 0) - IsNull(Sum(LG.AmtCr), 0)) > 0 Then
-                        (IsNull(Sum(LG.AmtDr), 0) - IsNull(Sum(LG.AmtCr), 0)) Else 0 End) As AmtDr,
-                        (Case When(IsNull(Sum(LG.AmtCr), 0) - IsNull(Sum(LG.AmtDr), 0)) > 0 Then
-                        (IsNull(Sum(LG.AmtCr), 0) - IsNull(Sum(LG.AmtDr), 0)) Else 0 End) As AmtCr,
-                        Max(Case IsNull(AG1.LedgerAccountGroupId, '') When '' Then IsNull(AG.LedgerAccountGroupName, '') Else IsNull(AG1.LedgerAccountGroupName, '') End)  
-                        As ContraGroupName,
-                        Max(Case IsNull(AG1.LedgerAccountGroupId, '') When '' Then IsNull(AG.LedgerAccountGroupNature, '') Else IsNull(AG1.LedgerAccountGroupNature, '') End)   
-                        As GroupNature
-                        FROM Web.Ledgers LG
-                        LEFT JOIN Web.LedgerHeaders H On Lg.LedgerHeaderId = H.LedgerHeaderId
-                        LEFT Join Web.LedgerAccounts SG On LG.LedgerAccountId = SG.LedgerAccountId
-                        LEFT JOIN Web.LedgerAccountGroups AG On AG.LedgerAccountGroupId = SG.LedgerAccountGroupId
-                        --LEFT JOIN AcGroupPath AGP On AGP.LedgerAccountGroupId = AG.LedgerAccountGroupId
-                        --And AGP.SNo = &IntLevel &
-                        LEFT  JOIN Web.LedgerAccountGroups AG1 On AG1.LedgerAccountGroupId = AG.ParentLedgerAccountGroupId
-                        " + StrCondition1 + @"
-                        AND AG.LedgerAccountGroupNature In ('Asset', 'Liability') 
-                        GROUP By (Case IsNull(AG1.LedgerAccountGroupId, '') When '' Then IsNull(AG.LedgerAccountGroupId, '')
-                        ELSE IsNull(AG1.LedgerAccountGroupId, '') End) 
-                        HAVING(IsNull(Sum(LG.AmtDr), 0) - IsNull(Sum(LG.AmtCr), 0)) <> 0
-                        ORDER By Max(Case IsNull(AG1.LedgerAccountGroupName, '') When '' Then IsNull(AG.LedgerAccountGroupName, '')
-                        ELSE IsNull(AG1.LedgerAccountGroupName, '') End) ";
+            mQry = GetQryForTrialBalance(SiteId, DivisionId, FromDate, ToDate, CostCenterId, IsIncludeZeroBalance, IsIncludeOpening, LedgerAccountGroup) +
+                    @"SELECT H.BaseLedgerAccountGroupId AS LedgerAccountGroupId, Max(BaseLedgerAccountGroupName) AS GName, 
+                                CASE WHEN Sum(isnull(H.Balance,0)) > 0 THEN Sum(isnull(H.Balance,0)) ELSE 0 END AS AmtDr,
+                                CASE WHEN Sum(isnull(H.Balance,0)) < 0 THEN abs(Sum(isnull(H.Balance,0))) ELSE 0 END AS AmtCr,
+                                Max(BaseLedgerAccountGroupName) AS ContraGroupName,
+                                Max(Ag.LedgerAccountGroupNature) As GroupNature
+                                FROM cteAcGroup H 
+                                LEFT JOIN Web.LedgerAccountGroups Ag On AG.LedgerAccountGroupId = H.BaseLedgerAccountGroupId
+                                Where AG.LedgerAccountGroupNature In ('Asset', 'Liability') 
+                                GROUP BY H.BaseLedgerAccountGroupId 
+                                Having (Sum(isnull(H.Opening,0)) <> 0 Or Sum(isnull(H.AmtDr,0)) <> 0 Or Sum(isnull(H.AmtCr,0)) <> 0 Or Sum(isnull(H.Balance,0)) <> 0) ";
 
 
+            //mQry = @"SELECT (Case IsNull(AG1.LedgerAccountGroupId,'') When '' Then IsNull(AG.LedgerAccountGroupId,'') 
+            //            Else IsNull(AG1.LedgerAccountGroupId, '') End)  As LedgerAccountGroupId,
+            //            Max(Case IsNull(AG1.LedgerAccountGroupName, '') When '' Then IsNull(AG.LedgerAccountGroupName, '')
+            //            Else IsNull(AG1.LedgerAccountGroupName, '') End)  As GName,
+            //            (Case When(IsNull(Sum(LG.AmtDr), 0) - IsNull(Sum(LG.AmtCr), 0)) > 0 Then
+            //            (IsNull(Sum(LG.AmtDr), 0) - IsNull(Sum(LG.AmtCr), 0)) Else 0 End) As AmtDr,
+            //            (Case When(IsNull(Sum(LG.AmtCr), 0) - IsNull(Sum(LG.AmtDr), 0)) > 0 Then
+            //            (IsNull(Sum(LG.AmtCr), 0) - IsNull(Sum(LG.AmtDr), 0)) Else 0 End) As AmtCr,
+            //            Max(Case IsNull(AG1.LedgerAccountGroupId, '') When '' Then IsNull(AG.LedgerAccountGroupName, '') Else IsNull(AG1.LedgerAccountGroupName, '') End)  
+            //            As ContraGroupName,
+            //            Max(Case IsNull(AG1.LedgerAccountGroupId, '') When '' Then IsNull(AG.LedgerAccountGroupNature, '') Else IsNull(AG1.LedgerAccountGroupNature, '') End)   
+            //            As GroupNature
+            //            FROM Web.Ledgers LG
+            //            LEFT JOIN Web.LedgerHeaders H On Lg.LedgerHeaderId = H.LedgerHeaderId
+            //            LEFT Join Web.LedgerAccounts SG On LG.LedgerAccountId = SG.LedgerAccountId
+            //            LEFT JOIN Web.LedgerAccountGroups AG On AG.LedgerAccountGroupId = SG.LedgerAccountGroupId
+            //            --LEFT JOIN AcGroupPath AGP On AGP.LedgerAccountGroupId = AG.LedgerAccountGroupId
+            //            --And AGP.SNo = &IntLevel &
+            //            LEFT  JOIN Web.LedgerAccountGroups AG1 On AG1.LedgerAccountGroupId = AG.ParentLedgerAccountGroupId
+            //            " + StrCondition1 + @"
+            //            AND AG.LedgerAccountGroupNature In ('Asset', 'Liability') 
+            //            GROUP By (Case IsNull(AG1.LedgerAccountGroupId, '') When '' Then IsNull(AG.LedgerAccountGroupId, '')
+            //            ELSE IsNull(AG1.LedgerAccountGroupId, '') End) 
+            //            HAVING(IsNull(Sum(LG.AmtDr), 0) - IsNull(Sum(LG.AmtCr), 0)) <> 0
+            //            ORDER By Max(Case IsNull(AG1.LedgerAccountGroupName, '') When '' Then IsNull(AG.LedgerAccountGroupName, '')
+            //            ELSE IsNull(AG1.LedgerAccountGroupName, '') End) ";
 
 
-            DTTemp = FillData(mQry).Tables[0];
+            DataSet DsTemp = new DataSet();
+            string ConnectionString = (string)System.Web.HttpContext.Current.Session["DefaultConnectionString"];
+
+            using (SqlConnection sqlConnection = new SqlConnection(ConnectionString))
+            {
+                sqlConnection.Open();
+                SqlCommand cmd = new SqlCommand(mQry);
+                SqlDataAdapter Da = new SqlDataAdapter(mQry, ConnectionString);
+                Da.SelectCommand.Parameters.AddWithValue("@SiteId", !string.IsNullOrEmpty(SiteId) ? SiteId : (object)DBNull.Value);
+                Da.SelectCommand.Parameters.AddWithValue("@DivisionId", !string.IsNullOrEmpty(DivisionId) ? DivisionId : (object)DBNull.Value);
+                Da.SelectCommand.Parameters.AddWithValue("@FromDate", FromDate);
+                Da.SelectCommand.Parameters.AddWithValue("@ToDate", ToDate);
+                Da.SelectCommand.Parameters.AddWithValue("@CostCenterId", !string.IsNullOrEmpty(CostCenterId) ? CostCenterId : (object)DBNull.Value);
+                Da.SelectCommand.Parameters.AddWithValue("@LedgerAccountGroup", !string.IsNullOrEmpty(LedgerAccountGroup) ? LedgerAccountGroup : (object)DBNull.Value);
+                Da.Fill(DsTemp);
+            }
+
+            DTTemp = DsTemp.Tables[0];
 
             FGMain.Columns.Add("GRCodeCredit");
             FGMain.Columns.Add("GRNameCredit");
@@ -1511,7 +1539,7 @@ namespace Service
                 {
                     J = FFindEmptyRow(ref FGMain, "GRCode");
                     FGMain.Rows[J]["GRCode"] = DTTemp.Rows[I]["LedgerAccountGroupId"];
-                    if (DTTemp.Rows[I]["GroupNature"].ToString() == "A")
+                    if (DTTemp.Rows[I]["GroupNature"].ToString() == "Asset")
                         FGMain.Rows[J]["GRName"] = DTTemp.Rows[I]["GName"];
                     else
                         FGMain.Rows[J]["GRName"] = DTTemp.Rows[I]["ContraGroupName"];
@@ -1533,27 +1561,27 @@ namespace Service
                 DblCredit_Total = DblCredit_Total + DHSMain_DblClosingStock;
             }
 
-            DTTemp = FGetTRDDataTable("",FromDate,ToDate, SiteId, DivisionId);
+            DTTemp = FGetTRDDataTable("",Settings);
 
             for (I = 0; I <= DTTemp.Rows.Count - 1; I++)
             {
                 if (Convert.ToDecimal(DTTemp.Rows[I]["AmtDr"]) > 0)
                     DblNet_Profit_Loss = DblNet_Profit_Loss - Convert.ToDecimal(DTTemp.Rows[I]["AmtDr"]);
                 else if (Convert.ToDecimal(DTTemp.Rows[I]["AmtCr"]) > 0)
-                    DblNet_Profit_Loss = DblNet_Profit_Loss - Convert.ToDecimal(DTTemp.Rows[I]["AmtCr"]);
+                    DblNet_Profit_Loss = DblNet_Profit_Loss + Convert.ToDecimal(DTTemp.Rows[I]["AmtCr"]);
 
             }
             DTTemp.Clear();
             DTTemp.Dispose();
 
-            DTTemp = FGetTRDDataTable("Not", FromDate, ToDate, SiteId, DivisionId);
+            DTTemp = FGetTRDDataTable("Not",  Settings);
 
             for (I = 0; I <= DTTemp.Rows.Count - 1; I++)
             {
                 if (Convert.ToDecimal(DTTemp.Rows[I]["AmtDr"]) > 0)
                     DblNet_Profit_Loss = DblNet_Profit_Loss - Convert.ToDecimal(DTTemp.Rows[I]["AmtDr"]);
                 else if (Convert.ToDecimal(DTTemp.Rows[I]["AmtCr"]) > 0)
-                    DblNet_Profit_Loss = DblNet_Profit_Loss - Convert.ToDecimal(DTTemp.Rows[I]["AmtCr"]);
+                    DblNet_Profit_Loss = DblNet_Profit_Loss + Convert.ToDecimal(DTTemp.Rows[I]["AmtCr"]);
 
             }
             DTTemp.Clear();
@@ -1668,11 +1696,30 @@ namespace Service
             return I;
         }
 
-        private DataTable FGetTRDDataTable(string ConditionVar, string FromDate, string ToDate, string SiteId, string DivisionId)
+        private DataTable FGetTRDDataTable(string ConditionVar, FinancialDisplaySettings Settings)
         {
             string StrCondition1 = "";
             DataTable DTTemp;
             string mQry = "";
+
+
+            var SiteSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "Site" select H).FirstOrDefault();
+            var DivisionSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "Division" select H).FirstOrDefault();
+            var FromDateSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "FromDate" select H).FirstOrDefault();
+            var ToDateSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "ToDate" select H).FirstOrDefault();
+            var CostCenterSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "CostCenter" select H).FirstOrDefault();
+            var IsIncludeZeroBalanceSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "IsIncludeZeroBalance" select H).FirstOrDefault();
+            var IsIncludeOpeningSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "IsIncludeOpening" select H).FirstOrDefault();
+            var LedgerAccountGroupSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "LedgerAccountGroup" select H).FirstOrDefault();
+
+            string SiteId = SiteSetting.Value;
+            string DivisionId = DivisionSetting.Value;
+            string FromDate = FromDateSetting.Value;
+            string ToDate = ToDateSetting.Value;
+            string CostCenterId = CostCenterSetting.Value;
+            string IsIncludeZeroBalance = IsIncludeZeroBalanceSetting.Value;
+            string IsIncludeOpening = IsIncludeOpeningSetting.Value;
+            string LedgerAccountGroup = LedgerAccountGroupSetting.Value;
 
 
             StrCondition1 = " Where H.DocDate <= '" + ToDate + "' ";
@@ -1682,33 +1729,63 @@ namespace Service
                 StrCondition1 = " And H.DivisionId In ('" + DivisionId + "') ";
             StrCondition1 += " And H.DocDate >= (Case When Ag.LedgerAccountGroupNature in ('Income','Expense') Then '" + FromDate + "' Else '1900/Jan/01' End) ";
 
-
-            mQry = @" Select (Case IsNull(AG1.LedgerAccountGroupId,'') When '' Then IsNull(AG.LedgerAccountGroupId,'') 
-                        Else IsNull(AG1.LedgerAccountGroupId,'') End)  As LedgerAccountGroupId, 
-                        Max(Case IsNull(AG1.LedgerAccountGroupName,'') When '' Then IsNull(AG.LedgerAccountGroupName,'') 
-                        Else IsNull(AG1.LedgerAccountGroupName,'') End)  As GName, 
-                        (Case When (IsNull(Sum(LG.AmtDr),0)-IsNull(Sum(LG.AmtCr),0))>0 Then  
-                        (IsNull(Sum(LG.AmtDr),0)-IsNull(Sum(LG.AmtCr),0)) Else 0 End) As AmtDr, 
-                        (Case When (IsNull(Sum(LG.AmtCr),0)-IsNull(Sum(LG.AmtDr),0))>0 Then 
-                        (IsNull(Sum(LG.AmtCr),0)-IsNull(Sum(LG.AmtDr),0)) Else 0 End) As AmtCr, 
-                        Max(AG.LedgerAccountGroupName) As ContraLedgerAccountGroupName,Max(AG.LedgerAccountGroupNature) As GroupNature 
-                        From Web.Ledgers  LG 
-                        LEFT JOIN Web.LedgerHeaders H On Lg.LedgerHeaderId = H.LedgerHeaderId
-                        Left Join Web.LedgerAccounts SG On LG.LedgerAccountId = SG.LedgerAccountId
-                        Left Join Web.LedgerAccountGroups AG On AG.LedgerAccountGroupId = SG.LedgerAccountGroupId
-                        --Left Join AcGroupPath AGP On AGP.LedgerAccountGroupId=AG.LedgerAccountGroupId And AGP.SNo= & IntLevel &  
-                        LEFT  JOIN Web.LedgerAccountGroups AG1 On AG1.LedgerAccountGroupId = AG.ParentLedgerAccountGroupId
-                        " + StrCondition1 + @"
-                        And AG.LedgerAccountGroupNature In ('Income','Expense') 
-                        And (AG.LedgerAccountNature " + ConditionVar + @" In ('Direct','Purchase','Sales') Or AG1.LedgerAccountNature " + ConditionVar + @" In ('Direct','Purchase','Sales')) 
-                        Group By (Case IsNull(AG1.LedgerAccountGroupId,'') When '' Then IsNull(AG.LedgerAccountGroupId,'') 
-                        Else IsNull(AG1.LedgerAccountGroupId,'') End) 
-                        Having (IsNull(Sum(LG.AmtDr),0)-IsNull(Sum(LG.AmtCr),0)) <> 0 
-                        Order By Max(Case IsNull(AG1.LedgerAccountGroupName,'') When '' Then IsNull(AG.LedgerAccountGroupName,'') 
-                        Else IsNull(AG1.LedgerAccountGroupName,'') End) ";
+            mQry = GetQryForTrialBalance(SiteId, DivisionId, FromDate, ToDate, CostCenterId, IsIncludeZeroBalance, IsIncludeOpening, LedgerAccountGroup) +
+                    @"SELECT H.BaseLedgerAccountGroupId AS LedgerAccountGroupId, Max(BaseLedgerAccountGroupName) AS GName, 
+                        CASE WHEN Sum(isnull(H.Balance,0)) > 0 THEN Sum(isnull(H.Balance,0)) ELSE 0 END AS AmtDr,
+                        CASE WHEN Sum(isnull(H.Balance,0)) < 0 THEN abs(Sum(isnull(H.Balance,0))) ELSE 0 END AS AmtCr,
+                        Max(BaseLedgerAccountGroupName) AS ContraGroupName,
+                        Max(Ag.LedgerAccountGroupNature) As GroupNature
+                        FROM cteAcGroup H 
+                        LEFT JOIN Web.LedgerAccountGroups Ag On AG.LedgerAccountGroupId = H.BaseLedgerAccountGroupId
+                        Where AG.LedgerAccountGroupNature In ('Income','Expense') 
+                        And AG.PLNature " + ConditionVar + @" In ('Direct','Purchase','Sale') 
+                        GROUP BY H.BaseLedgerAccountGroupId 
+                        Having (Sum(isnull(H.Opening,0)) <> 0 Or Sum(isnull(H.AmtDr,0)) <> 0 Or Sum(isnull(H.AmtCr,0)) <> 0 Or Sum(isnull(H.Balance,0)) <> 0) ";
 
 
-            DTTemp = FillData(mQry).Tables[0];
+            //mQry = @" Select (Case IsNull(AG1.LedgerAccountGroupId,'') When '' Then IsNull(AG.LedgerAccountGroupId,'') 
+            //            Else IsNull(AG1.LedgerAccountGroupId,'') End)  As LedgerAccountGroupId, 
+            //            Max(Case IsNull(AG1.LedgerAccountGroupName,'') When '' Then IsNull(AG.LedgerAccountGroupName,'') 
+            //            Else IsNull(AG1.LedgerAccountGroupName,'') End)  As GName, 
+            //            (Case When (IsNull(Sum(LG.AmtDr),0)-IsNull(Sum(LG.AmtCr),0))>0 Then  
+            //            (IsNull(Sum(LG.AmtDr),0)-IsNull(Sum(LG.AmtCr),0)) Else 0 End) As AmtDr, 
+            //            (Case When (IsNull(Sum(LG.AmtCr),0)-IsNull(Sum(LG.AmtDr),0))>0 Then 
+            //            (IsNull(Sum(LG.AmtCr),0)-IsNull(Sum(LG.AmtDr),0)) Else 0 End) As AmtCr, 
+            //            Max(AG.LedgerAccountGroupName) As ContraLedgerAccountGroupName,Max(AG.LedgerAccountGroupNature) As GroupNature 
+            //            From Web.Ledgers  LG 
+            //            LEFT JOIN Web.LedgerHeaders H On Lg.LedgerHeaderId = H.LedgerHeaderId
+            //            Left Join Web.LedgerAccounts SG On LG.LedgerAccountId = SG.LedgerAccountId
+            //            Left Join Web.LedgerAccountGroups AG On AG.LedgerAccountGroupId = SG.LedgerAccountGroupId
+            //            --Left Join AcGroupPath AGP On AGP.LedgerAccountGroupId=AG.LedgerAccountGroupId And AGP.SNo= & IntLevel &  
+            //            LEFT  JOIN Web.LedgerAccountGroups AG1 On AG1.LedgerAccountGroupId = AG.ParentLedgerAccountGroupId
+            //            " + StrCondition1 + @"
+            //            And AG.LedgerAccountGroupNature In ('Income','Expense') 
+            //            And (AG.LedgerAccountNature " + ConditionVar + @" In ('Direct','Purchase','Sales') Or AG1.LedgerAccountNature " + ConditionVar + @" In ('Direct','Purchase','Sales')) 
+            //            Group By (Case IsNull(AG1.LedgerAccountGroupId,'') When '' Then IsNull(AG.LedgerAccountGroupId,'') 
+            //            Else IsNull(AG1.LedgerAccountGroupId,'') End) 
+            //            Having (IsNull(Sum(LG.AmtDr),0)-IsNull(Sum(LG.AmtCr),0)) <> 0 
+            //            Order By Max(Case IsNull(AG1.LedgerAccountGroupName,'') When '' Then IsNull(AG.LedgerAccountGroupName,'') 
+            //            Else IsNull(AG1.LedgerAccountGroupName,'') End) ";
+
+
+            DataSet DsTemp = new DataSet();
+            string ConnectionString = (string)System.Web.HttpContext.Current.Session["DefaultConnectionString"];
+
+            using (SqlConnection sqlConnection = new SqlConnection(ConnectionString))
+            {
+                sqlConnection.Open();
+                SqlCommand cmd = new SqlCommand(mQry);
+                SqlDataAdapter Da = new SqlDataAdapter(mQry, ConnectionString);
+                Da.SelectCommand.Parameters.AddWithValue("@SiteId", !string.IsNullOrEmpty(SiteId) ? SiteId : (object)DBNull.Value);
+                Da.SelectCommand.Parameters.AddWithValue("@DivisionId", !string.IsNullOrEmpty(DivisionId) ? DivisionId : (object)DBNull.Value);
+                Da.SelectCommand.Parameters.AddWithValue("@FromDate", FromDate);
+                Da.SelectCommand.Parameters.AddWithValue("@ToDate", ToDate);
+                Da.SelectCommand.Parameters.AddWithValue("@CostCenterId", !string.IsNullOrEmpty(CostCenterId) ? CostCenterId : (object)DBNull.Value);
+                Da.SelectCommand.Parameters.AddWithValue("@LedgerAccountGroup", !string.IsNullOrEmpty(LedgerAccountGroup) ? LedgerAccountGroup : (object)DBNull.Value);
+                Da.Fill(DsTemp);
+            }
+
+            DTTemp = DsTemp.Tables[0];
 
             return DTTemp;
         }
@@ -1744,7 +1821,7 @@ namespace Service
             string LedgerAccountGroup = LedgerAccountGroupSetting.Value;
 
 
-            DTTemp = FGetTRDDataTable("", FromDate, ToDate, SiteId, DivisionId);
+            DTTemp = FGetTRDDataTable("", Settings);
 
             FGMain.Columns.Add("GRCodeCredit");
             FGMain.Columns.Add("GRNameCredit");
@@ -1836,7 +1913,7 @@ namespace Service
             }
 
 
-            DTTemp = FGetTRDDataTable("Not", FromDate, ToDate, SiteId, DivisionId);
+            DTTemp = FGetTRDDataTable("Not", Settings);
 
             DblDebit_Total = 0;
             DblCredit_Total = 0;

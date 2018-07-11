@@ -91,6 +91,9 @@ namespace Model.Models
         public virtual ChargeGroupPerson SalesTaxGroupPerson { get; set; }
 
 
+       [ForeignKey("PaymentTerms"), Display(Name = "Payment Terms")]
+        public int ? PaymentTermsId { get; set; }
+        public virtual PaymentTerms PaymentTerms { get; set; }
         [Display(Name = "Remark")]
         public string Remark { get; set; }
 

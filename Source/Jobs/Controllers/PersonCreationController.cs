@@ -13,6 +13,7 @@ using Model.ViewModel;
 using System.Xml.Linq;
 using Reports.Controllers;
 using Model.ViewModels;
+using Jobs.Helpers;
 
 namespace Jobs.Controllers
 {
@@ -80,6 +81,11 @@ namespace Jobs.Controllers
         //[ValidateAntiForgeryToken]
         public ActionResult _CreatePost(PersonViewModel PersonVm)
         {
+            if (PersonVm.CityId == 0 || PersonVm.CityId == null)
+            {
+                ModelState.AddModelError("City", "The Address field is required");
+            }
+
             if (ModelState.IsValid)
             {
                 if (PersonVm.PersonID == 0)
@@ -440,6 +446,23 @@ namespace Jobs.Controllers
                     return Json(new { success = true, PersonId = person.PersonID, Name = person.Name + ", " + person.Suffix + " [" + person.Code + "]" });
                 }
             }
+
+            var ModelStateErrorList = ModelState.Select(x => x.Value.Errors).Where(y => y.Count > 0).ToList();
+            string Messsages = "";
+            if (ModelStateErrorList.Count > 0)
+            {
+                foreach (var ModelStateError in ModelStateErrorList)
+                {
+                    foreach (var Error in ModelStateError)
+                    {
+                        if (!Messsages.Contains(Error.ErrorMessage))
+                            Messsages = Error.ErrorMessage + System.Environment.NewLine;
+                    }
+                }
+                if (Messsages != "")
+                    ModelState.AddModelError("", Messsages);
+            }
+
             return View(PersonVm);
 
         }

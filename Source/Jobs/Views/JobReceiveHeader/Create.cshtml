@@ -524,6 +524,7 @@
 
     $("#ProcessId").change(function(){
         CustomSelectFunction($("#JobReceiveById"), '/ComboHelpList/GetEmployeeWithProcess', '/ComboHelpList/SetSingleEmployee', ' ', false, 0, $('#ProcessId').val());
+        CustomSelectFunctionWithMultipleFilters($("#JobWorkerId"), '/JobReceiveHeader/GetCustomPerson_WithProcess', '/ComboHelpList/SetSinglePerson', ' ', false, 0,$('#DocTypeId').val(),$('#ProcessId').val());
     });
 
     var id=@Model.JobReceiveHeaderId;

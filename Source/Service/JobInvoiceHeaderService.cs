@@ -568,7 +568,7 @@ namespace Service
                         Reviewed = (SqlFunctions.CharIndex(Uname, p.ReviewBy) > 0),
                         TotalQty = p.JobInvoiceLines.Sum(m => m.Qty),
                         TotalAmount = JobInvoiceHeaderChargesTab.NetAmount ?? (p.JobInvoiceLines.Sum(m => m.Amount)),
-
+						ProcessName=p.Process.ProcessName,
                         ProductUidName = TempProductDetailTab.ProductUidName,
                         ProductName = TempProductDetailTab.ProductName,
                         ProductGroupName = TempProductDetailTab.ProductGroupName,
@@ -636,8 +636,8 @@ namespace Service
                         join pr in db.PersonRole on p.PersonID equals pr.PersonId into PersonRoleTable
                         from PersonRoleTab in PersonRoleTable.DefaultIfEmpty()
                         //where PersonProcessTab.ProcessId == settings.ProcessId
-                        where (DocTypeName == TransactionDoctypeConstants.ExpenseVoucher ? 1 == 1 : (ProcessId == null ? PersonProcessTab.ProcessId == settings.ProcessId : PersonProcessTab.ProcessId == ProcessId))
-                        && (string.IsNullOrEmpty(term) ? 1 == 1 : (p.Name.ToLower().Contains(term.ToLower()) || p.Code.ToLower().Contains(term.ToLower()) || p.Suffix.ToLower().Contains(term.ToLower())))
+                        where (ProcessId == null ? PersonProcessTab.ProcessId == settings.ProcessId : PersonProcessTab.ProcessId == ProcessId)
+                        && (string.IsNullOrEmpty(term) ? 1 == 1 : (p.Name.ToLower().Contains(term.ToLower()) || p.Code.ToLower().Contains(term.ToLower())))
                         && (string.IsNullOrEmpty(settings.filterPersonRoles) ? 1 == 1 : PersonRoles.Contains(PersonRoleTab.RoleDocTypeId.ToString()))
                         && BusinessEntityTab.DivisionIds.IndexOf(DivIdStr) != -1
                         && BusinessEntityTab.SiteIds.IndexOf(SiteIdStr) != -1

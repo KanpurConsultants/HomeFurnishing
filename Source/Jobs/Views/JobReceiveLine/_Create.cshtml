@@ -33,6 +33,7 @@
                 @Html.HiddenFor(m => m.OrderBalanceQty)
                 @Html.HiddenFor(m => m.UnitDecimalPlaces)
                 @Html.HiddenFor(m => m.ProductId)
+                @Html.HiddenFor(m => m.ProcessId)
                 @Html.HiddenFor(m => m.ProductUidId)
                 @Html.HiddenFor(m => m.Dimension1Id)
                 @Html.HiddenFor(m => m.Dimension2Id)
@@ -686,8 +687,8 @@
 
 
             //var data=InitializePopoverForJobReceive(this,$("#ProductUidName").val(),'@Model.JobReceiveSettings.isPostedInStock',$('#JobReceiveHeaderId').val(),TransactionTypeConstantsEnum.Receive);
-            var data=InitializePopoverForWashingReceive(this,$("#ProductUidName").val(),'@Model.JobReceiveSettings.isPostedInStock',$('#JobReceiveHeaderId').val(),TransactionTypeConstantsEnum.Receive,'@Model.JobReceiveSettings.ProcessId');
-
+            //var data=InitializePopoverForWashingReceive(this,$("#ProductUidName").val(),'@Model.JobReceiveSettings.isPostedInStock',$('#JobReceiveHeaderId').val(),TransactionTypeConstantsEnum.Receive,'@Model.JobReceiveSettings.ProcessId');
+            var data=InitializePopoverForWashingReceive(this,$("#ProductUidName").val(),'@Model.JobReceiveSettings.isPostedInStock',$('#JobReceiveHeaderId').val(),TransactionTypeConstantsEnum.Receive,'@Model.ProcessId');
 
             if(!data.status)
             {

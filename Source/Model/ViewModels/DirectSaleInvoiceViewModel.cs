@@ -236,6 +236,16 @@ namespace Model.ViewModels
         public string CityName { get; set; }
     }
 
+	public class SaleInvoiceCustomViewModel
+    {
+        [Key]
+        public int SaleInvoiceHeaderId { get; set; }
+        public int DocTypeId { get; set; }
+        public string DocumentTypeName { get; set; }
+        public List<DocumentTypeHeaderAttributeViewModel> DocumentTypeHeaderAttributes { get; set; }
+
+
+    }
     public class SaleOrderListViewModel
     {
         public int SaleOrderHeaderId { get; set; }

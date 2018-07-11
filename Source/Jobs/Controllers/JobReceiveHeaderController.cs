@@ -1753,6 +1753,25 @@ namespace Jobs.Controllers
             };
         }
 
+		public ActionResult GetCustomPerson_WithProcess(string searchTerm, int pageSize, int pageNum, int filter, int? filter2)//DocTypeId
+        {
+            var Query = _JobReceiveHeaderService.GetCustomPerson_WithProcess(filter, searchTerm, filter2);
+            var temp = Query.Skip(pageSize * (pageNum - 1))
+                .Take(pageSize)
+                .ToList();
+
+            var count = Query.Count();
+
+            ComboBoxPagedResult Data = new ComboBoxPagedResult();
+            Data.Results = temp;
+            Data.Total = count;
+
+            return new JsonpResult
+            {
+                Data = Data,
+                JsonRequestBehavior = JsonRequestBehavior.AllowGet
+            };
+        }
         public JsonResult IsDuplicatePartyDocNo(int PersonId, string PartyDocNo)
         {
             var temp = (from H in db.JobReceiveHeader

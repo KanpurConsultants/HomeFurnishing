@@ -266,7 +266,7 @@ namespace Jobs.Controllers
                     _DispatchWaybillHeaderService.Create(DispatchWaybillHeader);
 
 
-                    var routecities = new RouteLineService(_unitOfWork).GetRouteLineListForIndex(svm.RouteId).ToList();
+                    var routecities = new RouteLineService(_unitOfWork).GetRouteLineListForIndex(svm.RouteId ?? 0).ToList();
 
                     foreach (var item in routecities)
                     {
@@ -309,7 +309,7 @@ namespace Jobs.Controllers
                 #region EditRecord
                 else
                 {
-                    int routeid = _DispatchWaybillHeaderService.GetDispatchWaybillHeaderViewModel(svm.DispatchWaybillHeaderId).RouteId;
+                    int routeid = _DispatchWaybillHeaderService.GetDispatchWaybillHeaderViewModel(svm.DispatchWaybillHeaderId).RouteId ?? 0;
 
                     DispatchWaybillHeader DispatchWaybillHeader = Mapper.Map<DispatchWaybillHeaderViewModel, DispatchWaybillHeader>(svm);
 
@@ -336,7 +336,7 @@ namespace Jobs.Controllers
                         }
 
 
-                        var routecities = new RouteLineService(_unitOfWork).GetRouteLineListForIndex(svm.RouteId).ToList();
+                        var routecities = new RouteLineService(_unitOfWork).GetRouteLineListForIndex(svm.RouteId ?? 0).ToList();
 
                         foreach (var item in routecities)
                         {

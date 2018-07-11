@@ -21,10 +21,9 @@
         </h3>
     </div>
     <div>
-        @Html.ValidationLog((string)TempData["CSEXCL"])
         @using (Html.BeginForm("_CreatePost", "PersonCreation", FormMethod.Post, new { enctype = "multipart/form-data", id = "modformr2" }))
         {
-
+            @Html.ValidationLog((string)TempData["CSEXCL"])
             <div class="form-horizontal modal-body">
 
                 @Html.AntiForgeryToken()
@@ -44,8 +43,7 @@
                 @Html.HiddenFor(m => m.CreatedBy)
                 @Html.HiddenFor(m => m.CreatedDate)
 
-
-                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
@@ -111,7 +109,7 @@
                         <div class="form-group">
                             @Html.LabelFor(model => model.CityId, "City", new { @class = "control-label col-xs-4 " })
                             <div class="col-xs-7">
-                                @Html.TextBoxFor(model => model.CityId, new { @class = "form-control col-xs-7" })
+                                @Html.TextBoxFor(model => model.CityId, new { @class = "form-control col-xs-7 required" })
                                 @Html.ValidationMessageFor(model => model.CityId, "", new { @class = "text-danger" })
                             </div>
                         </div>
@@ -177,6 +175,16 @@
                         </div>
                     </div>
 
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.SalesTaxGroupPartyId, "Sales Tax Group", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.SalesTaxGroupPartyId, null, new { @class = "form-control col-xs-7 " })
+                                @Html.ValidationMessageFor(m => m.SalesTaxGroupPartyId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
 
                 </div>
 
@@ -197,6 +205,7 @@
     $(document).ready(function () {
         //CustomSelectFunction($("#CityId"), '/ComboHelpList/GetCity', '/ComboHelpList/SetSingleCity', '', false, 0);
         CustomSelectFunction($("#CityId"), '/ComboHelpList/GetCity', '/ComboHelpList/SetSingleCity', ' ', false, 0);
+        CustomSelectFunction($("#SalesTaxGroupPartyId"), '/ComboHelpList/GetSalesTaxGroupPerson', '/ComboHelpList/SetSingleSalesTaxGroupPerson', ' ', false, 0);
     });
 
     $('#submit').on("click", 'tr', function () {
@@ -212,6 +221,44 @@
     $("#Email").change(function () {
         //Validate_Email();
     });
+
+
+    $("#submit").click(function () {
+        if ($('#CityId').val() == 0 || $('#CityId').val() == null) {
+            $('#CityId').before("<span id=errormsg style='color:red'> City Is Required.  </span>")
+            $('#CityId').css('display', '')
+        }
+
+    });
+
+
+    var IsSaved = false;
+    var ValidationCount = 0;
+
+    $('#modform').bind('submit', function (event) {
+        if (!IsSaved) {
+            if (!ValidateData()) {
+                return false;
+            }
+            IsSaved = true;
+            $('button:submit').attr('disabled', 'disabled');
+            return IsSaved;
+        }
+        else {
+            return false;
+        }
+
+
+    });
+
+    function ValidateData() {
+        var ValidationMessage = "";
+
+        //Client Side Validaion.....
+
+        return (ValidationMessage == "");
+
+    }
 
 
     function Validate_Email() {

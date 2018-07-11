@@ -102,7 +102,7 @@ namespace Model.DatabaseViews
         [Key]
         public int SaleInvoiceHeaderId { get; set; }
         public int SaleInvoiceLineId { get; set; }
-        public int ? ProductUidId { get; set; }
+        public int? ProductUidId { get; set; }
         public int ProductID { get; set; }
 
         public int? Dimension1Id { get; set; }
@@ -168,6 +168,47 @@ namespace Model.DatabaseViews
         public string SaleDispatchNo { get; set; }
         public int SiteId { get; set; }
         public int DivisionId { get; set; }
+    }
+
+
+
+    [Table("ViewSaleInvoiceBalanceForWaybill")]
+    public class ViewSaleInvoiceBalanceForWaybill
+    {
+        [Key]
+        public int SaleInvoiceHeaderId { get; set; }
+        public int SaleToBuyerId { get; set; }
+        public int SiteId { get; set; }
+        public int DivisionId { get; set; }
+        public int DocTypeId { get; set; }
+        public DateTime DocDate { get; set; }
+        public string DocNo { get; set; }
+    }
+
+    [Table("ViewSaleInvoiceBalanceForCustomAttribute")]
+    public class ViewSaleInvoiceBalanceForCustomAttribute
+    {
+        [Key]
+        public int SaleInvoiceHeaderId { get; set; }
+        public int SaleToBuyerId { get; set; }
+        public int SiteId { get; set; }
+        public int DivisionId { get; set; }
+        public int DocTypeId { get; set; }
+        public DateTime DocDate { get; set; }
+        public string DocNo { get; set; }
+    }
+
+    [Table("ViewSaleInvoiceWithCustomAttribute")]
+    public class ViewSaleInvoiceWithCustomAttribute
+    {
+        [Key]
+        public int SaleInvoiceHeaderId { get; set; }
+        public int SaleToBuyerId { get; set; }
+        public int SiteId { get; set; }
+        public int DivisionId { get; set; }
+        public int DocTypeId { get; set; }
+        public DateTime DocDate { get; set; }
+        public string DocNo { get; set; }
     }
 
     [Table("ViewSaleInvoiceBalanceForDelivery")]

@@ -35,6 +35,7 @@ namespace Model.Models
 
         public bool IsActive { get; set; }
 
+		public bool IsCustomUI { get; set; }
         [Display(Name = "Created By")]
         public string CreatedBy { get; set; }
         [Display(Name = "Modified By")]

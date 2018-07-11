@@ -153,6 +153,7 @@ namespace Jobs.Controllers
                 ViewBag.WizardId = settings.WizardMenuId;
                 ViewBag.IsPostedInStock = settings.isPostedInStock;
                 ViewBag.isVisibleCostCenter = settings.isVisibleCostCenter;
+				ViewBag.isVisibleProcessHeader = settings.isVisibleProcessHeader;
                 ViewBag.ImportMenuId = settings.ImportMenuId;
                 ViewBag.SqlProcDocumentPrint = settings.SqlProcDocumentPrint;
                 ViewBag.SqlProcGatePass = settings.SqlProcGatePass;
@@ -163,6 +164,26 @@ namespace Jobs.Controllers
 
         }
 
+
+        public ActionResult GetCustomPerson_WithProcess(string searchTerm, int pageSize, int pageNum, int filter, int? filter2)//DocTypeId
+        {
+            var Query = _JobOrderHeaderService.GetCustomPerson_WithProcess(filter, searchTerm, filter2);
+            var temp = Query.Skip(pageSize * (pageNum - 1))
+                .Take(pageSize)
+                .ToList();
+
+            var count = Query.Count();
+
+            ComboBoxPagedResult Data = new ComboBoxPagedResult();
+            Data.Results = temp;
+            Data.Total = count;
+
+            return new JsonpResult
+            {
+                Data = Data,
+                JsonRequestBehavior = JsonRequestBehavior.AllowGet
+            };
+        }
 
         [HttpGet]
         public ActionResult BarcodePrint(int id)
@@ -1558,6 +1579,17 @@ namespace Jobs.Controllers
                         CostCentrerStatusRecord.ObjectState = Model.ObjectState.Deleted;
                         context.CostCenterStatus.Remove(CostCentrerStatusRecord);
                     }
+
+                    var CostCenterStatusExtendedRecord = (from p in context.CostCenterStatusExtended
+                                                   where p.CostCenterId == GeneratedCostCenter.CostCenterId
+                                                   select p).FirstOrDefault();
+
+                    if (CostCenterStatusExtendedRecord != null)
+                    {
+                        CostCenterStatusExtendedRecord.ObjectState = Model.ObjectState.Deleted;
+                        context.CostCenterStatusExtended.Remove(CostCenterStatusExtendedRecord);
+                    }
+
                     GeneratedCostCenter.ObjectState = Model.ObjectState.Deleted;
                     context.CostCenter.Remove(GeneratedCostCenter);
                 }

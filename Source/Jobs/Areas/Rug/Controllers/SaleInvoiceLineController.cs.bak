@@ -482,6 +482,8 @@ namespace Jobs.Areas.Rug.Controllers
         public ActionResult DeletePost(SaleInvoiceLineViewModel vm)
         {
             List<LogTypeViewModel> LogList = new List<LogTypeViewModel>();
+            int? StockId = 0;
+            int? StockProcessId = 0;
 
             SaleInvoiceLine SaleInvoiceLine = _SaleInvoiceLineService.GetSaleInvoiceLine(vm.SaleInvoiceLineId);
             SaleInvoiceHeader saleinvoiceheader = new SaleInvoiceHeaderService(_unitOfWork).Find(SaleInvoiceLine.SaleInvoiceHeaderId);
@@ -521,6 +523,9 @@ namespace Jobs.Areas.Rug.Controllers
             SaleDispatchLine SaleDispatchLine = _SaleDispatchLineService.GetSaleDispatchLine(vm.SaleDispatchLineId);
             PackingLine packingline = new PackingLineService(_unitOfWork).Find(SaleDispatchLine.PackingLineId);
 
+            StockId = SaleDispatchLine.StockId;
+
+            
             if (packingline.ProductUidId != null && packingline.ProductUidId != 0)
             {
                 ProductUid ProductUid = new ProductUidService(_unitOfWork).Find((int)packingline.ProductUidId);
@@ -549,6 +554,22 @@ namespace Jobs.Areas.Rug.Controllers
             var DispatchLine = db.SaleDispatchLine.Find(vm.SaleDispatchLineId);
 
             _SaleDispatchLineService.Delete(vm.SaleDispatchLineId);
+
+
+            if (StockId != null)
+            {
+                StockAdj Adj = (from L in db.StockAdj
+                                where L.StockOutId == StockId
+                                select L).FirstOrDefault();
+
+                if (Adj != null)
+                {
+                    //new StockAdjService(_unitOfWork).Delete(Adj);
+                    Adj.ObjectState = Model.ObjectState.Deleted;
+                    db.StockAdj.Remove(Adj);
+                }
+                new StockService(_unitOfWork).DeleteStockDB((int)StockId, ref db, true);
+            }
 
             if (DispatchLine != null && DispatchLine.StockId.HasValue && DispatchLine.StockId.Value > 0)
             {
@@ -885,7 +906,20 @@ namespace Jobs.Areas.Rug.Controllers
                         db.SaleDispatchHeader.Add(saledispatchheader);
 
 
+                        PackingLine PL = new PackingLineService(_unitOfWork).Find(item.PackingLineId);
 
+                        if (PL.StockInId != null)
+                        {
+                            StockAdj Adj_IssQty = new StockAdj();
+                            Adj_IssQty.StockAdjId = -Cnt;
+                            Adj_IssQty.StockInId = (int)PL.StockReceiveId;
+                            Adj_IssQty.StockOutId = (int)StockViewModel.StockId;
+                            Adj_IssQty.DivisionId = saleinvoiceheaderdetail.DivisionId;
+                            Adj_IssQty.SiteId = saleinvoiceheaderdetail.SiteId;
+                            Adj_IssQty.AdjustedQty = item.Qty;
+                            Adj_IssQty.ObjectState = Model.ObjectState.Added;
+                            db.StockAdj.Add(Adj_IssQty);
+                        }
 
 
                         SaleDispatchLine saledispatchline = new SaleDispatchLine();

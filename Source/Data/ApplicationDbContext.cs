@@ -101,6 +101,7 @@ namespace Data.Models
         public DbSet<ProductBuyerLog> ProductBuyerLog { get; set; }
 
         public DbSet<PaymentMode> PaymentMode { get; set; }
+        public DbSet<PaymentTerms> PaymentTerms { get; set; }
         public DbSet<PaymentModeLedgerAccount> PaymentModeLedgerAccount { get; set; }
 
         public DbSet<Area> Area { get; set; }
@@ -452,9 +453,10 @@ namespace Data.Models
         public DbSet<ViewSaleDispatchBalance> ViewSaleDispatchBalance { get; set; }
         public DbSet<ViewLedgerBalance> ViewLedgerBalance { get; set; }
         public DbSet<ViewSaleInvoiceBalance> ViewSaleInvoiceBalance { get; set; }
+        public DbSet<ViewSaleInvoiceBalanceForWaybill> ViewSaleInvoiceBalanceForWaybill { get; set; }        
         public DbSet<SaleInvoiceReturnHeaderCharge> SaleInvoiceReturnHeaderCharge { get; set; }
         public DbSet<SaleInvoiceReturnLineCharge> SaleInvoiceReturnLineCharge { get; set; }
-
+        public DbSet<ViewSaleInvoiceWithCustomAttribute> ViewSaleInvoiceWithCustomAttribute { get; set; }
         //Job Models
         public DbSet<LedgerHeaderCharge> LedgerHeaderCharges { get; set; }
         public DbSet<LedgerLineCharge> LedgerLineCharge { get; set; }
@@ -484,6 +486,7 @@ namespace Data.Models
         public DbSet<JobInvoiceRateAmendmentLine> JobInvoiceRateAmendmentLine { get; set; }
         public DbSet<JobReceiveHeader> JobReceiveHeader { get; set; }
         public DbSet<JobOrderHeaderExtended> JobOrderHeaderExtended { get; set; }
+        public DbSet<ViewSaleInvoiceBalanceForCustomAttribute> ViewSaleInvoiceBalanceForCustomAttribute { get; set; }        
         public DbSet<JobReceiveLine> JobReceiveLine { get; set; }
         public DbSet<JobReceiveBom> JobReceiveBom { get; set; }
         public DbSet<JobReceiveByProduct> JobReceiveByProduct { get; set; }

@@ -528,6 +528,8 @@ namespace Jobs.Controllers
                     saledispatchheader.DocDate = vm.DocDate;
                     saledispatchheader.SaleToBuyerId = vm.SaleToBuyerId;
                     saledispatchheader.ShipToPartyAddress = vm.ShipToPartyAddress;
+					saledispatchheader.ShipMethodId = vm.ShipMethodId;
+                    saledispatchheader.DeliveryTermsId = vm.DeliveryTermsId;
                     saledispatchheader.Remark = vm.Remark;
                     saledispatchheader.ModifiedDate = DateTime.Now;
                     saledispatchheader.ModifiedBy = User.Identity.Name;
@@ -2004,7 +2006,7 @@ LEFT JOIN web.Dimension2 D2 WITH (Nolock) ON D2.Dimension2Id=PL.Dimension2Id
 LEFT JOIN web.Dimension3 D3 WITH (Nolock) ON D3.Dimension3Id=PL.Dimension3Id
 LEFT JOIN Web.Dimension4 D4 WITH (nolock) ON D4.Dimension4Id=PL.Dimension4Id
 LEFT JOIN web.Units U WITH (Nolock) ON U.UnitId=PD.UnitId
-LEFT JOIN web.Units DU WITH (Nolock) ON DU.UnitId=POL.DealUnitId
+LEFT JOIN web.Units DU WITH (Nolock) ON DU.UnitId=PL.DealUnitId
 LEFT JOIN Web.Std_PersonRegistrations SPR WITH (Nolock) ON SPR.CustomerId=H.BillToBuyerId
 LEFT JOIN web.ChargeGroupProducts CGPD WITH (Nolock) ON L.SalesTaxGroupProductId = CGPD.ChargeGroupProductId
 LEFT JOIN
@@ -2159,7 +2161,7 @@ LEFT JOIN web.Dimension2 D2 WITH (Nolock) ON D2.Dimension2Id=PL.Dimension2Id
 LEFT JOIN web.Dimension3 D3 WITH (Nolock) ON D3.Dimension3Id=PL.Dimension3Id
 LEFT JOIN Web.Dimension4 D4 WITH (nolock) ON D4.Dimension4Id=PL.Dimension4Id
 LEFT JOIN web.Units U WITH (Nolock) ON U.UnitId=PD.UnitId
-LEFT JOIN web.Units DU WITH (Nolock) ON DU.UnitId=POL.DealUnitId
+LEFT JOIN web.Units DU WITH (Nolock) ON DU.UnitId=PL.DealUnitId
 LEFT JOIN Web.Std_PersonRegistrations SPR WITH (Nolock) ON SPR.CustomerId=H.BillToBuyerId
 LEFT JOIN web.ChargeGroupProducts CGPD WITH (Nolock) ON L.SalesTaxGroupProductId = CGPD.ChargeGroupProductId
 WHERE H.SaleInvoiceHeaderId= " + item + @"
@@ -2786,6 +2788,8 @@ EXEC(@Qry);	";
                     foreach (var item in LineCharges)
                     {
                         SaleInvoiceReturnLineCharge PoLineCharge = Mapper.Map<LineChargeViewModel, SaleInvoiceReturnLineCharge>(item);
+                        PoLineCharge.HeaderTableId = InvoiceRetHeader.SaleInvoiceReturnHeaderId;
+                        PoLineCharge.PersonID = SaleInvoiceHeader.BillToBuyerId;
                         PoLineCharge.ObjectState = Model.ObjectState.Added;
                         new SaleInvoiceReturnLineChargeService(_unitOfWork).Create(PoLineCharge);
                     }
@@ -2797,6 +2801,10 @@ EXEC(@Qry);	";
                         SaleInvoiceReturnHeaderCharge POHeaderCharge = Mapper.Map<HeaderChargeViewModel, SaleInvoiceReturnHeaderCharge>(HeaderCharges[i]);
                         POHeaderCharge.HeaderTableId = InvoiceRetHeader.SaleInvoiceReturnHeaderId;
                         POHeaderCharge.PersonID = InvoiceRetHeader.BuyerId;
+
+                        if (SaleInvoiceHeader.BillToBuyerId != InvoiceRetHeader.BuyerId)
+                            POHeaderCharge.PersonID = SaleInvoiceHeader.BillToBuyerId;
+
                         POHeaderCharge.ObjectState = Model.ObjectState.Added;
                         new SaleInvoiceReturnHeaderChargeService(_unitOfWork).Create(POHeaderCharge);
                     }

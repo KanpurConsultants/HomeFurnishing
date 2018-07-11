@@ -28,8 +28,8 @@ namespace Model.ViewModels
         public int SiteId { get; set; }
         public string SiteName { get; set; }
 
-        
-
+        public string WagesPayType { get; set; }
+         
         public int Status { get; set; }
 
         [Display(Name = "Remark")]

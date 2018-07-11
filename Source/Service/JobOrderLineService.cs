@@ -1553,6 +1553,9 @@ namespace Service
             if (!string.IsNullOrEmpty(settings.filterContraDivisions)) { contraDivisions = settings.filterContraDivisions.Split(",".ToCharArray()); }
             else { contraDivisions = new string[] { "NA" }; }
 
+			string[] ProductCategories = null;
+            if (!string.IsNullOrEmpty(settings.filterProductCategories)) { ProductCategories = settings.filterProductCategories.Split(",".ToCharArray()); }
+            else { ProductCategories = new string[] { "NA" }; }
             int CurrentSiteId = (int)System.Web.HttpContext.Current.Session["SiteId"];
             int CurrentDivisionId = (int)System.Web.HttpContext.Current.Session["DivisionId"];
 
@@ -1578,6 +1581,7 @@ namespace Service
                     && (Dimension4Id == null ? 1 == 1 : p.Dimension4Id == Dimension4Id)
                     && (string.IsNullOrEmpty(settings.filterContraSites) ? p.SiteId == CurrentSiteId : contraSites.Contains(p.SiteId.ToString()))
                     && (string.IsNullOrEmpty(settings.filterContraDivisions) ? p.DivisionId == CurrentDivisionId : contraDivisions.Contains(p.DivisionId.ToString()))
+					&& (string.IsNullOrEmpty(settings.filterProductCategories) ? 1==1 : ProductCategories.Contains(ProductTab.ProductCategoryId.ToString()))
                     && (string.IsNullOrEmpty(term) ? 1 == 1 : p.StockInNo.ToLower().Contains(term.ToLower())
                         || string.IsNullOrEmpty(term) ? 1 == 1 : StockTab.StockHeader.DocType.DocumentTypeShortName.ToLower().Contains(term.ToLower())
                         || string.IsNullOrEmpty(term) ? 1 == 1 : ProductTab.ProductName.ToLower().Contains(term.ToLower())

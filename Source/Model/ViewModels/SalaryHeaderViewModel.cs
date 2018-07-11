@@ -100,6 +100,8 @@ namespace Model.ViewModels
         public string DepartmentId { get; set; }
         public string DepartmentName { get; set; }
         public string WagesPayType { get; set; }
+		public string ContraDocumentTypeId { get; set; }
+        public string ContraDocumentTypeName { get; set; }
         public string Remark { get; set; }
 
         public int SalaryHeaderId { get; set; }

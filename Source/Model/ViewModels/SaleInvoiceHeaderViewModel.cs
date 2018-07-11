@@ -53,6 +53,11 @@ namespace Model.ViewModels
         public int DeliveryTermsId { get; set; }
         public virtual DeliveryTerms DeliveryTerms { get; set; }
 
+
+        [ForeignKey("PaymentTerms"), Display(Name = "Payment Terms"), Required(ErrorMessage = "The PaymentTerms Field is Required")]
+        public int PaymentTermsId { get; set; }
+        public virtual PaymentTerms PaymentTerms { get; set; }
+
         [Display(Name = "Transporter"), MaxLength(250)]
         public string Transporter { get; set; }
 
@@ -63,6 +68,7 @@ namespace Model.ViewModels
         public Decimal? ExchangeRate { get; set; }
 
         public Decimal? CreditDays { get; set; }
+   		public Decimal? CreditLimit { get; set; }
         public int Status { get; set; }
 
         [Display(Name = "BL No.")]

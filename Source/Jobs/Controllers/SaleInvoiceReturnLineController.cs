@@ -534,6 +534,15 @@ namespace Jobs.Controllers
                         {
                             item.LineTableId = s.SaleInvoiceReturnLineId;
                             item.PersonID = temp.BuyerId;
+
+                            var SaleInvoiceBillToParty = (from L in db.SaleInvoiceLine
+                                                          where L.SaleInvoiceLineId == svm.SaleInvoiceLineId
+                                                          select L.SaleInvoiceHeader.BillToBuyerId);
+
+                            if (SaleInvoiceBillToParty != null)
+                                item.PersonID = SaleInvoiceBillToParty.FirstOrDefault();
+
+
                             item.HeaderTableId = s.SaleInvoiceReturnHeaderId;
                             item.ObjectState = Model.ObjectState.Added;
                             new SaleInvoiceReturnLineChargeService(_unitOfWork).Create(item);
@@ -549,14 +558,22 @@ namespace Jobs.Controllers
                                 var footercharge = new SaleInvoiceReturnHeaderChargeService(_unitOfWork).Find(item.Id);
                                 footercharge.Rate = item.Rate;
                                 footercharge.Amount = item.Amount;
+                                item.PersonID = temp.BuyerId;
+
+                                if (item.PersonID != svm.linecharges.FirstOrDefault().PersonID)
+                                    footercharge.PersonID = svm.linecharges.FirstOrDefault().PersonID;
+
+
                                 new SaleInvoiceReturnHeaderChargeService(_unitOfWork).Update(footercharge);
-
                             }
-
                             else
                             {
                                 item.HeaderTableId = s.SaleInvoiceReturnHeaderId;
                                 item.PersonID = temp.BuyerId;
+
+                                if (item.PersonID != svm.linecharges.FirstOrDefault().PersonID)
+                                    item.PersonID = svm.linecharges.FirstOrDefault().PersonID;
+
                                 item.ObjectState = Model.ObjectState.Added;
                                 new SaleInvoiceReturnHeaderChargeService(_unitOfWork).Create(item);
                             }

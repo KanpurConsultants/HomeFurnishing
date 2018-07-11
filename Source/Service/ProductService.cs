@@ -52,6 +52,7 @@ namespace Service
         string FGetNewCode(int ProductTypeId, string ProcName);
         bool IsActionAllowed(List<string> UserRoles, int ProductTypeId, string ControllerName, string ActionName);
 
+        IQueryable<ComboBoxResult> GetRugWithInactiveColour(string term, int MainProductId);
         bool CheckForNameExists(string Name);
         bool CheckForNameExists(string Name, int Id);
     }
@@ -101,6 +102,66 @@ namespace Service
                         ReferenceDocId = p.ReferenceDocId,
                         SalesTaxProductCodeId = p.SalesTaxProductCodeId
                     }).FirstOrDefault();
+        }
+
+        public IQueryable<ComboBoxResult> GetRugWithInactiveColour(string term, int MainProductId)
+        {
+
+            //string[] ProductTypes = null;
+            //if (!string.IsNullOrEmpty(settings.filterProductTypes)) { ProductTypes = settings.filterProductTypes.Split(",".ToCharArray()); }
+            //else { ProductTypes = new string[] { "NA" }; }
+
+            //string[] Products = null;
+            //if (!string.IsNullOrEmpty(settings.filterProducts)) { Products = settings.filterProducts.Split(",".ToCharArray()); }
+            //else { Products = new string[] { "NA" }; }
+
+            //string[] ProductGroups = null;
+            //if (!string.IsNullOrEmpty(settings.filterProductGroups)) { ProductGroups = settings.filterProductGroups.Split(",".ToCharArray()); }
+            //else { ProductGroups = new string[] { "NA" }; }
+
+
+            if (MainProductId > 0)
+            {
+                int ? ProductGroupId = 0;
+                int ? SizeId = 0;
+
+                ProductGroupId = new ProductService(_unitOfWork).Find(MainProductId).ProductGroupId;
+
+                 SizeId = (from pb in db.ViewRugSize
+                            where 1==1
+                            && pb.ProductId == MainProductId                          
+                            select pb.ManufaturingSizeID).FirstOrDefault();
+
+
+                return (from pb in db.Product
+                        join VRS in db.ViewRugSize on pb.ProductId equals VRS.ProductId into VRSTable
+                        from VRSTab in VRSTable.DefaultIfEmpty()
+                        join FP in db.FinishedProduct on pb.ProductId equals FP.ProductId into FPTable
+                        from FPTab in FPTable.DefaultIfEmpty()
+                        join C in db.Colour on FPTab.ColourId equals C.ColourId into CTable
+                        from CTab in CTable.DefaultIfEmpty()
+                        where pb.ProductGroupId == ProductGroupId
+                        && VRSTab.ManufaturingSizeID == SizeId
+                        && CTab.IsActive !=true
+                        orderby pb.ProductName
+                        select new ComboBoxResult
+                        {
+                            id = pb.ProductId.ToString(),
+                            text = pb.ProductName,
+                            AProp1 = pb.ProductName ?? ""
+                        });
+            }
+            else
+                return (from pb in db.Product
+                        where (string.IsNullOrEmpty(term) ? 1 == 1 : pb.ProductName.ToLower().Contains(term.ToLower())
+                        || string.IsNullOrEmpty(term) ? 1 == 1 : pb.ProductName.ToLower().Contains(term.ToLower()))
+                        orderby pb.ProductName
+                        select new ComboBoxResult
+                        {
+                            id = pb.ProductId.ToString(),
+                            text = pb.ProductName,
+                            AProp1 = pb.ProductName ?? ""
+                        });
         }
 
         public IQueryable<ProductViewModel> GetProductListForGroup(int id)

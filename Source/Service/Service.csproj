@@ -133,6 +133,7 @@
     <Compile Include="EmployeeLineChargeService.cs" />
     <Compile Include="LedgerHeaderChargeService.cs" />
     <Compile Include="LedgerLineChargeService.cs" />
+    <Compile Include="PaymentTermsService.cs" />
     <Compile Include="ReportGenerateService_New.cs" />
     <Compile Include="LedgerWizardService.cs" />
     <Compile Include="SalaryWizardService.cs" />

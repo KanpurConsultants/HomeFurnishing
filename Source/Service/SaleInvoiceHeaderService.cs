@@ -40,6 +40,8 @@ namespace Service
         IEnumerable<SaleInvoicePrintViewModel> FGetPrintPackingListData(int Id);
         IEnumerable<SaleInvoicePrintViewModel> FGetPrintPackingListWithCollectionData(int Id);
         IEnumerable<SaleInvoiceHeader> GetSaleInvoiceListForReport(int BuyerId);
+
+        IQueryable<SaleInvoiceHeaderIndexViewModel> GetSaleInvoiceListForCustomIndex(int id, string Uname);
         int NextId(int id);
         int PrevId(int id);
         SaleInvoiceHeader FindDirectSaleInvoice(int id);
@@ -136,6 +138,50 @@ namespace Service
                 return id;
         }
 
+        public IQueryable<SaleInvoiceHeaderIndexViewModel> GetSaleInvoiceListForCustomIndex(int id, string Uname)
+        {
+            var DivisionId = (int)System.Web.HttpContext.Current.Session["DivisionId"];
+            var SiteId = (int)System.Web.HttpContext.Current.Session["SiteId"];
+
+
+            var temp = from p in db.ViewSaleInvoiceWithCustomAttribute
+                       join Pe in db.SaleInvoiceHeader on p.SaleInvoiceHeaderId equals Pe.SaleInvoiceHeaderId into PeTable
+                       from PeTab in PeTable.DefaultIfEmpty()
+                       join t2 in db.Persons on PeTab.BillToBuyerId equals t2.PersonID into table2
+                       from tab2 in table2.DefaultIfEmpty()
+                       where PeTab.DivisionId == DivisionId && PeTab.SiteId == SiteId && PeTab.DocTypeId == id
+                       orderby p.SaleInvoiceHeaderId
+                       select new SaleInvoiceHeaderIndexViewModel
+                       {
+                           SaleInvoiceHeaderId=p.SaleInvoiceHeaderId,
+                           DocNo=p.DocNo,
+                           DocDate=p.DocDate,
+                           SaleToBuyerName= tab2.Name,
+                           BillToBuyerName = tab2.Name,
+                       };
+            return temp;
+        }
+
+        public IQueryable<ComboBoxResult> GetPendingSaleInvoiceToCustomAttribute(string term)
+        {
+            var DivisionId = (int)System.Web.HttpContext.Current.Session["DivisionId"];
+            var SiteId = (int)System.Web.HttpContext.Current.Session["SiteId"];
+
+            var list = (from p in db.ViewSaleInvoiceBalanceForCustomAttribute
+                        join b in db.Persons on p.SaleToBuyerId equals b.PersonID into bTable
+                        from bTab in bTable.DefaultIfEmpty()
+                        where 1 == 1 
+                        && ((string.IsNullOrEmpty(term) ? 1 == 1 : p.DocNo.ToLower().Contains(term.ToLower()))
+                        || (string.IsNullOrEmpty(term) ? 1 == 1 : bTab.Code.Contains(term.ToLower())))
+                        orderby p.DocDate, p.DocNo
+                        select new ComboBoxResult
+                        {
+                            text = p.DocNo,
+                            id = p.SaleInvoiceHeaderId.ToString(),
+                            TextProp1 = bTab.Code
+                        });
+            return list;
+        }
         public SaleInvoiceHeaderIndexViewModel GetSaleInvoiceHeaderVM(int id)
         {
             SaleInvoiceHeaderIndexViewModel temp = (from p in db.SaleInvoiceHeader
@@ -448,8 +494,8 @@ namespace Service
                         from PersonProcessTab in PersonProcessTable.DefaultIfEmpty()
                         join pr in db.PersonRole on p.PersonID equals pr.PersonId into PersonRoleTable
                         from PersonRoleTab in PersonRoleTable.DefaultIfEmpty()
-                        where (DocTypeName == TransactionDoctypeConstants.IncomeVoucher ? 1 == 1 : PersonProcessTab.ProcessId == settings.ProcessId)
-                        && (string.IsNullOrEmpty(term) ? 1 == 1 : (p.Name.ToLower().Contains(term.ToLower()) || p.Code.ToLower().Contains(term.ToLower()) || p.Suffix.ToLower().Contains(term.ToLower())))
+                        where PersonProcessTab.ProcessId == settings.ProcessId
+                        && (string.IsNullOrEmpty(term) ? 1 == 1 : (p.Name.ToLower().Contains(term.ToLower()) || p.Code.ToLower().Contains(term.ToLower())))
                         && (string.IsNullOrEmpty(settings.filterPersonRoles) ? 1 == 1 : PersonRoles.Contains(PersonRoleTab.RoleDocTypeId.ToString()))
                         && BusinessEntityTab.DivisionIds.IndexOf(DivIdStr) != -1
                         && BusinessEntityTab.SiteIds.IndexOf(SiteIdStr) != -1

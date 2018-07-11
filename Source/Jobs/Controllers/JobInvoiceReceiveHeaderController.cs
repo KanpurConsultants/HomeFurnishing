@@ -89,6 +89,8 @@ namespace Jobs.Controllers
                 ViewBag.ImportMenuId = settings.ImportMenuId;
                 ViewBag.SqlProcDocumentPrint = settings.SqlProcDocumentPrint;
                 ViewBag.ExportMenuId = settings.ExportMenuId;
+				ViewBag.isVisibleProcessHeader= settings.isVisibleProcessHeader;
+                ViewBag.isVisibleHeaderJobWorker = settings.isVisibleHeaderJobWorker; 	
             }
 
             ViewBag.id = id;

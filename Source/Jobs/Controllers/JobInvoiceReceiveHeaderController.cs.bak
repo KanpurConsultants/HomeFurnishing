@@ -561,7 +561,12 @@ namespace Jobs.Controllers
                     bool DocDateChanged = false;
                     List<LogTypeViewModel> LogList = new List<LogTypeViewModel>();
 
-                    JobInvoiceHeader temp = _JobInvoiceHeaderService.Find(pt.JobInvoiceHeaderId);                    
+                    JobInvoiceHeader temp = _JobInvoiceHeaderService.Find(pt.JobInvoiceHeaderId);
+
+                    bool IsBillToPartyChanged = false;
+                    if (vm.JobWorkerId != temp.JobWorkerId)
+                        IsBillToPartyChanged = true;
+
 
                     JobInvoiceHeader ExRec = new JobInvoiceHeader();
                     ExRec = Mapper.Map<JobInvoiceHeader>(temp);
@@ -685,6 +690,25 @@ namespace Jobs.Controllers
                             }
                         }
                     }
+
+
+                    if (IsBillToPartyChanged == true)
+                    {
+                        IEnumerable<JobInvoiceHeaderCharge> HeaderChargeList = (from Hc in db.JobInvoiceHeaderCharges where Hc.HeaderTableId == temp.JobInvoiceHeaderId select Hc).ToList();
+                        foreach (JobInvoiceHeaderCharge HeaderCharge in HeaderChargeList)
+                        {
+                            HeaderCharge.PersonID = vm.JobWorkerId;
+                            _unitOfWork.Repository<JobInvoiceHeaderCharge>().Update(HeaderCharge);
+                        }
+
+                        IEnumerable<JobInvoiceLineCharge> LineChargeList = (from Hc in db.JobInvoiceLineCharge where Hc.HeaderTableId == temp.JobInvoiceHeaderId select Hc).ToList();
+                        foreach (JobInvoiceLineCharge LineCharge in LineChargeList)
+                        {
+                            LineCharge.PersonID = vm.JobWorkerId;
+                            _unitOfWork.Repository<JobInvoiceLineCharge>().Update(LineCharge);
+                        }
+                    }
+
 
                     XElement Modifications = new ModificationsCheckService().CheckChanges(LogList);
 
@@ -882,6 +906,8 @@ namespace Jobs.Controllers
                 pt.ReturnNature = (from H in db.JobInvoiceReturnHeader where H.JobInvoiceReturnHeaderId == JobInvoiceReturn.JobInvoiceReturnHeaderId select new { DocTypeNature = H.DocType.Nature }).FirstOrDefault().DocTypeNature;
                 if (pt.ReturnNature == TransactionNatureConstants.Credit)
                     pt.AdditionalInfo = "Credit Note is generated for this invoice.";
+                else if (pt.ReturnNature == TransactionNatureConstants.Debit)
+                    pt.AdditionalInfo = "Debit Note is generated for this invoice.";
                 else
                     pt.AdditionalInfo = "Invoice is cancelled.";
             }
@@ -1074,7 +1100,7 @@ namespace Jobs.Controllers
                     LedgerHeaderViewModel.SiteId = pd.SiteId;
                     LedgerHeaderViewModel.PartyDocNo = pd.JobWorkerDocNo;
                     LedgerHeaderViewModel.PartyDocDate = pd.JobWorkerDocDate;
-                    LedgerHeaderViewModel.Narration = "";
+                    LedgerHeaderViewModel.Narration = _JobInvoiceHeaderService.GetNarration(pd.JobInvoiceHeaderId);
                     LedgerHeaderViewModel.Remark = pd.Remark;
                     LedgerHeaderViewModel.CreatedBy = pd.CreatedBy;
                     LedgerHeaderViewModel.CreatedDate = DateTime.Now.Date;
@@ -1875,7 +1901,7 @@ namespace Jobs.Controllers
                                 if (Settings.SqlProcDocumentPrint == null || Settings.SqlProcDocumentPrint == "")
                                 {
                                     JobInvoiceHeaderRDL cr = new JobInvoiceHeaderRDL();
-                                    drp.CreateRDLFile("StdDocPrint_JobInvoice", cr.Create_StdDocPrint_JobInvoice());
+                                    drp.CreateRDLFile("Std_JobInvoice_Print", cr.Create_Std_JobInvoice_Print());
                                     List<ListofQuery> QueryList = new List<ListofQuery>();
                                     QueryList = DocumentPrintData(item);
                                     Pdf = drp.DocumentPrint_New(QueryList, User.Identity.Name);
@@ -1890,7 +1916,7 @@ namespace Jobs.Controllers
                                 if (Settings.SqlProcDocumentPrint_AfterSubmit == null || Settings.SqlProcDocumentPrint_AfterSubmit == "")
                                 {
                                     JobInvoiceHeaderRDL cr = new JobInvoiceHeaderRDL();
-                                    drp.CreateRDLFile("StdDocPrint_JobInvoice", cr.Create_StdDocPrint_JobInvoice());
+                                    drp.CreateRDLFile("Std_JobInvoice_Print", cr.Create_Std_JobInvoice_Print());
                                     List<ListofQuery> QueryList = new List<ListofQuery>();
                                     QueryList = DocumentPrintData(item);
                                     Pdf = drp.DocumentPrint_New(QueryList, User.Identity.Name);
@@ -1905,7 +1931,7 @@ namespace Jobs.Controllers
                                 if (Settings.SqlProcDocumentPrint_AfterApprove == null || Settings.SqlProcDocumentPrint_AfterApprove == "")
                                 {
                                     JobInvoiceHeaderRDL cr = new JobInvoiceHeaderRDL();
-                                    drp.CreateRDLFile("StdDocPrint_JobInvoice", cr.Create_StdDocPrint_JobInvoice());
+                                    drp.CreateRDLFile("Std_JobInvoice_Print", cr.Create_Std_JobInvoice_Print());
                                     List<ListofQuery> QueryList = new List<ListofQuery>();
                                     QueryList = DocumentPrintData(item);
                                     Pdf = drp.DocumentPrint_New(QueryList, User.Identity.Name);
@@ -2025,7 +2051,7 @@ P.Mobile AS PartyMobileNo,	SPR.*,
 	--Other Fields
 	@UnitDealCnt  AS DealUnitCnt,		
 	(CASE WHEN Isnull(H.Status,0)=0 OR Isnull(H.Status,0)=8 THEN 'Provisional ' +isnull(DT.PrintTitle,DT.DocumentTypeName) ELSE isnull(DT.PrintTitle,DT.DocumentTypeName) END) AS ReportTitle, 
-	'StdDocPrint_JobInvoice.rdl' AS ReportName,		
+	'Std_JobInvoice_Print.rdl' AS ReportName,		
 	SalesTaxGroupProductCaption,
 	SDS.SalesTaxProductCodeCaption
 	FROM Web.JobInvoiceHeaders H WITH (Nolock)

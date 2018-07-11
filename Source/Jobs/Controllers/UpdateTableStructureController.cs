@@ -150,6 +150,7 @@ namespace Module
             AddFields("ProductTypeSettings", "isVisibleConsumptionDetail", "BIT");
             AddFields("ProductTypeSettings", "isVisibleProductProcessDetail", "BIT");
 
+			AddFields("DocumentTypeHeaderAttributes", "IsCustomUI", "BIT");	
             AddFields("ProductTypeSettings", "ProductNameCaption", "NVARCHAR(Max)");
             AddFields("ProductTypeSettings", "ProductCodeCaption", "NVARCHAR(Max)");
             AddFields("ProductTypeSettings", "ProductDescriptionCaption", "NVARCHAR(Max)");
@@ -200,6 +201,10 @@ namespace Module
             AddFields("SaleInvoiceSettings", "isVisibleSalesExecutive", "BIT");
             AddFields("SaleInvoiceHeaders", "FinancierId", "Int", "People");
             AddFields("SaleInvoiceHeaders", "SalesExecutiveId", "Int", "People");
+            AddFields("SaleInvoiceHeaders", "PaymentTermsId", "Int", "PaymentTerms");
+
+            AddFields("People", "SisterConcernSiteId", "Int", "Sites");
+            AddFields("People", "SisterConcernDivisionId", "Int", "Divisions");
 
             AddFields("SaleInvoiceSettings", "isVisibleBLNo", "BIT");
             AddFields("SaleInvoiceSettings", "isVisibleCircularNo", "BIT");
@@ -331,6 +336,36 @@ namespace Module
             }
 
 
+
+            try
+            {
+                if ((int)ExecuteScaler("SELECT Count(*) AS Cnt FROM INFORMATION_SCHEMA.Tables WHERE TABLE_NAME = 'PaymentTerms'") == 0)
+                {
+                    mQry = @"CREATE TABLE Web.PaymentTerms
+	                            (
+	                            PaymentTermsId     INT IDENTITY NOT NULL,
+	                            PaymentTermsName   NVARCHAR (50) NOT NULL,
+	                            PrintingDescription NVARCHAR (50) NOT NULL,
+	                            IsActive            BIT NOT NULL,
+	                            CreatedBy           NVARCHAR (max),
+	                            ModifiedBy          NVARCHAR (max),
+	                            CreatedDate         DATETIME NOT NULL,
+	                            ModifiedDate        DATETIME NOT NULL,
+	                            OMSId               NVARCHAR (50),
+	                            CONSTRAINT [PK_Web.PaymentTerms] PRIMARY KEY (PaymentTermsId)
+	                            )
+                        
+
+                        CREATE UNIQUE INDEX [IX_PaymentTerms_PaymentTermsName]
+	                        ON Web.PaymentTerms (PaymentTermsName)
+                         ";
+                    ExecuteQuery(mQry);
+                }
+            }
+            catch (Exception ex)
+            {
+                RecordError(ex);
+            }
 
             try
             {

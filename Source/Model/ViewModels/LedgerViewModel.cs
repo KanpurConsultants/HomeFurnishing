@@ -126,9 +126,9 @@ namespace Model.ViewModels
         public decimal AmountDr { get; set; }
         public string DrCr { get; set; }
 
-        public decimal Qty { get; set; }
-        public decimal DealQty { get; set; }
-        public decimal Rate { get; set; }
+        public decimal ? Qty { get; set; }
+        public decimal ?  DealQty { get; set; }
+        public decimal ? Rate { get; set; }
 
         [Display(Name = "Specification"), MaxLength(10)]
         public string Specification { get; set; }

@@ -2162,6 +2162,7 @@ namespace Jobs.Controllers
             s.JobReceiveHeaderId = Id;
             s.JobReceiveHeaderDocNo = H.DocNo;
             s.JobWorkerId = JobWorkerId;
+			s.ProcessId = H.ProcessId;
             PrepareViewBag(s);
             if (!string.IsNullOrEmpty((string)TempData["CSEXCL"]))
             {

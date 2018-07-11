@@ -88,6 +88,7 @@ namespace Model.ViewModel
         public DateTime DocDate { get; set; }
         public string DocNo { get; set; }
         public string DocTypeName { get; set; }
+		public string ProcessName { get; set; }
         public string Remark { get; set; }
         public int Status { get; set; }
         public string JobWorkerDocNo { get; set; }
@@ -167,6 +168,7 @@ namespace Model.ViewModel
         public int? OrderDocTypeId { get; set; }
         public int? OrderHeaderId { get; set; }
         public int? MachineId { get; set; }
+		public int? ProcessId { get; set; }	
         public string MachineName { get; set; }
 
         //public decimal OrderQty { get; set; }

@@ -2558,7 +2558,7 @@ namespace Jobs.Areas.Rug.Controllers
                             LotNo = p.LotNo,
                             FromProcessId = StockTab.ProcessId,
                             FromProcessName = StockTab.Process.ProcessName,
-                            CurrenctGodownId = PUTab.CurrenctGodownId,
+                            CurrenctGodownId = StockTab.ProductUidId ==null ? StockTab.GodownId : PUTab.CurrenctGodownId,
                             Status = PUTab.Status
 
                         }).FirstOrDefault();

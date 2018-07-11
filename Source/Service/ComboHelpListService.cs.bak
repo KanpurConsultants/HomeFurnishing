@@ -2476,7 +2476,8 @@ namespace Service
                         from BusinessEntityTab in BusinessEntityTable.DefaultIfEmpty()
                         join pp in db.PersonProcess on b.PersonID equals pp.PersonId into PersonProcessTable
                         from PersonProcessTab in PersonProcessTable.DefaultIfEmpty()
-                        where PersonProcessTab.ProcessId == Processid 
+                        where PersonProcessTab.ProcessId == Processid
+                        && (b.IsActive == null ? 1 == 1 : b.IsActive == true)
                         && (string.IsNullOrEmpty(term) ? 1 == 1 : (b.Name.ToLower().Contains(term.ToLower()) || b.Code.ToLower().Contains(term.ToLower())))
                         && BusinessEntityTab.DivisionIds.IndexOf(DivId) != -1
                         && BusinessEntityTab.SiteIds.IndexOf(SiteId) != -1

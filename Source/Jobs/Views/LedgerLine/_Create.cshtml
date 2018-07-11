@@ -244,11 +244,14 @@
     $(document).ready(function () {
         var Nature  =  '@(((string)ViewBag.Nature).ToUpper() == "CR" ? "Dr" : "Cr")'
 
-        @*var SupplementaryNature  =  '@((string)ViewBag.Nature)'
-        if (SupplementaryNature == '')
-            SupplementaryNature = $("#DrCr").val()*@
+        if ($('#DrCr').val() != "" && $('#DrCr').val() != null)
+            Nature  =  $('#DrCr').val().toString().toUpperCase()
 
-
+        $('#DrCr').change(function()
+        {
+            Nature = $('#DrCr').val().toString().toUpperCase()
+            CustomSelectFunctionForLedgerId_Adjusted($("#SupplementaryForLedgerId"), '/LedgerLine/GetLedgerIds_Supplementary', '/ComboHelpList/SetSingleLedger', ' ', false, 0, $('#LedgerAccountId','.modal-body').val(),Nature, $('#LedgerHeaderId', '.modal-body').val());
+        })
 
         CustomSelectFunction($("#LedgerAccountId"), '/LedgerLine/GetLedgerAccount', '/ComboHelpList/SetSingleAccount', ' ', false, 0,$('#LedgerHeaderId','.modal-body').val());
         CustomSelectFunction($("#CostCenterId"), '/LedgerLine/GetCostCenters', '/ComboHelpList/SetSingleCostCenter', ' ', false, 0,$('#LedgerHeaderId','.modal-body').val());
@@ -269,7 +272,7 @@
         $('#LedgerAccountId').change(function()
         {
             CustomSelectFunctionForLedgerId_Adjusted($("#ReferenceId"), '/LedgerLine/GetLedgerIds_Adusted', '/ComboHelpList/SetSingleLedger', ' ', false, 0, $('#LedgerAccountId','.modal-body').val(),Nature, $('#LedgerHeaderId', '.modal-body').val());
-            CustomSelectFunctionForLedgerId_Adjusted($("#SupplementaryForLedgerId"), '/LedgerLine/GetLedgerIds_Supplementary', '/ComboHelpList/SetSingleLedger', ' ', false, 0, $('#LedgerAccountId','.modal-body').val(),SupplementaryNature, $('#LedgerHeaderId', '.modal-body').val());
+            CustomSelectFunctionForLedgerId_Adjusted($("#SupplementaryForLedgerId"), '/LedgerLine/GetLedgerIds_Supplementary', '/ComboHelpList/SetSingleLedger', ' ', false, 0, $('#LedgerAccountId','.modal-body').val(),Nature, $('#LedgerHeaderId', '.modal-body').val());
         })
 
         $('#ReferenceDocTypeId').change(function()

@@ -660,10 +660,6 @@ namespace Jobs.Controllers
             }
             if (ModelState.IsValid && BeforeSave && !EventException)
             {
-                JobReceiveHeader Header = new JobReceiveHeaderService(_unitOfWork).Find(vm.JobReceiveLineViewModel.FirstOrDefault().JobReceiveHeaderId);
-
-                JobReceiveSettings Settings = new JobReceiveSettingsService(_unitOfWork).GetJobReceiveSettingsForDocument(Header.DocTypeId, Header.DivisionId, Header.SiteId);
-
                 var JobOrderLineIds = vm.JobReceiveLineViewModel.Select(m => m.JobOrderLineId).ToArray();
 
                 var JobOrderLineCostCenterRecords = (from p in db.JobOrderLine
@@ -2234,6 +2230,15 @@ namespace Jobs.Controllers
             if (svm.JobReceiveSettings.isVisibleMachine && svm.JobReceiveSettings.isMandatoryMachine && (svm.MachineId <= 0 || svm.MachineId == null))
             {
                 ModelState.AddModelError("MachineId", "The Machine field is required");
+            }
+
+            if (settings.isMandatoryLotNo == true && svm.LotNo == null)
+            {
+                ModelState.AddModelError("LotNo", "The LotNo field is required");
+            }
+            if (settings.isMandatoryLotNoOrDimension1 == true && svm.LotNo == null && svm.Dimension1Id == null)
+            {
+                ModelState.AddModelError("LotNo", "The LotNo field is required");
             }
 
             //if (svm.OrderBalanceQty < svm.DocQty)

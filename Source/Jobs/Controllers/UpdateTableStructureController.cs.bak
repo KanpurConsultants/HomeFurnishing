@@ -150,6 +150,7 @@ namespace Module
             AddFields("ProductTypeSettings", "isVisibleConsumptionDetail", "BIT");
             AddFields("ProductTypeSettings", "isVisibleProductProcessDetail", "BIT");
 
+			AddFields("DocumentTypeHeaderAttributes", "IsCustomUI", "BIT");	
             AddFields("ProductTypeSettings", "ProductNameCaption", "NVARCHAR(Max)");
             AddFields("ProductTypeSettings", "ProductCodeCaption", "NVARCHAR(Max)");
             AddFields("ProductTypeSettings", "ProductDescriptionCaption", "NVARCHAR(Max)");
@@ -200,6 +201,10 @@ namespace Module
             AddFields("SaleInvoiceSettings", "isVisibleSalesExecutive", "BIT");
             AddFields("SaleInvoiceHeaders", "FinancierId", "Int", "People");
             AddFields("SaleInvoiceHeaders", "SalesExecutiveId", "Int", "People");
+            AddFields("SaleInvoiceHeaders", "PaymentTermsId", "Int", "PaymentTerms");
+
+            AddFields("People", "SisterConcernSiteId", "Int", "Sites");
+            AddFields("People", "SisterConcernDivisionId", "Int", "Divisions");
 
             AddFields("SaleInvoiceSettings", "isVisibleBLNo", "BIT");
             AddFields("SaleInvoiceSettings", "isVisibleCircularNo", "BIT");
@@ -3405,6 +3410,7 @@ namespace Module
 
 
             AddFields("PersonSettings", "CalculationId", "Int", "Calculations");
+            AddFields("LedgerSettings", "CalculationId", "Int", "Calculations");
 
             AddFields("Employee", "EmployeeId", "INT IDENTITY NOT NULL");
             AddFields("Employees", "BasicSalary", "Decimal(18,4)");
@@ -3946,6 +3952,42 @@ namespace Module
 
             AddFields("Narrations", "DocTypeId", "Int","DocumentTypes");
 
+            AddFields("LedgerLines", "SupplementaryForLedgerId", "Int", "Ledgers");
+
+
+            try
+            {
+                if ((int)ExecuteScaler("SELECT Count(*) AS Cnt FROM INFORMATION_SCHEMA.Tables WHERE TABLE_NAME = 'LedgerSupplementaries'") == 0)
+                {
+                    mQry = @"CREATE TABLE Web.LedgerSupplementaries
+	                        (
+	                        Id                    INT IDENTITY NOT NULL,
+	                        LedgerId              INT NOT NULL,
+	                        SupplementaryLedgerId INT NOT NULL,
+	                        Amount                DECIMAL (18, 4) NOT NULL,
+	                        CreatedBy             NVARCHAR (max) NULL,
+	                        ModifiedBy            NVARCHAR (max) NULL,
+	                        CreatedDate           DATETIME NOT NULL,
+	                        ModifiedDate          DATETIME NOT NULL,
+	                        OMSId                 NVARCHAR (50) NULL,
+	                        CONSTRAINT [PK_Web.LedgerSupplementaries] PRIMARY KEY (Id),
+	                        CONSTRAINT [FK_Web.LedgerSupplementaries_Web.Ledgers_LedgerId] FOREIGN KEY (LedgerId) REFERENCES Web.Ledgers (LedgerId),
+	                        CONSTRAINT [FK_Web.LedgerSupplementaries_Web.Ledgers_SupplementaryLedgerId] FOREIGN KEY (SupplementaryLedgerId) REFERENCES Web.Ledgers (LedgerId)
+	                        )
+
+                        CREATE INDEX IX_LedgerId
+	                        ON Web.LedgerSupplementaries (LedgerId)
+
+                        CREATE INDEX IX_SupplementaryLedgerId
+	                        ON Web.LedgerSupplementaries (SupplementaryLedgerId)
+                         ";
+                    ExecuteQuery(mQry);
+                }
+            }
+            catch (Exception ex)
+            {
+                RecordError(ex);
+            }
 
 
 

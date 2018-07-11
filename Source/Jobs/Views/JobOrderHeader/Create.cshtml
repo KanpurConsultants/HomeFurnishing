@@ -1273,6 +1273,7 @@
 
         $("#ProcessId").change(function(){
             CustomSelectFunction($("#OrderById"), '/ComboHelpList/GetEmployeeWithProcess', '/ComboHelpList/SetSingleEmployee', ' ', false, 0, $('#ProcessId').val());
+            CustomSelectFunctionWithMultipleFilters($("#JobWorkerId"), '/JobOrderHeader/GetCustomPerson_WithProcess', '/ComboHelpList/SetSinglePerson', ' ', false, 0,$('#DocTypeId').val(),$('#ProcessId').val());
         });
 
         if ($("#ProcessId").is(":hidden") == false)
