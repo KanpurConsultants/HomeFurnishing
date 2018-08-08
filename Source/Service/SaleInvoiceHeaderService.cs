@@ -246,6 +246,25 @@ namespace Service
                                                   NetAmount = SaleInvoiceHeaderChargesTab.Amount
                                               };
 
+            var SaleInvoiceCancelDetail = from Sih in db.SaleInvoiceHeader
+                       join Sil in db.SaleInvoiceLine on Sih.SaleInvoiceHeaderId equals Sil.SaleInvoiceHeaderId into SaleInvoiceLineTable from SaleInvoiceLineTab in SaleInvoiceLineTable.DefaultIfEmpty()
+                       join L in db.SaleInvoiceReturnLine on SaleInvoiceLineTab.SaleInvoiceLineId equals L.SaleInvoiceLineId into SaleInvoiceReturnLineTable from SaleInvoiceReturnLineTab in SaleInvoiceReturnLineTable.DefaultIfEmpty()
+                       join H in db.SaleInvoiceReturnHeader on SaleInvoiceReturnLineTab.SaleInvoiceReturnHeaderId equals H.SaleInvoiceReturnHeaderId into SaleInvoiceReturnHeaderTable from SaleInvoiceReturnHeaderTab in SaleInvoiceReturnHeaderTable.DefaultIfEmpty()
+                       join Hc in db.SaleInvoiceReturnHeaderCharge on SaleInvoiceReturnHeaderTab.SaleInvoiceReturnHeaderId equals Hc.HeaderTableId into SaleInvoiceReturnHeaderChargeTable
+                       from SaleInvoiceReturnHeaderChargeTab in SaleInvoiceReturnHeaderChargeTable.DefaultIfEmpty()
+                       join C in db.Charge on SaleInvoiceReturnHeaderChargeTab.ChargeId equals C.ChargeId into ChargeTable
+                       from ChargeTab in ChargeTable.DefaultIfEmpty()
+                       join D in db.DocumentType on SaleInvoiceReturnHeaderTab.DocTypeId equals D.DocumentTypeId into DocumentTypeTable
+                       from DocumentTypeTab in DocumentTypeTable.DefaultIfEmpty()
+                       where DocumentTypeTab.Nature == TransactionNatureConstants.Return && ChargeTab.ChargeName == "Net Amount"
+                       select new
+                       {
+                           SaleInvoiceHeaderId = Sih.SaleInvoiceHeaderId,
+                           CancelNetAmount = SaleInvoiceReturnHeaderChargeTab.Amount
+                       };
+
+
+
             var TempProductDetail = from H in db.SaleInvoiceHeader
                                     join L in db.SaleInvoiceLine on H.SaleInvoiceHeaderId equals L.SaleInvoiceHeaderId into SaleInvoiceLineTable
                                     from SaleInvoiceLineTab in SaleInvoiceLineTable.DefaultIfEmpty()
@@ -266,11 +285,13 @@ namespace Service
                        from SaleInvoiceHeaderChargesTab in SaleInvoiceHeaderChargesTable.DefaultIfEmpty()
                        join Tp in TempProductDetail on p.SaleInvoiceHeaderId equals Tp.SaleInvoiceHeaderId into TempProductDetailTable
                        from TempProductDetailTab in TempProductDetailTable.DefaultIfEmpty()
+                       join Sc in SaleInvoiceCancelDetail on p.SaleInvoiceHeaderId equals Sc.SaleInvoiceHeaderId into SaleInvoiceCancelDetailTable from SaleInvoiceCancelDetailTab in SaleInvoiceCancelDetailTable.DefaultIfEmpty()
                        orderby p.DocDate descending, p.DocNo descending
                        where p.DivisionId == DivisionId && p.SiteId == SiteId && p.DocTypeId == id
                        select new SaleInvoiceHeaderIndexViewModel
                        {
-                           Remark = p.Remark,
+                           //Remark = p.Remark,
+                           Remark = (SaleInvoiceHeaderChargesTab.NetAmount == (SaleInvoiceCancelDetailTab.CancelNetAmount ?? 0) ? "Cancelled." : ((SaleInvoiceCancelDetailTab.CancelNetAmount ?? 0) != 0 ? "Partially Cancelled." : "")) + p.Remark ,
                            DocDate = p.DocDate,
                            SaleInvoiceHeaderId = p.SaleInvoiceHeaderId,
                            DocNo = p.DocNo,
@@ -290,6 +311,7 @@ namespace Service
                            ProductUidName = TempProductDetailTab.ProductUidName,
                            ProductName = TempProductDetailTab.ProductName,
                            ProductGroupName = TempProductDetailTab.ProductGroupName,
+
 
                            DecimalPlaces = (from o in p.SaleInvoiceLines
                                             join rl in db.SaleDispatchLine on o.SaleDispatchLineId equals rl.SaleDispatchLineId

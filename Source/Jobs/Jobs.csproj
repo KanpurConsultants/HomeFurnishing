@@ -5330,6 +5330,7 @@
     <Content Include="Views\Narration\Index.cshtml" />
     <Content Include="Views\TaxReturn\TaxReturn.cshtml" />
     <Content Include="Views\Display_StockBalance\Display_StockBalance.cshtml" />
+    <Content Include="Views\SaleInvoiceHeader\_InvoiceReturn.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

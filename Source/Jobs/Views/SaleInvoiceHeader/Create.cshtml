@@ -101,6 +101,7 @@
                         <li><a href="@Url.Action("Email", "SaleInvoiceHeader")"><span class="glyphicon glyphicon-envelope"> </span> Email</a></li>
                         <li role="separator" class="divider"></li>
                         <li><a href="@Url.Action("Report", "SaleInvoiceHeader")"><span class="glyphicon glyphicon-th"> </span> Report</a></li>
+                        <li><a id="InvoiceReturn" data-modal="" href="@Url.Action("_CreateInvoiceReturn", "SaleInvoiceHeader", new { id = Model.SaleInvoiceHeaderId })"><span class="glyphicon glyphicon-remove"> </span> Cancel Invoice</a></li>
                     </ul>
                 </div>
             </div>
