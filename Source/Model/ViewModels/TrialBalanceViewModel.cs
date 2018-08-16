@@ -130,6 +130,11 @@ namespace Model.ViewModel
 
         public decimal? TotalDebit { get; set; }
         public decimal? TotalCredit { get; set; }
+
+        public int? ParentGRCode { get; set; }
+        public string ParentGRCodeCredit { get; set; }
+        public int RowNumber { get; set; }
+
     }
 
     [Serializable()]
@@ -143,6 +148,9 @@ namespace Model.ViewModel
         public string GRNameCredit { get; set; }
         public string ReportType { get; set; }
         public string OpenReportType { get; set; }
+
+        public int? ParentGRCode { get; set; }
+        public string ParentGRCodeCredit { get; set; }
 
         public decimal? TotalDebit { get; set; }
         public decimal? TotalCredit { get; set; }

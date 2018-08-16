@@ -270,7 +270,6 @@
                         <PaddingBottom>2pt</PaddingBottom>
                       </Style>
                     </Textbox>
-                    <rd:Selected>true</rd:Selected>
                   </CellContents>
                 </TablixCell>
               </TablixCells>
@@ -2371,12 +2370,6 @@
           </QueryParameter>
           <QueryParameter Name="@Godown">
             <Value>=Parameters!Godown.Value</Value>
-          </QueryParameter>
-          <QueryParameter Name="@Dimension1">
-            <Value>=Parameters!Dimension1.Value</Value>
-          </QueryParameter>
-          <QueryParameter Name="@Dimension2">
-            <Value>=Parameters!Dimension2.Value</Value>
           </QueryParameter>
         </QueryParameters>
         <CommandType>StoredProcedure</CommandType>

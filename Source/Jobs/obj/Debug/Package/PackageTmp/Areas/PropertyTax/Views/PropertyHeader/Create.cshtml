@@ -1,0 +1,1112 @@
+﻿@model Model.ViewModels.PropertyHeaderViewModel
+@using Core.Common
+@using Components.Logging
+
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="~/Content/ImagePreview.css" rel="stylesheet" />
+
+
+<!-- modal placeholder-->
+<div id='myModal' class='modal fade in'>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+@*<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>*@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-fileinput/4.4.5/js/plugins/piexif.min.js" type="text/javascript"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-fileinput/4.4.5/js/plugins/sortable.min.js" type="text/javascript"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-fileinput/4.4.5/js/plugins/purify.min.js" type="text/javascript"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" type="text/javascript"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-fileinput/4.4.5/js/fileinput.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-fileinput/4.4.5/themes/fa/theme.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-fileinput/4.4.5/js/(lang).js"></script>
+
+@*<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css">*@
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-fileinput/4.4.5/css/fileinput.min.css" media="all" rel="stylesheet" type="text/css" />
+
+
+@using (Html.BeginForm("Post", "PropertyHeader", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.PersonAddressId)
+    @Html.HiddenFor(m => m.SiteIds)
+    @Html.HiddenFor(m => m.Status)
+    @Html.HiddenFor(m => m.DivisionIds)
+    @Html.HiddenFor(m => m.DocTypeId)
+    @Html.HiddenFor(m => m.PersonID)
+    @Html.HiddenFor(m => m.LedgerAccountId)
+    @Html.HiddenFor(m => m.DocTypeId)
+    @Html.HiddenFor(m => m.CreatedDate)
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+
+            @CustomHelpers.RenderResHeaderInfo(ViewBag.transactionType, (int?)ViewBag.PendingToSubmit, (int?)ViewBag.PendingToReview, ViewBag.Name)
+            @*@if (ViewBag.transactionType == "submit" || ViewBag.transactionType == "submitContinue")
+            {<h3 style="border-bottom:0px solid #e1dada;padding-bottom:0px;">
+                <button type="submit" name="Command:Submit" class="btn btn-primary right" id="SubmitContinue" style="margin-left:5px;">Submit & Next<span class='badge'>@(ViewBag.PendingToSubmit != 0 ? ViewBag.PendingToSubmit : "")</span></button>
+                <button type="submit" name="Command:Submit" class="btn btn-primary right">Submit</button>
+                <input type="hidden" id="IsContinue" name="IsContinue" value="" />
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>Submit @ViewBag.Name</span>
+            </h3>}
+            else if (ViewBag.transactionType == "review" || ViewBag.transactionType == "ReviewContinue")
+            {<h3 style="border-bottom:0px solid #e1dada;padding-bottom:0px;">
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span> Review @ViewBag.Name</span>
+                <button type="submit" name="Command:Review" class="btn btn-primary right" style="margin-left:5px" id="ReviewContinue">Review & Next<span class='badge'>@(ViewBag.PendingToReview != 0 ? ViewBag.PendingToReview : "")</span></button>
+                <button type="submit" class="btn btn-primary right" name="Command:Review">Review</button>
+                <input type="hidden" id="IsContinue" name="IsContinue" value="" />
+            </h3>}
+            else if (ViewBag.transactionType == "detail")
+            {
+                <h3>
+                    <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>@ViewBag.Name</span>
+                </h3>
+            }
+            else
+            {
+                <h3 style="border-bottom:0px solid #e1dada;padding-bottom:0px;">
+                    <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span> @ViewBag.Name</span>
+                    <input type="submit" value="Save" class="btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9" />
+                </h3>
+            }*@
+            <hr style="margin-top: 5px; margin-bottom: 5px; border-top: 1px solid #d8d5d5" />
+
+
+            @{
+                string EditAction = "";
+                if (Model.Status == (int)StatusConstants.Drafted || Model.Status == (int)StatusConstants.Import)
+                {
+                    EditAction = "Modify";
+                }
+                else if ((Model.Status == (int)StatusConstants.Submitted || Model.Status == (int)StatusConstants.Modified))
+                {
+                    EditAction = "ModifyAfter_Submit";
+                }
+                else
+                {
+                    EditAction = "DetailInformation";
+                }
+            }
+            <div class="panel-info">             
+                <div class="btn-group">
+                    @Html.ActionLink(" ", "Create", "PropertyHeader", new { @id = @ViewBag.id, @GodownId = @ViewBag.GodownId }, new { @class = "cbtn btn-circle glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                    @*@Html.ActionLink(" ", "Create", "PropertyHeader", new { @id = ViewBag.id }, new { @class = "cbtn btn-circle glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip", target = "" })*@
+                    @Html.ActionLink(" ", EditAction, "PropertyHeader", new { @id = Model.PersonID, IndexType = ViewBag.IndexStatus }, new { @class = "cbtn btn-circle glyphicon glyphicon-edit", @title = "Edit", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "GeneratePrints", "PropertyHeader", new { Ids = Model.PersonID, DocTypeId = Model.DocTypeId }, new { @class = "cbtn btn-circle glyphicon glyphicon-print toolbar", @title = "Print", @data_toggle = "tooltip", @id = "PrintRecordC", target = "_blank" })
+                    @Html.ActionLink(" ", "GenerateInvoicePrints", "PropertyHeader", null, new { @class = "cbtn btn-circle glyphicon glyphicon-list-alt toolbar", @title = "Bill Print", @data_toggle = "tooltip", @id = "PrintRecordI", target = "_blank" })
+                    @Html.ActionLink(" ", "PrevPage", "PropertyHeader", new { DocId = @Model.PersonID, DocTypeId = Model.DocTypeId }, new { @class = "cbtn btn-circle glyphicon glyphicon-arrow-left toolbar", @title = "Prev Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "NextPage", "PropertyHeader", new { DocId = @Model.PersonID, DocTypeId = Model.DocTypeId }, new { @class = "cbtn btn-circle glyphicon glyphicon-arrow-right toolbar", @title = "Next Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Index", "PropertyHeader", new { id = ViewBag.id, GodownId = @Model.GodownId, IndexType = ViewBag.IndexStatus }, new { @class = "cbtn btn-circle glyphicon glyphicon-list toolbar", @title = "List", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Create", "Collection", new { @id = ViewBag.CollectionDocTypeId, @PersonId = Model.PersonID }, new { @class = "cbtn btn-circle glyphicon glyphicon-log-out toolbar", @title = "Collection", @data_toggle = "tooltip", target = "_blank" })
+                    @*@Html.ActionLink(" ", "GIS", "PropertyHeader", null, new { @class = "cbtn btn-circle glyphicon glyphicon-list toolbar", @title = "List", @data_toggle = "tooltip" })*@
+                </div>
+                <div class="btn-group">
+                    <a class="cbtn btn-circle glyphicon glyphicon-option-horizontal dropdown-toggle" aria-expanded="false" style="padding-top: 6px;padding-bottom: 6px;" href="#" data-toggle="dropdown" id="dropdownMenu1">
+                    </a>
+                    <ul class="dropdown-menu pull-right" aria-labelledby="dropdownMenu1">
+                        <li><a id="DocHistory" data-modal="" href="@Url.Action("GetHistory", "LogHistory", new { Ids = Model.PersonID, DocTypeId = Model.DocTypeId })"><span class="glyphicon glyphicon-user"> </span> History</a></li>
+                        @*<li><a href="@Url.Action("Email", "PropertyHeader")"><span class="glyphicon glyphicon-envelope"> </span> Email</a></li>*@
+                        @*<li role="separator" class="divider"></li>
+                        <li><a href="@Url.Action("Report", "PropertyHeader")"><span class="glyphicon glyphicon-th"> </span> Report</a></li>*@
+                    </ul>
+                </div>
+            </div>
+           
+
+        </div>
+
+        <div class="panel-info" style="padding-left:15px">
+
+            <div class="form-horizontal">
+
+                @Html.ValidationSummary(true)
+                <div class="row">
+                    <h4 class="col-md-12 black">
+                        <span class="glyphicon glyphicon-align-justify"></span>
+                        1.Property Details
+                    </h4>
+                    <div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-top:15px">
+                                    @Html.LabelFor(model => model.Code, "Property Id", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.Code, null, new { @class = "form-control col-xs-6 ", @readonly = "true" })
+                                        @Html.ValidationMessageFor(m => m.Code, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-top:15px">
+                                    @Html.LabelFor(model => model.ParentId, "Base Property Id", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.ParentId, new { @class = "form-control col-xs-6 " })
+                                        @Html.ValidationMessageFor(model => model.ParentId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.GISId, "GIS Id", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.GISId, new { @class = "form-control col-xs-6 " })
+                                        @Html.ValidationMessageFor(m => m.GISId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.GodownId, "Ward No.", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.GodownId, new { @class = "form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(m => m.GodownId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.BinLocationId, "Chak No.", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.BinLocationId, new { @class = "form-control col-xs-6 " })
+                                        @Html.ValidationMessageFor(m => m.BinLocationId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.HouseNo, "House No.", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.HouseNo, new { @class = "form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(model => model.HouseNo, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.OldHouseNo, "Old House No.", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.OldHouseNo, new { @class = "form-control col-xs-6 " })
+                                        @Html.ValidationMessageFor(model => model.OldHouseNo, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.AreaId, "Area", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.AreaId, new { @class = "form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(m => m.AreaId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Name, "Owner Name", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.Name, new { @class = "form-control col-xs-6  required" })
+                                        @Html.ValidationMessageFor(m => m.Name, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.FatherName, "Father/Husband Name", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.FatherName, new { @class = "form-control col-xs-6  required" })
+                                        @Html.ValidationMessageFor(model => model.FatherName, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Address, "Address", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextAreaFor(m => m.Address, new { @class = "form-control col-xs-6  required" })
+                                        @Html.ValidationMessageFor(model => model.Address, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ZipCode, "Pin Code", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.ZipCode, new { @class = "form-control col-xs-6 " })
+                                        @Html.ValidationMessageFor(model => model.ZipCode, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                           
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.AadharNo, "Aadhar No.", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.AadharNo, new { @class = "form-control col-xs-6 " })
+                                        @Html.ValidationMessageFor(model => model.AadharNo, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Mobile, "Mobile", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.Mobile, new { @class = "form-control col-xs-6 " })
+                                        @Html.ValidationMessageFor(model => model.Mobile, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Email, "Email", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.Email, new { @class = "form-control col-xs-6 " })
+                                        @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.CasteId, "Caste", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.CasteId, new { @class = "form-control col-xs-6  required" })
+                                        @Html.ValidationMessageFor(model => model.CasteId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ReligionId, "Religion", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.ReligionId, new { @class = "form-control col-xs-6  required" })
+                                        @Html.ValidationMessageFor(model => model.ReligionId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.PersonRateGroupId, "Road Width", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.PersonRateGroupId, new { @class = "form-control col-xs-6  required" })
+                                        @Html.ValidationMessageFor(model => model.PersonRateGroupId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.TotalTax, "Total Tax", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.TotalTax, new { @class = "form-control col-xs-6  ", @readonly = "true" })
+                                        @Html.ValidationMessageFor(model => model.TotalTax, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            @if (Model.DocumentTypeAttributes != null)
+                            {
+                                for (int i = 0; i < Model.DocumentTypeAttributes.Count; i++)
+                                {
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.Label(Model.DocumentTypeAttributes[i].Name, new { @class = "control-label col-md-4 col-sm-2" })
+                                            @Html.HiddenFor(m => Model.DocumentTypeAttributes[i].Name)
+                                            @Html.HiddenFor(m => Model.DocumentTypeAttributes[i].DocumentAttributeId)
+                                            @Html.HiddenFor(m => Model.DocumentTypeAttributes[i].DocumentTypeAttributeId)
+                                            @if (Model.DocumentTypeAttributes[i].DataType == "List")
+                                            {
+                                                List<SelectListItem> tem = new List<SelectListItem>();
+                                                foreach (string item in (Model.DocumentTypeAttributes[i].ListItem).Split(',').ToList())
+                                                {
+                                                    tem.Add(new SelectListItem { Text = item, Value = item, Selected = (Model.DocumentTypeAttributes[i].DefaultValue == item ? true : false) });
+                                                }
+
+
+                                                <div class="col-md-6 col-sm-10">
+                                                    @Html.DropDownListFor(m => Model.DocumentTypeAttributes[i].DefaultValue, new SelectList(tem as System.Collections.IEnumerable, "Value", "Text", Model.DocumentTypeAttributes[i].DefaultValue), " ", new { @class = "form-control col-xs-6 height" })
+                                                    @*<input type="text" name="@(item.Name)s" value=@item.DefaultValue class="form-control col-xs-6" />*@
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="col-md-6 col-sm-10">
+                                                    @Html.TextBoxFor(m => Model.DocumentTypeAttributes[i].DefaultValue, new { @class = "form-control col-xs-6" })
+                                                    @*<input type="text" name="@(item.Name)s" value=@item.DefaultValue class="form-control col-xs-6" />*@
+                                                </div>
+                                            }
+
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <hr />
+
+                <div class="row">
+                    <h4 class="col-md-12 black" style="margin-top:15px">
+                        <span class="glyphicon glyphicon-shopping-cart"></span>
+                        2.Detail
+                    </h4>
+                </div>
+
+                <div class="panel-info">
+                    <h5 style="padding:5px 0 3px 0;margin:0px;font-weight:bold">
+                        <span class="glyphicon glyphicon-plus-sign"></span>
+                        @{string Action = "";
+                        if (Model.Status == (int)StatusConstants.Drafted || Model.Status == (int)StatusConstants.Import)
+                        { Action = "CreateLine"; }
+                        else if (Model.Status == (int)StatusConstants.Submitted || Model.Status == (int)StatusConstants.Modified)
+                        { Action = "CreateLineAfter_Submit"; }
+                        }
+                        @Html.ActionLink("Add New Row ", Action, "PropertyLine", new { id = @Model.PersonID, IsProdBased = false }, new { data_modalCustom = "", id = "btnCreatePO", @class = "toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                    </h5>
+                </div>
+                <div style="padding-right:15px">
+
+
+
+                    <div class="panel panel-default" id="grid">
+
+                        <div class="panel-heading headrow">
+                            <div class="row grid-head">
+                                <div class="text-left block" style="width: 5%; ">
+                                    Srl.
+                                </div>
+                                <div class="block" style="width: 90%;">
+                                    <div class="row">
+                                        @*ProductInfo*@
+                                        <div class="block" style="width: 23%; ">
+                                            Date Of Consutruction
+                                        </div>
+                                        @*Dyeing Ratio*@
+                                        <div class="text-right block" style="width: 11%;">
+                                            Construction Type
+                                        </div>
+                                        @*Testing Qty*@
+                                        <div class="text-right block" style="width: 11%;">
+                                            Property Type
+                                        </div>
+                                        @*Doc Qty*@
+                                        <div class="text-right block" style="width: 11%;">
+                                            Discount Type
+                                        </div>
+                                        @*Excess Qty*@
+                                        <div class="text-right block" style="width: 11%;">
+                                            Property Area
+                                        </div>
+                                        @*Qty*@
+                                        <div class="text-right block" style="width: 11%;">
+                                            Taxable Area
+                                        </div>
+                                        @*Rate*@
+                                        <div class="text-right block" style="width: 11%;">
+                                            ARV
+                                        </div>
+                                        @*Amount*@
+                                        <div class="text-right block" style="width: 11%; ">
+                                            Tenant Name
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="" style="width:5%">
+
+                                </div>
+                            </div>
+
+                        </div>
+
+
+                        <div class="panel-info" id="gbody">
+
+
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <h4 class="col-md-12 black" style="margin-top:15px">
+                            <span class="glyphicon glyphicon-shopping-cart"></span>
+                            3.Attachments
+                        </h4>
+                    </div>
+
+                    @*<input id="input-id" type="file" class="file" data-preview-file-type="text" multiple type="file">*@
+                    <div class="panel-info file-loading">
+                        <input id="input-ficons-1" name="input-ficons-1[]" multiple type="file">
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+
+<script>
+    var AttachmentArr= new Array();
+    var initialPreviewConfigArr= new Array();
+    function Get_Attachments() {
+        var ProcessProgress = $("#Prod Order detail loading progress");
+        ProcessProgress.show();
+        $.ajax({
+            cache: false,
+            async : false,
+            type: "POST",
+            url: "@(Url.Action("GetAttachmentJson"))",
+            data: { DocId: $("#PersonID").val(), DocTypeId: $("#DocTypeId").val()},
+        success: function (data) {
+            if (data != null)
+            {
+                for(var i=0;i <= data.length-1;i ++ )
+                {
+                    if (data[i].FileName.includes(".pdf"))
+                    {
+                        AttachmentArr.push('<embed class="kv-preview-data file-preview-pdf" src="/Uploads/'+ data[i].FileFolderName +'/'+ data[i].FileName +'" type="application/pdf" {style}>\n')
+                        initialPreviewConfigArr.push({type: "pdf", size: 8000, caption: data[i].FileName + ".pdf", url: "/" + data[i].FileFolderName + "/" + data[i].FileName, key: i, downloadUrl: true})
+                    }
+                    else
+                    {
+                        AttachmentArr.push('<img class="file-preview-image kv-preview-data" src="/Uploads/'+ data[i].FileFolderName +'/'+ data[i].FileName +'">')
+                        initialPreviewConfigArr.push({caption: data[i].FileName + ".jpg", size: 827000, width: "120px", url: "/" + data[i].FileFolderName + "/" + data[i].FileName, key: i, downloadUrl: true})
+                        console.log("/" + data[i].FileFolderName + "/" + data[i].FileName);
+                    }
+                    
+
+                    
+                }
+            }
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert('Failed to retrieve Prod Order details.' + thrownError);
+            ProcessProgress.hide();
+        }
+    });
+    }
+
+
+
+    $("#input-ficons-1").load(Get_Attachments());
+
+    $("#input-ficons-1").fileinput({
+        
+        uploadUrl: "/PropertyHeader/AttachDocument?DocId="+ $("#PersonID").val() +"&DocTypeId="+ $("#DocTypeId").val(),
+        overwriteInitial: false,
+        initialPreview: AttachmentArr,
+        initialPreviewConfig: initialPreviewConfigArr,
+        allowedFileTypes: ['image', 'pdf'],
+        uploadAsync: true,
+        previewFileIcon: '<i class="fa fa-file"></i>',
+        previewFileIconSettings: {
+            'docx': '<i class="fa fa-file-word-o text-primary"></i>',
+            'xlsx': '<i class="fa fa-file-excel-o text-success"></i>',
+            'pptx': '<i class="fa fa-file-powerpoint-o text-danger"></i>',
+            'jpg': '<i class="fa fa-file-photo-o text-warning"></i>',
+            'pdf': '<i class="fa fa-file-pdf-o text-danger"></i>',
+            'zip': '<i class="fa fa-file-archive-o text-muted"></i>',
+        }
+    });
+
+</script>
+
+
+    @if ((ViewBag.Mode == "Add") || (ViewBag.Mode == "Edit"))
+{
+
+    <script type="text/javascript">
+
+            //Reloading the table contents on modal hide
+            //$('#myModal').on('hidden.bs.modal', function () {
+            //    window.location.reload();
+            //});
+
+
+
+            //For Populating Modal PopUp on DoubleClick Of Row
+            $('#gbody').on("dblclick",'.grid-body',function(){
+                var editurl=$(this).find('a[edit]').attr('href');
+                $('#myModalContent').load(editurl, function () {
+                    //alert('2');
+                    $('#myModal').modal({
+                        backdrop: 'static',
+                        keyboard: true
+                    }, 'show');
+
+                    bindForm1(this);
+                });
+            });
+
+
+    //For Handling Modal PopUp on Clicking Delete Icon
+    $('#gbody').on("click",'a[delete]', function (e) {
+        $('#myModalContent').load(this.href, function () {
+            //alert('2');
+            $('#myModal').modal({
+                backdrop: 'static',
+                keyboard: true
+            }, 'show');
+
+            bindForm1(this);
+        });
+        return false;
+    });
+
+    //For Handling Modal PopUp on Clicking Delete Icon
+    $('#gbody').on("click",'a[Detail]', function (e) {
+        $('#myModalContent').load(this.href, function (response, status, xhr) {
+            //alert('2');
+            if ( status == "error" ) {
+                var msg = "Sorry but there was an error: ";
+            }
+            else
+            {
+                $('#myModal').modal({
+                    backdrop: 'static',
+                    keyboard: true
+                }, 'show');
+
+                bindForm1(this);}
+        });
+        return false;
+    });
+
+
+    //Reloading the table contents on modal hide
+    $('#myModal').on('hidden.bs.modal', function () {
+        LoadProducts();
+    });
+
+
+
+
+    //For posting the data through ajax and render the contents sent back from the server
+    function bindForm1(dialog) {
+        //alert("binding1");
+        $('form#modform', dialog).submit(function () {
+            $.ajax({
+                url: this.action,
+                type: this.method,
+                data:$(this).serialize(),
+                success: function (result) {
+                    if (result.success) {
+                        $('#myModal').modal('hide');
+                        //Refresh
+                        //location.reload();
+                        //alert('Data Saved');
+                    }else if(!result.success)
+                    {//alert('Data Saved1');
+                        $('#myModalContent').html(result);
+                        bindForm1();
+                    }
+                    else {
+                        //alert('Data Saved2');
+                        $('#myModalContent').html(result);
+                        bindForm1();
+                    }
+                },
+            });
+            return false;
+        });
+
+    }
+
+    $(function () {
+
+        $.ajaxSetup({ cache: false });
+
+        $("a[data-modalCustom]").on("click", function (e) {
+            // hide dropdown if any
+            if(this.href=="")
+            {
+                return false;
+            }
+            //alert(' Script');
+            $('#myModalContent').load(this.href, function () {
+                $('#myModal').modal({
+                    backdrop: 'static',
+                    keyboard: true
+                }, 'show');
+
+                bindForm1(this);
+            });
+
+            return false;
+        });
+    });
+
+
+
+    var IsSaved=false;
+    var ValidationCount=0;
+
+    $('form').submit(function(event){
+
+        if(!IsSaved)
+        {
+            //if(!ValidateData() || !ValidateCostCenter())
+            if(!ValidateData())
+            {
+                return false;
+            }
+            IsSaved=true;
+            return IsSaved;
+        }
+        else
+        {
+            return false;
+        }
+
+
+    });
+
+
+    function ValidateData() {
+        var DocId=@Model.PersonID;
+        var TempValue;
+        var ValidationMessage="";
+
+
+
+        //Checking for dulicate key value
+        if(DocId<=0)
+        {
+            TempValue= $('#Code').DuplicateCheckForCreate({value: $('#Code').val(), doctype: $('#DocTypeId').val(), url:'/PropertyHeader/DuplicateCheckForCreate/' });
+            if (TempValue){ ValidationMessage=$('#DocNo').val() + " already exist <br />";}
+        }
+        else
+        {
+            TempValue = $('#Code').DuplicateCheckForEdit({ value: $('#Code').val(), doctype: $('#DocTypeId').val(),headerId:DocId, url: '/PropertyHeader/DuplicateCheckForEdit/' });
+            if (TempValue) {ValidationMessage+=$('#DocNo').val() + " already exist <br />";}
+        }
+        if(TempValue)
+        {
+            if($('#validationerrormsg').length==0){
+                $('.panel-info').filter(':eq(1)').before('<div class="alert alert-danger" role="alert" id="validationerrormsg">'+ValidationMessage+'</div>');}
+            else
+            {
+                $('#validationerrormsg').html(ValidationMessage);
+            }
+        }
+
+        return  (ValidationMessage=="");
+    }
+
+
+
+
+</script>
+
+}
+
+
+<script type="text/javascript">
+
+
+    $(document).ready(function () {
+        var id=@Model.PersonID;
+        var DocTypeId=@Model.DocTypeId;
+        if(id==null||id==0)
+        {
+            $(document).find('a#btnCreateF').removeAttr('href').removeAttr('data-modal');
+            $(document).find('a#btnCreate').removeAttr('href').removeAttr('data-modal');
+            $(document).find('a#btnCreatePO').removeAttr('href').removeAttr('data-modal');
+        }
+
+        $(document).ajaxStart(function () {
+            if ($(':submit', 'div.modal-content').length)
+                $(':submit', 'div.modal-content').attr("disabled", 'disabled');
+            return;
+        });
+
+        $(document).ajaxStop(function () {
+            if ($(':submit', 'div.modal-content').length)
+                $(':submit', 'div.modal-content').removeAttr("disabled");
+            return;
+        });
+
+
+        CustomSelectFunction($("#ParentId"), '/PropertyHeader/GetProperty', '/ComboHelpList/SetSinglePerson', ' ', false);
+        CustomSelectFunction($("#GodownId"), '/ComboHelpList/GetGodown', '/ComboHelpList/SetSingleGodown', ' ', false, 0);
+        CustomSelectFunction($("#BinLocationId"), '/ComboHelpList/GetBinLocations', '/ComboHelpList/SetSingleBinLocation', ' ', false, 0,0);
+        CustomSelectFunction($("#AreaId"), '/ComboHelpList/GetArea', '/ComboHelpList/SetSingleArea', ' ', false, 0);
+        CustomSelectFunction($("#CasteId"), '/ComboHelpList/GetCaste', '/ComboHelpList/SetSingleCaste', ' ', false, 0);
+        CustomSelectFunction($("#ReligionId"), '/ComboHelpList/GetReligion', '/ComboHelpList/SetSingleReligion', ' ', false, 0);
+        CustomSelectFunction($("#PersonRateGroupId"), '/ComboHelpList/GetPersonRateGroup', '/ComboHelpList/SetSinglePersonRateGroup', ' ', false, 0);
+
+
+
+
+        $("#GISId").focus();
+
+        //Calling the function to load the table data/ Line information
+        LoadProducts();
+
+        //Adding Hidden Input Fields
+        AddFields();
+
+
+        $("#GodownId").change(function(){
+            $("#BinLocationId").select2("data", { id: null, text: null });
+            CustomSelectFunction($("#BinLocationId"), '/ComboHelpList/GetBinLocation', '/ComboHelpList/SetSingleBinLocation', ' ', false, 0,$("#GodownId").val());
+        });
+
+    });
+
+
+
+
+
+    $("#GodownId,#BinLocationId").change(function(){
+        Get_HouseNo();
+    });
+
+
+    function Get_HouseNo() {
+        var ProcessProgress = $("#Prod Order detail loading progress");
+        ProcessProgress.show();
+        if ($("#GodownId").val() != "" && $("#GodownId").val() != 0 && $("#BinLocationId").val() != "" && $("#BinLocationId").val() != 0)
+        {
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url: "@(Url.Action("GetHouseNoJson"))",
+                data: { GodownId: $("#GodownId").val(), BinLocationId: $("#BinLocationId").val()},
+            success: function (data) {
+                if (data != null)
+                {
+                    $("#HouseNo").val(data);
+                }
+                else{
+                    $("#HouseNo").val("");
+                }
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert('Failed to retrieve Prod Order details.' + thrownError);
+                ProcessProgress.hide();
+            }
+            });
+        }
+        else 
+        {
+                $("#DiscountRate").val("");
+        }
+    }
+
+
+    var id=@Model.PersonID;
+
+
+
+
+
+
+
+    function LoadProducts() {
+        var SelectedRecord='@ViewBag.DocLineId';
+        var DomainName='@System.Configuration.ConfigurationManager.AppSettings["MenuDomain"]';
+        var groupId= @Model.PersonID;
+        var status='@Model.Status';
+        var LineEditUrl;
+        var LineDeleteUrl;
+        if(status==StatusContstantsEnum.Drafted||status==StatusContstantsEnum.Import)
+        {
+            LineEditUrl="/PropertyTax/PropertyLine/_ModifyLine/";
+            LineDeleteUrl="/PropertyTax/PropertyLine/_DeleteLine/";
+        }
+        else if(status==StatusContstantsEnum.Submitted || status == StatusContstantsEnum.Modified )
+        {
+            LineEditUrl="/PropertyTax/PropertyLine/_ModifyLineAfterSubmit/";
+            LineDeleteUrl="/PropertyTax/PropertyLine/_DeleteLine_AfterSubmit/";
+        }
+        else if(status==StatusContstantsEnum.Closed)
+        {
+            LineEditUrl="/PropertyTax/PropertyLine/_ModifyLineAfterApprove/";
+            LineDeleteUrl="/PropertyTax/PropertyLine/_DeleteLine_AfterApprove/";
+        }
+        else if(status==StatusContstantsEnum.Completed)
+        {
+            LineEditUrl="/PropertyLine/_ModifyLineAfterApprove/";
+            LineDeleteUrl="/PropertyLine/_DeleteLine_AfterApprove/";
+        }
+        var link="/PropertyLine/Index/"+groupId;
+        var TotalPropertyArea=0;
+        var TotalTaxableArea=0;
+        var TotalARV=0;
+        var unit=true;
+        var dunit=true;
+        var prevunit;
+        var prevdunit;
+        var decimal=0;
+        var DUdecimal=0;
+        $.ajax({
+            url: link,
+            type: "GET",
+            success: function (data) {
+                var row = ""
+                var srno=1;
+
+                if(data.length!=0)
+                {
+                    if(status!=StatusContstantsEnum.Drafted && status!=StatusContstantsEnum.Import)
+                        $('#GodownId').attr('readonly','true');
+
+                    $.each(data, function (index, item) {
+                        var BarCodeUrl=DomainName+"/Redirect/BarCodeDetail?BarCode="+item.ProductUidName;
+
+                        row += " <div class='row crow grid-body' style='margin-left:0px;margin-right:0px' id='"+item.JobOrderLineId+"'>"
+                            +"      <div class='row-index block'  style='width:5%'>"+srno+"<input type='hidden' class='id' value='"+item.JobOrderLineId+"' /></div>"
+                            +"          <div class='block'  style='width:90%'>"
+                            +"              <div class='row'>"
+                            +"                  <div class='block' style='width:23%'>"+(item.DateOfConsutruction==null?" ":"<strong>"+formatDate('d/m/Y',new Date(parseInt(item.DateOfConsutruction.substr(6))))+"</strong>")
+                            +"                  </div>"
+                            +"                  <div class='text-right block'  style='width:11%'>"+(item.ProductName==null?"0.00":item.ProductName)+"<br />"
+                            +"                  </div>"
+                            +"                  <div class='text-right block'  style='width:11%'>"+(item.Dimension1Name==null?"0.00":item.Dimension1Name)+"<br />"
+                            +"                  </div>"
+                            +"                  <div class='text-right block'  style='width:11%'>"+(item.DiscountTypeName==null?"0.00":item.DiscountTypeName)+"<br />"
+                            +"                  </div>"
+                            +"                   <div class='text-right block'  style='width:11%'>"+(item.PropertyArea==null?" ":item.PropertyArea.toFixed(2))
+                            +"                   </div>"
+                            +"                   <div class=' text-right block'  style='width:11%'>"+(item.TaxableArea==null?" ":item.TaxableArea.toFixed(2))
+                            +"                   </div>"
+                            +"                   <div class=' text-right block'  style='width:11%'>"+(item.ARV==null?" ":item.ARV.toFixed(2))
+                            +"                   </div>"
+                            +"                  <div class='text-right block'  style='width:11%'>"+(item.TenantName==null?" ":item.TenantName)+"<br />"
+                            +"                  </div>"
+                            +"              </div>"
+                            +"          </div>"
+                            +"      <div class='block'  style='width:5%'>"
+                            +"          <a class='glyphicon glyphicon-trash icon-Cus-Size' delete='' href='"+LineDeleteUrl+item.ProductBuyerId+"'></a>"
+                            +"          <a  edit='' href='"+LineEditUrl+item.ProductBuyerId+"'></a>"
+                            +"      </div>"
+                            +"  </div>"
+                            +"<hr style='margin-top:0px;margin-bottom:0px'/>";
+                        TotalPropertyArea+=item.PropertyArea;
+                        TotalTaxableArea+=item.TaxableArea;
+                        TotalARV+=item.ARV;
+                    });
+
+                    row+="<div class='row tfooter' style='padding-top:10px;'>"
+                        +"  <div class='block' style='width:5%'>"
+                        +"  </div>"
+                        +"  <div class='block' style='width:90%'>"
+                        +"      <div class='row'> "
+                        +"          <div class='block'  style='width:23%'><strong>Total</strong></div>"
+                        +"          <div class='block' style='width:11%'>"
+                        +"          </div>"
+                        +"          <div class='block' style='width:11%'>"
+                        +"          </div>"
+                        +"          <div class='block' style='width:11%'>"
+                        +"          </div>"
+                        +"          <div class='block text-right' style='width:11%'><strong>"
+                        +               TotalPropertyArea.toFixed(3)+"</strong>"
+                        +"          </div>"
+                        +"          <div class='block text-right' style='width:11%'><strong>"
+                        +               TotalTaxableArea.toFixed(3)+"</strong>"
+                        +"          </div>"
+                        +"          <div class='block text-right' style='width:11%'><strong>"
+                        +               TotalARV.toFixed(2)+"</strong>"
+                        +"          </div>"
+                        +"      </div>"
+                        +"  </div>"
+                        +"  <div class='block'  style='width:5%'>"
+                        +"  </div>"
+                        +"</div>"
+                    
+                }
+                else
+                {
+                    ;
+                }
+                $("#gbody").html(row);
+                if(SelectedRecord)
+                {
+                    var Id="#"+SelectedRecord
+                    NavigateToLineRecord(Id);}
+
+            },
+            error: function (result) {
+                alert("Error");
+            }
+        });
+    };
+
+
+</script>
+
+
+@if ((ViewBag.Mode != "Add") && (ViewBag.Mode != "Edit"))
+{
+    <script type="text/javascript">
+
+        RemoveFields();
+
+        function RemoveFields(){
+            //Disabling input fields
+            $(':input:not(:submit,#IsContinue)').attr('disabled','disabled');
+
+            //Removing all the events from the newly created lines
+            $('#gbody').unbind();
+
+            //Removing Add New Row ActionLink
+            if($('a#btnCreate').length)
+                $('a#btnCreate').parents('h5')[0].remove();
+            if($('a#btnCreatePO').length)
+                $('a#btnCreatePO').parents('h5')[0].remove();
+            //Preventing the click event on newly created elements
+            $(document).on('click','#gbody a[edit],#gbody a[delete],#gbodyconsumption a',function(event){
+                event.preventDefault();
+            })
+            //Removing the action link from the form so that the request will be redirected to the Submit function in the controller instead of the hardcoded path
+            $('form:last').prop('action','');
+
+            //For Populating Modal PopUp on DoubleClick Of Row
+            //$('#gbody').on("dblclick",'.grid-body',function(){
+            //    var editurl=$(this).find('a[edit]').attr('href');
+            //    $('#myModalContent').load(editurl, function () {
+            //        //alert('2');
+            //        $('#myModal').modal({
+            //            backdrop: 'static',
+            //            keyboard: true
+            //        }, 'show');
+            //    });
+            //});
+        }
+
+
+    </script>
+}
+
+@if ((Model.Status == (int)ActivityTypeContants.Modified || Model.Status == (int)ActivityTypeContants.Submitted)
+    && (ViewBag.transactionType == "submit" || ViewBag.transactionType == "submitContinue" || ViewBag.transactionType == "review" || ViewBag.transactionType == "ReviewContinue"))
+{
+    <script type="text/javascript">
+
+        var TrancType='@ViewBag.transactionType'
+
+        var href = '/ActivityLog/LogEditReason';
+
+        var $btnClicked;
+
+        $(':submit').bind('click', function () {
+            $btnClicked=$(this);
+            $('#myModalContent').load(href, function () {
+
+                $('#myModal').modal({
+                    backdrop: 'static',
+                    keyboard: true
+                }, 'show');
+
+                bindForm1(this);
+            });
+
+            return false;
+        })
+
+        function bindForm1(dialog) {
+
+            $('#modformr', dialog).submit(function () {
+
+                $.ajax({
+                    url: this.action,
+                    type: this.method,
+                    data: $(this).serialize(),
+                    success: function (result) {
+                        if (result.success) {
+                            $('#myModal').modal('hide');
+
+                            $(':submit').unbind();
+
+                            $('input[name="UserRemark"]').val(result.UserRemark);
+
+                            $btnClicked.trigger('click');
+                            //if(GatePassGen && !GatePassId && (TrancType=="submit"||TrancType=="submitContinue"))
+                            //{
+                            //    alertify.confirm('Generate GatePass ?').set({
+                            //        'closable': false, 'onok': function (onok) {
+
+                            //            $('input[name="GenGatePass"]').val('true');
+                            //            $btnClicked.trigger('click');
+
+                            //        }, 'oncancel': function (oncancel) {
+
+                            //            $('input[name="GenGatePass"]').val('false');
+                            //            $btnClicked.trigger('click');
+
+                            //        }
+                            //    }).setting('labels',{'ok':'Yes', 'cancel': 'No'});
+                            //}
+                            //else
+                            //{
+                            //    $btnClicked.trigger('click');
+                            //}
+                        } else {
+                            $('#myModalContent').html(result);
+                            bindForm1();
+                        }
+                    }
+                });
+                return false;
+            });
+
+        }
+
+    </script>
+}
+
+
+
+@if (ViewBag.transactionType != null && (ViewBag.transactionType == "submitContinue" || ViewBag.transactionType == "ReviewContinue"))
+{
+    <script type="text/javascript">
+        CreateTrasitionEffectForSubmit();
+
+        function CreateTrasitionEffectForSubmit() {
+
+            //$('body').find('.container.body-content > div.row ').wrap("<div class='animsition' data-animsition-in='fade-in-right-lg' data-animsition-out='fade-out-left-lg' style='animation-duration: 1.5s; -webkit-animation-duration: 1.5s; opacity: 0;'> </div>");
+
+            $('body').find('form').filter(":last").wrapInner("<div class='animsition' data-animsition-in='fade-in-right-lg' data-animsition-out='fade-out-left-lg' style='animation-duration: 1.5s; -webkit-animation-duration: 1.5s; opacity: 0;'> </div>");
+
+            var script = document.createElement('script');
+
+            script.setAttribute('type', 'text/javascript');
+
+            script.text = " $(document).ready(function () {$('.animsition').animsition().one('animsition.start', function () {}).one('animsition.end', function () {$(this).find('.animsition-child').addClass('zoom-in').css({'opacity': 1});})});";
+
+            $('body').append(script);
+
+        }
+
+    </script>
+}

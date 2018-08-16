@@ -1,0 +1,65 @@
+﻿@using GridMvc.Html;
+
+@model IQueryable<Model.ViewModels.WardIndexViewModel>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    string ControllerName = (string)ViewContext.RouteData.Values["controller"];
+    string IndexStatus = (string)ViewBag.IndexStatus;
+}
+
+<style type="text/css">
+    .panel-info .dropdown-toggle:hover {
+        color: #1AAFD0;
+    }
+</style>
+
+<!-- modal placeholder-->
+<div id='myModal' class='modal fade in'>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-list black"></span> Ward List </span>
+        </h3>
+        <hr style="margin-top:0px;margin-bottom:0px" />
+        <input type="hidden" class="DocType_Id" value="@ViewBag.id">
+        <div class="panel-info">
+        </div>
+
+
+    </div>
+    <div class="panel-info" style="padding-left:5px;padding-top:2px;font-size:12px">
+
+        @Html.Grid(Model).Columns(columns =>
+           {
+               columns.Add(m => m.GodownId, true).Css("Header_Id");
+               columns.Add(m => m.GodownCode).Sortable(true).Titled("Ward No.").Filterable(true).Sortable(true);
+               columns.Add(m => m.GodownName).Sortable(true).Titled("Ward Name").Filterable(true).Sortable(true);
+               columns.Add(m => m.PropertyCount).Sortable(true).Titled("Properties").Filterable(true).Sortable(true);
+           }).WithPaging(25).EmptyText("No records found.")
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    var id = @ViewBag.id
+    $('table.grid-table td').dblclick(function () {
+        var $this = $(this);
+        var row = $this.closest("tr");
+
+
+        var row = $this.closest("tr");
+        var GodownId = row.find('[data-name="GodownId"]').text();
+        //var url = '@Url.Action("Index", "PropertyHeader", new { Area = "PropertyTax" })' + "/" + id + "?GodownId=" + GodownId;
+        var url = "/PropertyTax/PropertyHeader/Index" + "/" + id + "?GodownId=" + GodownId;
+        window.location.href = url;
+    });
+</script>

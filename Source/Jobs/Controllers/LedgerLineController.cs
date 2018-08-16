@@ -1745,8 +1745,7 @@ namespace Jobs.Controllers
             return Json(Amount);
         }
 
-
-
+        
     }
 
 }

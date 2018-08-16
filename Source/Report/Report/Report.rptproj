@@ -3497,6 +3497,10 @@
       <FullPath>SaeOrderPlanPrint_Dyeing.rdl</FullPath>
     </ProjectItem>
     <ProjectItem>
+      <Name>SalaryPrint.rdl</Name>
+      <FullPath>SalaryPrint.rdl</FullPath>
+    </ProjectItem>
+    <ProjectItem>
       <Name>SaleDispatchHeaderReport_DH.rdl</Name>
       <FullPath>SaleDispatchHeaderReport_DH.rdl</FullPath>
     </ProjectItem>
@@ -5236,8 +5240,8 @@
       <FullPath>YearlyListOfPurja.rdl</FullPath>
     </ProjectItem>
     <ProjectItem>
-      <Name>SalaryPrint.rdl</Name>
-      <FullPath>SalaryPrint.rdl</FullPath>
+      <Name>InvoicePrint.rdl</Name>
+      <FullPath>InvoicePrint.rdl</FullPath>
     </ProjectItem>
   </Reports>
   <Configurations>

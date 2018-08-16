@@ -294,11 +294,31 @@ namespace Service
                     new LedgerAdjService(_unitOfWork).Delete(item.LedgerAdjId);
                 }
 
+                var LedgerSupplimentryList = (from H in db.LedgerHeader
+                                              join L in db.Ledger on H.LedgerHeaderId equals L.LedgerHeaderId into LedgerTable
+                                              from LedgerTab in LedgerTable.DefaultIfEmpty()
+                                              join La in db.LedgerSupplementary on LedgerTab.LedgerId equals La.LedgerId into LedgerSupplementaryTable
+                                              from LedgerSupplementaryTab in LedgerSupplementaryTable.DefaultIfEmpty()
+                                              where H.LedgerHeaderId == LedgerHeader.LedgerHeaderId && LedgerSupplementaryTab.LedgerId != null
+                                              select LedgerSupplementaryTab).ToList();
 
-                foreach (Ledger item in LedgerList)
+                foreach (LedgerSupplementary item in LedgerSupplimentryList)
                 {
-                    new LedgerService(_unitOfWork).Delete(item);
+                    var LedferLineForLedgerSupplimentryList = (from L in db.LedgerLine
+                                                               where L.SupplementaryForLedgerId == item.LedgerId
+                                                               select L).ToList();
+
+                    foreach (LedgerLine LLine in LedferLineForLedgerSupplimentryList)
+                    {
+                        LLine.SupplementaryForLedgerId = null;
+                        _unitOfWork.Repository<LedgerLine>().Update(LLine);
+                    }
+
+                    _unitOfWork.Repository<LedgerSupplementary>().Delete(item.Id);
+
+
                 }
+
 
                 LedgerHeaderId = LedgerHeader.LedgerHeaderId;
             }

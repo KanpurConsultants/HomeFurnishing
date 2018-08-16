@@ -236,25 +236,55 @@ namespace Jobs.Controllers
             }
             else if (vm.ReportType == ReportType_BalanceSheet)
             {
-                IEnumerable<BalanceSheetViewModel> BalanceSheet = _FinancialDisplayService.GetBalanceSheet(SettingParameter);
-
-                if (BalanceSheet != null)
+                if (vm.IsShowDetail == true)
                 {
-                    JsonResult json = Json(new { Success = true, Data = BalanceSheet.ToList() }, JsonRequestBehavior.AllowGet);
-                    json.MaxJsonLength = int.MaxValue;
-                    return json;
+                    IEnumerable<BalanceSheetViewModel> BalanceSheet = _FinancialDisplayService.GetBalanceSheetDetail(SettingParameter);
+
+                    if (BalanceSheet != null)
+                    {
+                        JsonResult json = Json(new { Success = true, Data = BalanceSheet.ToList() }, JsonRequestBehavior.AllowGet);
+                        json.MaxJsonLength = int.MaxValue;
+                        return json;
+                    }
+
+                }
+                else
+                {
+                    IEnumerable<BalanceSheetViewModel> BalanceSheet = _FinancialDisplayService.GetBalanceSheet(SettingParameter);
+
+                    if (BalanceSheet != null)
+                    {
+                        JsonResult json = Json(new { Success = true, Data = BalanceSheet.ToList() }, JsonRequestBehavior.AllowGet);
+                        json.MaxJsonLength = int.MaxValue;
+                        return json;
+                    }
                 }
             }
             else if (vm.ReportType == ReportType_ProfitAndLoss)
             {
-                IEnumerable<ProfitAndLossViewModel> ProfitAndLoss = _FinancialDisplayService.GetProfitAndLoss(SettingParameter);
-
-                if (ProfitAndLoss != null)
+                if (vm.IsShowDetail == true)
                 {
-                    JsonResult json = Json(new { Success = true, Data = ProfitAndLoss.ToList() }, JsonRequestBehavior.AllowGet);
-                    json.MaxJsonLength = int.MaxValue;
-                    return json;
+                    IEnumerable<ProfitAndLossViewModel> ProfitAndLoss = _FinancialDisplayService.GetProfitAndLossDetail(SettingParameter);
+
+                    if (ProfitAndLoss != null)
+                    {
+                        JsonResult json = Json(new { Success = true, Data = ProfitAndLoss.ToList() }, JsonRequestBehavior.AllowGet);
+                        json.MaxJsonLength = int.MaxValue;
+                        return json;
+                    }
                 }
+                else
+                {
+                    IEnumerable<ProfitAndLossViewModel> ProfitAndLoss = _FinancialDisplayService.GetProfitAndLoss(SettingParameter);
+
+                    if (ProfitAndLoss != null)
+                    {
+                        JsonResult json = Json(new { Success = true, Data = ProfitAndLoss.ToList() }, JsonRequestBehavior.AllowGet);
+                        json.MaxJsonLength = int.MaxValue;
+                        return json;
+                    }
+                }
+                
             }
 
 

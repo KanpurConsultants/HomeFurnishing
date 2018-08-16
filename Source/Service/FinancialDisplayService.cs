@@ -27,7 +27,9 @@ namespace Service
         IEnumerable<SubTrialBalanceSummaryViewModel> GetSubTrialBalanceSummary(FinancialDisplaySettings Settings);
         IEnumerable<LedgerBalanceViewModel> GetLedgerBalance(FinancialDisplaySettings Settings);
         IEnumerable<BalanceSheetViewModel> GetBalanceSheet(FinancialDisplaySettings Settings);
+        IEnumerable<BalanceSheetViewModel> GetBalanceSheetDetail(FinancialDisplaySettings Settings);
         IEnumerable<ProfitAndLossViewModel> GetProfitAndLoss(FinancialDisplaySettings Settings);
+        IEnumerable<ProfitAndLossViewModel> GetProfitAndLossDetail(FinancialDisplaySettings Settings);
     }
 
     public class FinancialDisplayService : IFinancialDisplayService
@@ -98,7 +100,25 @@ namespace Service
                                         @" ORDER BY OrderByColumn ";
 
 
-            IEnumerable<TrialBalanceViewModel> TrialBalanceList = db.Database.SqlQuery<TrialBalanceViewModel>(mQry, SqlParameterSiteId, SqlParameterDivisionId, SqlParameterFromDate, SqlParameterToDate, SqlParameterCostCenter, SqlParameterLedgerAccountGroup).ToList();
+            List<TrialBalanceViewModel> TrialBalanceList = db.Database.SqlQuery<TrialBalanceViewModel>(mQry, SqlParameterSiteId, SqlParameterDivisionId, SqlParameterFromDate, SqlParameterToDate, SqlParameterCostCenter, SqlParameterLedgerAccountGroup).ToList();
+
+            decimal TotalAmtDr = TrialBalanceList.Sum(i => i.AmtDr).Value;
+            decimal TotalAmtCr = TrialBalanceList.Sum(i => i.AmtCr).Value;
+
+            if (LedgerAccountGroup == null || LedgerAccountGroup == "" || LedgerAccountGroup == "0")
+                if (TotalAmtDr != TotalAmtCr)
+                {
+                    TrialBalanceViewModel BlankItem = new TrialBalanceViewModel();
+                    TrialBalanceList.Add(BlankItem);
+                    TrialBalanceViewModel DiffVm = new TrialBalanceViewModel();
+                    DiffVm.LedgerAccountGroupName = "<Strong>Difference in Trial Balance</Strong>";
+                    if (TotalAmtDr > TotalAmtCr)
+                        DiffVm.AmtCr = TotalAmtDr - TotalAmtCr;
+                    else
+                        DiffVm.AmtDr = TotalAmtCr - TotalAmtDr;
+                    TrialBalanceList.Add(DiffVm);
+                }
+
 
             return TrialBalanceList;
 
@@ -270,7 +290,8 @@ namespace Service
                             LEFT JOIN web.LedgerAccountGroups LAG  WITH (Nolock) ON LAG.LedgerAccountGroupId = LA.LedgerAccountGroupId 
                             LEFT JOIN Web.People P On LA.PersonId = P.PersonId
                             WHERE 1 = 1 
-                            AND LH.DocDate <= @ToDate " +
+                            AND LH.DocDate <= @ToDate
+                            AND LH.DocDate >= (Case When LAG.LedgerAccountNature in ('Expense','Income') Then @FromDate Else '01/01/1900' End) " +
                             (SiteId != null ? " AND LH.SiteId IN (SELECT Items FROM [dbo].[Split] (@Site, ','))" : "") +
                             (DivisionId != null ? " AND LH.DivisionId IN (SELECT Items FROM [dbo].[Split] (@Division, ','))" : "") +
                             (CostCenterId != null ? " AND H.CostCenterId IN (SELECT Items FROM [dbo].[Split] (@CostCenter, ','))" : "") +
@@ -280,7 +301,24 @@ namespace Service
                             (IsIncludeZeroBalance == "False" ? " HAVING sum(isnull(H.AmtDr,0))  - sum(isnull(H.AmtCr,0)) <> 0 " : "") +
                             "Order By LedgerAccountName ";
 
-            IEnumerable<SubTrialBalanceViewModel> SubTrialBalanceList = db.Database.SqlQuery<SubTrialBalanceViewModel>(mQry, SqlParameterSiteId, SqlParameterDivisionId, SqlParameterFromDate, SqlParameterToDate, SqlParameterCostCenter, SqlParameterLedgerAccountGroup).ToList();
+            List<SubTrialBalanceViewModel> SubTrialBalanceList = db.Database.SqlQuery<SubTrialBalanceViewModel>(mQry, SqlParameterSiteId, SqlParameterDivisionId, SqlParameterFromDate, SqlParameterToDate, SqlParameterCostCenter, SqlParameterLedgerAccountGroup).ToList();
+
+            decimal TotalAmtDr = SubTrialBalanceList.Sum(i => i.AmtDr).Value;
+            decimal TotalAmtCr = SubTrialBalanceList.Sum(i => i.AmtCr).Value;
+
+            if (TotalAmtDr != TotalAmtCr)
+            {
+                SubTrialBalanceViewModel BlankItem = new SubTrialBalanceViewModel();
+                SubTrialBalanceList.Add(BlankItem);
+                SubTrialBalanceViewModel DiffVm = new SubTrialBalanceViewModel();
+                DiffVm.LedgerAccountName = "Difference in Trial Balance";
+                if (TotalAmtDr > TotalAmtCr)
+                    DiffVm.AmtCr = TotalAmtDr - TotalAmtCr;
+                else
+                    DiffVm.AmtDr = TotalAmtCr - TotalAmtDr;
+                SubTrialBalanceList.Add(DiffVm);
+            }
+
 
             return SubTrialBalanceList;
 
@@ -388,10 +426,12 @@ namespace Service
 			                                         THEN CASE WHEN P.Suffix = P.Code THEN ' [' + P.Code + ']'
 			 								                                          ELSE ', ' + P.Suffix + ' [' + P.Code + ']' END	
 			                                         ELSE ', ' + LA.LedgerAccountSuffix END) AS LedgerAccountName,
-                                                Sum(CASE WHEN H.DocDate < @FromDate THEN L.AmtDr - L.AmtCr ELSE 0 END) AS Opening,
+                                                Sum(Case When LAG.LedgerAccountNature in ('Expense','Income') Then 0 Else CASE WHEN H.DocDate < @FromDate THEN L.AmtDr - L.AmtCr ELSE 0 END END) AS Opening,
                                                 Sum(CASE WHEN H.DocDate >= @FromDate AND H.DocDate <= @ToDate THEN L.AmtDr ELSE 0 END) AS AmtDr,
                                                 Sum(CASE WHEN H.DocDate >= @FromDate AND H.DocDate <= @ToDate THEN L.AmtCr ELSE 0 END) AS AmtCr,
-                                                Sum(CASE WHEN H.DocDate <= @ToDate THEN L.AmtDr-L.AmtCr ELSE 0 END) AS Balance
+                                                Sum(Case When LAG.LedgerAccountNature in ('Expense','Income') Then 
+			                                        CASE WHEN H.DocDate >= @FromDate AND H.DocDate <= @ToDate THEN L.AmtDr-L.AmtCr ELSE 0 END 
+		                                            ELSE CASE WHEN H.DocDate <= @ToDate THEN L.AmtDr-L.AmtCr ELSE 0 END END) AS Balance
                                                 FROM Web.LedgerHeaders H 
                                                 INNER JOIN web.Ledgers L ON L.LedgerHeaderId = H.LedgerHeaderId
                                                 LEFT JOIN web.LedgerAccounts LA ON L.LedgerAccountId = LA.LedgerAccountId
@@ -650,7 +690,28 @@ namespace Service
                             (IsIncludeZeroBalance == "False" ? " And Sum(isnull(H.Balance,0)) <> 0 " : "") +
                             @" ORDER BY OrderByColumn ";
 
-            IEnumerable<TrialBalanceViewModel> TrialBalanceList = db.Database.SqlQuery<TrialBalanceViewModel>(mQry, SqlParameterSiteId, SqlParameterDivisionId, SqlParameterFromDate, SqlParameterToDate, SqlParameterCostCenter, SqlParameterLedgerAccountGroup).ToList();
+            List<TrialBalanceViewModel> TrialBalanceList = db.Database.SqlQuery<TrialBalanceViewModel>(mQry, SqlParameterSiteId, SqlParameterDivisionId, SqlParameterFromDate, SqlParameterToDate, SqlParameterCostCenter, SqlParameterLedgerAccountGroup).ToList();
+
+            if (LedgerAccountGroup == null || LedgerAccountGroup == "" || LedgerAccountGroup == "0")
+            { 
+                TotalAmtDr = TrialBalanceList.Sum(m => m.AmtDr) ?? 0;
+                TotalAmtCr = TrialBalanceList.Sum(m => m.AmtCr) ?? 0;
+
+                if (TotalAmtDr != TotalAmtCr)
+                {
+                    TrialBalanceViewModel BlankItem = new TrialBalanceViewModel();
+                    BlankItem.ParentLedgerAccountGroupName = "ZZZ";
+                    TrialBalanceList.Add(BlankItem);
+                    TrialBalanceViewModel DiffVm = new TrialBalanceViewModel();
+                    DiffVm.LedgerAccountGroupName = "<Strong>Difference in Trial Balance</Strong>";
+                    DiffVm.ParentLedgerAccountGroupName = "ZZZ";
+                    if (TotalAmtDr > TotalAmtCr)
+                        DiffVm.AmtCr = TotalAmtDr - TotalAmtCr;
+                    else
+                        DiffVm.AmtDr = TotalAmtCr - TotalAmtDr;
+                    TrialBalanceList.Add(DiffVm);
+                }
+            }
 
             TotalAmtDr = TrialBalanceList.Sum(m => m.AmtDr) ?? 0;
             TotalAmtCr = TrialBalanceList.Sum(m => m.AmtCr) ?? 0;
@@ -987,7 +1048,7 @@ namespace Service
         public string GetQryForTrialBalance(string SiteId, string DivisionId, string FromDate, string ToDate,
                             string CostCenterId, string IsIncludeZeroBalance, string IsIncludeOpening, string LedgerAccountGroup)
         {
-
+            //And H.DocDate >= (Case When LAG.LedgerAccountNature in ('Expenses','Income') Then @FromDate Else '1900/Jan/01' End) 
 
             string mQry = @" DECLARE @TempcteGroupBalance AS TABLE (
 	                        LedgerAccountGroupId INT, 
@@ -1004,10 +1065,12 @@ namespace Service
                                     (
                                         SELECT LA.LedgerAccountGroupId, Max(LAG.LedgerAccountGroupName ) LedgerAccountGroupName, 
                                         Max(LAG.ParentLedgerAccountGroupId) ParentLedgerAccountGroupId, Max(PLAG.LedgerAccountGroupName) AS ParentLedgerAccountGroupName, 
-                                        Sum(CASE WHEN H.DocDate < @FromDate THEN L.AmtDr-L.AmtCr ELSE 0 END) AS Opening,
+                                        Sum(Case When LAG.LedgerAccountNature in ('Expense','Income') Then 0 Else CASE WHEN H.DocDate < @FromDate THEN L.AmtDr-L.AmtCr ELSE 0 END END) AS Opening,
                                         Sum(CASE WHEN H.DocDate >= @FromDate AND H.DocDate <= @ToDate THEN L.AmtDr ELSE 0 END) AS AmtDr,
                                         Sum(CASE WHEN H.DocDate >= @FromDate AND H.DocDate <= @ToDate THEN L.AmtCr ELSE 0 END) AS AmtCr,
-                                        Sum(CASE WHEN H.DocDate <= @ToDate THEN L.AmtDr-L.AmtCr ELSE 0 END) AS Balance
+                                        Sum(Case When LAG.LedgerAccountNature in ('Expense','Income') Then 
+			                                        CASE WHEN H.DocDate >= @FromDate AND H.DocDate <= @ToDate THEN L.AmtDr-L.AmtCr ELSE 0 END 
+		                                        ELSE CASE WHEN H.DocDate <= @ToDate THEN L.AmtDr-L.AmtCr ELSE 0 END END) AS Balance
                                         FROM Web.LedgerHeaders H 
                                         INNER JOIN web.Ledgers L ON L.LedgerHeaderId = H.LedgerHeaderId
                                         LEFT JOIN web.LedgerAccounts LA ON L.LedgerAccountId = LA.LedgerAccountId
@@ -1042,10 +1105,12 @@ namespace Service
 			                                 THEN CASE WHEN P.Suffix = P.Code THEN ' [' + P.Code + ']'
 			 								                                  ELSE ', ' + P.Suffix + ' [' + P.Code + ']' END	
 			                                 ELSE ', ' + LA.LedgerAccountSuffix END) AS LedgerAccountName,
-                                        Sum(CASE WHEN H.DocDate < @FromDate THEN L.AmtDr - L.AmtCr ELSE 0 END) AS Opening,
+                                        Sum(Case When LAG.LedgerAccountNature in ('Expense','Income') Then 0 Else CASE WHEN H.DocDate < @FromDate THEN L.AmtDr - L.AmtCr ELSE 0 END END) AS Opening,
                                         Sum(CASE WHEN H.DocDate >= @FromDate AND H.DocDate <= @ToDate THEN L.AmtDr ELSE 0 END) AS AmtDr,
                                         Sum(CASE WHEN H.DocDate >= @FromDate AND H.DocDate <= @ToDate THEN L.AmtCr ELSE 0 END) AS AmtCr,
-                                        Sum(CASE WHEN H.DocDate <= @ToDate THEN L.AmtDr-L.AmtCr ELSE 0 END) AS Balance
+                                        Sum(Case When LAG.LedgerAccountNature in ('Expense','Income') Then 
+			                                        CASE WHEN H.DocDate >= @FromDate AND H.DocDate <= @ToDate THEN L.AmtDr-L.AmtCr ELSE 0 END 
+		                                        ELSE CASE WHEN H.DocDate <= @ToDate THEN L.AmtDr-L.AmtCr ELSE 0 END END) AS Balance
                                         FROM Web.LedgerHeaders H 
                                         INNER JOIN web.Ledgers L ON L.LedgerHeaderId = H.LedgerHeaderId
                                         LEFT JOIN web.LedgerAccounts LA ON L.LedgerAccountId = LA.LedgerAccountId
@@ -1069,60 +1134,6 @@ namespace Service
                                         FROM @TempcteGroupBalance ag
                                         INNER JOIN cteAcGroup  ON cteAcGroup.LedgerAccountGroupId = Ag.ParentLedgerAccountGroupId 
                                     ) ";
-
-
-            //            mQry = @"WITH cteLedgerBalance AS
-            //                                                (
-            //                                                    SELECT L.LedgerAccountId, Max(LA.LedgerAccountName) AS LedgerAccountName,
-            //                                                    Sum(CASE WHEN H.DocDate < @FromDate THEN L.AmtDr - L.AmtCr ELSE 0 END) AS Opening,
-            //                                                    Sum(CASE WHEN H.DocDate > @FromDate AND H.DocDate <= @ToDate THEN L.AmtDr ELSE 0 END) AS AmtDr,
-            //                                                    Sum(CASE WHEN H.DocDate > @FromDate AND H.DocDate <= @ToDate THEN L.AmtCr ELSE 0 END) AS AmtCr,
-            //                                                    Sum(CASE WHEN H.DocDate <= @ToDate THEN L.AmtDr-L.AmtCr ELSE 0 END) AS Balance
-            //                                                    FROM Web.LedgerHeaders H 
-            //                                                    INNER JOIN web.Ledgers L ON L.LedgerHeaderId = H.LedgerHeaderId
-            //                                                    LEFT JOIN web.LedgerAccounts LA ON L.LedgerAccountId = LA.LedgerAccountId
-            //                                                    LEFT JOIN web.LedgerAccountGroups LAG ON LA.LedgerAccountGroupId = LAG.LedgerAccountGroupId  		
-            //                                                    WHERE 1 = 1 " +
-            //                                        (SiteId != null ? " AND H.SiteId IN (SELECT Items FROM [dbo].[Split] (@Site, ','))" : "") +
-            //                                        (DivisionId != null ? " AND H.DivisionId IN (SELECT Items FROM [dbo].[Split] (@Division, ','))" : "") +
-            //                                        (CostCenterId != null ? " AND L.CostCenterId IN (SELECT Items FROM [dbo].[Split] (@CostCenter, ','))" : "") +
-            //                                        (IsIncludeOpening == "True" ? " AND H.DocDate >= @FromDate" : "") +
-            //                                        @" And LA.LedgerAccountGroupId " + (LedgerAccountGroup != null && LedgerAccountGroup != "" ? " = @LedgerAccountGroup " : " Is Null ") +
-            //                                        @" GROUP BY L.LedgerAccountId " +
-            //                                        (IsIncludeZeroBalance == "False" ? " Having Sum(CASE WHEN H.DocDate <= @ToDate THEN L.AmtDr-L.AmtCr ELSE 0 END) <> 0 " : "") +
-            //                                    @"),
-            //                                            cteGroupBalance AS
-            //                                                (
-            //                                                    SELECT LA.LedgerAccountGroupId, Max(LAG.LedgerAccountGroupName) LedgerAccountGroupName, 
-            //                                                    Max(LAG.ParentLedgerAccountGroupId) ParentLedgerAccountGroupId, Max(PLAG.LedgerAccountGroupName) AS ParentLedgerAccountGroupName, 
-            //                                                    Sum(CASE WHEN H.DocDate < @FromDate THEN L.AmtDr-L.AmtCr ELSE 0 END) AS Opening,
-            //                                                    Sum(CASE WHEN H.DocDate > @FromDate AND H.DocDate <= @ToDate THEN L.AmtDr ELSE 0 END) AS AmtDr,
-            //                                                    Sum(CASE WHEN H.DocDate > @FromDate AND H.DocDate <= @ToDate THEN L.AmtCr ELSE 0 END) AS AmtCr,
-            //                                                    Sum(CASE WHEN H.DocDate <= @ToDate THEN L.AmtDr-L.AmtCr ELSE 0 END) AS Balance
-            //                                                    FROM Web.LedgerHeaders H 
-            //                                                    INNER JOIN web.Ledgers L ON L.LedgerHeaderId = H.LedgerHeaderId
-            //                                                    LEFT JOIN web.LedgerAccounts LA ON L.LedgerAccountId = LA.LedgerAccountId
-            //                                                    LEFT JOIN web.LedgerAccountGroups LAG ON LA.LedgerAccountGroupId = LAG.LedgerAccountGroupId  		
-            //                                                    LEFT JOIN web.LedgerAccountGroups PLAG ON PLAG.LedgerAccountGroupId = LAG.ParentLedgerAccountGroupId  		
-            //                                                    WHERE 1=1 " +
-            //                                        (SiteId != null ? " AND H.SiteId IN (SELECT Items FROM [dbo].[Split] (@Site, ','))" : "") +
-            //                                        (DivisionId != null ? " AND H.DivisionId IN (SELECT Items FROM [dbo].[Split] (@Division, ','))" : "") +
-            //                                        (CostCenterId != null ? " AND L.CostCenterId IN (SELECT Items FROM [dbo].[Split] (@CostCenter, ','))" : "") +
-            //                                        (IsIncludeOpening == "True" ? " AND H.DocDate >= @FromDate" : "") +
-            //                                        @" And H.DocDate >= @FromDate
-            //                                                    GROUP BY LA.LedgerAccountGroupId " +
-            //                                        (IsIncludeZeroBalance == "False" ? " Having Sum(CASE WHEN H.DocDate <= @ToDate THEN L.AmtDr-L.AmtCr ELSE 0 END) <> 0 " : "") +
-            //                                    @") ,
-            //               	                            cteAcGroup as
-            //                                                (
-            //                                                    SELECT ag.LedgerAccountGroupId AS BaseLedgerAccountGroupId, ag.LedgerAccountGroupName AS BaseLedgerAccountGroupName, ag.LedgerAccountGroupId, ag.LedgerAccountGroupName, ag.ParentLedgerAccountGroupId, ag.ParentLedgerAccountGroupName, ag.Opening, ag.AmtDr, ag.AmtCr, ag.Balance, 0 AS Level   
-            //                                                    FROM cteGroupBalance ag		
-            //                                                    WHERE   ag.ParentLedgerAccountGroupId " + (LedgerAccountGroup != null && LedgerAccountGroup != "" ? " = @LedgerAccountGroup " : " Is Null ") +
-            //                                        @"UNION ALL
-            //                                                    SELECT cteAcGroup.BaseLedgerAccountGroupId, cteAcGroup.BaseLedgerAccountGroupName , ag.LedgerAccountGroupId, ag.LedgerAccountGroupName, ag.ParentLedgerAccountGroupId, ag.ParentLedgerAccountGroupName, ag.Opening, ag.AmtDr, ag.AmtCr, ag.Balance, LEVEL +1     
-            //                                                    FROM cteGroupBalance ag
-            //                                                    INNER JOIN cteAcGroup  ON cteAcGroup.LedgerAccountGroupId = Ag.ParentLedgerAccountGroupId 
-            //                                                ) ";
 
             return mQry;
         }
@@ -1177,7 +1188,29 @@ namespace Service
                             (IsIncludeZeroBalance == "False" ? " And Sum(isnull(H.Balance,0)) <> 0 " : "") +
                             @" ORDER BY OrderByColumn ";
 
-            IEnumerable<TrialBalanceViewModel> TrialBalanceList = db.Database.SqlQuery<TrialBalanceViewModel>(mQry, SqlParameterSiteId, SqlParameterDivisionId, SqlParameterFromDate, SqlParameterToDate, SqlParameterCostCenter, SqlParameterLedgerAccountGroup).ToList();
+            List<TrialBalanceViewModel> TrialBalanceList = db.Database.SqlQuery<TrialBalanceViewModel>(mQry, SqlParameterSiteId, SqlParameterDivisionId, SqlParameterFromDate, SqlParameterToDate, SqlParameterCostCenter, SqlParameterLedgerAccountGroup).ToList();
+
+
+            if (LedgerAccountGroup == null || LedgerAccountGroup == "" || LedgerAccountGroup == "0")
+            {
+                TotalAmtDr = TrialBalanceList.Sum(m => m.AmtDr) ?? 0;
+                TotalAmtCr = TrialBalanceList.Sum(m => m.AmtCr) ?? 0;
+
+                if (TotalAmtDr != TotalAmtCr)
+                {
+                    TrialBalanceViewModel BlankItem = new TrialBalanceViewModel();
+                    BlankItem.TopParentLedgerAccountGroupName = "ZZZ";
+                    TrialBalanceList.Add(BlankItem);
+                    TrialBalanceViewModel DiffVm = new TrialBalanceViewModel();
+                    DiffVm.LedgerAccountGroupName = "<Strong>Difference in Trial Balance</Strong>";
+                    DiffVm.TopParentLedgerAccountGroupName = "ZZZ";
+                    if (TotalAmtDr > TotalAmtCr)
+                        DiffVm.AmtCr = TotalAmtDr - TotalAmtCr;
+                    else
+                        DiffVm.AmtDr = TotalAmtCr - TotalAmtDr;
+                    TrialBalanceList.Add(DiffVm);
+                }
+            }
 
             TotalAmtDr = TrialBalanceList.Sum(m => m.AmtDr) ?? 0;
             TotalAmtCr = TrialBalanceList.Sum(m => m.AmtCr) ?? 0;
@@ -1561,7 +1594,7 @@ namespace Service
                 DblCredit_Total = DblCredit_Total + DHSMain_DblClosingStock;
             }
 
-            DTTemp = FGetTRDDataTable("",Settings);
+            DTTemp = FGetTRDDataTable("", Settings);
 
             for (I = 0; I <= DTTemp.Rows.Count - 1; I++)
             {
@@ -1574,7 +1607,7 @@ namespace Service
             DTTemp.Clear();
             DTTemp.Dispose();
 
-            DTTemp = FGetTRDDataTable("Not",  Settings);
+            DTTemp = FGetTRDDataTable("Not", Settings);
 
             for (I = 0; I <= DTTemp.Rows.Count - 1; I++)
             {
@@ -1589,7 +1622,7 @@ namespace Service
 
             if (DblNet_Profit_Loss < 0)
             {
-                J = FFindEmptyRow(ref FGMain,"GRNameCredit");
+                J = FFindEmptyRow(ref FGMain, "GRNameCredit");
                 if (J < FFindEmptyRow(ref FGMain, "GRName"))
                     J = FFindEmptyRow(ref FGMain, "GRName");
                 FGMain.Rows[J]["GRNameCredit"] = "Net Loss";
@@ -1655,7 +1688,7 @@ namespace Service
             return BalanceSheetViewModelList;
         }
 
-        
+
 
         public DataSet FillData(string Qry)
         {
@@ -1870,7 +1903,7 @@ namespace Service
 
             DblGrossProfit = (DblDebit_Total - DblCredit_Total);
 
-            if(DblDebit_Total - DblCredit_Total > 0)
+            if (DblDebit_Total - DblCredit_Total > 0)
             {
                 J = FFindEmptyRow(ref FGMain, "GRNameCredit");
                 FGMain.Rows[J]["GRNameCredit"] = "Gross Loss";
@@ -1895,6 +1928,9 @@ namespace Service
                 FGMain.Rows.Add();
                 FGMain.Rows[FGMain.Rows.Count - 1]["Debit"] = DblDebit_Total;
                 FGMain.Rows[FGMain.Rows.Count - 1]["Credit"] = DblCredit_Total;
+
+
+
                 FGMain.Rows.Add();
             }
 
@@ -1993,10 +2029,857 @@ namespace Service
         }
 
 
+
+
         public void Dispose()
         {
         }
+
+        public IEnumerable<BalanceSheetViewModel> GetBalanceSheetDetail(FinancialDisplaySettings Settings)
+        {
+            string StrCondition1 = "";
+            DataTable DtBalanceSheetSummary = new DataTable();
+            Decimal DblDebit_Total = 0;
+            Decimal DblCredit_Total = 0;
+            int I = 0, J = 0;
+            Decimal DblNet_Profit_Loss = 0;
+            string mQry = "";
+            DataTable FGMain = new DataTable();
+            List<BalanceSheetViewModel> BalanceSheetViewModelList = new List<BalanceSheetViewModel>();
+
+            var SiteSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "Site" select H).FirstOrDefault();
+            var DivisionSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "Division" select H).FirstOrDefault();
+            var FromDateSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "FromDate" select H).FirstOrDefault();
+            var ToDateSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "ToDate" select H).FirstOrDefault();
+            var CostCenterSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "CostCenter" select H).FirstOrDefault();
+            var IsIncludeZeroBalanceSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "IsIncludeZeroBalance" select H).FirstOrDefault();
+            var IsIncludeOpeningSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "IsIncludeOpening" select H).FirstOrDefault();
+            var LedgerAccountGroupSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "LedgerAccountGroup" select H).FirstOrDefault();
+
+            string SiteId = SiteSetting.Value;
+            string DivisionId = DivisionSetting.Value;
+            string FromDate = FromDateSetting.Value;
+            string ToDate = ToDateSetting.Value;
+            string CostCenterId = CostCenterSetting.Value;
+            string IsIncludeZeroBalance = IsIncludeZeroBalanceSetting.Value;
+            string IsIncludeOpening = IsIncludeOpeningSetting.Value;
+            string LedgerAccountGroup = LedgerAccountGroupSetting.Value;
+
+
+            StrCondition1 = " Where H.DocDate <= '" + ToDate + "' ";
+            if (SiteId != null)
+                StrCondition1 = " And H.SiteId In ('" + SiteId + "') ";
+            if (DivisionId != null)
+                StrCondition1 = " And H.DivisionId In ('" + DivisionId + "') ";
+
+            mQry = GetQryForTrialBalance(SiteId, DivisionId, FromDate, ToDate, CostCenterId, IsIncludeZeroBalance, IsIncludeOpening, LedgerAccountGroup) +
+                    @"SELECT H.BaseLedgerAccountGroupId AS LedgerAccountGroupId, Max(BaseLedgerAccountGroupName) AS GName, 
+                                CASE WHEN Sum(isnull(H.Balance,0)) > 0 THEN Sum(isnull(H.Balance,0)) ELSE 0 END AS AmtDr,
+                                CASE WHEN Sum(isnull(H.Balance,0)) < 0 THEN abs(Sum(isnull(H.Balance,0))) ELSE 0 END AS AmtCr,
+                                Max(BaseLedgerAccountGroupName) AS ContraGroupName,
+                                Max(Ag.LedgerAccountGroupNature) As GroupNature
+                                FROM cteAcGroup H 
+                                LEFT JOIN Web.LedgerAccountGroups Ag On AG.LedgerAccountGroupId = H.BaseLedgerAccountGroupId
+                                Where AG.LedgerAccountGroupNature In ('Asset', 'Liability') 
+                                GROUP BY H.BaseLedgerAccountGroupId 
+                                Having (Sum(isnull(H.Opening,0)) <> 0 Or Sum(isnull(H.AmtDr,0)) <> 0 Or Sum(isnull(H.AmtCr,0)) <> 0 Or Sum(isnull(H.Balance,0)) <> 0) ";
+            DataSet DsBalanceSheetSummary = new DataSet();
+
+            string ConnectionString = (string)System.Web.HttpContext.Current.Session["DefaultConnectionString"];
+
+            using (SqlConnection sqlConnection = new SqlConnection(ConnectionString))
+            {
+                sqlConnection.Open();
+                SqlCommand cmd = new SqlCommand(mQry);
+                SqlDataAdapter Da = new SqlDataAdapter(mQry, ConnectionString);
+                Da.SelectCommand.Parameters.AddWithValue("@SiteId", !string.IsNullOrEmpty(SiteId) ? SiteId : (object)DBNull.Value);
+                Da.SelectCommand.Parameters.AddWithValue("@DivisionId", !string.IsNullOrEmpty(DivisionId) ? DivisionId : (object)DBNull.Value);
+                Da.SelectCommand.Parameters.AddWithValue("@FromDate", FromDate);
+                Da.SelectCommand.Parameters.AddWithValue("@ToDate", ToDate);
+                Da.SelectCommand.Parameters.AddWithValue("@CostCenterId", !string.IsNullOrEmpty(CostCenterId) ? CostCenterId : (object)DBNull.Value);
+                Da.SelectCommand.Parameters.AddWithValue("@LedgerAccountGroup", !string.IsNullOrEmpty(LedgerAccountGroup) ? LedgerAccountGroup : (object)DBNull.Value);
+                Da.Fill(DsBalanceSheetSummary);
+            }
+
+            DtBalanceSheetSummary = DsBalanceSheetSummary.Tables[0];
+
+            DataTable DtDistinctLedgerAccountGroup = DtBalanceSheetSummary.DefaultView.ToTable(true, "LedgerAccountGroupId");
+            for (int i = 0; i <= DtDistinctLedgerAccountGroup.Rows.Count - 1; i++)
+            {
+                if (LedgerAccountGroup == "" || LedgerAccountGroup == null)
+                    LedgerAccountGroup = DtDistinctLedgerAccountGroup.Rows[i]["LedgerAccountGroupId"].ToString();
+                else
+                    LedgerAccountGroup += "," + DtDistinctLedgerAccountGroup.Rows[i]["LedgerAccountGroupId"].ToString();
+            }
+
+            FGMain.Columns.Add("GRCodeCredit");
+            FGMain.Columns.Add("GRNameCredit");
+            FGMain.Columns.Add("Credit");
+            FGMain.Columns.Add("GRCode");
+            FGMain.Columns.Add("GRName");
+            FGMain.Columns.Add("Debit");
+
+
+            DblDebit_Total = 0;
+            DblCredit_Total = 0;
+
+            for (I = 0; I <= DtBalanceSheetSummary.Rows.Count - 1; I++)
+            {
+                if (Convert.ToDecimal(DtBalanceSheetSummary.Rows[I]["AmtDr"]) > 0)
+                {
+                    J = FFindEmptyRow(ref FGMain, "GRCodeCredit");
+                    FGMain.Rows[J]["GRCodeCredit"] = DtBalanceSheetSummary.Rows[I]["LedgerAccountGroupId"];
+                    if (DtBalanceSheetSummary.Rows[I]["GroupNature"].ToString() == "Asset")
+                        FGMain.Rows[J]["GRNameCredit"] = DtBalanceSheetSummary.Rows[I]["GName"];
+                    else
+                        FGMain.Rows[J]["GRNameCredit"] = DtBalanceSheetSummary.Rows[I]["ContraGroupName"];
+                    FGMain.Rows[J]["Credit"] = DtBalanceSheetSummary.Rows[I]["AmtDr"];
+                    DblCredit_Total = DblCredit_Total + Convert.ToDecimal(FGMain.Rows[J]["Credit"]);
+                }
+                else if (Convert.ToDecimal(DtBalanceSheetSummary.Rows[I]["AmtCr"]) > 0)
+                {
+                    J = FFindEmptyRow(ref FGMain, "GRCode");
+                    FGMain.Rows[J]["GRCode"] = DtBalanceSheetSummary.Rows[I]["LedgerAccountGroupId"];
+                    if (DtBalanceSheetSummary.Rows[I]["GroupNature"].ToString() == "Asset")
+                        FGMain.Rows[J]["GRName"] = DtBalanceSheetSummary.Rows[I]["GName"];
+                    else
+                        FGMain.Rows[J]["GRName"] = DtBalanceSheetSummary.Rows[I]["ContraGroupName"];
+                    FGMain.Rows[J]["Debit"] = DtBalanceSheetSummary.Rows[I]["AmtCr"];
+                    DblDebit_Total = DblDebit_Total + Convert.ToDecimal(FGMain.Rows[J]["Debit"]);
+                }
+            }
+
+            DtBalanceSheetSummary.Clear();
+            DtBalanceSheetSummary.Dispose();
+
+            Decimal DHSMain_DblClosingStock = 0;
+            if (DHSMain_DblClosingStock > 0)
+            {
+                J = 0;
+                FGMain.Rows[J]["GRNameCredit"] = "Closing Stock";
+                FGMain.Rows[J]["Credit"] = DHSMain_DblClosingStock;
+                DblCredit_Total = DblCredit_Total + DHSMain_DblClosingStock;
+            }
+
+            DtBalanceSheetSummary = FGetTRDDataTable("", Settings);
+
+            for (I = 0; I <= DtBalanceSheetSummary.Rows.Count - 1; I++)
+            {
+                if (Convert.ToDecimal(DtBalanceSheetSummary.Rows[I]["AmtDr"]) > 0)
+                    DblNet_Profit_Loss = DblNet_Profit_Loss - Convert.ToDecimal(DtBalanceSheetSummary.Rows[I]["AmtDr"]);
+                else if (Convert.ToDecimal(DtBalanceSheetSummary.Rows[I]["AmtCr"]) > 0)
+                    DblNet_Profit_Loss = DblNet_Profit_Loss + Convert.ToDecimal(DtBalanceSheetSummary.Rows[I]["AmtCr"]);
+
+            }
+            DtBalanceSheetSummary.Clear();
+            DtBalanceSheetSummary.Dispose();
+
+            DtBalanceSheetSummary = FGetTRDDataTable("Not", Settings);
+
+            for (I = 0; I <= DtBalanceSheetSummary.Rows.Count - 1; I++)
+            {
+                if (Convert.ToDecimal(DtBalanceSheetSummary.Rows[I]["AmtDr"]) > 0)
+                    DblNet_Profit_Loss = DblNet_Profit_Loss - Convert.ToDecimal(DtBalanceSheetSummary.Rows[I]["AmtDr"]);
+                else if (Convert.ToDecimal(DtBalanceSheetSummary.Rows[I]["AmtCr"]) > 0)
+                    DblNet_Profit_Loss = DblNet_Profit_Loss + Convert.ToDecimal(DtBalanceSheetSummary.Rows[I]["AmtCr"]);
+
+            }
+            DtBalanceSheetSummary.Clear();
+            DtBalanceSheetSummary.Dispose();
+
+            if (DblNet_Profit_Loss < 0)
+            {
+                J = FFindEmptyRow(ref FGMain, "GRNameCredit");
+                if (J < FFindEmptyRow(ref FGMain, "GRName"))
+                    J = FFindEmptyRow(ref FGMain, "GRName");
+                FGMain.Rows[J]["GRNameCredit"] = "Net Loss";
+                FGMain.Rows[J]["Credit"] = Math.Abs(DblNet_Profit_Loss);
+                DblCredit_Total = DblCredit_Total + Math.Abs(DblNet_Profit_Loss);
+            }
+            else if (DblNet_Profit_Loss > 0)
+            {
+                J = FFindEmptyRow(ref FGMain, "GRName");
+                if (J < FFindEmptyRow(ref FGMain, "GRNameCredit"))
+                    J = FFindEmptyRow(ref FGMain, "GRNameCredit");
+                FGMain.Rows[J]["GRName"] = "Net Profit";
+                FGMain.Rows[J]["Debit"] = Math.Abs(DblNet_Profit_Loss);
+                DblDebit_Total = DblDebit_Total + Math.Abs(DblNet_Profit_Loss);
+            }
+
+
+            if (DblDebit_Total - DblCredit_Total > Convert.ToDecimal(0.001))
+            {
+                J = FFindEmptyRow(ref FGMain, "GRNameCredit");
+                FGMain.Rows[J]["GRNameCredit"] = "Difference In Trial Balance";
+                FGMain.Rows[J]["Credit"] = DblDebit_Total - DblCredit_Total;
+                DblCredit_Total = DblCredit_Total + (DblDebit_Total - DblCredit_Total);
+            }
+            else if (DblCredit_Total - DblDebit_Total > Convert.ToDecimal(0.001))
+            {
+                J = FFindEmptyRow(ref FGMain, "GRName");
+                FGMain.Rows[J]["GRName"] = "Difference In Trial Balance";
+                FGMain.Rows[J]["Debit"] = DblCredit_Total - DblDebit_Total;
+                DblDebit_Total = DblDebit_Total + (DblCredit_Total - DblDebit_Total);
+            }
+
+            for (I = 0; I <= FGMain.Rows.Count - 1; I++)
+            {
+                BalanceSheetViewModel vm = new BalanceSheetViewModel();
+                if (FGMain.Rows[I]["GRCode"] != null && FGMain.Rows[I]["GRCode"] != System.DBNull.Value)
+                    vm.GRCode = Convert.ToInt32(FGMain.Rows[I]["GRCode"]);
+                if (FGMain.Rows[I]["GRName"] != null && FGMain.Rows[I]["GRName"] != System.DBNull.Value)
+                    vm.GRName = "<Strong>" + Convert.ToString(FGMain.Rows[I]["GRName"]) + "</Strong>";
+                if (FGMain.Rows[I]["Debit"] != null && FGMain.Rows[I]["Debit"] != System.DBNull.Value)
+                    vm.Debit = Convert.ToDecimal(FGMain.Rows[I]["Debit"]);
+                if (FGMain.Rows[I]["Credit"] != null && FGMain.Rows[I]["Credit"] != System.DBNull.Value)
+                    vm.Credit = Convert.ToDecimal(FGMain.Rows[I]["Credit"]);
+                if (FGMain.Rows[I]["GRCodeCredit"] != null && FGMain.Rows[I]["GRCodeCredit"] != System.DBNull.Value)
+                    vm.GRCodeCredit = Convert.ToString(FGMain.Rows[I]["GRCodeCredit"]);
+                if (FGMain.Rows[I]["GRNameCredit"] != null && FGMain.Rows[I]["GRNameCredit"] != System.DBNull.Value)
+                    vm.GRNameCredit = "<Strong>" + Convert.ToString(FGMain.Rows[I]["GRNameCredit"]) + "</Strong>";
+
+                vm.TotalDebit = DblDebit_Total;
+                vm.TotalCredit = DblCredit_Total;
+
+                vm.ReportType = "Balance Sheet";
+                vm.OpenReportType = "Trial Balance";
+
+
+                vm.RowNumber = I;
+
+                BalanceSheetViewModelList.Add(vm);
+            }
+
+
+
+            string LedgerAccountGroup_Debit = string.Join<string>(",", BalanceSheetViewModelList.Select(m => m.GRCode.ToString()));
+            string LedgerAccountGroup_Credit = string.Join<string>(",", BalanceSheetViewModelList.Select(m => (m.GRCodeCredit ?? "").ToString()));
+
+            SqlParameter SqlParameterSiteId_Child_Debit = new SqlParameter("@Site", !string.IsNullOrEmpty(SiteId) ? SiteId : (object)DBNull.Value);
+            SqlParameter SqlParameterDivisionId_Child_Debit = new SqlParameter("@Division", !string.IsNullOrEmpty(DivisionId) ? DivisionId : (object)DBNull.Value);
+            SqlParameter SqlParameterFromDate_Child_Debit = new SqlParameter("@FromDate", FromDate);
+            SqlParameter SqlParameterToDate_Child_Debit = new SqlParameter("@ToDate", ToDate);
+            SqlParameter SqlParameterCostCenter_Child_Debit = new SqlParameter("@CostCenter", !string.IsNullOrEmpty(CostCenterId) ? CostCenterId : (object)DBNull.Value);
+            SqlParameter SqlParameterLedgerAccountGroup_Child_Debit = new SqlParameter("@LedgerAccountGroup", !string.IsNullOrEmpty(LedgerAccountGroup_Debit.ToString()) ? LedgerAccountGroup_Debit : (object)DBNull.Value);
+
+            mQry = GetQryForTrialBalance(SiteId, DivisionId, FromDate, ToDate, CostCenterId, IsIncludeZeroBalance, IsIncludeOpening, LedgerAccountGroup) +
+                            @"SELECT Max(PAg.LedgerAccountGroupId) As ParentGRCode, H.BaseLedgerAccountGroupId AS GRCode, '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + '<Strong>' +  Max(BaseLedgerAccountGroupName) + '</Strong>' AS GRName, 
+                                    -Sum(isnull(H.Balance,0)) AS Debit,
+                                    Null As Credit,
+                                    NULL AS LedgerAccountId, 'Trial Balance' ReportType, 'Trial Balance' AS OpenReportType, Max(BaseLedgerAccountGroupName) As OrderByColumn,
+                                    Max(PAg.LedgerAccountGroupName) AS ParentLedgerAccountGroupName
+                                    FROM cteAcGroup H 
+                                    LEFT JOIN Web.LedgerAccountGroups Ag ON H.BaseLedgerAccountGroupId = Ag.LedgerAccountGroupId
+                                    LEFT JOIN Web.LedgerAccountGroups PAg ON Ag.ParentLedgerAccountGroupId = PAg.LedgerAccountGroupId
+                                    GROUP BY H.BaseLedgerAccountGroupId 
+                                    Having (Sum(isnull(H.Opening,0)) <> 0 Or Sum(isnull(H.AmtDr,0)) <> 0 Or Sum(isnull(H.AmtCr,0)) <> 0 Or Sum(isnull(H.Balance,0)) <> 0) " +
+                            (IsIncludeZeroBalance == "False" ? " And Sum(isnull(H.Balance,0)) <> 0 " : "") +
+
+                            @"UNION ALL 
+                
+                                    SELECT Ag.LedgerAccountGroupId As ParentGRCode, H.LedgerAccountId AS GRCode, '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + H.LedgerAccountName AS GRName, 
+                                    -isnull(H.Balance,0) AS Debit,
+                                    Null AS Credit,
+                                    H.LedgerAccountId AS LedgerAccountId, 'Trial Balance' ReportType, 'Ledger' AS OpenReportType, H.LedgerAccountName  As OrderByColumn,
+                                    Ag.LedgerAccountGroupName AS ParentLedgerAccountGroupName
+                                    FROM cteLedgerBalance H 
+                                    LEFT JOIN Web.LedgerAccounts A ON H.LedgerAccountId = A.LedgerAccountId 
+                                    LEFT JOIN Web.LedgerAccountGroups Ag ON A.LedgerAccountGroupId = Ag.LedgerAccountGroupId 
+                                    Where (isnull(H.Opening,0) <> 0 Or isnull(H.AmtDr,0) <> 0 Or isnull(H.AmtCr,0) <> 0 Or isnull(H.Balance,0) <> 0) " +
+                            (IsIncludeZeroBalance == "False" ? " And isnull(H.Balance,0) <> 0 " : "") +
+                            @" ORDER BY OrderByColumn ";
+
+            List<BalanceSheetViewModel> ChileBalanceSheetList_Debit = db.Database.SqlQuery<BalanceSheetViewModel>(mQry, SqlParameterSiteId_Child_Debit, SqlParameterDivisionId_Child_Debit, SqlParameterFromDate_Child_Debit, SqlParameterToDate_Child_Debit, SqlParameterCostCenter_Child_Debit, SqlParameterLedgerAccountGroup_Child_Debit).ToList();
+
+
+            SqlParameter SqlParameterSiteId_Child_Credit = new SqlParameter("@Site", !string.IsNullOrEmpty(SiteId) ? SiteId : (object)DBNull.Value);
+            SqlParameter SqlParameterDivisionId_Child_Credit = new SqlParameter("@Division", !string.IsNullOrEmpty(DivisionId) ? DivisionId : (object)DBNull.Value);
+            SqlParameter SqlParameterFromDate_Child_Credit = new SqlParameter("@FromDate", FromDate);
+            SqlParameter SqlParameterToDate_Child_Credit = new SqlParameter("@ToDate", ToDate);
+            SqlParameter SqlParameterCostCenter_Child_Credit = new SqlParameter("@CostCenter", !string.IsNullOrEmpty(CostCenterId) ? CostCenterId : (object)DBNull.Value);
+            SqlParameter SqlParameterLedgerAccountGroup_Child_Credit = new SqlParameter("@LedgerAccountGroup", !string.IsNullOrEmpty(LedgerAccountGroup_Credit) ? LedgerAccountGroup_Credit : (object)DBNull.Value);
+
+            mQry = GetQryForTrialBalance(SiteId, DivisionId, FromDate, ToDate, CostCenterId, IsIncludeZeroBalance, IsIncludeOpening, LedgerAccountGroup) +
+                            @"SELECT Convert(nvarchar,Max(PAg.LedgerAccountGroupId)) As ParentGRCodeCredit, Convert(nvarchar,H.BaseLedgerAccountGroupId) AS GRCodeCredit, '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + '<Strong>' +  Max(BaseLedgerAccountGroupName) + '</Strong>' AS GRNameCredit, 
+                                    Null AS Debit,
+                                    Sum(isnull(H.Balance,0)) As Credit,
+                                    NULL AS LedgerAccountId, 'Trial Balance' ReportType, 'Trial Balance' AS OpenReportType, Max(BaseLedgerAccountGroupName) As OrderByColumn,
+                                    Max(PAg.LedgerAccountGroupName) AS ParentLedgerAccountGroupName
+                                    FROM cteAcGroup H 
+                                    LEFT JOIN Web.LedgerAccountGroups Ag ON H.BaseLedgerAccountGroupId = Ag.LedgerAccountGroupId
+                                    LEFT JOIN Web.LedgerAccountGroups PAg ON Ag.ParentLedgerAccountGroupId = PAg.LedgerAccountGroupId
+                                    GROUP BY H.BaseLedgerAccountGroupId 
+                                    Having (Sum(isnull(H.Opening,0)) <> 0 Or Sum(isnull(H.AmtDr,0)) <> 0 Or Sum(isnull(H.AmtCr,0)) <> 0 Or Sum(isnull(H.Balance,0)) <> 0) " +
+                            (IsIncludeZeroBalance == "False" ? " And Sum(isnull(H.Balance,0)) <> 0 " : "") +
+
+                            @"UNION ALL 
+                
+                                    SELECT Convert(nvarchar,Ag.LedgerAccountGroupId)  As ParentGRCodeCredit, Convert(nvarchar,H.LedgerAccountId) AS GRCodeCredit, '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + H.LedgerAccountName AS GRNameCredit, 
+                                    Null AS Debit,
+                                    isnull(H.Balance,0) AS Credit,
+                                    H.LedgerAccountId AS LedgerAccountId, 'Trial Balance' ReportType, 'Ledger' AS OpenReportType, H.LedgerAccountName  As OrderByColumn,
+                                    Ag.LedgerAccountGroupName AS ParentLedgerAccountGroupName
+                                    FROM cteLedgerBalance H 
+                                    LEFT JOIN Web.LedgerAccounts A ON H.LedgerAccountId = A.LedgerAccountId 
+                                    LEFT JOIN Web.LedgerAccountGroups Ag ON A.LedgerAccountGroupId = Ag.LedgerAccountGroupId 
+                                    Where (isnull(H.Opening,0) <> 0 Or isnull(H.AmtDr,0) <> 0 Or isnull(H.AmtCr,0) <> 0 Or isnull(H.Balance,0) <> 0) " +
+                            (IsIncludeZeroBalance == "False" ? " And isnull(H.Balance,0) <> 0 " : "") +
+                            @" ORDER BY OrderByColumn ";
+
+            List<BalanceSheetViewModel> ChileBalanceSheetList_Credit = db.Database.SqlQuery<BalanceSheetViewModel>(mQry, SqlParameterSiteId_Child_Credit, SqlParameterDivisionId_Child_Credit, SqlParameterFromDate_Child_Credit, SqlParameterToDate_Child_Credit, SqlParameterCostCenter_Child_Credit, SqlParameterLedgerAccountGroup_Child_Credit).ToList();
+
+
+            List<BalanceSheetViewModel> BalanceSheetViewModel_DebitSide = (from H in BalanceSheetViewModelList
+                                                                           select new BalanceSheetViewModel
+                                                                           {
+                                                                               GRCode = H.GRCode,
+                                                                               GRName = H.GRName,
+                                                                               Debit = H.Debit,
+                                                                           }).ToList();
+
+            List<BalanceSheetViewModel> BalanceSheetViewModel_CreditSide = (from H in BalanceSheetViewModelList
+                                                                            select new BalanceSheetViewModel
+                                                                            {
+                                                                                GRCodeCredit = H.GRCodeCredit,
+                                                                                GRNameCredit = H.GRNameCredit,
+                                                                                Credit = H.Credit,
+                                                                            }).ToList();
+
+            for (I = 0; I <= BalanceSheetViewModel_DebitSide.Count - 1; I++)
+            {
+                if (BalanceSheetViewModel_DebitSide[I].ParentGRCode == null)
+                {
+                    foreach (var item in ChileBalanceSheetList_Debit)
+                    {
+                        if (BalanceSheetViewModel_DebitSide[I].GRCode == item.ParentGRCode)
+                        {
+                            BalanceSheetViewModel Temp = new BalanceSheetViewModel();
+                            Temp.GRCode = item.GRCode;
+                            Temp.GRName = item.GRName;
+                            Temp.Debit = item.Debit;
+                            Temp.ParentGRCode = item.ParentGRCode;
+                            BalanceSheetViewModel_DebitSide.Insert(I + 1, Temp);
+                        }
+                    }
+                }
+            }
+
+            for (I = 0; I <= BalanceSheetViewModel_CreditSide.Count - 1; I++)
+            {
+                if (BalanceSheetViewModel_CreditSide[I].ParentGRCodeCredit == null)
+                {
+                    foreach (var item in ChileBalanceSheetList_Credit)
+                    {
+                        if (BalanceSheetViewModel_CreditSide[I].GRCodeCredit == item.ParentGRCodeCredit)
+                        {
+                            BalanceSheetViewModel Temp = new BalanceSheetViewModel();
+                            Temp.GRCodeCredit = item.GRCodeCredit;
+                            Temp.GRNameCredit = item.GRNameCredit;
+                            Temp.Credit = item.Credit;
+                            Temp.ParentGRCodeCredit = item.ParentGRCodeCredit;
+                            BalanceSheetViewModel_CreditSide.Insert(I + 1, Temp);
+                        }
+                    }
+                }
+            }
+
+
+            string StrQry1 = "", StrQry2 = "";
+            DataTable DtCombined = new DataTable();
+            for (I = 0; I <= BalanceSheetViewModel_DebitSide.Count - 1; I++)
+            {
+                if (StrQry1 != "")
+                    StrQry1 = StrQry1 + " UNION ALL ";
+
+                StrQry1 = StrQry1 + "Select " + I + " As RowNumber, '" + BalanceSheetViewModel_DebitSide[I].GRCode + "' As GRCode, '" + BalanceSheetViewModel_DebitSide[I].GRName + "' As GRName, " + (BalanceSheetViewModel_DebitSide[I].Debit ?? 0) + " As Debit ";
+            }
+
+            for (I = 0; I <= BalanceSheetViewModel_CreditSide.Count - 1; I++)
+            {
+                if (StrQry2 != "")
+                    StrQry2 = StrQry2 + " UNION ALL ";
+
+                StrQry2 = StrQry2 + "Select " + I + " As RowNumber, '" + BalanceSheetViewModel_CreditSide[I].GRCodeCredit + "' As GRCodeCredit, '" + BalanceSheetViewModel_CreditSide[I].GRNameCredit + "' As GRNameCredit, " + (BalanceSheetViewModel_CreditSide[I].Credit ?? 0) + " As Credit ";
+            }
+
+            mQry = "Select GRCode, GRName, Debit, GRCodeCredit, GRNameCredit, Credit From (" + StrQry1 + ") As V1 FULL JOIN (" + StrQry2 + ") As V2 On V1.RowNumber = V2.RowNumber ";
+            using (SqlConnection sqlConnection = new SqlConnection(ConnectionString))
+            {
+                sqlConnection.Open();
+                SqlCommand cmd = new SqlCommand(mQry);
+                SqlDataAdapter Da = new SqlDataAdapter(mQry, ConnectionString);
+                Da.Fill(DtCombined);
+            }
+
+
+            List<BalanceSheetViewModel> BalanceSheetViewModelList_Combined = new List<BalanceSheetViewModel>();
+            for (I = 0; I <= DtCombined.Rows.Count - 1; I++)
+            {
+                BalanceSheetViewModel vm = new BalanceSheetViewModel();
+                if (DtCombined.Rows[I]["GRCode"] != null && DtCombined.Rows[I]["GRCode"] != System.DBNull.Value)
+                    vm.GRCode = Convert.ToInt32(DtCombined.Rows[I]["GRCode"]);
+                if (DtCombined.Rows[I]["GRName"] != null && DtCombined.Rows[I]["GRName"] != System.DBNull.Value)
+                    vm.GRName = Convert.ToString(DtCombined.Rows[I]["GRName"]);
+                if (DtCombined.Rows[I]["Debit"] != null && DtCombined.Rows[I]["Debit"] != System.DBNull.Value)
+                    if (Convert.ToDecimal(DtCombined.Rows[I]["Debit"]) != 0)
+                        vm.Debit = Convert.ToDecimal(DtCombined.Rows[I]["Debit"]);
+                if (DtCombined.Rows[I]["Credit"] != null && DtCombined.Rows[I]["Credit"] != System.DBNull.Value)
+                    if (Convert.ToDecimal(DtCombined.Rows[I]["Credit"]) != 0)
+                        vm.Credit = Convert.ToDecimal(DtCombined.Rows[I]["Credit"]);
+                if (DtCombined.Rows[I]["GRCodeCredit"] != null && DtCombined.Rows[I]["GRCodeCredit"] != System.DBNull.Value)
+                    vm.GRCodeCredit = Convert.ToString(DtCombined.Rows[I]["GRCodeCredit"]);
+                if (DtCombined.Rows[I]["GRNameCredit"] != null && DtCombined.Rows[I]["GRNameCredit"] != System.DBNull.Value)
+                    vm.GRNameCredit = Convert.ToString(DtCombined.Rows[I]["GRNameCredit"]);
+
+                vm.TotalDebit = DblDebit_Total;
+                vm.TotalCredit = DblCredit_Total;
+
+                vm.ReportType = "Balance Sheet";
+                vm.OpenReportType = "Trial Balance";
+
+                BalanceSheetViewModelList_Combined.Add(vm);
+            }
+
+            return BalanceSheetViewModelList_Combined;
+        }
+
+        public IEnumerable<ProfitAndLossViewModel> GetProfitAndLossDetail(FinancialDisplaySettings Settings)
+        {
+            DataTable DTTemp;
+            Decimal DblDebit_Total = 0;
+            Decimal DblCredit_Total = 0;
+            Decimal DblGrossProfit = 0;
+            Decimal DblNetProfit = 0;
+            int I, J, IntFindRowFrom;
+            string mQry = "";
+            DataTable FGMain = new DataTable();
+            List<ProfitAndLossViewModel> ProfitAndLossViewModelList = new List<ProfitAndLossViewModel>();
+
+            var SiteSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "Site" select H).FirstOrDefault();
+            var DivisionSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "Division" select H).FirstOrDefault();
+            var FromDateSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "FromDate" select H).FirstOrDefault();
+            var ToDateSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "ToDate" select H).FirstOrDefault();
+            var CostCenterSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "CostCenter" select H).FirstOrDefault();
+            var IsIncludeZeroBalanceSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "IsIncludeZeroBalance" select H).FirstOrDefault();
+            var IsIncludeOpeningSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "IsIncludeOpening" select H).FirstOrDefault();
+            var LedgerAccountGroupSetting = (from H in Settings.FinancialDisplayParameters where H.ParameterName == "LedgerAccountGroup" select H).FirstOrDefault();
+
+            string SiteId = SiteSetting.Value;
+            string DivisionId = DivisionSetting.Value;
+            string FromDate = FromDateSetting.Value;
+            string ToDate = ToDateSetting.Value;
+            string CostCenterId = CostCenterSetting.Value;
+            string IsIncludeZeroBalance = IsIncludeZeroBalanceSetting.Value;
+            string IsIncludeOpening = IsIncludeOpeningSetting.Value;
+
+
+            DTTemp = FGetTRDDataTable("", Settings);
+
+            FGMain.Columns.Add("GRCodeCredit");
+            FGMain.Columns.Add("GRNameCredit");
+            FGMain.Columns.Add("Credit");
+            FGMain.Columns.Add("GRCode");
+            FGMain.Columns.Add("GRName");
+            FGMain.Columns.Add("Debit");
+
+            DblDebit_Total = 0;
+            DblCredit_Total = 0;
+
+            for (I = 0; I <= DTTemp.Rows.Count - 1; I++)
+            {
+                if (Convert.ToDecimal(DTTemp.Rows[I]["AmtCr"]) > 0)
+                {
+                    J = FFindEmptyRow(ref FGMain, "GRNameCredit");
+                    FGMain.Rows[J]["GRCodeCredit"] = DTTemp.Rows[I]["LedgerAccountGroupId"];
+                    if (DTTemp.Rows[I]["GroupNature"].ToString() == "Income")
+                        FGMain.Rows[J]["GRNameCredit"] = DTTemp.Rows[I]["GName"];
+                    else
+                        FGMain.Rows[J]["GRNameCredit"] = DTTemp.Rows[I]["ContraGroupName"];
+                    FGMain.Rows[J]["Credit"] = DTTemp.Rows[I]["AmtCr"];
+                    DblCredit_Total = DblCredit_Total + Convert.ToDecimal(DTTemp.Rows[I]["AmtCr"]);
+                }
+                else if (Convert.ToDecimal(DTTemp.Rows[I]["AmtDr"]) > 0)
+                {
+                    J = FFindEmptyRow(ref FGMain, "GRName");
+                    FGMain.Rows[J]["GRCode"] = DTTemp.Rows[I]["LedgerAccountGroupId"];
+                    if (DTTemp.Rows[I]["GroupNature"].ToString() == "Expense")
+                        FGMain.Rows[J]["GRName"] = DTTemp.Rows[I]["GName"];
+                    else
+                        FGMain.Rows[J]["GRName"] = DTTemp.Rows[I]["ContraGroupName"];
+                    FGMain.Rows[J]["Debit"] = DTTemp.Rows[I]["AmtDr"];
+                    DblDebit_Total = DblDebit_Total + Convert.ToDecimal(DTTemp.Rows[I]["AmtDr"]);
+                }
+            }
+
+            Decimal DHSMain_DblClosingStock = 0;
+            if (DHSMain_DblClosingStock > 0)
+            {
+                J = 0;
+                FGMain.Rows[J]["GRNameCredit"] = "Closing Stock";
+                FGMain.Rows[J]["Credit"] = DHSMain_DblClosingStock;
+                DblCredit_Total = DblCredit_Total + DHSMain_DblClosingStock;
+            }
+
+            DblGrossProfit = (DblDebit_Total - DblCredit_Total);
+
+            if (DblDebit_Total - DblCredit_Total > 0)
+            {
+                J = FFindEmptyRow(ref FGMain, "GRNameCredit");
+                FGMain.Rows[J]["GRNameCredit"] = "Gross Loss";
+                FGMain.Rows[J]["Credit"] = DblDebit_Total - DblCredit_Total;
+                DblCredit_Total = DblCredit_Total + (DblDebit_Total - DblCredit_Total);
+                DblDebit_Total = DblCredit_Total;
+            }
+            else if (DblCredit_Total - DblDebit_Total > 0)
+            {
+                J = FFindEmptyRow(ref FGMain, "GRNameCredit");
+                FGMain.Rows[J]["GRNameCredit"] = "Gross Profit";
+                FGMain.Rows[J]["Debit"] = DblDebit_Total - DblCredit_Total;
+                DblDebit_Total = DblDebit_Total + (DblCredit_Total - DblDebit_Total);
+                DblCredit_Total = DblDebit_Total;
+            }
+
+
+            if (DblDebit_Total > 0)
+            {
+                FGMain.Rows.Add();
+                FGMain.Rows[FGMain.Rows.Count - 1]["GRCode"] = "0";
+                FGMain.Rows.Add();
+                FGMain.Rows[FGMain.Rows.Count - 1]["Debit"] = DblDebit_Total;
+                FGMain.Rows[FGMain.Rows.Count - 1]["Credit"] = DblCredit_Total;
+
+                //Code For Showing Totals Parellal
+                FGMain.Rows[FGMain.Rows.Count - 1]["GRCode"] = "-1";
+                FGMain.Rows[FGMain.Rows.Count - 1]["GRCodeCredit"] = "-1";
+                FGMain.Rows.Add();
+            }
+
+            IntFindRowFrom = FGMain.Rows.Count;
+            if (DblGrossProfit > 0)
+            {
+                J = FFindEmptyRow(ref FGMain, "GRNameCredit", IntFindRowFrom);
+                FGMain.Rows[J]["GRName"] = "Gross Loss";
+                FGMain.Rows[J]["Debit"] = Math.Abs(DblGrossProfit);
+            }
+            else
+            {
+                J = FFindEmptyRow(ref FGMain, "GRNameCredit", IntFindRowFrom);
+                FGMain.Rows[J]["GRName"] = "Gross Profit";
+                FGMain.Rows[J]["Credit"] = Math.Abs(DblGrossProfit);
+            }
+
+
+            DTTemp = FGetTRDDataTable("Not", Settings);
+
+            DblDebit_Total = 0;
+            DblCredit_Total = 0;
+
+            for (I = 0; I <= DTTemp.Rows.Count - 1; I++)
+            {
+                if (Convert.ToDecimal(DTTemp.Rows[I]["AmtCr"]) > 0)
+                {
+                    J = FFindEmptyRow(ref FGMain, "GRNameCredit", IntFindRowFrom);
+                    FGMain.Rows[J]["GRCodeCredit"] = DTTemp.Rows[I]["LedgerAccountGroupId"];
+                    if (DTTemp.Rows[I]["GroupNature"].ToString() == "Income")
+                        FGMain.Rows[J]["GRNameCredit"] = DTTemp.Rows[I]["GName"];
+                    else
+                        FGMain.Rows[J]["GRNameCredit"] = DTTemp.Rows[I]["ContraGroupName"];
+                    FGMain.Rows[J]["Credit"] = DTTemp.Rows[I]["AmtCr"];
+                    DblCredit_Total = DblCredit_Total + Convert.ToDecimal(DTTemp.Rows[I]["AmtCr"]);
+                }
+                else if (Convert.ToDecimal(DTTemp.Rows[I]["AmtDr"]) > 0)
+                {
+                    J = FFindEmptyRow(ref FGMain, "GRName", IntFindRowFrom);
+                    FGMain.Rows[J]["GRCode"] = DTTemp.Rows[I]["LedgerAccountGroupId"];
+                    if (DTTemp.Rows[I]["GroupNature"].ToString() == "Expense")
+                        FGMain.Rows[J]["GRName"] = DTTemp.Rows[I]["GName"];
+                    else
+                        FGMain.Rows[J]["GRName"] = DTTemp.Rows[I]["ContraGroupName"];
+                    FGMain.Rows[J]["Debit"] = DTTemp.Rows[I]["AmtDr"];
+                    DblDebit_Total = DblDebit_Total + Convert.ToDecimal(DTTemp.Rows[I]["AmtDr"]);
+                }
+            }
+
+            DblNetProfit = DblGrossProfit + (DblDebit_Total - DblCredit_Total);
+            if (DblNetProfit > 0)
+            {
+                J = FFindEmptyRow(ref FGMain, "GRNameCredit", IntFindRowFrom);
+                FGMain.Rows[J]["GRNameCredit"] = "Net Loss";
+                FGMain.Rows[J]["Credit"] = Math.Abs(DblNetProfit);
+                DblCredit_Total = DblCredit_Total + Math.Abs(DblNetProfit);
+                DblDebit_Total = DblCredit_Total;
+            }
+            else if (DblNetProfit < 0)
+            {
+                J = FFindEmptyRow(ref FGMain, "GRName", IntFindRowFrom);
+                FGMain.Rows[J]["GRName"] = "Net Profit";
+                FGMain.Rows[J]["Debit"] = Math.Abs(DblNetProfit);
+                DblDebit_Total = DblDebit_Total + Math.Abs(DblNetProfit);
+                DblCredit_Total = DblDebit_Total;
+            }
+
+
+
+            for (I = 0; I <= FGMain.Rows.Count - 1; I++)
+            {
+                ProfitAndLossViewModel vm = new ProfitAndLossViewModel();
+                if (FGMain.Rows[I]["GRCode"] != null && FGMain.Rows[I]["GRCode"] != System.DBNull.Value)
+                    vm.GRCode = Convert.ToInt32(FGMain.Rows[I]["GRCode"]);
+                if (FGMain.Rows[I]["GRName"] != null && FGMain.Rows[I]["GRName"] != System.DBNull.Value)
+                    vm.GRName = "<Strong>" + Convert.ToString(FGMain.Rows[I]["GRName"]) + "</Strong>";
+                if (FGMain.Rows[I]["Debit"] != null && FGMain.Rows[I]["Debit"] != System.DBNull.Value)
+                    vm.Debit = Convert.ToDecimal(FGMain.Rows[I]["Debit"]);
+                if (FGMain.Rows[I]["Credit"] != null && FGMain.Rows[I]["Credit"] != System.DBNull.Value)
+                    vm.Credit = Convert.ToDecimal(FGMain.Rows[I]["Credit"]);
+                if (FGMain.Rows[I]["GRCodeCredit"] != null && FGMain.Rows[I]["GRCodeCredit"] != System.DBNull.Value)
+                    vm.GRCodeCredit = Convert.ToString(FGMain.Rows[I]["GRCodeCredit"]);
+                if (FGMain.Rows[I]["GRNameCredit"] != null && FGMain.Rows[I]["GRNameCredit"] != System.DBNull.Value)
+                    vm.GRNameCredit = "<Strong>" + Convert.ToString(FGMain.Rows[I]["GRNameCredit"]) + "</Strong>";
+
+                vm.TotalDebit = DblDebit_Total;
+                vm.TotalCredit = DblCredit_Total;
+
+                vm.ReportType = "Profit And Loss";
+                vm.OpenReportType = "Trial Balance";
+
+                ProfitAndLossViewModelList.Add(vm);
+            }
+
+            string ConnectionString = (string)System.Web.HttpContext.Current.Session["DefaultConnectionString"];
+
+            string LedgerAccountGroup_Debit = string.Join<string>(",", ProfitAndLossViewModelList.Select(m => m.GRCode.ToString()));
+            string LedgerAccountGroup_Credit = string.Join<string>(",", ProfitAndLossViewModelList.Select(m => (m.GRCodeCredit ?? "").ToString()));
+
+            SqlParameter SqlParameterSiteId_Child_Debit = new SqlParameter("@Site", !string.IsNullOrEmpty(SiteId) ? SiteId : (object)DBNull.Value);
+            SqlParameter SqlParameterDivisionId_Child_Debit = new SqlParameter("@Division", !string.IsNullOrEmpty(DivisionId) ? DivisionId : (object)DBNull.Value);
+            SqlParameter SqlParameterFromDate_Child_Debit = new SqlParameter("@FromDate", FromDate);
+            SqlParameter SqlParameterToDate_Child_Debit = new SqlParameter("@ToDate", ToDate);
+            SqlParameter SqlParameterCostCenter_Child_Debit = new SqlParameter("@CostCenter", !string.IsNullOrEmpty(CostCenterId) ? CostCenterId : (object)DBNull.Value);
+            SqlParameter SqlParameterLedgerAccountGroup_Child_Debit = new SqlParameter("@LedgerAccountGroup", !string.IsNullOrEmpty(LedgerAccountGroup_Debit.ToString()) ? LedgerAccountGroup_Debit : (object)DBNull.Value);
+
+            mQry = GetQryForTrialBalance(SiteId, DivisionId, FromDate, ToDate, CostCenterId, IsIncludeZeroBalance, IsIncludeOpening, LedgerAccountGroup_Debit) +
+                            @"SELECT Max(PAg.LedgerAccountGroupId) As ParentGRCode, H.BaseLedgerAccountGroupId AS GRCode, '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + '<Strong>' +  Max(BaseLedgerAccountGroupName) + '</Strong>' AS GRName, 
+                                    Sum(isnull(H.Balance,0)) AS Debit,
+                                    Null As Credit,
+                                    NULL AS LedgerAccountId, 'Trial Balance' ReportType, 'Trial Balance' AS OpenReportType, Max(BaseLedgerAccountGroupName) As OrderByColumn,
+                                    Max(PAg.LedgerAccountGroupName) AS ParentLedgerAccountGroupName
+                                    FROM cteAcGroup H 
+                                    LEFT JOIN Web.LedgerAccountGroups Ag ON H.BaseLedgerAccountGroupId = Ag.LedgerAccountGroupId
+                                    LEFT JOIN Web.LedgerAccountGroups PAg ON Ag.ParentLedgerAccountGroupId = PAg.LedgerAccountGroupId
+                                    GROUP BY H.BaseLedgerAccountGroupId 
+                                    Having (Sum(isnull(H.Opening,0)) <> 0 Or Sum(isnull(H.AmtDr,0)) <> 0 Or Sum(isnull(H.AmtCr,0)) <> 0 Or Sum(isnull(H.Balance,0)) <> 0) " +
+                            (IsIncludeZeroBalance == "False" ? " And Sum(isnull(H.Balance,0)) <> 0 " : "") +
+
+                            @"UNION ALL 
+                
+                                    SELECT Ag.LedgerAccountGroupId As ParentGRCode, H.LedgerAccountId AS GRCode, '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + H.LedgerAccountName AS GRName, 
+                                    isnull(H.Balance,0) AS Debit,
+                                    Null AS Credit,
+                                    H.LedgerAccountId AS LedgerAccountId, 'Trial Balance' ReportType, 'Ledger' AS OpenReportType, H.LedgerAccountName  As OrderByColumn,
+                                    Ag.LedgerAccountGroupName AS ParentLedgerAccountGroupName
+                                    FROM cteLedgerBalance H 
+                                    LEFT JOIN Web.LedgerAccounts A ON H.LedgerAccountId = A.LedgerAccountId 
+                                    LEFT JOIN Web.LedgerAccountGroups Ag ON A.LedgerAccountGroupId = Ag.LedgerAccountGroupId 
+                                    Where (isnull(H.Opening,0) <> 0 Or isnull(H.AmtDr,0) <> 0 Or isnull(H.AmtCr,0) <> 0 Or isnull(H.Balance,0) <> 0) " +
+                            (IsIncludeZeroBalance == "False" ? " And isnull(H.Balance,0) <> 0 " : "") +
+                            @" ORDER BY OrderByColumn ";
+
+            List<ProfitAndLossViewModel> ChileProfitAndLossList_Debit = db.Database.SqlQuery<ProfitAndLossViewModel>(mQry, SqlParameterSiteId_Child_Debit, SqlParameterDivisionId_Child_Debit, SqlParameterFromDate_Child_Debit, SqlParameterToDate_Child_Debit, SqlParameterCostCenter_Child_Debit, SqlParameterLedgerAccountGroup_Child_Debit).ToList();
+
+
+            SqlParameter SqlParameterSiteId_Child_Credit = new SqlParameter("@Site", !string.IsNullOrEmpty(SiteId) ? SiteId : (object)DBNull.Value);
+            SqlParameter SqlParameterDivisionId_Child_Credit = new SqlParameter("@Division", !string.IsNullOrEmpty(DivisionId) ? DivisionId : (object)DBNull.Value);
+            SqlParameter SqlParameterFromDate_Child_Credit = new SqlParameter("@FromDate", FromDate);
+            SqlParameter SqlParameterToDate_Child_Credit = new SqlParameter("@ToDate", ToDate);
+            SqlParameter SqlParameterCostCenter_Child_Credit = new SqlParameter("@CostCenter", !string.IsNullOrEmpty(CostCenterId) ? CostCenterId : (object)DBNull.Value);
+            SqlParameter SqlParameterLedgerAccountGroup_Child_Credit = new SqlParameter("@LedgerAccountGroup", !string.IsNullOrEmpty(LedgerAccountGroup_Credit) ? LedgerAccountGroup_Credit : (object)DBNull.Value);
+
+            mQry = GetQryForTrialBalance(SiteId, DivisionId, FromDate, ToDate, CostCenterId, IsIncludeZeroBalance, IsIncludeOpening, LedgerAccountGroup_Credit) +
+                            @"SELECT Convert(nvarchar,Max(PAg.LedgerAccountGroupId)) As ParentGRCodeCredit, Convert(nvarchar,H.BaseLedgerAccountGroupId) AS GRCodeCredit, '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + '<Strong>' +  Max(BaseLedgerAccountGroupName) + '</Strong>' AS GRNameCredit, 
+                                    Null AS Debit,
+                                    -Sum(isnull(H.Balance,0)) As Credit,
+                                    NULL AS LedgerAccountId, 'Trial Balance' ReportType, 'Trial Balance' AS OpenReportType, Max(BaseLedgerAccountGroupName) As OrderByColumn,
+                                    Max(PAg.LedgerAccountGroupName) AS ParentLedgerAccountGroupName
+                                    FROM cteAcGroup H 
+                                    LEFT JOIN Web.LedgerAccountGroups Ag ON H.BaseLedgerAccountGroupId = Ag.LedgerAccountGroupId
+                                    LEFT JOIN Web.LedgerAccountGroups PAg ON Ag.ParentLedgerAccountGroupId = PAg.LedgerAccountGroupId
+                                    GROUP BY H.BaseLedgerAccountGroupId 
+                                    Having (Sum(isnull(H.Opening,0)) <> 0 Or Sum(isnull(H.AmtDr,0)) <> 0 Or Sum(isnull(H.AmtCr,0)) <> 0 Or Sum(isnull(H.Balance,0)) <> 0) " +
+                            (IsIncludeZeroBalance == "False" ? " And Sum(isnull(H.Balance,0)) <> 0 " : "") +
+
+                            @"UNION ALL 
+                
+                                    SELECT Convert(nvarchar,Ag.LedgerAccountGroupId)  As ParentGRCodeCredit, Convert(nvarchar,H.LedgerAccountId) AS GRCodeCredit, '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + H.LedgerAccountName AS GRNameCredit, 
+                                    Null AS Debit,
+                                    -isnull(H.Balance,0) AS Credit,
+                                    H.LedgerAccountId AS LedgerAccountId, 'Trial Balance' ReportType, 'Ledger' AS OpenReportType, H.LedgerAccountName  As OrderByColumn,
+                                    Ag.LedgerAccountGroupName AS ParentLedgerAccountGroupName
+                                    FROM cteLedgerBalance H 
+                                    LEFT JOIN Web.LedgerAccounts A ON H.LedgerAccountId = A.LedgerAccountId 
+                                    LEFT JOIN Web.LedgerAccountGroups Ag ON A.LedgerAccountGroupId = Ag.LedgerAccountGroupId 
+                                    Where (isnull(H.Opening,0) <> 0 Or isnull(H.AmtDr,0) <> 0 Or isnull(H.AmtCr,0) <> 0 Or isnull(H.Balance,0) <> 0) " +
+                            (IsIncludeZeroBalance == "False" ? " And isnull(H.Balance,0) <> 0 " : "") +
+                            @" ORDER BY OrderByColumn ";
+
+            List<ProfitAndLossViewModel> ChildProfitAndLossList_Credit = db.Database.SqlQuery<ProfitAndLossViewModel>(mQry, SqlParameterSiteId_Child_Credit, SqlParameterDivisionId_Child_Credit, SqlParameterFromDate_Child_Credit, SqlParameterToDate_Child_Credit, SqlParameterCostCenter_Child_Credit, SqlParameterLedgerAccountGroup_Child_Credit).ToList();
+
+
+            List<ProfitAndLossViewModel> ProfitAndLossViewModel_DebitSide = (from H in ProfitAndLossViewModelList
+                                                                             select new ProfitAndLossViewModel
+                                                                             {
+                                                                                 GRCode = H.GRCode,
+                                                                                 GRName = H.GRName,
+                                                                                 Debit = H.Debit,
+                                                                             }).ToList();
+
+            List<ProfitAndLossViewModel> ProfitAndLossViewModel_CreditSide = (from H in ProfitAndLossViewModelList
+                                                                              select new ProfitAndLossViewModel
+                                                                              {
+                                                                                  GRCodeCredit = H.GRCodeCredit,
+                                                                                  GRNameCredit = H.GRNameCredit,
+                                                                                  Credit = H.Credit,
+                                                                              }).ToList();
+
+            for (I = 0; I <= ProfitAndLossViewModel_DebitSide.Count - 1; I++)
+            {
+                if (ProfitAndLossViewModel_DebitSide[I].ParentGRCode == null)
+                {
+                    foreach (var item in ChileProfitAndLossList_Debit)
+                    {
+                        if (ProfitAndLossViewModel_DebitSide[I].GRCode == item.ParentGRCode)
+                        {
+                            ProfitAndLossViewModel Temp = new ProfitAndLossViewModel();
+                            Temp.GRCode = item.GRCode;
+                            Temp.GRName = item.GRName;
+                            Temp.Debit = item.Debit;
+                            Temp.ParentGRCode = item.ParentGRCode;
+                            ProfitAndLossViewModel_DebitSide.Insert(I + 1, Temp);
+                        }
+                    }
+                }
+            }
+
+            for (I = 0; I <= ProfitAndLossViewModel_CreditSide.Count - 1; I++)
+            {
+                if (ProfitAndLossViewModel_CreditSide[I].ParentGRCodeCredit == null)
+                {
+                    foreach (var item in ChildProfitAndLossList_Credit)
+                    {
+                        if (ProfitAndLossViewModel_CreditSide[I].GRCodeCredit == item.ParentGRCodeCredit)
+                        {
+                            ProfitAndLossViewModel Temp = new ProfitAndLossViewModel();
+                            Temp.GRCodeCredit = item.GRCodeCredit;
+                            Temp.GRNameCredit = item.GRNameCredit;
+                            Temp.Credit = item.Credit;
+                            Temp.ParentGRCodeCredit = item.ParentGRCodeCredit;
+                            ProfitAndLossViewModel_CreditSide.Insert(I + 1, Temp);
+                        }
+                    }
+                }
+            }
+
+            int MaxLines = 0;
+            int DebitSiteLineNum = 0;
+            int CreditSiteLineNum = 0;
+            string StrQry1 = "", StrQry2 = "";
+            int M = 0;
+            DataTable DtCombined = new DataTable();
+            for (I = 0; I <= ProfitAndLossViewModel_DebitSide.Count - 1; I++)
+            {
+                if (ProfitAndLossViewModel_DebitSide[I].GRCode == -1)
+                {
+                    MaxLines = I;
+                    DebitSiteLineNum = I;
+                    break;
+                }
+
+                if (StrQry1 != "")
+                    StrQry1 = StrQry1 + " UNION ALL ";
+
+                StrQry1 = StrQry1 + "Select " + I + " As RowNumber, '" + ProfitAndLossViewModel_DebitSide[I].GRCode + "' As GRCode, '" + ProfitAndLossViewModel_DebitSide[I].GRName + "' As GRName, " + (ProfitAndLossViewModel_DebitSide[I].Debit ?? 0) + " As Debit ";
+            }
+
+            for (I = 0; I <= ProfitAndLossViewModel_CreditSide.Count - 1; I++)
+            {
+                if (ProfitAndLossViewModel_CreditSide[I].GRCodeCredit == "-1")
+                {
+                    if (I > MaxLines)
+                    {
+                        MaxLines = I;
+                        CreditSiteLineNum = I;
+                    }
+                    break;
+                }
+
+                if (StrQry2 != "")
+                    StrQry2 = StrQry2 + " UNION ALL ";
+
+                StrQry2 = StrQry2 + "Select " + I + " As RowNumber, '" + ProfitAndLossViewModel_CreditSide[I].GRCodeCredit + "' As GRCodeCredit, '" + ProfitAndLossViewModel_CreditSide[I].GRNameCredit + "' As GRNameCredit, " + (ProfitAndLossViewModel_CreditSide[I].Credit ?? 0) + " As Credit ";
+            }
+
+            M = 0;
+            for (I = DebitSiteLineNum; I <= ProfitAndLossViewModel_DebitSide.Count - 1; I++)
+            {
+                if (StrQry1 != "")
+                    StrQry1 = StrQry1 + " UNION ALL ";
+
+                StrQry1 = StrQry1 + "Select " + (MaxLines + M) + " As RowNumber, '" + ProfitAndLossViewModel_DebitSide[I].GRCode + "' As GRCode, '" + ProfitAndLossViewModel_DebitSide[I].GRName + "' As GRName, " + (ProfitAndLossViewModel_DebitSide[I].Debit ?? 0) + " As Debit ";
+                M = M + 1;
+            }
+
+
+            M = 0;
+            for (I = CreditSiteLineNum; I <= ProfitAndLossViewModel_CreditSide.Count - 1; I++)
+            {
+                if (StrQry2 != "")
+                    StrQry2 = StrQry2 + " UNION ALL ";
+
+                StrQry2 = StrQry2 + "Select " + (MaxLines + M) + " As RowNumber, '" + ProfitAndLossViewModel_CreditSide[I].GRCodeCredit + "' As GRCodeCredit, '" + ProfitAndLossViewModel_CreditSide[I].GRNameCredit + "' As GRNameCredit, " + (ProfitAndLossViewModel_CreditSide[I].Credit ?? 0) + " As Credit ";
+                M = M + 1;
+            }
+
+
+
+
+            mQry = "Select GRCode, GRName, Debit, GRCodeCredit, GRNameCredit, Credit From (" + StrQry1 + ") As V1 FULL JOIN (" + StrQry2 + ") As V2 On V1.RowNumber = V2.RowNumber ";
+            using (SqlConnection sqlConnection = new SqlConnection(ConnectionString))
+            {
+                sqlConnection.Open();
+                SqlCommand cmd = new SqlCommand(mQry);
+                SqlDataAdapter Da = new SqlDataAdapter(mQry, ConnectionString);
+                Da.Fill(DtCombined);
+            }
+
+
+            List<ProfitAndLossViewModel> ProfitAndLossViewModelList_Combined = new List<ProfitAndLossViewModel>();
+            for (I = 0; I <= DtCombined.Rows.Count - 1; I++)
+            {
+                ProfitAndLossViewModel vm = new ProfitAndLossViewModel();
+                if (DtCombined.Rows[I]["GRCode"] != null && DtCombined.Rows[I]["GRCode"] != System.DBNull.Value)
+                    vm.GRCode = Convert.ToInt32(DtCombined.Rows[I]["GRCode"]);
+                if (DtCombined.Rows[I]["GRName"] != null && DtCombined.Rows[I]["GRName"] != System.DBNull.Value)
+                    vm.GRName = Convert.ToString(DtCombined.Rows[I]["GRName"]);
+                if (DtCombined.Rows[I]["Debit"] != null && DtCombined.Rows[I]["Debit"] != System.DBNull.Value)
+                    if (Convert.ToDecimal(DtCombined.Rows[I]["Debit"]) != 0)
+                        vm.Debit = Convert.ToDecimal(DtCombined.Rows[I]["Debit"]);
+                if (DtCombined.Rows[I]["Credit"] != null && DtCombined.Rows[I]["Credit"] != System.DBNull.Value)
+                    if (Convert.ToDecimal(DtCombined.Rows[I]["Credit"]) != 0)
+                        vm.Credit = Convert.ToDecimal(DtCombined.Rows[I]["Credit"]);
+                if (DtCombined.Rows[I]["GRCodeCredit"] != null && DtCombined.Rows[I]["GRCodeCredit"] != System.DBNull.Value)
+                    vm.GRCodeCredit = Convert.ToString(DtCombined.Rows[I]["GRCodeCredit"]);
+                if (DtCombined.Rows[I]["GRNameCredit"] != null && DtCombined.Rows[I]["GRNameCredit"] != System.DBNull.Value)
+                    vm.GRNameCredit = Convert.ToString(DtCombined.Rows[I]["GRNameCredit"]);
+
+                vm.TotalDebit = DblDebit_Total;
+                vm.TotalCredit = DblCredit_Total;
+
+                vm.ReportType = "Profit And Loss";
+                vm.OpenReportType = "Trial Balance";
+
+                ProfitAndLossViewModelList_Combined.Add(vm);
+            }
+
+            return ProfitAndLossViewModelList_Combined;
+        }
     }
-
-
 }

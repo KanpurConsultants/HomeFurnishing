@@ -7066,73 +7066,73 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>02/01/2018 14:24:11</publishTime>
     </File>
     <File Include="bin/Components.dll">
-      <publishTime>07/11/2018 13:10:20</publishTime>
+      <publishTime>07/19/2018 17:16:01</publishTime>
     </File>
     <File Include="bin/Components.pdb">
-      <publishTime>07/11/2018 13:10:20</publishTime>
+      <publishTime>07/19/2018 17:16:00</publishTime>
     </File>
     <File Include="bin/Core.dll">
-      <publishTime>07/11/2018 13:10:00</publishTime>
+      <publishTime>08/16/2018 15:51:54</publishTime>
     </File>
     <File Include="bin/Core.pdb">
-      <publishTime>07/11/2018 13:10:00</publishTime>
+      <publishTime>08/16/2018 15:51:54</publishTime>
     </File>
     <File Include="bin/CustomEventHandlers.dll">
-      <publishTime>07/16/2018 20:32:04</publishTime>
+      <publishTime>08/16/2018 15:52:26</publishTime>
     </File>
     <File Include="bin/CustomEventHandlers.pdb">
-      <publishTime>07/16/2018 20:32:04</publishTime>
+      <publishTime>08/16/2018 15:52:26</publishTime>
     </File>
     <File Include="bin/Data.dll">
-      <publishTime>07/16/2018 20:31:44</publishTime>
+      <publishTime>08/16/2018 15:52:09</publishTime>
     </File>
     <File Include="bin/Data.pdb">
-      <publishTime>07/16/2018 20:31:43</publishTime>
+      <publishTime>08/16/2018 15:52:09</publishTime>
     </File>
     <File Include="bin/DocumentEvents.dll">
-      <publishTime>07/16/2018 20:32:03</publishTime>
+      <publishTime>08/16/2018 15:52:25</publishTime>
     </File>
     <File Include="bin/DocumentEvents.pdb">
-      <publishTime>07/16/2018 20:32:03</publishTime>
+      <publishTime>08/16/2018 15:52:25</publishTime>
     </File>
     <File Include="bin/Components.pdb">
-      <publishTime>07/11/2018 13:10:20</publishTime>
+      <publishTime>07/19/2018 17:16:00</publishTime>
     </File>
     <File Include="bin/Core.dll">
-      <publishTime>07/11/2018 13:10:00</publishTime>
+      <publishTime>08/16/2018 15:51:54</publishTime>
     </File>
     <File Include="bin/Core.pdb">
-      <publishTime>07/11/2018 13:10:00</publishTime>
+      <publishTime>08/16/2018 15:51:54</publishTime>
     </File>
     <File Include="bin/CustomEventHandlers.dll">
-      <publishTime>07/16/2018 20:32:04</publishTime>
+      <publishTime>08/16/2018 15:52:26</publishTime>
     </File>
     <File Include="bin/CustomEventHandlers.pdb">
-      <publishTime>07/16/2018 20:32:04</publishTime>
+      <publishTime>08/16/2018 15:52:26</publishTime>
     </File>
     <File Include="bin/Data.dll">
-      <publishTime>07/16/2018 20:31:44</publishTime>
+      <publishTime>08/16/2018 15:52:09</publishTime>
     </File>
     <File Include="bin/Data.pdb">
-      <publishTime>07/16/2018 20:31:43</publishTime>
+      <publishTime>08/16/2018 15:52:09</publishTime>
     </File>
     <File Include="bin/DocumentEvents.dll">
-      <publishTime>07/16/2018 20:32:03</publishTime>
+      <publishTime>08/16/2018 15:52:25</publishTime>
     </File>
     <File Include="bin/DocumentEvents.pdb">
-      <publishTime>07/16/2018 20:32:03</publishTime>
+      <publishTime>08/16/2018 15:52:25</publishTime>
     </File>
     <File Include="bin/Elmah.dll">
       <publishTime>02/01/2018 14:25:25</publishTime>
     </File>
     <File Include="bin/EMailContents.dll">
-      <publishTime>07/16/2018 20:32:03</publishTime>
+      <publishTime>08/16/2018 15:52:26</publishTime>
     </File>
     <File Include="bin/EMailContents.pdb">
-      <publishTime>07/16/2018 20:32:03</publishTime>
+      <publishTime>08/16/2018 15:52:26</publishTime>
     </File>
     <File Include="bin/EMailContents.pdb">
-      <publishTime>07/16/2018 20:32:03</publishTime>
+      <publishTime>08/16/2018 15:52:26</publishTime>
     </File>
     <File Include="bin/EntityFramework.dll">
       <publishTime>02/01/2018 14:25:18</publishTime>
@@ -7153,25 +7153,25 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>02/01/2018 14:25:26</publishTime>
     </File>
     <File Include="bin/Jobs.dll">
-      <publishTime>07/16/2018 21:56:32</publishTime>
+      <publishTime>08/16/2018 16:48:00</publishTime>
     </File>
     <File Include="bin/Jobs.pdb">
-      <publishTime>07/16/2018 21:56:32</publishTime>
+      <publishTime>08/16/2018 16:48:00</publishTime>
     </File>
     <File Include="bin/Jobs.pdb">
-      <publishTime>07/16/2018 21:56:32</publishTime>
+      <publishTime>08/16/2018 16:48:00</publishTime>
     </File>
     <File Include="bin/log4net.dll">
       <publishTime>02/01/2018 14:25:27</publishTime>
     </File>
     <File Include="bin/Mailer.dll">
-      <publishTime>07/11/2018 13:10:11</publishTime>
+      <publishTime>08/16/2018 15:52:10</publishTime>
     </File>
     <File Include="bin/Mailer.pdb">
-      <publishTime>07/11/2018 13:10:11</publishTime>
+      <publishTime>08/16/2018 15:52:10</publishTime>
     </File>
     <File Include="bin/Mailer.pdb">
-      <publishTime>07/11/2018 13:10:11</publishTime>
+      <publishTime>08/16/2018 15:52:10</publishTime>
     </File>
     <File Include="bin/Microsoft.AspNet.Identity.Core.dll">
       <publishTime>02/01/2018 14:25:21</publishTime>
@@ -7252,13 +7252,13 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>02/01/2018 14:25:23</publishTime>
     </File>
     <File Include="bin/Model.dll">
-      <publishTime>07/11/2018 13:10:05</publishTime>
+      <publishTime>08/16/2018 15:52:00</publishTime>
     </File>
     <File Include="bin/Model.pdb">
-      <publishTime>07/11/2018 13:10:04</publishTime>
+      <publishTime>08/16/2018 15:52:00</publishTime>
     </File>
     <File Include="bin/Model.pdb">
-      <publishTime>07/11/2018 13:10:04</publishTime>
+      <publishTime>08/16/2018 15:52:00</publishTime>
     </File>
     <File Include="bin/Models.Login.dll">
       <publishTime>09/01/2017 09:54:56</publishTime>
@@ -7276,25 +7276,25 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>02/01/2018 14:25:24</publishTime>
     </File>
     <File Include="bin/NotificationContents.dll">
-      <publishTime>07/11/2018 13:10:12</publishTime>
+      <publishTime>07/19/2018 17:16:00</publishTime>
     </File>
     <File Include="bin/NotificationContents.pdb">
-      <publishTime>07/11/2018 13:10:12</publishTime>
+      <publishTime>07/19/2018 17:16:00</publishTime>
     </File>
     <File Include="bin/Notifier.dll">
-      <publishTime>07/16/2018 20:32:03</publishTime>
+      <publishTime>08/16/2018 15:52:25</publishTime>
     </File>
     <File Include="bin/Notifier.pdb">
-      <publishTime>07/16/2018 20:32:03</publishTime>
+      <publishTime>08/16/2018 15:52:25</publishTime>
     </File>
     <File Include="bin/NotificationContents.pdb">
-      <publishTime>07/11/2018 13:10:12</publishTime>
+      <publishTime>07/19/2018 17:16:00</publishTime>
     </File>
     <File Include="bin/Notifier.dll">
-      <publishTime>07/16/2018 20:32:03</publishTime>
+      <publishTime>08/16/2018 15:52:25</publishTime>
     </File>
     <File Include="bin/Notifier.pdb">
-      <publishTime>07/16/2018 20:32:03</publishTime>
+      <publishTime>08/16/2018 15:52:25</publishTime>
     </File>
     <File Include="bin/Owin.dll">
       <publishTime>02/01/2018 14:25:24</publishTime>
@@ -7309,13 +7309,13 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>02/01/2018 14:25:03</publishTime>
     </File>
     <File Include="bin/Reports.dll">
-      <publishTime>07/16/2018 20:32:08</publishTime>
+      <publishTime>08/16/2018 15:52:37</publishTime>
     </File>
     <File Include="bin/Reports.pdb">
-      <publishTime>07/16/2018 20:32:08</publishTime>
+      <publishTime>08/16/2018 15:52:37</publishTime>
     </File>
     <File Include="bin/Reports.pdb">
-      <publishTime>07/16/2018 20:32:08</publishTime>
+      <publishTime>08/16/2018 15:52:37</publishTime>
     </File>
     <File Include="bin/Reports/CompanyDetail.rdlc">
       <publishTime>02/01/2018 14:25:01</publishTime>
@@ -7486,13 +7486,13 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>02/01/2018 14:25:24</publishTime>
     </File>
     <File Include="bin/Service.dll">
-      <publishTime>07/16/2018 20:32:02</publishTime>
+      <publishTime>08/16/2018 15:52:24</publishTime>
     </File>
     <File Include="bin/Service.pdb">
-      <publishTime>07/16/2018 20:32:02</publishTime>
+      <publishTime>08/16/2018 15:52:24</publishTime>
     </File>
     <File Include="bin/Service.pdb">
-      <publishTime>07/16/2018 20:32:02</publishTime>
+      <publishTime>08/16/2018 15:52:24</publishTime>
     </File>
     <File Include="bin/System.Web.Helpers.dll">
       <publishTime>02/01/2018 14:25:21</publishTime>
@@ -8472,7 +8472,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>06/16/2018 11:15:55</publishTime>
     </File>
     <File Include="Scripts/FinancialDisplay/FinancialDisplay.js">
-      <publishTime>06/15/2018 20:16:23</publishTime>
+      <publishTime>08/15/2018 19:21:08</publishTime>
     </File>
     <File Include="Scripts/FunctionForMultiSelect.js">
       <publishTime>04/30/2018 12:17:22</publishTime>
@@ -10452,7 +10452,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>02/01/2018 14:24:07</publishTime>
     </File>
     <File Include="Views/LedgerHeader/Index.cshtml">
-      <publishTime>02/01/2018 14:24:07</publishTime>
+      <publishTime>08/13/2018 12:49:09</publishTime>
     </File>
     <File Include="Views/LedgerHeader/_DocumentCancel.cshtml">
       <publishTime>02/01/2018 14:24:07</publishTime>
@@ -13803,7 +13803,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>02/01/2018 14:24:10</publishTime>
     </File>
     <File Include="Web.config">
-      <publishTime>07/16/2018 21:57:20</publishTime>
+      <publishTime>08/16/2018 16:49:01</publishTime>
     </File>
   </ItemGroup>
 </Project>

@@ -1,0 +1,277 @@
+﻿@model Model.ViewModels.SalaryLineViewModel
+@using Core.Common
+
+<style type="text/css">
+    .cusleftnormal {
+        border-bottom-left-radius: 0pc !important;
+        border-top-left-radius: 0px !important;
+    }
+
+    .cusrightnormal {
+        border-bottom-right-radius: 0px !important;
+        border-top-right-radius: 0px !important;
+    }
+</style>
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> @ViewBag.DocNo</span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("_CreatePost", "SalaryLine", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        {
+
+            @Html.ValidationLog((string)TempData["CSEXCL"])
+            <div class="form-horizontal modal-body">
+                @Html.AntiForgeryToken()
+
+                @Html.HiddenFor(model => model.SalaryHeaderId)
+                @Html.HiddenFor(m => m.SalaryLineId)
+                @Html.HiddenFor(m => m.SalarySettings.CalculationId)
+                @Html.HiddenFor(m => m.DocTypeId)
+                @Html.HiddenFor(m => m.SiteId)
+                @Html.HiddenFor(m => m.DivisionId)
+
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.EmployeeId, "Employee", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.EmployeeId, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.EmployeeId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Days, "Days", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Days, new { @class = "form-control col-xs-7 text-right required" })
+                                @Html.ValidationMessageFor(model => model.Days, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.OtherAddition, "Additions", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.OtherAddition, new { @class = "form-control col-xs-7 text-right required" })
+                                @Html.ValidationMessageFor(model => model.OtherAddition, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.OtherDeduction, "Deduction", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.OtherDeduction, new { @class = "form-control col-xs-7 text-right required" })
+                                @Html.ValidationMessageFor(model => model.OtherDeduction, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.LoanEMI, "Loan EMI", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.LoanEMI, new { @class = "form-control col-xs-7 text-right required" })
+                                @Html.ValidationMessageFor(model => model.LoanEMI, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Advance, "Advance", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Advance, new { @class = "form-control col-xs-7 text-right required", @id = "Amount" })
+                                @Html.ValidationMessageFor(model => model.Advance, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.NetPayable, "Net Payable", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.NetPayable, new { @class = "form-control col-xs-7 text-right required", @id = "Amount" })
+                                @Html.ValidationMessageFor(model => model.NetPayable, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Remark, "Remark", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Remark, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.Remark, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @*<div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                    @if (ViewBag.LineMode == "Edit" || ViewBag.LineMode == "Create")
+                    {
+                        <button class="btn custom left" name="Command:Edit" type="submit" id="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-floppy-disk black"></span> </h2></button>}
+                    @if (ViewBag.LineMode == "Delete")
+                    {
+                        <button class="btn custom" name="Command:Delete" id="delete" type="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-trash black"></span> </h2></button>}
+
+                </div>*@
+
+            </div>
+
+        }
+    </div>
+</div>
+
+
+@if (ViewBag.LineMode == "Create")
+{
+    <script type="text/javascript">
+        $(function(){
+
+            $.ajax({
+                cache: false,
+                url: "/TaxCalculation/GetMaxLineId/",
+                data: { HeaderId: parseInt($('#SalaryHeaderId').val()), LineTable:"Web.SalaryLines", LineKeyField: "SalaryLineId", HeaderKeyField:"SalaryHeaderId"},
+                success: function (data) {
+                    AddCalculation(data);
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert('Failed to retrive calculation footer' + thrownError);
+                },
+            });
+
+
+            function AddCalculation(MaxLineId)
+            {
+                AddCalculationFields(parseInt($('#SalaryHeaderId').val()), true, '@Model.SalarySettings.CalculationId', "Web.SalaryHeaderCharges", "Web.SalaryLineCharges", MaxLineId, $('#DocTypeId','.modal-body').val(), $('#SiteId','.modal-body').val(),$('#DivisionId','.modal-body').val());
+            }
+
+        })
+    </script>
+}
+else
+{
+    <script type="text/javascript">
+        $(function(){
+            AddCalculationFieldsEdit(parseInt($('#SalaryHeaderId').val()), $('#SalaryLineId').val(), false, "Web.SalaryHeaderCharges", "Web.SalaryLineCharges");
+        })
+    </script>
+}
+
+
+
+
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        //CustomSelectFunction($("#ProductId"), '/ComboHelpList/GetProducts', '/ComboHelpList/SetSingleProducts', 'Enter Product Name', false, 3);
+        var DocID = $('#SalaryHeaderId', '.modal-body').val();
+        CustomSelectFunction($("#EmployeeId"), '/SalaryLine/GetEmployee', '/ComboHelpList/SetSinglePerson', ' ', false, 0);
+
+
+
+        var IsSaved=false;
+        var ValidationCount=0;
+
+        $('#modform').bind('submit',function(event){
+
+            if(!IsSaved)
+            {
+                if(!ValidateData())
+                {
+                    return false;
+                }
+                IsSaved=true;
+                $('button:submit').attr('disabled','disabled');
+                return IsSaved;
+            }
+            else
+            {
+                return false;
+            }
+
+
+        });
+
+        function ValidateData() {
+            var ValidationMessage = "";
+
+            //Client Side Validaion.....
+
+            return  (ValidationMessage=="");
+
+        }
+
+
+
+        $('.datepicker').datepicker({
+            format: 'dd/MM/yyyy',
+            "setDate": new Date(),
+            "autoclose": true
+
+        })
+
+        var id=@Model.SalaryLineId;
+
+        if(id>0)
+        {
+            $('#EmployeeId').attr('readonly','true');
+        }
+
+
+        $('#delete','.modal-content').click(function (e) {
+            if(id>0)
+            {
+                var url = '/SalaryLine/DeletePost';
+                $('form#modform').attr('action',url);
+
+                DeletingProductCharges();
+                return;
+            }
+            else
+            {
+                return false;
+            }
+        })
+    });
+
+</script>
+
+@if (ViewBag.LineMode == "Edit" || ViewBag.LineMode == "Create" || ViewBag.LineMode == "Delete")
+{
+    <script type="text/javascript">
+        $(function(){
+            function Calculation() {
+                ChargeCalculation();
+            }
+        })
+    </script>
+}
+
+@if ((ViewBag.LineMode != "Create") && (ViewBag.LineMode != "Edit") && (ViewBag.LineMode != "Delete"))
+{
+    <script type="text/javascript">
+
+        RemoveFields();
+
+        function RemoveFields(){
+            //Disabling input fields
+            $(':input','.modal-body').attr('disabled','disabled');
+        }
+
+
+    </script>
+}

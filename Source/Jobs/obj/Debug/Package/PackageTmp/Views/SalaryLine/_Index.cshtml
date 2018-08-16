@@ -1,0 +1,130 @@
+﻿@model IEnumerable<Model.ViewModels.SalaryLineViewModel>
+@using Core.Common
+
+
+<div style="min-width: 700px;">
+    <div class="panel-heading headrow">
+        <div class="row grid-head">
+            <div class="text-left block" style="width: 5%; ">
+                Srl.
+            </div>
+            <div class="block" style="width: 80%;">
+                <div class="row">
+                    <div class="block" style="width:25%; ">
+                        Employee
+                    </div>
+                    <div class="text-right block" style="width: 8%;">
+                        Days
+                    </div>
+                    <div class="text-right block" style="width: 10%;">
+                        Basic Salary
+                    </div>
+                    <div class="text-right block" style="width: 10%;">
+                        Additions
+                    </div>
+                    <div class="text-right block" style="width: 10%;">
+                        Deductions
+                    </div>
+                    <div class="text-right block" style="width: 10%;">
+                        Loan EMI
+                    </div>
+                    <div class="text-right block" style="width: 10%;">
+                        Advance
+                    </div>
+                    <div class="text-right block" style="width: 10%;">
+                        Net Payable
+                    </div>
+                </div>
+            </div>
+            
+            <div class="" style="width:5%">    </div>
+            <div class="" style="width:5%">    </div>
+        </div>
+
+    </div>
+
+    @{
+        var SelectedRecord = ViewBag.DocLineId;
+        var DomainName = System.Configuration.ConfigurationManager.AppSettings["AdminSetupDomain"];
+        var groupId = ViewBag.SalaryHeaderId;
+        int status = ViewBag.Status;
+        var LineEditUrl = "";
+        var LineDeleteUrl = "";
+        var LineReferenceIndexUrl = "";
+        if (status == (int)StatusConstants.Drafted || status == (int)StatusConstants.Import)
+        {
+            LineEditUrl = "/SalaryLine/_ModifyLine/";
+            LineDeleteUrl = "/SalaryLine/_DeleteLine/";
+            LineReferenceIndexUrl = "/SalaryLine/_SalaryLineReferenceIndex/";
+        }
+        else if (status == (int)StatusConstants.Submitted || status == (int)StatusConstants.Modified)
+        {
+            LineEditUrl = "/SalaryLine/_ModifyLineAfterSubmit/";
+            LineDeleteUrl = "/SalaryLine/_DeleteLine_AfterSubmit/";
+            LineReferenceIndexUrl = "/SalaryLine/_SalaryLineReferenceIndex/";
+        }
+        else
+        {
+            LineEditUrl = "/SalaryLine/DetailInformation/";
+            LineDeleteUrl = "/SalaryLine/DetailInformation/";
+        }
+        var link = "/SalaryLine/Index/" + groupId;
+        decimal QtyCount = 0;
+        decimal DealQtyCount = 0;
+        decimal AmountCount = 0;
+        var unit = true;
+        var dunit = true;
+        var prevunit = "";
+        var prevdunit = "";
+        var ddecimal = 0;
+        var DUdecimal = 0;
+    }
+
+
+    <div class="panel-info" id="gbody">
+
+        @{var srno = 1;}
+        @foreach (var item in Model)
+        {
+            <div class='row crow grid-body' style='margin-left:0px;margin-right:0px' id='@item.SalaryLineId'>
+                <div class='row-index block' style='width:5%'>@(srno++)<input type='hidden' class='id' value='@item.SalaryLineId' /></div>
+                <div class='block navbody' style='width:80%'>
+                    <div class='row'>
+                        <div class="block" style='width:25%'>
+                            <strong> @item.EmployeeName </strong>
+                        </div>
+                        <div class='text-right block' style='width:8%'>
+                            @Math.Round(item.Days, 1)
+                        </div>
+                        <div class='text-right block' style='width:10%'>
+                            @Math.Round(item.BasicSalary, 2)
+                        </div>
+                        <div class='text-right block' style='width:10%'>
+                            @Math.Round(item.OtherAddition ?? 0, 2)
+                        </div>
+                        <div class='text-right block' style='width:10%'>
+                            @Math.Round(item.OtherDeduction ?? 0, 2)
+                        </div>
+                        <div class='text-right block' style='width:10%'>
+                            @Math.Round(item.LoanEMI ?? 0, 2)
+                        </div>
+                        <div class='text-right block' style='width:10%'>
+                            @Math.Round(item.Advance ?? 0, 2)
+                        </div>
+                        <div class='text-right block' style='width:10%'>
+                            @Math.Round(item.NetPayable, 2)
+                        </div>
+                    </div>
+                </div>
+                <div class='block' style='width:5%'>
+                    <a class='glyphicon glyphicon-trash icon-Cus-Size hidden-xs' data-modal='' data-detaildisabled='true' delete='' href='@LineDeleteUrl@item.SalaryLineId'></a>
+                    <a edit='' href='@LineEditUrl@item.SalaryLineId'></a>
+                </div>
+                <div class='block' style='width:5%'>
+                    <a class='glyphicon glyphicon-user icon-Cus-Size hidden-xs' data-modal='' data-detaildisabled='true' delete='' href='@LineReferenceIndexUrl@item.SalaryLineId'></a>
+                    <a edit='' href='@LineEditUrl@item.SalaryLineId'></a>
+                </div>
+            </div>
+        }
+    </div>
+</div>

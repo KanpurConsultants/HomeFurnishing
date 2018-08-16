@@ -1930,6 +1930,35 @@ LEFT JOIN Web.LedgerAccounts LAS WITH (nolock) ON LAS.LedgerAccountId=L.LedgerAc
             return PartialView("_DocumentCancel", svm);
         }
 
+        public JsonResult GetLedgerDifferenceList()
+        {
+            int SiteId = (int)System.Web.HttpContext.Current.Session["SiteId"];
+            int DivisionId = (int)System.Web.HttpContext.Current.Session["DivisionId"];
+
+            var LedgerHeaderDifferenceList = (from L in db.Ledger
+                                              where L.LedgerHeader.SiteId == SiteId && L.LedgerHeader.DivisionId == DivisionId
+                                              && L.LedgerHeader.DocType.DocumentTypeName != "Opening Balance"
+                                              group new { L } by new { L.LedgerHeaderId } into Result
+                                              select new
+                                              {
+                                                  LedgerHeaderId = Result.Key.LedgerHeaderId,
+                                                  LedgerHeaderDocNo = Result.Max(i => i.L.LedgerHeader.DocType.DocumentTypeName) + "-" + Result.Max(i => i.L.LedgerHeader.DocNo),
+                                                  Difference = Result.Sum(i => i.L.AmtDr) - Result.Sum(i => i.L.AmtCr)
+                                              }).Where(i => i.Difference != 0).ToList();
+
+
+            string ErrorStr = "";
+            foreach (var item in LedgerHeaderDifferenceList)
+            {
+                if (ErrorStr == "")
+                    ErrorStr = "These Entries have some diffrence : " + item.LedgerHeaderDocNo;
+                else
+                    ErrorStr = ErrorStr + ", " + item.LedgerHeaderDocNo;
+            }
+
+            return Json(ErrorStr);
+        }
+
         protected override void Dispose(bool disposing)
         {
             if (!string.IsNullOrEmpty((string)TempData["CSEXC"]))

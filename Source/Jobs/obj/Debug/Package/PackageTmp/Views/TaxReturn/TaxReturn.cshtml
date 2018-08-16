@@ -1,0 +1,95 @@
+﻿@model Model.ViewModels.TaxReturnViewModel
+@using System.Text.RegularExpressions
+
+@{
+    ViewBag.Title = "GST Return";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+
+</style>
+@using (Html.BeginForm("Post", "TaxReturn", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    <div class="panel panel-default">
+
+        <div class="panel-heading">
+            <h4>
+                <span> GST Return </span>
+                @*<input type="checkbox" id="checkbox" />*@
+                <input type="submit" name="Download" value="Download" id="Download" class="btn btn-primary btn-sm CurveBorder height" style="float : right ; width:7em" />
+
+            </h4>
+        </div>
+
+        <div class="panel-info" style="padding-left:15px">
+            @Html.AntiForgeryToken()
+            <div class="form-horizontal" role="form">
+                @Html.ValidationSummary(true)
+
+                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                    <div class="panel-heading" role="tab" >
+                        <h4 class="panel-title">
+                            <span role="button" data-toggle="collapse" data-parent="#accordion" >
+                                <span style="color:black" class="glyphicon glyphicon-plus-sign collapse_Ico"></span>
+                                Fill GST Return Detail
+                            </span>
+                        </h4>
+                    </div>
+                    <div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.Format, "Format", new { @class = "control-label col-md-4 col-sm-2" })
+                                        <div class="col-md-7 col-sm-10">
+                                            @Html.DropDownListFor(m => m.Format, new SelectList(ViewBag.FormatList as System.Collections.IEnumerable, "Value", "Text"), new { @class = "form-control col-xs-6 height" })
+                                            @Html.ValidationMessageFor(m => m.Format, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.FromDate, "From Date", new { @class = "control-label col-md-4 col-sm-2" })
+                                        <div class="col-md-7 col-sm-10">
+                                            @Html.TextBoxFor(m => m.FromDate, "{0:dd/MMMM/yyyy}", new { @class = "datepicker form-control" })
+                                            @Html.ValidationMessageFor(model => model.FromDate, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.ToDate, "To Date", new { @class = "control-label col-md-4 col-sm-2" })
+                                        <div class="col-md-7 col-sm-10">
+                                            @Html.TextBoxFor(m => m.ToDate, "{0:dd/MMMM/yyyy}", new { @class = "datepicker form-control" })
+                                            @Html.ValidationMessageFor(model => model.ToDate, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+
+                        <span style="font-family: Calibri,sans-serif,Verdana;font-size:large">
+                            @*@Html.ActionLink("Back to List", "Index", "ReportHeader")*@
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+
+
+        </div>
+    </div>
+
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("input:text,form").attr("autocomplete", "off");
+    })
+</script>
