@@ -135,13 +135,9 @@
     <Compile Include="Constants\SubModuleConstants.cs" />
     <Compile Include="InitializeTables.cs" />
     <Compile Include="LogApplicationDbContext.cs" />
-    <Compile Include="Migrations\201802050758131_PropertyTax.cs" />
-    <Compile Include="Migrations\201802050758131_PropertyTax.Designer.cs">
-      <DependentUpon>201802050758131_PropertyTax.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201805220729060_LedgerSupplmentry.cs" />
-    <Compile Include="Migrations\201805220729060_LedgerSupplmentry.Designer.cs">
-      <DependentUpon>201805220729060_LedgerSupplmentry.cs</DependentUpon>
+    <Compile Include="Migrations\201808200702189_BusinessSessionLine.cs" />
+    <Compile Include="Migrations\201808200702189_BusinessSessionLine.Designer.cs">
+      <DependentUpon>201808200702189_BusinessSessionLine.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="NotificationApplicationDbContext.cs" />
@@ -183,11 +179,8 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201802050758131_PropertyTax.resx">
-      <DependentUpon>201802050758131_PropertyTax.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201805220729060_LedgerSupplmentry.resx">
-      <DependentUpon>201805220729060_LedgerSupplmentry.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201808200702189_BusinessSessionLine.resx">
+      <DependentUpon>201808200702189_BusinessSessionLine.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -198,6 +198,38 @@ namespace Jobs.Controllers
                 return View("~/Views/Shared/PermissionDenied.cshtml").Warning("You don't have permission to do this task.");
             }
 
+
+            //var HeaderWithNoLines = (from H in db.LedgerHeader
+            //                         join L in db.LedgerLine on H.LedgerHeaderId equals L.LedgerHeaderId into LedgerLineTable
+            //                         from LedgerLineTab in LedgerLineTable.DefaultIfEmpty()
+            //                         where H.CreatedBy == User.Identity.Name && LedgerLineTab.LedgerLineId == null
+            //                         select new
+            //                         {
+            //                             LedgerHeaderId = H.LedgerHeaderId,
+            //                             LedgerDocNo = H.DocNo
+            //                         }).ToList();
+
+            //if (HeaderWithNoLines != null)
+            //{
+            //    string ValidationMsg = "";
+            //    foreach(var item in HeaderWithNoLines)
+            //    {
+            //        ValidationMsg = ValidationMsg + "Entry No "+ item.LedgerDocNo + " is not completed."
+            //    }
+            //    if (new RolePermissionService(_unitOfWork).IsActionAllowed(UserRoles, id, settings.ProcessId, this.ControllerContext.RouteData.Values["controller"].ToString(), "Create") == false)
+            //    {
+            //        return View("~/Views/Shared/PermissionDenied.cshtml").Warning(ValidationMsg);
+            //    }
+            //}
+
+            string IncompleteEntryValidation = _LedgerHeaderService.GetIncompleteEntryValidation(User.Identity.Name);
+            if (IncompleteEntryValidation != "")
+            {
+                return View("~/Views/Shared/PermissionDenied.cshtml").Warning(IncompleteEntryValidation);
+            }
+
+
+
             DocumentType DocType = new DocumentTypeService(_unitOfWork).Find(id);
             if ((settings.isVisibleLineDrCr ?? false) == false)
             {

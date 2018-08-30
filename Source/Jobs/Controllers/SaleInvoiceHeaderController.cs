@@ -442,6 +442,20 @@ namespace Jobs.Controllers
             PrepareViewBag(s.DocTypeId);
             ViewBag.Mode = "Edit";
 
+            var SaleInvoiceReturn = db.SaleInvoiceReturnLine.Where(i => i.SaleInvoiceLine.SaleInvoiceHeaderId == id).FirstOrDefault();
+            if (SaleInvoiceReturn != null)
+            {
+                vm.ReturnNature = (from H in db.SaleInvoiceReturnHeader where H.SaleInvoiceReturnHeaderId == SaleInvoiceReturn.SaleInvoiceReturnHeaderId select new { DocTypeNature = H.DocType.Nature }).FirstOrDefault().DocTypeNature;
+                if (vm.ReturnNature == TransactionNatureConstants.Credit)
+                    vm.AdditionalInfo = "Credit Note is generated for this invoice.";
+                else if (vm.ReturnNature == TransactionNatureConstants.Debit)
+                    vm.AdditionalInfo = "Debit Note is generated for this invoice.";
+                else
+                    vm.AdditionalInfo = "Invoice is cancelled.";
+            }
+
+
+
             if (!(System.Web.HttpContext.Current.Request.UrlReferrer.PathAndQuery).Contains("Create"))
                 LogActivity.LogActivityDetail(LogVm.Map(new ActiivtyLogViewModel
                 {

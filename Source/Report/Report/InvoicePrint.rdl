@@ -1605,6 +1605,7 @@
                         <PaddingBottom>2pt</PaddingBottom>
                       </Style>
                     </Textbox>
+                    <rd:Selected>true</rd:Selected>
                   </CellContents>
                 </TablixCell>
                 <TablixCell>
@@ -1634,9 +1635,6 @@
                         <Border>
                           <Style>None</Style>
                         </Border>
-                        <LeftBorder>
-                          <Style>Solid</Style>
-                        </LeftBorder>
                         <PaddingLeft>2pt</PaddingLeft>
                         <PaddingRight>2pt</PaddingRight>
                         <PaddingTop>2pt</PaddingTop>

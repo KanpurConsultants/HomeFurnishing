@@ -203,6 +203,7 @@ namespace Data.Models
         public DbSet<Company> Company { get; set; }
         public DbSet<CompanySettings> CompanySettings { get; set; }
         public DbSet<BusinessSession> BusinessSession { get; set; }
+        public DbSet<BusinessSessionLine> BusinessSessionLine { get; set; }
         public DbSet<CostCenter> CostCenter { get; set; }
         public DbSet<Country> Country { get; set; }
         public DbSet<Currency> Currency { get; set; }

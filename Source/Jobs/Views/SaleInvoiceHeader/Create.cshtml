@@ -111,6 +111,20 @@
                 @Html.ValidationSummary(true)
 
                 <div >
+
+                    @if (Model.LockReason != null)
+                    {
+                        <div class="alert alert-info" style="text-align:center;">
+                            <strong>@Model.LockReason</strong>
+                        </div>
+                    }
+                    else if (Model.AdditionalInfo != null)
+                    {
+                        <div class="alert alert-info" style="text-align:center;">
+                            <strong>@Model.AdditionalInfo</strong>
+                        </div>
+                    }
+
                     <h4 class="col-md-12 black">
                         <span class="glyphicon glyphicon-align-justify"></span>
                         1.Document Details

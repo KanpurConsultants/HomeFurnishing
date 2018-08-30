@@ -319,9 +319,15 @@ namespace Service
 
                 }
 
+                foreach (Ledger item in LedgerList)
+                {
+                    new LedgerService(_unitOfWork).Delete(item);
+                }
 
                 LedgerHeaderId = LedgerHeader.LedgerHeaderId;
             }
+
+
 
 
             IEnumerable<LedgerPostingViewModel> LedgerHeaderAmtDr = from H in HeaderTable

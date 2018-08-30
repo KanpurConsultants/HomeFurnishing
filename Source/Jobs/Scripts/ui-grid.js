@@ -19143,7 +19143,7 @@ module.filter('px', function() {
                   //Code By Akash
                   if (cellValue != null)
                   {
-                      cellValue = cellValue.toString().replace('<Strong>', '').replace('</br>', '').replace('</Strong>', '').replace('<Strong>', '').replace('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;', '      ')
+                      cellValue = cellValue.toString().replace('<Strong>', '').replace('</br>', '').replace('</Strong>', '').replace('<Strong>', '').replace(/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/g, '      ')
                   }
                   //End Code By Akash
 

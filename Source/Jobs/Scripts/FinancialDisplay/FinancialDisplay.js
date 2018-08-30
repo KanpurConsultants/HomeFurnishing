@@ -83,9 +83,16 @@ FinancialDisplay.controller('MainCtrl', ['$scope', '$log', '$http', 'uiGridConst
 
           if ($("#ReportType").val() == "Balance Sheet" || $("#ReportType").val() == "Profit And Loss") {
               if (rowCol.col.field == "GRName" || rowCol.col.field == "Debit")
+              {
                   $("#LedgerAccountGroup").val(rowCol.row.entity.GRCode);
+                  //$("#LedgerAccount").val(rowCol.row.entity.GRCode);
+
+              }
               else if (rowCol.col.field == "GRNameCredit" || rowCol.col.field == "Credit")
+              {
                   $("#LedgerAccountGroup").val(rowCol.row.entity.GRCodeCredit);
+                  //$("#LedgerAccount").val(rowCol.row.entity.GRCodeCredit);
+              }
           }
           else {
               $("#LedgerAccountGroup").val(rowCol.row.entity.LedgerAccountGroupId);
@@ -338,7 +345,7 @@ FinancialDisplay.controller('MainCtrl', ['$scope', '$log', '$http', 'uiGridConst
                       if (myPdfRow[key].toString().includes('</br>'))
                           myPdfRow[key] = myPdfRow[key].toString().replace('</br>', ' ');
                       if (myPdfRow[key].toString().includes('&nbsp;'))
-                          myPdfRow[key] = myPdfRow[key].toString().replace('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;', '      ');
+                          myPdfRow[key] = myPdfRow[key].toString().replace(/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/g, '      ');
                   }
                   else {
                       myPdfRow[key] = '';

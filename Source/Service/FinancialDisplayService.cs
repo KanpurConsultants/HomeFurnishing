@@ -555,8 +555,16 @@ namespace Service
             if (CostCenterId != null) mCondStr = mCondStr + " AND H.CostCenterId IN (SELECT Items FROM [dbo].[Split] (@CostCenter, ','))";
             if (LedgerAccount != null && LedgerAccount != "") mCondStr = mCondStr + " AND LA.LedgerAccountId = @LedgerAccount";
 
+            //string mOpeningDateCondStr = "";
+            //if (FromDate != null) mOpeningDateCondStr = mOpeningDateCondStr + " AND LH.DocDate < @FromDate ";
+
             string mOpeningDateCondStr = "";
-            if (FromDate != null) mOpeningDateCondStr = mOpeningDateCondStr + " AND LH.DocDate < @FromDate ";
+            if (FromDate != null)
+            {
+                mOpeningDateCondStr = mOpeningDateCondStr + " AND LH.DocDate >= (Case When LAG.LedgerAccountNature in ('Expense','Income') Then @FromDate Else '01/01/1900' End) ";
+                mOpeningDateCondStr = mOpeningDateCondStr + " AND LH.DocDate < @FromDate ";
+            }
+
 
 
             string mDateCondStr = "";
@@ -583,6 +591,7 @@ namespace Service
 	                            FROM web.LedgerHeaders LH   WITH (Nolock) 
 	                            LEFT JOIN  web.Ledgers H WITH (Nolock) ON LH.LedgerHeaderId = H.LedgerHeaderId 
 	                            LEFT JOIN web.LedgerAccounts LA  WITH (Nolock) ON LA.LedgerAccountId = H.LedgerAccountId 
+                                LEFT JOIN Web.LedgerAccountGroups LAG On LA.LedgerAccountGroupId = LAG.LedgerAccountGroupId
 	                            WHERE H.LedgerAccountId IS NOT NULL " + mCondStr + mOpeningDateCondStr +
                                 @" GROUP BY H.LedgerAccountId
 	 
@@ -1530,11 +1539,11 @@ namespace Service
                 sqlConnection.Open();
                 SqlCommand cmd = new SqlCommand(mQry);
                 SqlDataAdapter Da = new SqlDataAdapter(mQry, ConnectionString);
-                Da.SelectCommand.Parameters.AddWithValue("@SiteId", !string.IsNullOrEmpty(SiteId) ? SiteId : (object)DBNull.Value);
-                Da.SelectCommand.Parameters.AddWithValue("@DivisionId", !string.IsNullOrEmpty(DivisionId) ? DivisionId : (object)DBNull.Value);
+                Da.SelectCommand.Parameters.AddWithValue("@Site", !string.IsNullOrEmpty(SiteId) ? SiteId : (object)DBNull.Value);
+                Da.SelectCommand.Parameters.AddWithValue("@Division", !string.IsNullOrEmpty(DivisionId) ? DivisionId : (object)DBNull.Value);
                 Da.SelectCommand.Parameters.AddWithValue("@FromDate", FromDate);
                 Da.SelectCommand.Parameters.AddWithValue("@ToDate", ToDate);
-                Da.SelectCommand.Parameters.AddWithValue("@CostCenterId", !string.IsNullOrEmpty(CostCenterId) ? CostCenterId : (object)DBNull.Value);
+                Da.SelectCommand.Parameters.AddWithValue("@CostCenter", !string.IsNullOrEmpty(CostCenterId) ? CostCenterId : (object)DBNull.Value);
                 Da.SelectCommand.Parameters.AddWithValue("@LedgerAccountGroup", !string.IsNullOrEmpty(LedgerAccountGroup) ? LedgerAccountGroup : (object)DBNull.Value);
                 Da.Fill(DsTemp);
             }
@@ -1585,10 +1594,14 @@ namespace Service
             DTTemp.Clear();
             DTTemp.Dispose();
 
-            Decimal DHSMain_DblClosingStock = 0;
+            Decimal DHSMain_DblClosingStock = Convert.ToDecimal(FillData(@"SELECT IsNull(Sum(L.ClosingStockValue),0) AS ClosingStockValue
+                                    FROM Web.BusinessSessionLines L
+                                    LEFT JOIN Web.BusinessSessions H ON L.BusinessSessionId = H.BusinessSessionId
+                                    WHERE '" + ToDate + @"' BETWEEN H.FromDate AND H.UptoDate " +
+                        (SiteId != null ? " AND L.SiteId IN (SELECT Items FROM[dbo].[Split]('" + SiteId + @"', ','))" : "")).Tables[0].Rows[0]["ClosingStockValue"]);
             if (DHSMain_DblClosingStock > 0)
             {
-                J = 0;
+                J = FFindEmptyRow(ref FGMain, "GRNameCredit");
                 FGMain.Rows[J]["GRNameCredit"] = "Closing Stock";
                 FGMain.Rows[J]["Credit"] = DHSMain_DblClosingStock;
                 DblCredit_Total = DblCredit_Total + DHSMain_DblClosingStock;
@@ -1608,6 +1621,9 @@ namespace Service
             DTTemp.Dispose();
 
             DTTemp = FGetTRDDataTable("Not", Settings);
+
+            if (DHSMain_DblClosingStock > 0)
+                DblNet_Profit_Loss = DblNet_Profit_Loss + DHSMain_DblClosingStock;
 
             for (I = 0; I <= DTTemp.Rows.Count - 1; I++)
             {
@@ -1809,11 +1825,11 @@ namespace Service
                 sqlConnection.Open();
                 SqlCommand cmd = new SqlCommand(mQry);
                 SqlDataAdapter Da = new SqlDataAdapter(mQry, ConnectionString);
-                Da.SelectCommand.Parameters.AddWithValue("@SiteId", !string.IsNullOrEmpty(SiteId) ? SiteId : (object)DBNull.Value);
-                Da.SelectCommand.Parameters.AddWithValue("@DivisionId", !string.IsNullOrEmpty(DivisionId) ? DivisionId : (object)DBNull.Value);
+                Da.SelectCommand.Parameters.AddWithValue("@Site", !string.IsNullOrEmpty(SiteId) ? SiteId : (object)DBNull.Value);
+                Da.SelectCommand.Parameters.AddWithValue("@Division", !string.IsNullOrEmpty(DivisionId) ? DivisionId : (object)DBNull.Value);
                 Da.SelectCommand.Parameters.AddWithValue("@FromDate", FromDate);
                 Da.SelectCommand.Parameters.AddWithValue("@ToDate", ToDate);
-                Da.SelectCommand.Parameters.AddWithValue("@CostCenterId", !string.IsNullOrEmpty(CostCenterId) ? CostCenterId : (object)DBNull.Value);
+                Da.SelectCommand.Parameters.AddWithValue("@CostCenter", !string.IsNullOrEmpty(CostCenterId) ? CostCenterId : (object)DBNull.Value);
                 Da.SelectCommand.Parameters.AddWithValue("@LedgerAccountGroup", !string.IsNullOrEmpty(LedgerAccountGroup) ? LedgerAccountGroup : (object)DBNull.Value);
                 Da.Fill(DsTemp);
             }
@@ -1866,6 +1882,20 @@ namespace Service
             DblDebit_Total = 0;
             DblCredit_Total = 0;
 
+
+            //Decimal DHSMain_DblOpeningStock = Convert.ToDecimal(FillData(@"SELECT IsNull(Sum(L.OpeningStockValue),0) AS OpeningStockValue
+            //                        FROM Web.BusinessSessionLines L
+            //                        LEFT JOIN Web.BusinessSessions H ON L.BusinessSessionId = H.BusinessSessionId
+            //                        WHERE '" + FromDate + @"' BETWEEN H.FromDate AND H.UptoDate " + 
+            //                        (SiteId != null ? " AND L.SiteId IN (SELECT Items FROM[dbo].[Split]('" + SiteId + @"', ','))" : "")).Tables[0].Rows[0]["OpeningStockValue"]);
+            //if (DHSMain_DblOpeningStock > 0)
+            //{
+            //    J = FFindEmptyRow(ref FGMain, "GRName");
+            //    FGMain.Rows[J]["GRName"] = "Opening Stock";
+            //    FGMain.Rows[J]["Debit"] = DHSMain_DblOpeningStock;
+            //    DblDebit_Total = DblDebit_Total + DHSMain_DblOpeningStock;
+            //}
+
             for (I = 0; I <= DTTemp.Rows.Count - 1; I++)
             {
                 if (Convert.ToDecimal(DTTemp.Rows[I]["AmtCr"]) > 0)
@@ -1892,10 +1922,14 @@ namespace Service
                 }
             }
 
-            Decimal DHSMain_DblClosingStock = 0;
+            Decimal DHSMain_DblClosingStock = Convert.ToDecimal(FillData(@"SELECT IsNull(Sum(L.ClosingStockValue),0) AS ClosingStockValue
+                                    FROM Web.BusinessSessionLines L
+                                    LEFT JOIN Web.BusinessSessions H ON L.BusinessSessionId = H.BusinessSessionId
+                                    WHERE '" + ToDate + @"' BETWEEN H.FromDate AND H.UptoDate " +
+                                    (SiteId != null ? " AND L.SiteId IN (SELECT Items FROM[dbo].[Split]('" + SiteId + @"', ','))" : "")).Tables[0].Rows[0]["ClosingStockValue"]);
             if (DHSMain_DblClosingStock > 0)
             {
-                J = 0;
+                J = FFindEmptyRow(ref FGMain, "GRNameCredit");
                 FGMain.Rows[J]["GRNameCredit"] = "Closing Stock";
                 FGMain.Rows[J]["Credit"] = DHSMain_DblClosingStock;
                 DblCredit_Total = DblCredit_Total + DHSMain_DblClosingStock;
@@ -1914,8 +1948,8 @@ namespace Service
             else if (DblCredit_Total - DblDebit_Total > 0)
             {
                 J = FFindEmptyRow(ref FGMain, "GRNameCredit");
-                FGMain.Rows[J]["GRNameCredit"] = "Gross Profit";
-                FGMain.Rows[J]["Debit"] = DblDebit_Total - DblCredit_Total;
+                FGMain.Rows[J]["GRName"] = "Gross Profit";
+                FGMain.Rows[J]["Debit"] = DblCredit_Total - DblDebit_Total;
                 DblDebit_Total = DblDebit_Total + (DblCredit_Total - DblDebit_Total);
                 DblCredit_Total = DblDebit_Total;
             }
@@ -1937,14 +1971,14 @@ namespace Service
             IntFindRowFrom = FGMain.Rows.Count;
             if (DblGrossProfit > 0)
             {
-                J = FFindEmptyRow(ref FGMain, "GRNameCredit", IntFindRowFrom);
+                J = FFindEmptyRow(ref FGMain, "GRName", IntFindRowFrom);
                 FGMain.Rows[J]["GRName"] = "Gross Loss";
                 FGMain.Rows[J]["Debit"] = Math.Abs(DblGrossProfit);
             }
             else
             {
                 J = FFindEmptyRow(ref FGMain, "GRNameCredit", IntFindRowFrom);
-                FGMain.Rows[J]["GRName"] = "Gross Profit";
+                FGMain.Rows[J]["GRNameCredit"] = "Gross Profit";
                 FGMain.Rows[J]["Credit"] = Math.Abs(DblGrossProfit);
             }
 
@@ -2152,10 +2186,14 @@ namespace Service
             DtBalanceSheetSummary.Clear();
             DtBalanceSheetSummary.Dispose();
 
-            Decimal DHSMain_DblClosingStock = 0;
+            Decimal DHSMain_DblClosingStock = Convert.ToDecimal(FillData(@"SELECT IsNull(Sum(L.ClosingStockValue),0) AS ClosingStockValue
+                                    FROM Web.BusinessSessionLines L
+                                    LEFT JOIN Web.BusinessSessions H ON L.BusinessSessionId = H.BusinessSessionId
+                                    WHERE '" + ToDate + @"' BETWEEN H.FromDate AND H.UptoDate " +
+                                    (SiteId != null ? " AND L.SiteId IN (SELECT Items FROM[dbo].[Split]('" + SiteId + @"', ','))" : "")).Tables[0].Rows[0]["ClosingStockValue"]);
             if (DHSMain_DblClosingStock > 0)
             {
-                J = 0;
+                J = FFindEmptyRow(ref FGMain, "GRNameCredit");
                 FGMain.Rows[J]["GRNameCredit"] = "Closing Stock";
                 FGMain.Rows[J]["Credit"] = DHSMain_DblClosingStock;
                 DblCredit_Total = DblCredit_Total + DHSMain_DblClosingStock;
@@ -2175,6 +2213,9 @@ namespace Service
             DtBalanceSheetSummary.Dispose();
 
             DtBalanceSheetSummary = FGetTRDDataTable("Not", Settings);
+
+            if (DHSMain_DblClosingStock > 0)
+                DblNet_Profit_Loss = DblNet_Profit_Loss + DHSMain_DblClosingStock;
 
             for (I = 0; I <= DtBalanceSheetSummary.Rows.Count - 1; I++)
             {
@@ -2485,6 +2526,19 @@ namespace Service
             DblDebit_Total = 0;
             DblCredit_Total = 0;
 
+            //Decimal DHSMain_DblOpeningStock = Convert.ToDecimal(FillData(@"SELECT IsNull(Sum(L.OpeningStockValue),0) AS OpeningStockValue
+            //                        FROM Web.BusinessSessionLines L
+            //                        LEFT JOIN Web.BusinessSessions H ON L.BusinessSessionId = H.BusinessSessionId
+            //                        WHERE '" + FromDate + @"' BETWEEN H.FromDate AND H.UptoDate " +
+            //                        (SiteId != null ? " AND L.SiteId IN (SELECT Items FROM[dbo].[Split]('" + SiteId + @"', ','))" : "")).Tables[0].Rows[0]["OpeningStockValue"]);
+            //if (DHSMain_DblOpeningStock > 0)
+            //{
+            //    J = FFindEmptyRow(ref FGMain, "GRName");
+            //    FGMain.Rows[J]["GRName"] = "Opening Stock";
+            //    FGMain.Rows[J]["Debit"] = DHSMain_DblOpeningStock;
+            //    DblDebit_Total = DblDebit_Total + DHSMain_DblOpeningStock;
+            //}
+
             for (I = 0; I <= DTTemp.Rows.Count - 1; I++)
             {
                 if (Convert.ToDecimal(DTTemp.Rows[I]["AmtCr"]) > 0)
@@ -2511,10 +2565,14 @@ namespace Service
                 }
             }
 
-            Decimal DHSMain_DblClosingStock = 0;
+            Decimal DHSMain_DblClosingStock = Convert.ToDecimal(FillData(@"SELECT IsNull(Sum(L.ClosingStockValue),0) AS ClosingStockValue
+                                    FROM Web.BusinessSessionLines L
+                                    LEFT JOIN Web.BusinessSessions H ON L.BusinessSessionId = H.BusinessSessionId
+                                    WHERE '" + ToDate + @"' BETWEEN H.FromDate AND H.UptoDate " +
+                                    (SiteId != null ? " AND L.SiteId IN (SELECT Items FROM[dbo].[Split]('" + SiteId + @"', ','))" : "")).Tables[0].Rows[0]["ClosingStockValue"]);
             if (DHSMain_DblClosingStock > 0)
             {
-                J = 0;
+                J = FFindEmptyRow(ref FGMain, "GRNameCredit");
                 FGMain.Rows[J]["GRNameCredit"] = "Closing Stock";
                 FGMain.Rows[J]["Credit"] = DHSMain_DblClosingStock;
                 DblCredit_Total = DblCredit_Total + DHSMain_DblClosingStock;
@@ -2533,8 +2591,8 @@ namespace Service
             else if (DblCredit_Total - DblDebit_Total > 0)
             {
                 J = FFindEmptyRow(ref FGMain, "GRNameCredit");
-                FGMain.Rows[J]["GRNameCredit"] = "Gross Profit";
-                FGMain.Rows[J]["Debit"] = DblDebit_Total - DblCredit_Total;
+                FGMain.Rows[J]["GRName"] = "Gross Profit";
+                FGMain.Rows[J]["Debit"] = DblCredit_Total - DblDebit_Total;
                 DblDebit_Total = DblDebit_Total + (DblCredit_Total - DblDebit_Total);
                 DblCredit_Total = DblDebit_Total;
             }
@@ -2564,7 +2622,7 @@ namespace Service
             else
             {
                 J = FFindEmptyRow(ref FGMain, "GRNameCredit", IntFindRowFrom);
-                FGMain.Rows[J]["GRName"] = "Gross Profit";
+                FGMain.Rows[J]["GRNameCredit"] = "Gross Profit";
                 FGMain.Rows[J]["Credit"] = Math.Abs(DblGrossProfit);
             }
 

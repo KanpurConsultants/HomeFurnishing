@@ -32,6 +32,7 @@ namespace Service
         string GetMaxDocNo();
         string GetLedgerAccountType(int id);//LedgerAccount Id
         LedgerHeader FindByDocNo(string Docno);
+        string GetIncompleteEntryValidation(string Uname);
         int NextId(int id);
         int PrevId(int id);
         //IQueryable<ComboBoxResult> GetLedgerAccountHelpList(int DocTypeId, string term);
@@ -311,6 +312,34 @@ namespace Service
 
         //    return list;
         //}
+
+        public string GetIncompleteEntryValidation(string Uname)
+        {
+            string ValidationMsg = "";
+
+            var HeaderWithNoLines = (from H in db.LedgerHeader
+                                     join L in db.LedgerLine on H.LedgerHeaderId equals L.LedgerHeaderId into LedgerLineTable
+                                     from LedgerLineTab in LedgerLineTable.DefaultIfEmpty()
+                                     where H.CreatedBy == Uname && LedgerLineTab.LedgerLineId == null
+                                     && (H.DocType.DocumentTypeName == "Payment Voucher" ||
+                                             H.DocType.DocumentTypeName == "Receipt Voucher" ||
+                                             H.DocType.DocumentTypeName == "Journal Voucher" ||
+                                             H.DocType.DocumentTypeName == "Contra Voucher")
+                                     select new
+                                     {
+                                         LedgerHeaderId = H.LedgerHeaderId,
+                                         LedgerDocNo = H.DocNo,
+                                         DocTypeName = H.DocType.DocumentTypeName,
+                                         SiteName = H.Site.SiteName
+                                     }).ToList();
+
+            if (HeaderWithNoLines != null)
+            {
+                foreach (var item in HeaderWithNoLines)
+                    ValidationMsg = ValidationMsg + "Entry No " + item.LedgerDocNo + " on site "+ item.SiteName +" is not completed.";
+            }
+            return ValidationMsg;
+        }
 
 
         public void Dispose()

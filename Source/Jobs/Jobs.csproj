@@ -436,6 +436,7 @@
     <Compile Include="Controllers\LedgerLine_WithCalculationController.cs" />
     <Compile Include="Controllers\MailboxController.cs" />
     <Compile Include="Controllers\LedgerWizardController.cs" />
+    <Compile Include="Controllers\BusinessSessionLineController.cs" />
     <Compile Include="Controllers\TaxReturnController.cs" />
     <Compile Include="Controllers\SalaryWizardController.cs" />
     <Compile Include="Controllers\LedgerAccountMergingController.cs" />
@@ -3195,6 +3196,7 @@
     <Content Include="Scripts\Mailbox\Read-menu.js" />
     <Content Include="Scripts\LedgerWizard\LedgerWizard.js" />
     <Content Include="Scripts\Salary\Salary.js" />
+    <Content Include="Scripts\BusinessSessionLine\BusinessSessionLine.js" />
     <Content Include="Scripts\SaleEnquiryProductMappingWithGrid\SaleEnquiryProductMappingWithGrid.js" />
     <Content Include="Scripts\RolePermission\RolePermission.js" />
     <Content Include="Scripts\DisplayJobOrderBalance\DisplayJobOrderBalance.js" />
@@ -5331,6 +5333,7 @@
     <Content Include="Views\TaxReturn\TaxReturn.cshtml" />
     <Content Include="Views\Display_StockBalance\Display_StockBalance.cshtml" />
     <Content Include="Views\SaleInvoiceHeader\_InvoiceReturn.cshtml" />
+    <Content Include="Views\BusinessSessionLine\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

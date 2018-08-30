@@ -156,6 +156,7 @@
     <Compile Include="Models\RolesDocTypeProcess.cs" />
     <Compile Include="Models\RolesDocType.cs" />
     <Compile Include="Models\SalaryLineReference.cs" />
+    <Compile Include="Models\BusinessSessionLine.cs" />
     <Compile Include="Models\SaleQuotationHeaderAttributes.cs" />
     <Compile Include="Models\DivisionSettings.cs" />
     <Compile Include="Models\SalarySettings.cs" />

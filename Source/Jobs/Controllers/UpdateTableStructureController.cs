@@ -4021,6 +4021,36 @@ namespace Module
 
 
 
+            try
+            {
+                if ((int)ExecuteScaler("SELECT Count(*) AS Cnt FROM INFORMATION_SCHEMA.Tables WHERE TABLE_NAME = 'BusinessSessionLines'") == 0)
+                {
+                    mQry = @"CREATE TABLE Web.BusinessSessionLines
+	                            (
+	                                BusinessSessionLineId   INT IDENTITY NOT NULL,
+	                                BusinessSessionId       INT NOT NULL,
+	                                SiteId                  INT NOT NULL,
+	                                DivisionId              INT NOT NULL,
+	                                OpeningStockValue       DECIMAL(18,4) NULL,
+	                                ClosingStockValue       DECIMAL(18,4) NULL,
+	                                CreatedBy               NVARCHAR (max) NULL,
+	                                ModifiedBy              NVARCHAR (max) NULL,
+	                                CreatedDate             DATETIME NOT NULL,
+	                                ModifiedDate            DATETIME NOT NULL,
+	                                OMSId                   NVARCHAR (50) NULL,
+	                                CONSTRAINT [PK_Web.BusinessSessionLines] PRIMARY KEY (BusinessSessionLineId), 
+	                                CONSTRAINT [FK_Web.BusinessSessionLines_Web.Sites_SiteId] FOREIGN KEY (SiteId) REFERENCES Web.Sites (SiteId),
+	                                CONSTRAINT [FK_Web.BusinessSessionLines_Web.Divisions_DivisionId] FOREIGN KEY (DivisionId) REFERENCES Web.Divisions (DivisionId)
+	                            ) ";
+                    ExecuteQuery(mQry);
+                }
+            }
+            catch (Exception ex)
+            {
+                RecordError(ex);
+            }
+
+
             ReCreateProcedures();
             DataCorrection();
 

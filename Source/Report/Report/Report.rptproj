@@ -9,8 +9,8 @@
   </DataSources>
   <DataSets>
     <ProjectItem>
-      <Name>DsMain.rsd</Name>
-      <FullPath>DsMain.rsd</FullPath>
+      <Name>DataSourceMain.rsd</Name>
+      <FullPath>DataSourceMain.rsd</FullPath>
     </ProjectItem>
   </DataSets>
   <Reports>
@@ -1087,6 +1087,10 @@
     <ProjectItem>
       <Name>HisabOfPurja3.rdl</Name>
       <FullPath>HisabOfPurja3.rdl</FullPath>
+    </ProjectItem>
+    <ProjectItem>
+      <Name>InvoicePrint.rdl</Name>
+      <FullPath>InvoicePrint.rdl</FullPath>
     </ProjectItem>
     <ProjectItem>
       <Name>JobCancelPrint_HomeFurnishing.rdl</Name>
@@ -5238,10 +5242,6 @@
     <ProjectItem>
       <Name>YearlyListOfPurja.rdl</Name>
       <FullPath>YearlyListOfPurja.rdl</FullPath>
-    </ProjectItem>
-    <ProjectItem>
-      <Name>InvoicePrint.rdl</Name>
-      <FullPath>InvoicePrint.rdl</FullPath>
     </ProjectItem>
   </Reports>
   <Configurations>

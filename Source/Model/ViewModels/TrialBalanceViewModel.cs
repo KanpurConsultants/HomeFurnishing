@@ -149,6 +149,8 @@ namespace Model.ViewModel
         public string ReportType { get; set; }
         public string OpenReportType { get; set; }
 
+
+
         public int? ParentGRCode { get; set; }
         public string ParentGRCodeCredit { get; set; }
 
