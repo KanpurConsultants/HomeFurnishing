@@ -89,8 +89,8 @@ namespace Model.Models
 
 
 
-        public bool? isAllowedDuplicatePrint { get; set; }        
-
+        public bool? isAllowedDuplicatePrint { get; set; }
+        public bool? isPrintinLetterhead { get; set; }
 
         [Display(Name = "Created By")]
         public string CreatedBy { get; set; }

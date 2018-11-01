@@ -1477,56 +1477,62 @@ namespace Jobs.Controllers
                     db.LedgerHeader.Add(LedgerHeader);
                 }
 
-                    IEnumerable<SalaryLine> SalaryLineList = from L in db.SalaryLine where L.SalaryHeaderId == Header.SalaryHeaderId select L;
+                IEnumerable<SalaryLine> SalaryLineList = from L in db.SalaryLine where L.SalaryHeaderId == Header.SalaryHeaderId select L;
 
-                foreach (var Line in SalaryLineList)
+                SalarySettings setting = new SalarySettingsService(_unitOfWork).GetSalarySettingsForDocument(Header.DocTypeId, Header.DivisionId, Header.SiteId);
+
+                if (setting.isPostedInLedger == true)
                 {
-                    #region LedgerSave
-                    Ledger Ledger = new Ledger();
+                    foreach (var Line in SalaryLineList)
+                    {
+                        #region LedgerSave
+                        Ledger Ledger = new Ledger();
 
-                    LedgerAccount LA = new LedgerAccountService(_unitOfWork).GetLedgerAccountByPersondId(Line.EmployeeId);
-                    PersonProcess PP = new PersonProcessService(_unitOfWork).GetPersonProcessIdListByPersonId(Line.EmployeeId).FirstOrDefault();
-                    Process P = new ProcessService(_unitOfWork).Find(PP.ProcessId);
-                    LedgerAccount LAC = new LedgerAccountService(_unitOfWork).Find(P.AccountId);
+                        LedgerAccount LA = new LedgerAccountService(_unitOfWork).GetLedgerAccountByPersondId(Line.EmployeeId);
+                        PersonProcess PP = new PersonProcessService(_unitOfWork).GetPersonProcessIdListByPersonId(Line.EmployeeId).FirstOrDefault();
+                        Process P = new ProcessService(_unitOfWork).Find(PP.ProcessId);
+                        LedgerAccount LAC = new LedgerAccountService(_unitOfWork).Find(P.AccountId);
 
-                    Ledger.AmtCr = Line.NetPayable;
-                    Ledger.ContraLedgerAccountId = LAC.LedgerAccountId;
-                    Ledger.LedgerAccountId = LA.LedgerAccountId;
-                    Ledger.LedgerHeaderId = LedgerHeaderViewModel.LedgerHeaderId;
-                    Ledger.Narration = Header.Remark + Line.Remark;
-                    Ledger.ObjectState = Model.ObjectState.Added;
-                    Ledger.LedgerId = 1;
-                    db.Ledger.Add(Ledger);
+                        Ledger.AmtCr = Line.NetPayable;
+                        Ledger.ContraLedgerAccountId = LAC.LedgerAccountId;
+                        Ledger.LedgerAccountId = LA.LedgerAccountId;
+                        Ledger.LedgerHeaderId = LedgerHeaderViewModel.LedgerHeaderId;
+                        Ledger.Narration = Header.Remark + Line.Remark;
+                        Ledger.ObjectState = Model.ObjectState.Added;
+                        Ledger.LedgerId = 1;
+                        db.Ledger.Add(Ledger);
 
-                    #endregion
+                        #endregion
 
-                    #region ContraLedgerSave
-                    Ledger ContraLedger = new Ledger();
+                        #region ContraLedgerSave
+                        Ledger ContraLedger = new Ledger();
 
-                    ContraLedger.AmtDr = Line.NetPayable;
-                    ContraLedger.LedgerHeaderId = LedgerHeaderViewModel.LedgerHeaderId;
-                    ContraLedger.LedgerAccountId = LAC.LedgerAccountId;
-                    ContraLedger.ContraLedgerAccountId = LA.LedgerAccountId;
-                    ContraLedger.ObjectState = Model.ObjectState.Added;
-                    db.Ledger.Add(ContraLedger);
-                    #endregion
+                        ContraLedger.AmtDr = Line.NetPayable;
+                        ContraLedger.LedgerHeaderId = LedgerHeaderViewModel.LedgerHeaderId;
+                        ContraLedger.LedgerAccountId = LAC.LedgerAccountId;
+                        ContraLedger.ContraLedgerAccountId = LA.LedgerAccountId;
+                        ContraLedger.ObjectState = Model.ObjectState.Added;
+                        db.Ledger.Add(ContraLedger);
+                        #endregion
+                    }
+
                 }
-
             }
 
             Header.LedgerHeaderId = LedgerHeaderViewModel.LedgerHeaderId;
 
-
             var LedgerLineList_Temp = (from L in db.SalaryLine
                                        join A in db.LedgerAccount on L.EmployeeId equals A.PersonId into LedgerAccountTable
                                        from LedgerAccountTab in LedgerAccountTable.DefaultIfEmpty()
-
                                        where L.SalaryHeaderId == Header.SalaryHeaderId
                                        select new
                                        {
                                            SalaryLineId = L.SalaryLineId,
                                            DocTypeId = L.SalaryHeader.DocTypeId,
                                            LedgerAccountId = LedgerAccountTab.LedgerAccountId,
+                                           Amount = Header.WagesPayType == "Daily" ? L.BasicSalary*L.Days : L.BasicSalary * L.Days,
+                                           TDS =L.TDS,
+                                           TDSBaseValue=L.TDSBaseValue,
                                            OtherAddition = L.OtherAddition,
                                            OtherDeduction = L.OtherDeduction,
                                            LoanEMI = L.LoanEMI,
@@ -1678,6 +1684,88 @@ namespace Jobs.Controllers
                 }
                 #endregion
 
+
+
+                #region "TDS Ledger Posting"
+                if ((LedgerLine_Temp.TDS ?? 0) > 0)
+                {
+                    int TDSAdjustementAccountId = 0;
+                    LedgerAccount TDSAdjustementAccount = new LedgerAccountService(_unitOfWork).Find("Tds Collection A/c");
+                    if (TDSAdjustementAccount != null)
+                        TDSAdjustementAccountId = TDSAdjustementAccount.LedgerAccountId;
+
+                    LedgerLine LedgerLine = new LedgerLine();
+                    LedgerLine.BaseValue = (decimal)LedgerLine_Temp.TDSBaseValue;
+                    LedgerLine.Amount = (decimal)LedgerLine_Temp.TDS;
+                    LedgerLine.LedgerAccountId = LedgerLine_Temp.LedgerAccountId;
+                    LedgerLine.LedgerHeaderId = (int)Header.LedgerHeaderId;
+                    LedgerLine.CreatedBy = LedgerHeaderViewModel.CreatedBy;
+                    LedgerLine.CreatedDate = DateTime.Now.Date;
+                    LedgerLine.ModifiedBy = LedgerHeaderViewModel.ModifiedBy;
+                    LedgerLine.ModifiedDate = DateTime.Now.Date;
+                    LedgerLine.ObjectState = Model.ObjectState.Added;
+                    db.LedgerLine.Add(LedgerLine);
+
+                    Ledger Ledger = new Ledger();
+                    Ledger.LedgerId = LedgerId_Running--;
+                    Ledger.AmtCr = 0;
+                    Ledger.AmtDr = (decimal)LedgerLine_Temp.TDS;
+                    Ledger.ChqNo = null;
+                    Ledger.ChqDate = null;
+                    Ledger.ContraLedgerAccountId = TDSAdjustementAccountId;
+                    Ledger.CostCenterId = null;
+                    Ledger.DueDate = null;
+                    Ledger.LedgerAccountId = LedgerLine_Temp.LedgerAccountId;
+                    Ledger.LedgerHeaderId = (int)Header.LedgerHeaderId;
+                    Ledger.LedgerLineId = null;
+                    Ledger.ProductUidId = null;
+                    Ledger.Narration = Header.Remark;
+                    Ledger.ObjectState = Model.ObjectState.Added;
+                    db.Ledger.Add(Ledger);
+
+                    //Decimal TDS_RunningBalance = LedgerLine_Temp.TDS ?? 0;
+                    //IEnumerable<AdvanceLedgerIdList> AdvanceList = new SalaryWizardService().GetAdvanceList(LedgerLine_Temp.LedgerAccountId);
+                    //foreach (var AdvanceLedger in AdvanceList)
+                    //{
+                    //    if (TDS_RunningBalance > 0)
+                    //    {
+                    //        LedgerAdj LedgerAdj = new LedgerAdj();
+                    //        LedgerAdj.LedgerAdjId = LedgerAdjId_Running--;
+                    //        LedgerAdj.CrLedgerId = Ledger.LedgerId;
+                    //        LedgerAdj.DrLedgerId = AdvanceLedger.LedgerId;
+
+                    //        if (AdvanceLedger.Amount >= Advance_RunningBalance)
+                    //            LedgerAdj.Amount = Advance_RunningBalance;
+                    //        else
+                    //            LedgerAdj.Amount = AdvanceLedger.Amount;
+
+                    //        LedgerAdj.SiteId = Header.SiteId;
+                    //        LedgerAdj.CreatedDate = DateTime.Now;
+                    //        LedgerAdj.ModifiedDate = DateTime.Now;
+                    //        LedgerAdj.CreatedBy = User.Identity.Name;
+                    //        LedgerAdj.ModifiedBy = User.Identity.Name;
+                    //        LedgerAdj.ObjectState = Model.ObjectState.Added;
+                    //        db.LedgerAdj.Add(LedgerAdj);
+
+                    //        Advance_RunningBalance = Advance_RunningBalance - LedgerAdj.Amount;
+                    //    }
+                    //}
+
+                    Ledger ContraLedger = new Ledger();
+                    ContraLedger.LedgerId = LedgerId_Running--;
+                    ContraLedger.AmtCr = (decimal)LedgerLine_Temp.TDS;
+                    ContraLedger.AmtDr = 0;
+                    ContraLedger.LedgerHeaderId = (int)Header.LedgerHeaderId;
+                    ContraLedger.CostCenterId = null;
+                    ContraLedger.LedgerLineId = null;
+                    ContraLedger.LedgerAccountId = TDSAdjustementAccountId;
+                    ContraLedger.ContraLedgerAccountId = LedgerLine_Temp.LedgerAccountId;
+                    ContraLedger.ChqNo = null;
+                    ContraLedger.ChqDate = null;
+                    ContraLedger.ObjectState = Model.ObjectState.Added;
+                    db.Ledger.Add(ContraLedger);
+                }
+                #endregion
 
 
                 #region "Addition Ledger Posting"

@@ -203,6 +203,7 @@ namespace Data.Models
         public DbSet<Company> Company { get; set; }
         public DbSet<CompanySettings> CompanySettings { get; set; }
         public DbSet<BusinessSession> BusinessSession { get; set; }
+        public DbSet<BusinessSessionLine> BusinessSessionLine { get; set; }
         public DbSet<CostCenter> CostCenter { get; set; }
         public DbSet<Country> Country { get; set; }
         public DbSet<Currency> Currency { get; set; }
@@ -439,6 +440,7 @@ namespace Data.Models
         public DbSet<SaleDispatchHeader> SaleDispatchHeader { get; set; }
         public DbSet<SaleDispatchLine> SaleDispatchLine { get; set; }
         public DbSet<SaleInvoiceHeader> SaleInvoiceHeader { get; set; }
+        public DbSet<CustomHeader> CustomHeader { get; set; }
         public DbSet<SaleInvoiceHeaderDetail> SaleInvoiceHeaderDetail { get; set; }
         public DbSet<SaleInvoiceHeaderAttributes> SaleInvoiceHeaderAttributes { get; set; }
         public DbSet<SaleInvoiceLine> SaleInvoiceLine { get; set; }
@@ -446,6 +448,7 @@ namespace Data.Models
         public DbSet<DispatchWaybillHeader> DispatchWaybillHeader { get; set; }
         public DbSet<DispatchWaybillLine> DispatchWaybillLine { get; set; }
         public DbSet<CustomDetail> CustomDetail { get; set; }
+        public DbSet<CustomHeaderAttributes> CustomHeaderAttributes { get; set; }
         public DbSet<SaleDispatchReturnHeader> SaleDispatchReturnHeader { get; set; }
         public DbSet<SaleDispatchReturnLine> SaleDispatchReturnLine { get; set; }
         public DbSet<SaleInvoiceReturnHeader> SaleInvoiceReturnHeader { get; set; }
@@ -486,6 +489,7 @@ namespace Data.Models
         public DbSet<JobInvoiceRateAmendmentLine> JobInvoiceRateAmendmentLine { get; set; }
         public DbSet<JobReceiveHeader> JobReceiveHeader { get; set; }
         public DbSet<JobOrderHeaderExtended> JobOrderHeaderExtended { get; set; }
+        public DbSet<ViewSaleInvoiceBalanceForCustomAttribute> ViewSaleInvoiceBalanceForCustomAttribute { get; set; }        
         public DbSet<JobReceiveLine> JobReceiveLine { get; set; }
         public DbSet<JobReceiveBom> JobReceiveBom { get; set; }
         public DbSet<JobReceiveByProduct> JobReceiveByProduct { get; set; }
@@ -563,6 +567,10 @@ namespace Data.Models
         public DbSet<PackingSetting> PackingSettings { get; set; }
         public DbSet<PackingHeader> PackingHeader { get; set; }
         public DbSet<PackingLine> PackingLine { get; set; }
+
+        public DbSet<CostingHeader> CostingHeader { get; set; }
+        public DbSet<CostingLine> CostingLine { get; set; }
+
         public DbSet<PackingLineExtended> PackingLineExtended { get; set; }
 
         //Stock Models

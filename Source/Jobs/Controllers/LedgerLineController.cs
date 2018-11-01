@@ -303,7 +303,8 @@ namespace Jobs.Controllers
                     LedgerLine.LedgerAccountId = svm.LedgerAccountId;
                     LedgerLine.Amount = svm.Amount;
                     LedgerLine.ChqNo = svm.ChqNo;
-                    LedgerLine.ChqDate = svm.DueDate;
+                    LedgerLine.ChqDate = svm.ChqDate;
+                    LedgerLine.DueDate = svm.DueDate;
                     LedgerLine.CostCenterId = svm.CostCenterId;
                     LedgerLine.BaseRate = svm.BaseRate;
                     LedgerLine.BaseValue = svm.BaseValue;
@@ -536,8 +537,8 @@ namespace Jobs.Controllers
                     LedgerLine.ChqNo = svm.ChqNo;
                     LedgerLine.CostCenterId = svm.CostCenterId;
                     LedgerLine.Remark = svm.Remark;
-                    LedgerLine.ChqDate = svm.DueDate;
-                    LedgerLine.BaseRate = svm.BaseRate;
+                    LedgerLine.ChqDate = svm.ChqDate;
+                    LedgerLine.DueDate = svm.DueDate;                    LedgerLine.BaseRate = svm.BaseRate;
                     LedgerLine.BaseValue = svm.BaseValue;
                     LedgerLine.ReferenceId = svm.ReferenceId;
                     LedgerLine.ProductUidId = svm.ProductUidId;

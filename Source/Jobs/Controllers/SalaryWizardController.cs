@@ -161,6 +161,9 @@ namespace Jobs.Controllers
                         Line.EmployeeId = SalaryData.EmployeeId;
                         Line.BasicSalary = SalaryData.BasicPay;
                         Line.Days = SalaryData.Days;
+                        Line.TDS = SalaryData.TDS;
+                        Line.TDSBaseValue = SalaryData.TDSBaseValue;
+                        Line.RetensionAmount= SalaryData.RetensionAmount;
                         Line.OtherAddition = SalaryData.Additions;
                         Line.OtherDeduction = SalaryData.Deductions;
                         Line.LoanEMI = SalaryData.LoanEMI;
@@ -182,7 +185,7 @@ namespace Jobs.Controllers
                         Decimal TotalAmount = 0;
                         if (EmployeeChargesList.Count == 0)
                         {
-                            Line.NetPayable = (Line.BasicSalary) + (Line.OtherAddition ?? 0) - (Line.OtherDeduction ?? 0) - (Line.LoanEMI ?? 0) - (Line.Advance ?? 0);
+                            Line.NetPayable = (Line.BasicSalary) - (Line.TDS ?? 0) + (Line.OtherAddition ?? 0) - (Line.OtherDeduction ?? 0) - (Line.LoanEMI ?? 0) - (Line.Advance ?? 0);
                         }
                         else
                         {
@@ -245,7 +248,7 @@ namespace Jobs.Controllers
 
                                 Charge NetSalaryCharge = (from C in db.Charge where C.ChargeName == "Net Salary" select C).FirstOrDefault();
                                 if (NetSalaryCharge != null && LineCharge.ChargeId == NetSalaryCharge.ChargeId)
-                                    Line.NetPayable = (LineCharge.Amount ?? 0) + (Line.OtherAddition ?? 0) - (Line.OtherDeduction ?? 0) - (Line.LoanEMI ?? 0) - (Line.Advance ?? 0);
+                                    Line.NetPayable = (LineCharge.Amount ?? 0) - (Line.TDS ?? 0) + (Line.OtherAddition ?? 0) - (Line.OtherDeduction ?? 0) - (Line.LoanEMI ?? 0) - (Line.Advance ?? 0);
                             }
                         }
 

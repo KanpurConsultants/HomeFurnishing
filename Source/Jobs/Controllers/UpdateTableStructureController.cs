@@ -61,6 +61,225 @@ namespace Module
 
             try
             {
+                if ((int)ExecuteScaler("SELECT Count(*) AS Cnt FROM INFORMATION_SCHEMA.Tables WHERE TABLE_NAME = 'ProgressAttributes'") == 0)
+                {
+                    mQry = @"CREATE TABLE Web.ProgressAttributes
+	                        (
+	                        ProgressAttributeId INT IDENTITY NOT NULL,
+	                        Sr                  INT NOT NULL,
+	                        Name                NVARCHAR (max) NOT NULL,
+	                        Value               DECIMAL (18, 2),
+	                        IsActive            BIT NOT NULL,
+	                        CreatedBy           NVARCHAR (max),
+	                        ModifiedBy          NVARCHAR (max),
+	                        CreatedDate         DATETIME NOT NULL,
+	                        ModifiedDate        DATETIME NOT NULL,
+	                        OMSId               NVARCHAR (50),
+	                        DocumentTypeId      INT,
+	                        CONSTRAINT [PK_Web.ProgressAttributes] PRIMARY KEY (ProgressAttributeId)
+	                        )";
+                    ExecuteQuery(mQry);
+                }
+            }
+            catch (Exception ex)
+            {
+                RecordError(ex);
+            }
+
+
+
+            try
+            {
+                if ((int)ExecuteScaler("SELECT Count(*) AS Cnt FROM INFORMATION_SCHEMA.Tables WHERE TABLE_NAME = 'SaleOrderLineProgress'") == 0)
+                {
+                    mQry = @"CREATE TABLE Web.SaleOrderLineProgress
+	                        (
+	                        SaleOrderLineProgressId INT IDENTITY NOT NULL,
+	                        SaleOrderLineId         INT NOT NULL,
+	                        ProgressAttributeId     INT NOT NULL,
+	                        Value                   DECIMAL (18, 4),
+	                        UserValue               DECIMAL (18, 4),
+	                        CreatedBy               NVARCHAR (max),
+	                        ModifiedBy              NVARCHAR (max),
+	                        CreatedDate             DATETIME NOT NULL,
+	                        ModifiedDate            DATETIME NOT NULL,
+	                        OMSId                   NVARCHAR (50),
+	                        CONSTRAINT [PK_Web.SaleOrderLineProgress] PRIMARY KEY (SaleOrderLineProgressId),
+	                        CONSTRAINT [FK_Web.SaleOrderLineProgress_Web.ProgressAttribute_ProgressAttributeId] FOREIGN KEY (ProgressAttributeId) REFERENCES Web.ProgressAttributes (ProgressAttributeId),
+	                        CONSTRAINT [FK_Web.SaleOrderLineProgress_Web.SaleOrderLines_SaleOrderLineId] FOREIGN KEY (SaleOrderLineId) REFERENCES Web.SaleOrderLines (SaleOrderLineId)
+	                        )
+
+                        CREATE INDEX [IX_SaleOrderLineId]
+	                        ON Web.SaleOrderLineProgress (SaleOrderLineId)
+
+
+                        CREATE INDEX [ProgressAttributeId]
+	                        ON Web.SaleOrderLineProgress (ProgressAttributeId)
+
+
+                        CREATE UNIQUE INDEX [IX_SaleOrderLineProgress_SaleOrdeHeaderProgressAttribute]
+	                        ON Web.SaleOrderLineProgress (SaleOrderLineId, ProgressAttributeId)";
+                    ExecuteQuery(mQry);
+                }
+            }
+            catch (Exception ex)
+            {
+                RecordError(ex);
+            }
+
+
+
+            try
+            {
+                if ((int)ExecuteScaler("SELECT Count(*) AS Cnt FROM INFORMATION_SCHEMA.Tables WHERE TABLE_NAME = 'SaleOrderHeaderProgress'") == 0)
+                {
+                    mQry = @"CREATE TABLE Web.SaleOrderHeaderProgress
+	                        (
+	                        SaleOrderHeaderProgressId INT IDENTITY NOT NULL,
+	                        SaleOrderHeaderId         INT NOT NULL,
+	                        ProgressAttributeId     INT NOT NULL,
+	                        Value                   DECIMAL (18, 4),
+	                        UserValue               DECIMAL (18, 4),
+	                        CreatedBy               NVARCHAR (max),
+	                        ModifiedBy              NVARCHAR (max),
+	                        CreatedDate             DATETIME NOT NULL,
+	                        ModifiedDate            DATETIME NOT NULL,
+	                        OMSId                   NVARCHAR (50),
+	                        CONSTRAINT [PK_Web.SaleOrderHeaderProgress] PRIMARY KEY (SaleOrderHeaderProgressId),
+	                        CONSTRAINT [FK_Web.SaleOrderHeaderProgress_Web.ProgressAttribute_ProgressAttributeId] FOREIGN KEY (ProgressAttributeId) REFERENCES Web.ProgressAttributes (ProgressAttributeId),
+	                        CONSTRAINT [FK_Web.SaleOrderHeaderProgress_Web.SaleOrderHeaders_SaleOrderHeaderId] FOREIGN KEY (SaleOrderHeaderId) REFERENCES Web.SaleOrderHeaders (SaleOrderHeaderId)
+	                        )
+
+                        CREATE INDEX [IX_SaleOrderHeaderId]
+	                        ON Web.SaleOrderHeaderProgress (SaleOrderHeaderId)
+
+
+                        CREATE INDEX [ProgressAttributeId]
+	                        ON Web.SaleOrderHeaderProgress (ProgressAttributeId)
+
+
+                        CREATE UNIQUE INDEX [IX_SaleOrderHeaderProgress_SaleOrdeHeaderProgressAttribute]
+	                        ON Web.SaleOrderHeaderProgress (SaleOrderHeaderId, ProgressAttributeId)";
+                    ExecuteQuery(mQry);
+                }
+            }
+            catch (Exception ex)
+            {
+                RecordError(ex);
+            }
+
+
+            try
+            {
+                if ((int)ExecuteScaler("SELECT Count(*) AS Cnt FROM INFORMATION_SCHEMA.Tables WHERE TABLE_NAME = 'CustomHeaders'") == 0)
+                {
+                    mQry = @"CREATE TABLE Web.CustomHeaders
+	                        (
+	                        CustomHeaderId     INT IDENTITY NOT NULL,
+	                        DocTypeId               INT NOT NULL,
+	                        DocDate                 DATETIME NOT NULL,
+	                        DocNo                   NVARCHAR (20) NOT NULL,
+	                        DivisionId              INT NOT NULL,
+	                        SiteId                  INT NOT NULL,
+	                        Status                  INT NOT NULL,
+	                        Remark                  NVARCHAR (max),
+	                        LockReason              NVARCHAR (max),
+	                        CreatedBy               NVARCHAR (max),
+	                        ModifiedBy              NVARCHAR (max),
+	                        CreatedDate             DATETIME NOT NULL,
+	                        ModifiedDate            DATETIME NOT NULL,
+	                        OMSId                   NVARCHAR (50),
+	                        CONSTRAINT [PK_Web.CustomHeaders] PRIMARY KEY (CustomHeaderId),
+	                        CONSTRAINT [FK_Web.CustomHeaders_Web.Divisions_DivisionId] FOREIGN KEY (DivisionId) REFERENCES Web.Divisions (DivisionId),
+	                        CONSTRAINT [FK_Web.CustomHeaders_Web.DocumentTypes_DocTypeId] FOREIGN KEY (DocTypeId) REFERENCES Web.DocumentTypes (DocumentTypeId),
+	                        CONSTRAINT [FK_Web.CustomHeaders_Web.Sites_SiteId] FOREIGN KEY (SiteId) REFERENCES Web.Sites (SiteId)
+	                        )
+                            
+
+                            CREATE UNIQUE INDEX [IX_CustomHeader_DocID]
+	                                    ON Web.CustomHeaders (DocTypeId, DocNo, DivisionId, SiteId)
+
+                            CREATE UNIQUE INDEX [IX_CustomHeaders_DocID]
+	                            ON Web.CustomHeaders (DocTypeId, DocNo, DivisionId, SiteId)
+                            ";
+                    ExecuteQuery(mQry);
+                }
+            }
+            catch (Exception ex)
+            {
+                RecordError(ex);
+            }
+
+
+            try
+            {
+                if ((int)ExecuteScaler("SELECT Count(*) AS Cnt FROM INFORMATION_SCHEMA.Tables WHERE TABLE_NAME = 'CustomLines'") == 0)
+                {
+                    mQry = @"CREATE TABLE Web.CustomLines
+	                            (
+	                            CustomLineId        INT IDENTITY NOT NULL,
+	                            CustomHeaderId      INT NOT NULL,
+	                            Remark                   NVARCHAR (max),
+	                            LockReason               NVARCHAR (max),
+	                            Sr                       INT,
+	                            CreatedBy                NVARCHAR (max),
+	                            ModifiedBy               NVARCHAR (max),
+	                            CreatedDate              DATETIME NOT NULL,
+	                            ModifiedDate             DATETIME NOT NULL,
+	                            OMSId                    NVARCHAR (50),
+	                            CONSTRAINT [PK_Web.CustomLines] PRIMARY KEY (CustomLineId),
+	                            CONSTRAINT [FK_Web.CustomLines_Web.CustomHeaders_CustomHeaderId] FOREIGN KEY (CustomHeaderId) REFERENCES Web.CustomHeaders (CustomHeaderId),
+	                            )
+                            
+
+CREATE INDEX [IX_CustomHeaderId]
+	ON Web.CustomLines (CustomHeaderId)
+                            ";
+                    ExecuteQuery(mQry);
+                }
+            }
+            catch (Exception ex)
+            {
+                RecordError(ex);
+            }
+
+
+            try
+            {
+                if ((int)ExecuteScaler("SELECT Count(*) AS Cnt FROM INFORMATION_SCHEMA.Tables WHERE TABLE_NAME = 'CustomHeaderAttributes'") == 0)
+                {
+                    mQry = @"CREATE TABLE Web.CustomHeaderAttributes
+	                            (
+	                            Id                            INT IDENTITY NOT NULL,
+	                            HeaderTableId                 INT NOT NULL,
+	                            DocumentTypeHeaderAttributeId INT NOT NULL,
+	                            Value                         NVARCHAR (max),
+	                            CONSTRAINT [PK_Web.CustomHeaderAttributes] PRIMARY KEY (Id)
+	                            WITH (FILLFACTOR = 90),
+	                            CONSTRAINT [FK_Web.CustomHeaderAttributes_Web.DocumentTypeHeaderAttributes_DocumentTypeHeaderAttributeId] FOREIGN KEY (DocumentTypeHeaderAttributeId) REFERENCES Web.DocumentTypeHeaderAttributes (DocumentTypeHeaderAttributeId),
+	                            CONSTRAINT [FK_Web.CustomHeaderAttributes_Web.CustomHeaders_HeaderTableId] FOREIGN KEY (HeaderTableId) REFERENCES Web.CustomHeaders (CustomHeaderId)
+	                            )
+                            
+
+CREATE INDEX [IX_HeaderTableId]
+	ON Web.CustomHeaderAttributes (HeaderTableId)
+	WITH (FILLFACTOR = 90)
+
+CREATE INDEX [IX_DocumentTypeHeaderAttributeId]
+	ON Web.CustomHeaderAttributes (DocumentTypeHeaderAttributeId)
+	WITH (FILLFACTOR = 90)
+                            ";
+                    ExecuteQuery(mQry);
+                }
+            }
+            catch (Exception ex)
+            {
+                RecordError(ex);
+            }
+
+
+            try
+            {
                 if ((int)ExecuteScaler("SELECT Count(*) AS Cnt FROM INFORMATION_SCHEMA.Tables WHERE TABLE_NAME = 'PersonProductUids'") == 0)
                 {
                     mQry = @"CREATE TABLE Web.PersonProductUids 
@@ -117,6 +336,7 @@ namespace Module
             AddFields("LedgerAccountGroups", "TradingSr", "INT");
             AddFields("LedgerAccountGroups", "PLNature", "NVARCHAR (20)");
             AddFields("LedgerAccountGroups", "PLSr", "INT");
+            AddFields("LedgerAccountGroups", "LedgerAccountGroupNature", "NVARCHAR (10)");
 
 
             AddFields("SaleInvoiceHeaderDetail", "FreightRemark", "NVARCHAR (50)");
@@ -131,7 +351,12 @@ namespace Module
 
             AddFields("Processes", "DepartmentId", "INT", "Departments");
             AddFields("SalaryLines", "BasicSalary", " Decimal(18,4)");
+            AddFields("SalaryLines", "TDS", " Decimal(18,4)");
+            AddFields("SalaryLines", "TDSBaseValue", " Decimal(18,4)");            
             AddFields("SalaryHeaders", "WagesPayType", "NVARCHAR (20)");
+
+            AddFields("TdsGroups", "LedgerAccountId", "INT", "LedgerAccounts");
+            AddFields("TdsGroups", "Percentage", " Decimal(18,4)");
 
             AddFields("ProductTypeSettings", "isVisibleProductDescription", "BIT");
             AddFields("ProductTypeSettings", "isVisibleProductSpecification", "BIT");
@@ -172,6 +397,8 @@ namespace Module
             AddFields("JobInvoiceHeaders", "IsDocumentPrinted", "Bit");
 
             AddFields("JobInvoiceLines", "RateDiscountPer", "Decimal(18,4)");
+            AddFields("JobInvoiceLines", "RetensionRate", "Decimal(18,4)");
+            AddFields("JobInvoiceLines", "RetensionAmount", "Decimal(18,4)");
             AddFields("JobReceiveLines", "MfgDate", "DATETIME");
 
             AddFields("DocumentTypeSettings", "CostCenterCaption", "NVARCHAR (50)");
@@ -227,10 +454,12 @@ namespace Module
             AddFields("SalaryHeaders", "IsDocumentPrinted", "Bit");
             AddFields("SalarySettings", "isAllowedDuplicatePrint", "BIT NOT NULL DEFAULT(1)");
             AddFields("SalarySettings", "isPrintinLetterhead", "BIT");
+            AddFields("SalarySettings", "isPostedInLedger", "BIT");
 
             AddFields("LedgerHeaders", "IsDocumentPrinted", "Bit");
             AddFields("LedgerSettings", "isAllowedDuplicatePrint", "BIT NOT NULL DEFAULT(1)");
             AddFields("LedgerSettings", "isPrintinLetterhead", "BIT");
+            AddFields("LedgerSettings", "isVisibleDueDate", "BIT");
             AddFields("LedgerSettings", "isVisibleQty", "BIT NOT NULL DEFAULT(0)");
             AddFields("LedgerSettings", "isVisibleDealQty", "BIT NOT NULL DEFAULT(0)");
             AddFields("LedgerSettings", "isVisibleRate", "BIT NOT NULL DEFAULT(0)");
@@ -426,6 +655,109 @@ namespace Module
             }
 
 
+
+
+
+            try
+            {
+                if ((int)ExecuteScaler("SELECT Count(*) AS Cnt FROM INFORMATION_SCHEMA.Tables WHERE TABLE_NAME = 'CostingHeaders'") == 0)
+                {
+                    mQry = @"CREATE TABLE Web.CostingHeaders
+	                        (
+	                        CostingHeaderId INT IDENTITY NOT NULL,
+	                        DocTypeId       INT NOT NULL,
+	                        DocDate         DATETIME NOT NULL,
+	                        DocNo           NVARCHAR (20) NOT NULL,
+	                        DivisionId      INT NOT NULL,
+	                        SiteId          INT NOT NULL,
+	                        PersonId        INT NOT NULL,
+	                        Remark          NVARCHAR (max),
+	                        LockReason      NVARCHAR (max),
+	                        Status          INT NOT NULL,
+	                        ReviewCount     INT,
+	                        ReviewBy        NVARCHAR (max),
+	                        CreatedBy       NVARCHAR (max),
+	                        ModifiedBy      NVARCHAR (max),
+	                        CreatedDate     DATETIME NOT NULL,
+	                        ModifiedDate    DATETIME NOT NULL,
+	                        OMSId           NVARCHAR (50),
+	                        CONSTRAINT [PK_Web.CostingHeaders] PRIMARY KEY (CostingHeaderId),
+	                        CONSTRAINT [FK_Web.CostingHeaders_Web.People_PersonId] FOREIGN KEY (PersonId) REFERENCES Web.People (PersonID),
+	                        CONSTRAINT [FK_Web.CostingHeaders_Web.Divisions_DivisionId] FOREIGN KEY (DivisionId) REFERENCES Web.Divisions (DivisionId),
+	                        CONSTRAINT [FK_Web.CostingHeaders_Web.DocumentTypes_DocTypeId] FOREIGN KEY (DocTypeId) REFERENCES Web.DocumentTypes (DocumentTypeId),
+	                        CONSTRAINT [FK_Web.CostingHeaders_Web.Sites_SiteId] FOREIGN KEY (SiteId) REFERENCES Web.Sites (SiteId)
+	                        )
+
+
+                        CREATE UNIQUE INDEX [IX_CostingHeader_DocID]
+	                        ON Web.CostingHeaders (DocTypeId, DocNo, DivisionId, SiteId)
+
+
+                        CREATE INDEX [IX_PersonId]
+	                        ON Web.CostingHeaders (PersonId)
+
+
+                        CREATE UNIQUE INDEX [IX_CostingHeaders_DocID]
+	                        ON Web.CostingHeaders (DocTypeId, DocNo, DivisionId, SiteId)
+                         ";
+                    ExecuteQuery(mQry);
+                }
+            }
+            catch (Exception ex)
+            {
+                RecordError(ex);
+            }
+
+
+            try
+            {
+                if ((int)ExecuteScaler("SELECT Count(*) AS Cnt FROM INFORMATION_SCHEMA.Tables WHERE TABLE_NAME = 'CostingLines'") == 0)
+                {
+                    mQry = @"CREATE TABLE Web.CostingLines
+	                        (
+	                        CostingLineId   INT IDENTITY NOT NULL,
+	                        CostingHeaderId INT NOT NULL,
+	                        ProductGroupId  INT,
+	                        ColourId        INT,
+	                        SizeId          INT,
+	                        Qty             DECIMAL (18, 4) NOT NULL,
+	                        PileWeight      DECIMAL (18, 4),
+	                        LockReason      NVARCHAR (max),
+	                        CreatedBy       NVARCHAR (max),
+	                        ModifiedBy      NVARCHAR (max),
+	                        CreatedDate     DATETIME NOT NULL,
+	                        ModifiedDate    DATETIME NOT NULL,
+	                        OMSId           NVARCHAR (50),
+	                        Remark          NVARCHAR (max),
+	                        CONSTRAINT [PK_Web.CostingLines] PRIMARY KEY (CostingLineId),
+	                        CONSTRAINT [FK_Web.CostingLines_Web.ProductGroup_ProductGroupId] FOREIGN KEY (ProductGroupId) REFERENCES Web.ProductGroups (ProductGroupId),
+	                        CONSTRAINT [FK_Web.CostingLines_Web.Colours_ColourId] FOREIGN KEY (ColourId) REFERENCES Web.Colours (ColourId),
+	                        CONSTRAINT [FK_Web.CostingLines_Web.Sizes_SizeId] FOREIGN KEY (SizeId) REFERENCES Web.Sizes (SizeId)
+	                        )
+
+
+                        CREATE INDEX [IX_CostingHeaderId]
+	                        ON Web.CostingLines (CostingHeaderId)
+
+
+                        CREATE INDEX [IX_ProductGroupId]
+	                        ON Web.CostingLines (ProductGroupId)
+
+
+                        CREATE INDEX [IX_ColourId]
+	                        ON Web.CostingLines (ColourId)
+
+
+                        CREATE INDEX [IX_SizeId]
+	                        ON Web.CostingLines (SizeId)
+                                                 ";
+                    ExecuteQuery(mQry);
+                }
+            }
+            catch (Exception ex)
+            {
+                RecordError(ex);
+            }
 
 
             try
@@ -1838,6 +2170,7 @@ namespace Module
 
             AddFields("PackingSettings", "ProcessId", "Int","Processes");
 
+            AddFields("JobOrderBoms", "ProcessId", "Int", "Processes");
 
             try
             {
@@ -2325,6 +2658,7 @@ namespace Module
             AddFields("PackingSettings", "UnitConversionForId", "TINYINT", "UnitConversionFors");
             AddFields("PackingSettings", "ExportMenuId", "INT", "Menus");
 
+            AddFields("StockHeaderSettings", "isVisibleHOCostCenter", "BIT");
 
             AddFields("PackingLines", "StockInId", "INT", "Stocks");
 
@@ -2747,6 +3081,41 @@ namespace Module
 
                             CREATE INDEX IX_StockLineId
 	                            ON Web.JobOrderBomMaterialIssues (StockLineId)";
+                    ExecuteQuery(mQry);
+                }
+            }
+            catch (Exception ex)
+            {
+                RecordError(ex);
+            }
+
+
+            try
+            {
+                if ((int)ExecuteScaler("SELECT Count(*) AS Cnt FROM INFORMATION_SCHEMA.Tables WHERE TABLE_NAME = 'JobOrderCancelBomMaterialReceives'") == 0)
+                {
+                    mQry = @"CREATE TABLE Web.JobOrderCancelBomMaterialReceives
+	                            (
+	                            JobOrderCancelBomMaterialReceiveId INT IDENTITY NOT NULL,
+	                            JobOrderBomId              INT,
+	                            StockLineId                INT NOT NULL,
+	                            ReceiveForQty                DECIMAL (18, 4) NOT NULL,
+	                            Qty                        DECIMAL (18, 4) NOT NULL,
+	                            CreatedBy                  NVARCHAR (max),
+	                            ModifiedBy                 NVARCHAR (max),
+	                            CreatedDate                DATETIME NOT NULL,
+	                            ModifiedDate               DATETIME NOT NULL,
+	                            OMSId                      NVARCHAR (50),
+	                            CONSTRAINT [PK_Web.JobOrderCancelBomMaterialReceive] PRIMARY KEY (JobOrderCancelBomMaterialReceiveId),
+	                            CONSTRAINT [FK_Web.JobOrderCancelBomMaterialReceive_Web.JobOrderBoms_JobOrderBomId] FOREIGN KEY (JobOrderBomId) REFERENCES Web.JobOrderBoms (JobOrderBomId),
+	                            CONSTRAINT [FK_Web.JobOrderCancelBomMaterialReceive_Web.StockLines_StockLineId] FOREIGN KEY (StockLineId) REFERENCES Web.StockLines (StockLineId)
+	                            )
+
+                            CREATE INDEX IX_JobOrderBomId
+	                            ON Web.JobOrderCancelBomMaterialIssues (JobOrderBomId)
+
+                            CREATE INDEX IX_StockLineId
+	                            ON Web.JobOrderCancelBomMaterialIssues (StockLineId)";
                     ExecuteQuery(mQry);
                 }
             }
@@ -3424,8 +3793,10 @@ namespace Module
             AddFields("LedgerLines", "AgentId", "Int", "People");
             AddFields("LedgerLines", "ReferenceLedgerAccountId", "Int", "LedgerAccounts");
             AddFields("LedgerLines", "DiscountAmount", "Decimal(18,4)");
+            AddFields("LedgerLines", "DueDate", "DATETIME");
+             
 
-            AddFields("People", "ReviewBy", "nvarchar(Max)");
+           	AddFields("People", "ReviewBy", "nvarchar(Max)");
             AddFields("People", "ReviewCount", "Int");
             AddFields("People", "Status", "Int");
 
@@ -3688,7 +4059,7 @@ namespace Module
 	                        OtherAddition  DECIMAL (18, 4),
 	                        OtherDeduction DECIMAL (18, 4),
 	                        LoadEMI        DECIMAL (18, 4),
-                            Advance        DECIMAL (18, 4),
+	                        NetPayable     DECIMAL (18, 4) NOT NULL,
 	                        Remark         NVARCHAR (max),
 	                        Sr             INT,
 	                        CreatedBy      NVARCHAR (max),
@@ -3697,12 +4068,15 @@ namespace Module
 	                        ModifiedDate   DATETIME NOT NULL,
 	                        LockReason     NVARCHAR (max),
 	                        OMSId          NVARCHAR (50),
+	                        LoanEMI        DECIMAL (18, 4),
+	                        Advance        DECIMAL (18, 4),
+	                        BasicSalary    DECIMAL (18, 4),
 	                        CONSTRAINT [PK_Web.SalaryLines] PRIMARY KEY (SalaryLineId),
-	                        CONSTRAINT [FK_Web.SalaryLines_Web.Employees_EmployeeId] FOREIGN KEY (EmployeeId) REFERENCES Web.Employees (EmployeeId),
-	                        CONSTRAINT [FK_Web.SalaryLines_Web.SalaryHeaders_SalaryHeaderId] FOREIGN KEY (SalaryHeaderId) REFERENCES Web.SalaryHeaders (SalaryHeaderId)
+	                        CONSTRAINT [FK_Web.SalaryLines_Web.SalaryHeaders_SalaryHeaderId] FOREIGN KEY (SalaryHeaderId) REFERENCES Web.SalaryHeaders (SalaryHeaderId),
+	                        CONSTRAINT [FK_Web.SalaryLines_EmployeeIdPersonId] FOREIGN KEY (EmployeeId) REFERENCES Web.People (PersonID)
 	                        )
 
-                        CREATE UNIQUE INDEX IX_SalaryLine_Unique
+                        CREATE UNIQUE INDEX [IX_SalaryLine_Unique]
 	                        ON Web.SalaryLines (SalaryHeaderId, EmployeeId) ";
                     ExecuteQuery(mQry);
                 }
@@ -3972,6 +4346,7 @@ namespace Module
 
             AddFields("SalaryLines", "Advance", "Decimal(18,4)");
             AddFields("SalaryLines", "NetPayable", "DECIMAL(18,4) NOT NULL DEFAULT((0))");
+            AddFields("SalaryLines", "RetensionAmount", "Decimal(18,4)");
 
             AddFields("SalaryHeaders", "LedgerHeaderId", "Int","LedgerHeaders");
 
@@ -3983,6 +4358,8 @@ namespace Module
             AddFields("Narrations", "DocTypeId", "Int","DocumentTypes");
 
             AddFields("LedgerLines", "SupplementaryForLedgerId", "Int", "Ledgers");
+
+            AddFields("SaleInvoiceHeaders", "SaleToPartySalesTaxNo", "nvarchar(50)");
 
 
             try

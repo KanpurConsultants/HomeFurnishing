@@ -151,7 +151,11 @@ namespace Model.ViewModels
         public string ChqNo { get; set; }
 
         [Display(Name = "Chq Date")]
-        public DateTime ? DueDate { get; set; }
+        public DateTime ? ChqDate { get; set; }
+
+        [Display(Name = "Due Date")]
+        public DateTime? DueDate { get; set; }
+
         public int DocumentCategoryId { get; set; }
         public string Remark { get; set; }
         public LedgerSettingViewModel LedgerSetting { get; set; }

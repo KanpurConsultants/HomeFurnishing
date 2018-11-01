@@ -130,7 +130,6 @@ namespace Model.ViewModels
         public decimal ?  DealQty { get; set; }
         public decimal ? Rate { get; set; }
 
-
         [Display(Name = "Specification"), MaxLength(10)]
         public string Specification { get; set; }
 

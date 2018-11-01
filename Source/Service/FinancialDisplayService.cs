@@ -291,7 +291,7 @@ namespace Service
                             LEFT JOIN Web.People P On LA.PersonId = P.PersonId
                             WHERE 1 = 1 
                             AND LH.DocDate <= @ToDate
-                            AND LH.DocDate >= (Case When LAG.LedgerAccountNature in ('Expense','Income') Then @FromDate Else '01/01/1900' End) " +
+                            AND LH.DocDate >= (Case When LAG.LedgerAccountGroupNature in ('Expense','Income') Then @FromDate Else '01/01/1900' End) " +
                             (SiteId != null ? " AND LH.SiteId IN (SELECT Items FROM [dbo].[Split] (@Site, ','))" : "") +
                             (DivisionId != null ? " AND LH.DivisionId IN (SELECT Items FROM [dbo].[Split] (@Division, ','))" : "") +
                             (CostCenterId != null ? " AND H.CostCenterId IN (SELECT Items FROM [dbo].[Split] (@CostCenter, ','))" : "") +
@@ -426,10 +426,10 @@ namespace Service
 			                                         THEN CASE WHEN P.Suffix = P.Code THEN ' [' + P.Code + ']'
 			 								                                          ELSE ', ' + P.Suffix + ' [' + P.Code + ']' END	
 			                                         ELSE ', ' + LA.LedgerAccountSuffix END) AS LedgerAccountName,
-                                                Sum(Case When LAG.LedgerAccountNature in ('Expense','Income') Then 0 Else CASE WHEN H.DocDate < @FromDate THEN L.AmtDr - L.AmtCr ELSE 0 END END) AS Opening,
+                                                Sum(Case When LAG.LedgerAccountGroupNature in ('Expense','Income') Then 0 Else CASE WHEN H.DocDate < @FromDate THEN L.AmtDr - L.AmtCr ELSE 0 END END) AS Opening,
                                                 Sum(CASE WHEN H.DocDate >= @FromDate AND H.DocDate <= @ToDate THEN L.AmtDr ELSE 0 END) AS AmtDr,
                                                 Sum(CASE WHEN H.DocDate >= @FromDate AND H.DocDate <= @ToDate THEN L.AmtCr ELSE 0 END) AS AmtCr,
-                                                Sum(Case When LAG.LedgerAccountNature in ('Expense','Income') Then 
+                                                Sum(Case When LAG.LedgerAccountGroupNature in ('Expense','Income') Then 
 			                                        CASE WHEN H.DocDate >= @FromDate AND H.DocDate <= @ToDate THEN L.AmtDr-L.AmtCr ELSE 0 END 
 		                                            ELSE CASE WHEN H.DocDate <= @ToDate THEN L.AmtDr-L.AmtCr ELSE 0 END END) AS Balance
                                                 FROM Web.LedgerHeaders H 
@@ -561,7 +561,7 @@ namespace Service
             string mOpeningDateCondStr = "";
             if (FromDate != null)
             {
-                mOpeningDateCondStr = mOpeningDateCondStr + " AND LH.DocDate >= (Case When LAG.LedgerAccountNature in ('Expense','Income') Then @FromDate Else '01/01/1900' End) ";
+                mOpeningDateCondStr = mOpeningDateCondStr + " AND LH.DocDate >= (Case When LAG.LedgerAccountGroupNature in ('Expense','Income') Then @FromDate Else '01/01/1900' End) ";
                 mOpeningDateCondStr = mOpeningDateCondStr + " AND LH.DocDate < @FromDate ";
             }
 
@@ -1057,7 +1057,7 @@ namespace Service
         public string GetQryForTrialBalance(string SiteId, string DivisionId, string FromDate, string ToDate,
                             string CostCenterId, string IsIncludeZeroBalance, string IsIncludeOpening, string LedgerAccountGroup)
         {
-            //And H.DocDate >= (Case When LAG.LedgerAccountNature in ('Expenses','Income') Then @FromDate Else '1900/Jan/01' End) 
+            //And H.DocDate >= (Case When LAG.LedgerAccountGroupNature in ('Expenses','Income') Then @FromDate Else '1900/Jan/01' End) 
 
             string mQry = @" DECLARE @TempcteGroupBalance AS TABLE (
 	                        LedgerAccountGroupId INT, 
@@ -1074,10 +1074,10 @@ namespace Service
                                     (
                                         SELECT LA.LedgerAccountGroupId, Max(LAG.LedgerAccountGroupName ) LedgerAccountGroupName, 
                                         Max(LAG.ParentLedgerAccountGroupId) ParentLedgerAccountGroupId, Max(PLAG.LedgerAccountGroupName) AS ParentLedgerAccountGroupName, 
-                                        Sum(Case When LAG.LedgerAccountNature in ('Expense','Income') Then 0 Else CASE WHEN H.DocDate < @FromDate THEN L.AmtDr-L.AmtCr ELSE 0 END END) AS Opening,
+                                        Sum(Case When LAG.LedgerAccountGroupNature in ('Expense','Income') Then 0 Else CASE WHEN H.DocDate < @FromDate THEN L.AmtDr-L.AmtCr ELSE 0 END END) AS Opening,
                                         Sum(CASE WHEN H.DocDate >= @FromDate AND H.DocDate <= @ToDate THEN L.AmtDr ELSE 0 END) AS AmtDr,
                                         Sum(CASE WHEN H.DocDate >= @FromDate AND H.DocDate <= @ToDate THEN L.AmtCr ELSE 0 END) AS AmtCr,
-                                        Sum(Case When LAG.LedgerAccountNature in ('Expense','Income') Then 
+                                        Sum(Case When LAG.LedgerAccountGroupNature in ('Expense','Income') Then 
 			                                        CASE WHEN H.DocDate >= @FromDate AND H.DocDate <= @ToDate THEN L.AmtDr-L.AmtCr ELSE 0 END 
 		                                        ELSE CASE WHEN H.DocDate <= @ToDate THEN L.AmtDr-L.AmtCr ELSE 0 END END) AS Balance
                                         FROM Web.LedgerHeaders H 
@@ -1114,10 +1114,10 @@ namespace Service
 			                                 THEN CASE WHEN P.Suffix = P.Code THEN ' [' + P.Code + ']'
 			 								                                  ELSE ', ' + P.Suffix + ' [' + P.Code + ']' END	
 			                                 ELSE ', ' + LA.LedgerAccountSuffix END) AS LedgerAccountName,
-                                        Sum(Case When LAG.LedgerAccountNature in ('Expense','Income') Then 0 Else CASE WHEN H.DocDate < @FromDate THEN L.AmtDr - L.AmtCr ELSE 0 END END) AS Opening,
+                                        Sum(Case When LAG.LedgerAccountGroupNature in ('Expense','Income') Then 0 Else CASE WHEN H.DocDate < @FromDate THEN L.AmtDr - L.AmtCr ELSE 0 END END) AS Opening,
                                         Sum(CASE WHEN H.DocDate >= @FromDate AND H.DocDate <= @ToDate THEN L.AmtDr ELSE 0 END) AS AmtDr,
                                         Sum(CASE WHEN H.DocDate >= @FromDate AND H.DocDate <= @ToDate THEN L.AmtCr ELSE 0 END) AS AmtCr,
-                                        Sum(Case When LAG.LedgerAccountNature in ('Expense','Income') Then 
+                                        Sum(Case When LAG.LedgerAccountGroupNature in ('Expense','Income') Then 
 			                                        CASE WHEN H.DocDate >= @FromDate AND H.DocDate <= @ToDate THEN L.AmtDr-L.AmtCr ELSE 0 END 
 		                                        ELSE CASE WHEN H.DocDate <= @ToDate THEN L.AmtDr-L.AmtCr ELSE 0 END END) AS Balance
                                         FROM Web.LedgerHeaders H 

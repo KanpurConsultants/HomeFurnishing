@@ -75,6 +75,9 @@ namespace Model.Models
 
         public Decimal? CurrentBalance { get; set; }
 
+        [MaxLength(50)]
+        public string SaleToPartySalesTaxNo { get; set; }
+
         public int Status { get; set; }
 
         [ForeignKey("Financier")]

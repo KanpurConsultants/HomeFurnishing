@@ -58,7 +58,7 @@ namespace Model.Models
         /// </summary>
         [MaxLength(100)]
         public string SqlProcDocumentPrint_AfterApprove { get; set; }
-
+        public bool? isPostedInLedger { get; set; }
 
         [ForeignKey("ImportMenu")]
         [Display(Name = "ImportMenu")]

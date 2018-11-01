@@ -4258,11 +4258,12 @@ namespace Jobs.Controllers
           public ActionResult GetFinishedMaterialDivisionWise(string searchTerm, int pageSize, int pageNum)
           {
               //Get the paged results and the total count of the results for this query. ProductCacheKeyHint
-              var productCacheKeyHint = ConfigurationManager.AppSettings["FinishedMaterialDivisionWiseCacheKeyHint"];
+              //var productCacheKeyHint = ConfigurationManager.AppSettings["FinishedMaterialDivisionWiseCacheKeyHint"];
 
-              //THis statement has been changed because GetProductHelpList was calling again and again. 
+            var productCacheKeyHint = "CacheproductKeyHint";
+            //THis statement has been changed because GetProductHelpList was calling again and again. 
 
-              AutoCompleteComboBoxRepositoryAndHelper ar = new AutoCompleteComboBoxRepositoryAndHelper(cbl.GetFinishedMaterialDivisionWiseHelpList(), productCacheKeyHint, RefreshData.RefreshProductData);
+            AutoCompleteComboBoxRepositoryAndHelper ar = new AutoCompleteComboBoxRepositoryAndHelper(cbl.GetFinishedMaterialDivisionWiseHelpList(), productCacheKeyHint, RefreshData.RefreshProductData);
               //AutoCompleteComboBoxRepositoryAndHelper ar = new AutoCompleteComboBoxRepositoryAndHelper(null, productCacheKeyHint);
 
               if (RefreshData.RefreshProductData == true) { RefreshData.RefreshProductData = false; }

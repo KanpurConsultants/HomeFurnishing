@@ -505,6 +505,7 @@ namespace Jobs.Controllers
                                 BomPost.Dimension4Id = Bomitem.Dimension4Id;
                                 BomPost.JobOrderHeaderId = line.JobOrderHeaderId;
                                 BomPost.JobOrderLineId = line.JobOrderLineId;
+                                BomPost.ProcessId = Header.ProcessId;
                                 BomPost.ModifiedBy = User.Identity.Name;
                                 BomPost.ModifiedDate = DateTime.Now;
                                 BomPost.ProductId = Bomitem.ProductId;
@@ -1209,6 +1210,7 @@ namespace Jobs.Controllers
                             BomPost.Dimension4Id = item.Dimension4Id;
                             BomPost.JobOrderHeaderId = s.JobOrderHeaderId;
                             BomPost.JobOrderLineId = s.JobOrderLineId;
+                            BomPost.ProcessId = temp.ProcessId;
                             BomPost.ModifiedBy = User.Identity.Name;
                             BomPost.ModifiedDate = DateTime.Now;
                             BomPost.ProductId = item.ProductId;
@@ -1613,6 +1615,7 @@ namespace Jobs.Controllers
                             BomPost.Dimension4Id = item.Dimension4Id;
                             BomPost.JobOrderHeaderId = s.JobOrderHeaderId;
                             BomPost.JobOrderLineId = s.JobOrderLineId;
+                            BomPost.ProcessId = temp.ProcessId;
                             BomPost.ModifiedBy = User.Identity.Name;
                             BomPost.ModifiedDate = DateTime.Now;
                             BomPost.ProductId = item.ProductId;

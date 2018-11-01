@@ -430,6 +430,113 @@ app.controller('MainCtrl', ['$scope', '$log', '$http', 'uiGridConstants', 'uiGri
           
       }
 
+      $scope.BindDataCustom = function () {
+          $.ajax({
+              url: '/GridCustomReport/GridCustomReportFill/' + $(this).serialize(),
+              type: "POST",
+              data: $("#registerSubmit").serialize(),
+              success: function (result) {
+                  Lock = false;
+                  if (result.Success == true) {
+                      var results = result;
+                      if (results.Data.length > 0) {
+                          var columnsIn = results.Data[results.Data.length - 1];
+                          var j = 0;
+                          var ColumnCount = 0;
+                          //console.log(col);
+                          $scope.gridOptions.columnDefs = new Array();
+                         
+                          $.each(columnsIn, function (key, value) {
+                              if (columnsIn[j]["Key"] != "SysParamType") {
+                                  var ColWidth = GetColumnWidth(results, j);
+                                  var col1 = 0;
+                                  $scope.gridOptions.columnDefs.push({
+                                      field: columnsIn[j]["Key"], aggregationType: columnsIn[j]["Value"],                                      
+                                      cellClass: function( grid, row, col, rowRenderIndex, colRenderIndex) {
+                                          //if (grid.row.getProperty('Colourvalue') === 'red')
+                                          //{
+                                          //    return 'cell-Colour-Red cell-text';
+                                          //}
+                                          //else if (grid.row.getProperty('Colourvalue') === 'green') {
+                                          //    return 'cell-Colour-Green cell-text';
+                                          //}
+                                         
+                                          if (grid.getCellValue(row, col).toLowerCase() === 'red') {
+                                              return 'cell-Colour-Red cell-text';
+                                          }
+                                          else if (grid.getCellValue(row, col).toLowerCase() === 'green') {
+                                              return 'cell-Colour-Green cell-text';
+                                          }
+
+                                          if (grid.getCellValue(row, col-1).toLowerCase() === 'red') {
+                                              return 'cell-Colour-Red cell-text';
+                                          }
+                                          else if (grid.getCellValue(row, col-1).toLowerCase() === 'green') {
+                                              return 'cell-Colour-Green cell-text';
+                                          }
+
+                                          if (grid.getCellValue(row, col + 1).toLowerCase() === 'red') {
+                                              return 'cell-Colour-Red cell-text';
+                                          }
+                                          else if (grid.getCellValue(row, col + 1).toLowerCase() === 'green') {
+                                              return 'cell-Colour-Green cell-text';
+                                          }
+
+                                      },
+
+
+                                      aggregationHideLabel: true,
+                                      headerCellClass: (columnsIn[j]["Value"] == null ? 'header-text' : 'text-right header-text'),
+                                      footerCellClass: (columnsIn[j]["Value"] == null ? '' : 'text-right '),
+                                      width: ColWidth,
+                                      enablePinning: true,
+                                      visible: (columnsIn[j]["Key"] == "DocId" || columnsIn[j]["Key"] == "DocTypeId" ? false : true)
+                                  });
+                                   //alert(columnsIn[j]["Key"]);
+                                  //alert(colRenderIndex);
+                              }
+                              ColumnCount++;
+                              j++;
+
+
+                          });
+
+
+                          var rowDataSet = [];
+                          var i = 0;
+                          $.each(results.Data, function (key, value) {
+                              var rowData = [];
+                              var j = 0
+                              var columnsIn = results.Data[i];
+                              if (columnsIn[ColumnCount - 1]["Value"] == null) {
+                                  $.each(columnsIn, function (key, value) {
+                                      rowData[columnsIn[j]["Key"]] = columnsIn[j]["Value"];
+                                      j++;
+                                  });
+                              }
+                              rowDataSet[i] = rowData;
+                              i++;
+                          });
+
+                          $scope.gridOptions.data = rowDataSet;
+
+                          $scope.gridApi.grid.refresh();
+
+                      }
+                  }
+                  else if (!result.Success) {
+                      alert('Something went wrong');
+                  }
+              },
+              error: function () {
+                  Lock: false;
+                  alert('Something went wrong');
+              }
+          });
+
+
+      }
+
   }
 ]);
 

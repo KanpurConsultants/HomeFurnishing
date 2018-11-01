@@ -36,7 +36,7 @@ namespace Model.Models
         public bool? isVisibleProductUid { get; set; }
         public bool? isVisibleDrCr { get; set; }
         public bool? isVisibleLineDrCr { get; set; }
-
+        public bool? isVisibleDueDate { get; set; }
         public bool? isVisibleAdjustmentType { get; set; }
         public bool? isVisiblePaymentFor { get; set; }
         public bool? isVisiblePartyDocNo { get; set; }

@@ -670,25 +670,53 @@ namespace Service
             //                JobOrderDocNo = t.JobOrderHeader.DocNo,
             //            }).FirstOrDefault();
 
-            var temp = (from p in db.ProductUid
-                        where p.ProductUIDId == Uid
-                        select new
-                        {
-                            Rec = (from t in db.JobOrderLine
-                                   join v in db.ViewJobOrderBalanceForInspection on t.JobOrderLineId equals v.JobOrderLineId
-								   join PU in db.ProductUid on v.ProductUidId equals PU.ProductUIDId
-                                   where v.ProductUidId == p.ProductUIDId && v.BalanceQty > 0
-                                   join Jol in db.JobOrderLine on t.JobOrderLineId equals Jol.JobOrderLineId
-                                   where 1==1 && p.LastTransactionDocTypeId == p.GenDocTypeId && p.LastTransactionDocId == p.GenDocId									
-                                   select new JobOrderInspectionLineViewModel
-                                   {
-                                       JobOrderLineId = t.JobOrderLineId,
-                                       JobOrderDocNo = t.JobOrderHeader.DocNo,
-                                   }).FirstOrDefault()
-                        }
-                        ).FirstOrDefault();
+            int SiteId = (int)System.Web.HttpContext.Current.Session["SiteId"];
+            int DivisionId = (int)System.Web.HttpContext.Current.Session["DivisionId"];
 
-            return temp.Rec;
+            if (SiteId == 1)
+            {
+                var temp = (from p in db.ProductUid
+                            where p.ProductUIDId == Uid
+                            select new
+                            {
+                                Rec = (from t in db.JobOrderLine
+                                       join v in db.ViewJobOrderBalanceForInspection on t.JobOrderLineId equals v.JobOrderLineId
+                                       join PU in db.ProductUid on v.ProductUidId equals PU.ProductUIDId
+                                       where v.ProductUidId == p.ProductUIDId && v.BalanceQty > 0
+                                       join Jol in db.JobOrderLine on t.JobOrderLineId equals Jol.JobOrderLineId
+                                       where 1 == 1 && p.LastTransactionDocTypeId == p.GenDocTypeId && p.LastTransactionDocId == p.GenDocId
+                                       select new JobOrderInspectionLineViewModel
+                                       {
+                                           JobOrderLineId = t.JobOrderLineId,
+                                           JobOrderDocNo = t.JobOrderHeader.DocNo,
+                                       }).FirstOrDefault()
+                            }
+                            ).FirstOrDefault();
+                return temp.Rec;
+            }
+            else
+            {
+                var temp = (from p in db.ProductUid
+                            where p.ProductUIDId == Uid
+                            select new
+                            {
+                                Rec = (from t in db.JobOrderLine
+                                       join v in db.ViewJobOrderBalanceForInspection on t.JobOrderLineId equals v.JobOrderLineId
+                                       join PU in db.ProductUid on v.ProductUidId equals PU.ProductUIDId
+                                       where v.ProductUidId == p.ProductUIDId && v.BalanceQty > 0
+                                       join Jol in db.JobOrderLine on t.JobOrderLineId equals Jol.JobOrderLineId
+                                       where 1 == 1 && v.SiteId  >1
+                                       select new JobOrderInspectionLineViewModel
+                                       {
+                                           JobOrderLineId = t.JobOrderLineId,
+                                           JobOrderDocNo = t.JobOrderHeader.DocNo,
+                                       }).FirstOrDefault()
+                            }
+                            ).FirstOrDefault();
+                return temp.Rec;
+            }
+
+            
         }
 
         public IQueryable<ComboBoxResult> GetPendingProductsForJobOrderInspection(string term, int JobOrderInspectionHeaderId)//DocTypeId

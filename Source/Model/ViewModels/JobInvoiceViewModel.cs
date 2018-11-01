@@ -100,6 +100,8 @@ namespace Model.ViewModel
         public int JobInvoiceHeaderId { get; set; }
         public virtual JobInvoiceHeader JobInvoiceHeader { get; set; }
 
+        public decimal? RetensionRate { get; set; }
+        public decimal? RetensionAmount { get; set; }
 
         public int JobWorkerId { get; set; }
         public string JobWorkerName { get; set; }

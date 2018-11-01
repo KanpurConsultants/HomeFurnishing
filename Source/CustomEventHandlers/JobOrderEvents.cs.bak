@@ -45,23 +45,31 @@ namespace Jobs.Controllers
 
             try
             {
+                var JobOrder = (from H in db.JobOrderHeader
+                            join D in db.DocumentType on H.DocTypeId equals D.DocumentTypeId into DocumentTypeTable
+                            from DocumentTypeTab in DocumentTypeTable.DefaultIfEmpty()
+                            where H.JobOrderHeaderId == EventArgs.DocId
+                            select new { DocTypeName = DocumentTypeTab.DocumentTypeName, Status = H.Status }).FirstOrDefault();
 
-                using (SqlConnection sqlConnection = new SqlConnection(ConnectionString))
+                if (JobOrder.DocTypeName == "Weaving Order" || JobOrder.DocTypeName == "Weaving Finished Order" && JobOrder.Status != 0)
                 {
-                    sqlConnection.Open();
-
-
-                    using (SqlCommand cmd = new SqlCommand("Web.SpUpdate_CostCenterStatusExtendedFromOrder"))
+                    using (SqlConnection sqlConnection = new SqlConnection(ConnectionString))
                     {
-                        cmd.CommandType = CommandType.StoredProcedure;
-                        cmd.Connection = sqlConnection;
-                        cmd.Parameters.AddWithValue("@JobOrderHeaderId", Id);
-                        cmd.CommandTimeout = 1000;
-                        //cmd.Connection.Open();
-                        cmd.ExecuteNonQuery();
-                        //cmd.Connection.Close();
-                    }
+                        sqlConnection.Open();
 
+
+                        using (SqlCommand cmd = new SqlCommand("Web.SpUpdate_CostCenterStatusExtendedFromOrder"))
+                        {
+                            cmd.CommandType = CommandType.StoredProcedure;
+                            cmd.Connection = sqlConnection;
+                            cmd.Parameters.AddWithValue("@JobOrderHeaderId", Id);
+                            cmd.CommandTimeout = 1000;
+                            //cmd.Connection.Open();
+                            cmd.ExecuteNonQuery();
+                            //cmd.Connection.Close();
+                        }
+
+                    }
                 }
             }
 
@@ -74,48 +82,39 @@ namespace Jobs.Controllers
             }
 
 
-            try
-            {
-
-                using (SqlConnection sqlConnection = new SqlConnection(ConnectionString))
-                {
-                    sqlConnection.Open();
-
-
-                    using (SqlCommand cmd = new SqlCommand("Web.sp_CreateCostcenterForOverTuftMain"))
-                    {
-                        cmd.CommandType = CommandType.StoredProcedure;
-                        cmd.Connection = sqlConnection;
-                        cmd.Parameters.AddWithValue("@JobOrderHeaderId", Id);
-                        cmd.CommandTimeout = 1000;
-                        cmd.ExecuteNonQuery();
-                    }
-
-                }
-            }
-
-            catch (Exception ex)
-            {
-                throw ex;
-            }
 
             try
             {
+                
+                var JobOrder = (from H in db.JobOrderHeader
+                                join D in db.DocumentType on H.DocTypeId equals D.DocumentTypeId into DocumentTypeTable
+                                from DocumentTypeTab in DocumentTypeTable.DefaultIfEmpty()
+                                join JOL in db.JobOrderLine  on H.JobOrderHeaderId equals JOL.JobOrderHeaderId into JOLTable
+                                from JOLTab in JOLTable.DefaultIfEmpty()
+                                join P in db.Product  on JOLTab.ProductId  equals P.ProductId into PTable
+                                from PTab in PTable.DefaultIfEmpty()
+                                join PC in db.ProductCategory  on PTab.ProductCategoryId equals PC.ProductCategoryId into PCTable
+                                from PCTab in PCTable.DefaultIfEmpty()
+                                where H.JobOrderHeaderId == EventArgs.DocId
+                                && PCTab.ProductCategoryName== "OVER TUFT"
+                                select new { DocTypeName = DocumentTypeTab.DocumentTypeName, Status = H.Status }).FirstOrDefault();
 
-                using (SqlConnection sqlConnection = new SqlConnection(ConnectionString))
+                if (JobOrder !=null)
                 {
-                    sqlConnection.Open();
-
-
-                    using (SqlCommand cmd = new SqlCommand("Web.sp_CreateCostcenterForOverTuftMain"))
+                    using (SqlConnection sqlConnection = new SqlConnection(ConnectionString))
                     {
-                        cmd.CommandType = CommandType.StoredProcedure;
-                        cmd.Connection = sqlConnection;
-                        cmd.Parameters.AddWithValue("@JobOrderHeaderId", Id);
-                        cmd.CommandTimeout = 1000;
-                        cmd.ExecuteNonQuery();
-                    }
+                        sqlConnection.Open();
 
+
+                        using (SqlCommand cmd = new SqlCommand("Web.sp_CreateCostcenterForOverTuftMain"))
+                        {
+                            cmd.CommandType = CommandType.StoredProcedure;
+                            cmd.Connection = sqlConnection;
+                            cmd.Parameters.AddWithValue("@JobOrderHeaderId", Id);
+                            cmd.CommandTimeout = 1000;
+                            cmd.ExecuteNonQuery();
+                        }
+                    }
                 }
             }
 
@@ -127,7 +126,8 @@ namespace Jobs.Controllers
             // return Redirect(ReturnUrl);
 
 
-        }
+
+    }
 
         bool JobOrderEvents__beforeLineSaveDataValidation(object sender, JobEventArgs EventArgs, ref ApplicationDbContext db)
         {

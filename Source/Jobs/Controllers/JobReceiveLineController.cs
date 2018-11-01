@@ -777,7 +777,7 @@ namespace Jobs.Controllers
                         line.JobReceiveHeaderId = item.JobReceiveHeaderId;
                         line.JobOrderLineId = item.JobOrderLineId;
                         line.ProductUidId = JobOrderLine.ProductUidId;
-                        line.ProductId = JobOrderLine.ProductId;
+                        line.ProductId = item.ProductId;
                         line.Dimension1Id = JobOrderLine.Dimension1Id;
                         line.Dimension2Id = JobOrderLine.Dimension2Id;
                         line.Dimension3Id = JobOrderLine.Dimension3Id;
@@ -839,7 +839,7 @@ namespace Jobs.Controllers
                             StockViewModel.SiteId = Header.SiteId;
                             StockViewModel.CurrencyId = null;
                             StockViewModel.PersonId = Header.JobWorkerId;
-                            StockViewModel.ProductId = JobOrderLine.ProductId;
+                            StockViewModel.ProductId = item.ProductId;
                             StockViewModel.HeaderFromGodownId = null;
                             StockViewModel.HeaderGodownId = Header.GodownId;
                             StockViewModel.HeaderProcessId = Header.ProcessId;

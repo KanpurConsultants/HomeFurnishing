@@ -148,10 +148,10 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                @Html.LabelFor(model => model.DueDate, "Chq/Ref Date", new { @class = "control-label col-md-4 col-sm-2" })
+                                @Html.LabelFor(model => model.ChqDate, "Chq/Ref Date", new { @class = "control-label col-md-4 col-sm-2" })
                                 <div class="col-md-7 col-sm-10">
-                                    @Html.TextBoxFor(model => model.DueDate, "{0:dd/MMMM/yyyy}", new { @class = "datepicker form-control col-xs-7" })
-                                    @Html.ValidationMessageFor(model => model.DueDate, "", new { @class = "text-danger" })
+                                    @Html.TextBoxFor(model => model.ChqDate, "{0:dd/MMMM/yyyy}", new { @class = "datepicker form-control col-xs-7" })
+                                    @Html.ValidationMessageFor(model => model.ChqDate, "", new { @class = "text-danger" })
                                 </div>
                             </div>
                         </div>
@@ -167,6 +167,18 @@
                             </div>
                         </div>
                     </div>
+
+
+                    <div class="col-md-6" style="display:@(Model.LedgerSetting.isVisibleDueDate?"":"none")">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.DueDate, "Due Date", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.DueDate, "{0:dd/MMMM/yyyy}", new { @class = "datepicker form-control col-xs-7" })
+                                @Html.ValidationMessageFor(model => model.DueDate, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
 
                     <div class="col-md-6" style="display:@(Model.LedgerSetting.isVisibleReferenceDocTypeId?"":"none")">
                         @Html.HiddenFor(m => m.LedgerSetting.isVisibleReferenceDocTypeId)

@@ -236,8 +236,8 @@ namespace Model.DatabaseViews
         public int? Dimension4Id { get; set; }
         public virtual Dimension4 Dimension4 { get; set; }
 
-
-
+        
+        public decimal? RetensionRate { get; set; }
 
         public int JobWorkerId { get; set; }
         public DateTime OrderDate { get; set; }

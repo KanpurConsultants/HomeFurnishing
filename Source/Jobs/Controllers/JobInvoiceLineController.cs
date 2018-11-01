@@ -192,6 +192,8 @@ namespace Jobs.Controllers
                             line.Qty = item.ReceiptBalQty;
                             line.DealQty = item.DealQty;
                             line.Amount = DecimalRoundOff.amountToFixed((item.DealQty * item.Rate), Settings.AmountRoundOff);
+                            line.RetensionRate = item.RetensionRate;
+                            line.RetensionAmount = DecimalRoundOff.amountToFixed((item.DealQty * item.RetensionRate), Settings.AmountRoundOff);
                             line.CostCenterId = item.CostCenterId;
                             line.CreatedDate = DateTime.Now;
                             line.ModifiedDate = DateTime.Now;
@@ -266,6 +268,17 @@ namespace Jobs.Controllers
                             }).ToList();
 
 
+                  var  temp1 = (from p in db.JobReceiveLine
+                             where RecLineIds.Contains(p.JobReceiveLineId)
+                             join rqa in db.JobReceiveQALine on p.JobReceiveLineId equals rqa.JobReceiveLineId into qatable
+                             from qatab in qatable.DefaultIfEmpty()
+                             group new { p, qatab } by new { p.JobReceiveLineId } into g
+                             select new ReferenceLineChargeViewModel
+                             {
+                                 LineId = g.Key.JobReceiveLineId,
+                                 PenaltyAmt = g.Select(m => m.p.PenaltyAmt - (m.p.IncentiveAmt ?? 0)).FirstOrDefault() + ((g.Select(m => m.qatab).FirstOrDefault() == null) ? 0 : g.Select(m => m.qatab.PenaltyAmt).FirstOrDefault()),
+                                 ChargeGroupProductId = g.Select(m => m.p.JobOrderLine.Product.SalesTaxGroupProductId ?? m.p.JobOrderLine.Product.ProductGroup.DefaultSalesTaxGroupProductId).FirstOrDefault(),
+                             });
 
                     
                     //foreach (var item in temp)

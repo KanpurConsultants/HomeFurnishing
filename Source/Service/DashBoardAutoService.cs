@@ -1299,6 +1299,13 @@ namespace Service
         public string Value2 { get; set; }
     }
 
+    public class DashBoardTrippleValue
+    {
+        public string Value1 { get; set; }
+        public string Value2 { get; set; }
+        public string Value3 { get; set; }
+    }
+
     public class SessnionValues
     {
         public DateTime MonthStartDate { get; set; }

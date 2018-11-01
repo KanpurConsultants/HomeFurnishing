@@ -163,6 +163,7 @@ namespace Jobs.Controllers
 
                     temp.LedgerAccountGroupName = pt.LedgerAccountGroupName;
                     temp.LedgerAccountNature = pt.LedgerAccountNature;
+                    temp.LedgerAccountGroupNature = pt.LedgerAccountGroupNature;
                     temp.LedgerAccountType = pt.LedgerAccountType;
                     temp.ParentLedgerAccountGroupId = pt.ParentLedgerAccountGroupId;
                     temp.IsActive = pt.IsActive;

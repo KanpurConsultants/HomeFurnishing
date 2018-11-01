@@ -40,6 +40,7 @@ namespace Service
         IEnumerable<ComboBoxList> GetPendingRequisitionHelpList(int Id, int PersonId, string term);
         IEnumerable<ComboBoxList> GetProductHelpListForFilters(int Id, int PersonId, string term, int Limit);
         IEnumerable<StockLineViewModel> GetRequisitionsForFilters(RequisitionFiltersForIssue vm, bool All);
+        IEnumerable<StockLineViewModel> GetIssuedForFiltersByParentCostCenter(RequisitionFiltersForIssue vm, bool All);        
         IEnumerable<StockExchangeLineViewModel> GetRequisitionsForExchange(RequisitionFiltersForExchange vm);
         IEnumerable<StockReceiveLineViewModel> GetRequisitionsForReceive(RequisitionFiltersForReceive vm);
         IEnumerable<StockReceiveLineViewModel> GetStockProcessForReceive(StockProcessFiltersForReceive vm);
@@ -75,7 +76,10 @@ namespace Service
         IEnumerable<StockLineViewModel> GetStockInForFilters(StockInFiltersForIssue vm);
         IEnumerable<ComboBoxResult> GetStockProcessBalanceForReceive(int StockHeaderId, string term);
         IEnumerable<StockIssueForProductsFilterViewModel> GetProductsForFilters(ProductsFiltersForIssue svm);
+        IEnumerable<StockIssueForProductsFilterViewModel> GetStockReceiveProductsForFilters(ProductsFiltersForIssue svm);       
+
         IEnumerable<StockLineViewModel> GetBOMDetailForProducts(ProductsFilterViewModel vm);
+        IEnumerable<StockReceiveLineViewModel> GetBOMDetailForProductReceive(ProductsFilterViewModel vm);
         IEnumerable<StockExchangeLineViewModel> GetReceiveProductBomForExchange(int StockHeaderId);
 
     }
@@ -994,7 +998,7 @@ namespace Service
                          && (string.IsNullOrEmpty(settings.filterContraSites) ? 1 == 1 : ContraSites.Contains(tab.SiteId.ToString()))
                           && (string.IsNullOrEmpty(settings.filterContraDivisions) ? 1 == 1 : ContraDivisions.Contains(tab.DivisionId.ToString()))
                         && (All ? 1 == 1 : p.BalanceQty > 0) && p.PersonId == vm.PersonId
-                        orderby p.ProductId, p.Dimension1Id, p.Dimension2Id, p.Dimension3Id, p.Dimension4Id
+                        orderby tabPG.ProductGroupName.Replace(" ", "").Replace("/", ""), tab2.ProductName, tab3.Dimension1.Dimension1Name, tab3.Dimension2.Dimension2Name, tab3.Dimension3.Dimension3Name, tab3.Dimension4.Dimension4Name
                         select new StockLineViewModel
                         {
                             Dimension1Name = tab3.Dimension1.Dimension1Name,
@@ -1029,8 +1033,127 @@ namespace Service
         }
 
 
+        public IEnumerable<StockLineViewModel> GetIssuedForFiltersByParentCostCenter(RequisitionFiltersForIssue vm, bool All)
+        {
+            
+            var Stock = new StockHeaderService(_unitOfWork).Find(vm.StockHeaderId);
+          
+            var settings = new StockHeaderSettingsService(_unitOfWork).GetStockHeaderSettingsForDocument(Stock.DocTypeId, Stock.DivisionId, Stock.SiteId);
+
+            
+
+            string[] ProductTypes = null;
+            if (!string.IsNullOrEmpty(settings.filterProductTypes)) { ProductTypes = settings.filterProductTypes.Split(",".ToCharArray()); }
+            else { ProductTypes = new string[] { "NA" }; }
+
+            string[] ContraSites = null;
+            if (!string.IsNullOrEmpty(settings.filterContraSites)) { ContraSites = settings.filterContraSites.Split(",".ToCharArray()); }
+            else { ContraSites = new string[] { "NA" }; }
+
+            string[] ContraDivisions = null;
+            if (!string.IsNullOrEmpty(settings.filterContraDivisions)) { ContraDivisions = settings.filterContraDivisions.Split(",".ToCharArray()); }
+            else { ContraDivisions = new string[] { "NA" }; }
 
 
+            string[] ProductIdArr = null;
+            if (!string.IsNullOrEmpty(vm.ProductId)) { ProductIdArr = vm.ProductId.Split(",".ToCharArray()); }
+            else { ProductIdArr = new string[] { "NA" }; }
+
+            string[] SaleOrderIdArr = null;
+            if (!string.IsNullOrEmpty(vm.RequisitionHeaderId)) { SaleOrderIdArr = vm.RequisitionHeaderId.Split(",".ToCharArray()); }
+            else { SaleOrderIdArr = new string[] { "NA" }; }
+
+            string[] ProductGroupIdArr = null;
+            if (!string.IsNullOrEmpty(vm.ProductGroupId)) { ProductGroupIdArr = vm.ProductGroupId.Split(",".ToCharArray()); }
+            else { ProductGroupIdArr = new string[] { "NA" }; }
+
+            string[] Dim1IdArr = null;
+            if (!string.IsNullOrEmpty(vm.Dimension1Id)) { Dim1IdArr = vm.Dimension1Id.Split(",".ToCharArray()); }
+            else { Dim1IdArr = new string[] { "NA" }; }
+
+            string[] Dim2IdArr = null;
+            if (!string.IsNullOrEmpty(vm.Dimension2Id)) { Dim2IdArr = vm.Dimension2Id.Split(",".ToCharArray()); }
+            else { Dim2IdArr = new string[] { "NA" }; }
+
+            string[] Dim3IdArr = null;
+            if (!string.IsNullOrEmpty(vm.Dimension3Id)) { Dim3IdArr = vm.Dimension3Id.Split(",".ToCharArray()); }
+            else { Dim3IdArr = new string[] { "NA" }; }
+
+            string[] Dim4IdArr = null;
+            if (!string.IsNullOrEmpty(vm.Dimension4Id)) { Dim4IdArr = vm.Dimension4Id.Split(",".ToCharArray()); }
+            else { Dim4IdArr = new string[] { "NA" }; }
+
+            string[] CostCenterArr = null;
+            if (!string.IsNullOrEmpty(vm.CostCenterId)) { CostCenterArr = vm.CostCenterId.Split(",".ToCharArray()); }
+            else { CostCenterArr = new string[] { "NA" }; }
+
+      
+
+            CostCenter CC = (from j in db.CostCenter
+                                             where 1 == 1
+                                             && (string.IsNullOrEmpty(vm.CostCenterId) ? 1 == 1 : CostCenterArr.Contains(j.CostCenterId.ToString()))
+                                             select j
+                                            ).FirstOrDefault();
+
+            JobOrderHeader ParentJobOrder = (from j in db.JobOrderHeader
+                                             join JL in db.JobOrderLine on j.JobOrderHeaderId equals JL.JobOrderHeaderId into JLtable
+                                             from JLtab in JLtable.DefaultIfEmpty()
+                                             join PL in db.ProdOrderLine on JLtab.ProdOrderLineId equals PL.ProdOrderLineId into PLtable
+                                             from PLtab in PLtable.DefaultIfEmpty()
+                                             join PJL in db.JobOrderLine on PLtab.ReferenceDocLineId equals PJL.JobOrderLineId into PJLtable
+                                             from PJLtab in PJLtable.DefaultIfEmpty()
+                                             join PJH in db.JobOrderHeader on PJLtab.JobOrderHeaderId equals PJH.JobOrderHeaderId into PJHtable
+                                             from PJHtab in PJHtable.DefaultIfEmpty()
+                                             where 1==1
+                                             && (string.IsNullOrEmpty(vm.CostCenterId) ? 1 == 1 : CostCenterArr.Contains(j.CostCenterId.ToString()))
+                                             select PJHtab
+                                             ).FirstOrDefault();
+
+            var temp = (from p in db.StockHeader
+                        join S in db.StockProcess on p.StockHeaderId equals S.StockHeaderId into table
+                        from tab in table.DefaultIfEmpty()
+                        join product in db.Product on tab.ProductId equals product.ProductId into table2
+                        from tab2 in table2.DefaultIfEmpty()
+                        join PG in db.ProductGroups on tab2.ProductGroupId equals PG.ProductGroupId into tablePG
+                        from tabPG in tablePG.DefaultIfEmpty()        
+                        where (string.IsNullOrEmpty(vm.ProductId) ? 1 == 1 : ProductIdArr.Contains(tab.ProductId.ToString()))
+                        && (string.IsNullOrEmpty(vm.ProductGroupId) ? 1 == 1 : ProductGroupIdArr.Contains(tab2.ProductGroupId.ToString()))
+                        && (string.IsNullOrEmpty(vm.Dimension1Id) ? 1 == 1 : Dim1IdArr.Contains(tab.Dimension1Id.ToString()))
+                        && (string.IsNullOrEmpty(vm.Dimension2Id) ? 1 == 1 : Dim2IdArr.Contains(tab.Dimension2Id.ToString()))
+                        && (string.IsNullOrEmpty(vm.Dimension3Id) ? 1 == 1 : Dim3IdArr.Contains(tab.Dimension3Id.ToString()))
+                        && (string.IsNullOrEmpty(vm.Dimension4Id) ? 1 == 1 : Dim4IdArr.Contains(tab.Dimension4Id.ToString()))
+                        && tab.CostCenterId == ParentJobOrder.CostCenterId && p.DocTypeId == Stock.DocTypeId
+                        && (string.IsNullOrEmpty(settings.filterProductTypes) ? 1 == 1 : ProductTypes.Contains(tab.Product.ProductGroup.ProductTypeId.ToString()))                        
+                        orderby tab.ProductId, tab.Dimension1Id, tab.Dimension2Id, tab.Dimension3Id, tab.Dimension4Id
+                        select new StockLineViewModel
+                        {
+                            Dimension1Name = tab.Dimension1.Dimension1Name,
+                            Dimension2Name = tab.Dimension2.Dimension2Name,
+                            Dimension3Name = tab.Dimension3.Dimension3Name,
+                            Dimension4Name = tab.Dimension4.Dimension4Name,
+                            Dimension1Id = tab.Dimension1Id,
+                            Dimension2Id = tab.Dimension2Id,
+                            Dimension3Id = tab.Dimension3Id,
+                            Dimension4Id = tab.Dimension4Id,
+                            ProductGroupId = tabPG.ProductGroupId,
+                            ProductGroupName = tabPG.ProductGroupName.Replace(" ", "").Replace("/", ""),
+                            ProcessId = p.ProcessId,
+                            RequisitionBalanceQty = tab.Qty_Rec- tab.Qty_Iss,
+                            Qty = tab.Qty_Rec - tab.Qty_Iss,
+                            ProductName = tab2.ProductName,
+                            ProductId = tab.ProductId,
+                            CostCenterId = CC.CostCenterId,
+                            StockHeaderId = vm.StockHeaderId,
+                            UnitId = tab2.UnitId,
+                            UnitName = tab2.Unit.UnitName,
+                            UnitDecimalPlaces = tab2.Unit.DecimalPlaces,
+                        }
+
+
+
+                        );
+            return temp;
+        }
         public IEnumerable<StockExchangeLineViewModel> GetRequisitionsForExchange(RequisitionFiltersForExchange vm)
         {
 
@@ -2906,6 +3029,30 @@ namespace Service
             return temp2;
         }
 
+        public IEnumerable<StockIssueForProductsFilterViewModel> GetStockReceiveProductsForFilters(ProductsFiltersForIssue svm)
+        {
+
+            SqlParameter SqlParameterCostCenterId = new SqlParameter("@CostCenterId", svm.CostCenterId);
+
+            IEnumerable<StockIssueForProductsFilterViewModel> StockAvailableForPacking = db.Database.SqlQuery<StockIssueForProductsFilterViewModel>("Web.spGetCancelProductsFromCostCenter @CostCenterId", SqlParameterCostCenterId).ToList();
+
+            var temp2 = (from p in StockAvailableForPacking
+                         select new StockIssueForProductsFilterViewModel
+                         {
+                             JobHeaderDocNo = p.JobHeaderDocNo,
+                             JobOrderHeaderId = p.JobOrderHeaderId,
+                             JobOrderLineId = p.JobOrderLineId,
+                             Qty = p.Qty,
+                             ProductId = p.ProductId,
+                             ProductName = p.ProductName,
+                             CostCenterId = p.CostCenterId,
+                             CostCenterName = p.CostCenterName,
+                             StockHeaderId = svm.StockHeaderId,
+                             IsBomPosted = p.IsBomPosted,
+                         }).ToList();
+
+            return temp2;
+        }
 
         //public IEnumerable<StockLineViewModel> GetBOMDetailForProducts(ProductsFilterViewModel vm)
         //{
@@ -3058,9 +3205,12 @@ namespace Service
             string[] JobOrderLineIds = null;
             JobOrderLineIds = vm.StockIssueForProductsFilterViewModel.Select(i => i.JobOrderLineId.ToString()).ToArray();
 
+            StockHeader SH = new StockHeaderService(_unitOfWork).Find(vm.StockIssueForProductsFilterViewModel.FirstOrDefault().StockHeaderId);
+
             var TempJobOrderBom = (from L in db.JobOrderBom 
                                    where JobOrderLineIds.Contains(L.JobOrderLineId.ToString())
                                    && L.Product.ProductGroup.ProductType.ProductTypeName == "YARN" || L.Product.ProductGroup.ProductType.ProductTypeName == "Yarn SKU"
+                                   && L.ProcessId ==SH.ProcessId
                                    select new
                                    {
                                        JobOrderLineId = L.JobOrderLineId ?? 0,
@@ -3125,8 +3275,92 @@ namespace Service
             return StockLineVm;
         }
 
+        public IEnumerable<StockReceiveLineViewModel> GetBOMDetailForProductReceive(ProductsFilterViewModel vm)
+        {
+            string[] JobOrderLineIds = null;
+            JobOrderLineIds = vm.StockIssueForProductsFilterViewModel.Select(i => i.JobOrderLineId.ToString()).ToArray();
 
-        
+            StockHeader SH = new StockHeaderService(_unitOfWork).Find(vm.StockIssueForProductsFilterViewModel.FirstOrDefault().StockHeaderId);
+
+            var TempJobOrderBom = (from L in db.JobOrderBom
+                                   join JC in db.JobOrderCancelLine on L.JobOrderLineId equals JC.JobOrderLineId into JCTable
+                                   from JCTab in JCTable.DefaultIfEmpty()
+                                   join JCM in db.JobOrderCancelBomMaterialReceive on L.JobOrderBomId equals JCM.JobOrderBomId into JCMTable
+                                   from JCMTab in JCMTable.DefaultIfEmpty()
+                                   where JobOrderLineIds.Contains(L.JobOrderLineId.ToString())
+                                   && L.Product.ProductGroup.ProductType.ProductTypeName == "YARN" || L.Product.ProductGroup.ProductType.ProductTypeName == "Yarn SKU"
+                                   && L.ProcessId == SH.ProcessId && JCTab.Qty > 0 && JCMTab.JobOrderBomId == null 
+                                   select new
+                                   {
+                                       JobOrderLineId = L.JobOrderLineId ?? 0,
+                                       JobOrderBomId = L.JobOrderBomId,
+                                       CostCenterId = L.JobOrderHeader.CostCenterId,
+                                       ProductId = L.ProductId,
+                                       ProductName = L.Product.ProductName,
+                                       ProductGroupName = L.Product.ProductGroup.ProductGroupName.Replace(" ", "").Replace("/", ""),
+                                       Dimension1Id = L.Dimension1Id,
+                                       Dimension1Name = L.Dimension1.Dimension1Name,
+                                       Qty = L.Qty,
+                                       ReceiveForQty = JCTab.Qty,
+                                       UnitId = L.Product.UnitId,
+                                       UnitName = L.Product.Unit.UnitName,
+                                       UnitDecimalPlaces = L.Product.Unit.DecimalPlaces,
+                                       ProcessId = L.JobOrderHeader.ProcessId
+                                   }).ToList();
+
+
+            var JobOrderBomMaterialIssueVmList = (from H in vm.StockIssueForProductsFilterViewModel
+                                                  join JOB in TempJobOrderBom on H.JobOrderLineId equals JOB.JobOrderLineId
+                                                  join JOL in db.JobOrderLine on H.JobOrderLineId equals JOL.JobOrderLineId
+                                                  where H.Qty > 0 && JOB.Qty > 0
+                                                  select new JobOrderCancelBomMaterialReceiveViewModel
+                                                  {
+                                                      JobOrderCancelBomId = JOB.JobOrderBomId,
+                                                      CostCenterId = JOB.CostCenterId ?? 0,
+                                                      ProductId = JOB.ProductId,
+                                                      Dimension1Id = JOB.Dimension1Id,
+                                                      ReceiveForQty = H.Qty ?? 0,
+                                                      Qty = JOB.Qty / JOL.Qty * (H.Qty ?? 0),
+                                                  }).ToList();
+
+
+            System.Web.HttpContext.Current.Session["JobOrderCancelBomMaterialReceive"] = JobOrderBomMaterialIssueVmList;
+
+
+            var StockLineVm = (from H in vm.StockIssueForProductsFilterViewModel
+                               join JOB in TempJobOrderBom on H.JobOrderLineId equals JOB.JobOrderLineId into TempJobOrderBomTable
+                               from TempJobOrderBomTab in TempJobOrderBomTable.DefaultIfEmpty()
+                               join CC in db.CostCenter on TempJobOrderBomTab.CostCenterId equals CC.CostCenterId into CCTable
+                               from CCTab in CCTable.DefaultIfEmpty()
+                               join JOL in db.JobOrderLine on H.JobOrderLineId equals JOL.JobOrderLineId into JOLTable
+                               from JOLTab in JOLTable.DefaultIfEmpty()
+                               where H.Qty > 0 && TempJobOrderBomTab.Qty > 0
+                               group new { H, TempJobOrderBomTab, CCTab, JOLTab } by new { H.StockHeaderId, TempJobOrderBomTab.CostCenterId, CCTab.CostCenterName, TempJobOrderBomTab.ProductId, TempJobOrderBomTab.Dimension1Id } into Result
+                               select new StockReceiveLineViewModel
+                               {
+                                   Dimension1Name = Result.Max(i => i.TempJobOrderBomTab.Dimension1Name),
+                                   Dimension1Id = Result.Key.Dimension1Id,
+                                   ProcessId = Result.Max(i => i.TempJobOrderBomTab.ProcessId),
+                                   //RequisitionBalanceQty = Result.Sum(i => i.TempJobOrderBomTab.Qty),
+                                   //Qty = Result.Sum(i => i.TempJobOrderBomTab.Qty),
+                                   RequisitionBalanceQty = (decimal)Result.Sum(i => i.TempJobOrderBomTab.Qty / i.JOLTab.Qty * (decimal)i.H.Qty),
+                                   Qty = (decimal)Result.Sum(i => i.TempJobOrderBomTab.Qty / i.JOLTab.Qty * (decimal)i.H.Qty),
+                                   QtyRec = (decimal)Result.Sum(i => i.TempJobOrderBomTab.Qty / i.JOLTab.Qty * (decimal)i.H.Qty),
+                                   ProductName = Result.Max(i => i.TempJobOrderBomTab.ProductName),
+                                   ProductId = Result.Key.ProductId,
+                                   ProductGroupName = Result.Max(i => i.TempJobOrderBomTab.ProductGroupName),
+                                   CostCenterId = Result.Key.CostCenterId,
+                                   CostCenterName= Result.Max(i => i.CCTab.CostCenterName),
+                                   StockHeaderId = Result.Key.StockHeaderId,
+                                   UnitId = Result.Max(i => i.TempJobOrderBomTab.UnitId),
+                                   UnitName = Result.Max(i => i.TempJobOrderBomTab.UnitName),
+                                   UnitDecimalPlaces = Result.Max(i => i.TempJobOrderBomTab.UnitDecimalPlaces),
+                                   ReceiveForQty = Result.Sum(i => i.H.Qty),
+                               }).ToList();
+
+            return StockLineVm;
+        }
+
 
 
     }
@@ -3140,6 +3374,18 @@ namespace Service
         public int ProductId { get; set; }
         public int? Dimension1Id { get; set; }
         public decimal IssueForQty { get; set; }
+        public decimal Qty { get; set; }
+    }
+
+    [Serializable]
+    public class JobOrderCancelBomMaterialReceiveViewModel
+    {
+        public int StockLineId { get; set; }
+        public int JobOrderCancelBomId { get; set; }
+        public int CostCenterId { get; set; }
+        public int ProductId { get; set; }
+        public int? Dimension1Id { get; set; }
+        public decimal ReceiveForQty { get; set; }
         public decimal Qty { get; set; }
     }
 }

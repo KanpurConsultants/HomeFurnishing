@@ -96,6 +96,10 @@ namespace Jobs.App_Start
 
             container.RegisterType<IRepository<CollectionSettings>, Repository<CollectionSettings>>();
 
+            container.RegisterType<IRepository<CustomHeader>, Repository<CustomHeader>>();
+            container.RegisterType<ICustomHeaderService, CustomHeaderService>(new PerRequestLifetimeManager());
+            
+
             container.RegisterType<IRepository<Caste>, Repository<Caste>>();
             container.RegisterType<ICasteService, CasteService>(new PerRequestLifetimeManager());
 
@@ -172,6 +176,7 @@ namespace Jobs.App_Start
             container.RegisterType<ApplicationDbContext, ApplicationDbContext>("New");
 
             container.RegisterType<IDashBoardAutoService, DashBoardAutoService>(new PerRequestLifetimeManager());
+            container.RegisterType<IDashBoardRugService, DashBoardRugService>(new PerRequestLifetimeManager());
 
             container.RegisterType<IDisplay_ProdOrderBalanceService, Display_ProdOrderBalanceService>(new PerRequestLifetimeManager());
             container.RegisterType<IDisplay_PaymentAdivceWithInvoiceService, Display_PaymentAdivceWithInvoiceService>(new PerRequestLifetimeManager());
@@ -184,6 +189,15 @@ namespace Jobs.App_Start
 
             container.RegisterType<IRepository<SaleOrderLine>, Repository<SaleOrderLine>>();
             container.RegisterType<Service.ISaleOrderLineService, Service.SaleOrderLineService>(new PerRequestLifetimeManager());
+
+
+
+            container.RegisterType<IRepository<CostingHeader>, Repository<CostingHeader>>();
+            container.RegisterType<Service.ICostingHeaderService, Service.CostingHeaderService>(new PerRequestLifetimeManager());
+
+            container.RegisterType<IRepository<CostingLine>, Repository<CostingLine>>();
+            container.RegisterType<Service.ICostingLineService, Service.CostingLineService>(new PerRequestLifetimeManager());
+
 
 
 
@@ -1522,6 +1536,12 @@ namespace Jobs.App_Start
             Mapper.CreateMap<LedgersViewModel, Ledger>();
             Mapper.CreateMap<Ledger, LedgersViewModel>();
 
+            Mapper.CreateMap<CostingHeaderIndexViewModel, CostingHeader>();
+            Mapper.CreateMap<CostingHeader, CostingHeaderIndexViewModel>();
+            Mapper.CreateMap<CostingLineViewModel, CostingLine>();
+            Mapper.CreateMap<CostingLine, CostingLineViewModel>();
+
+
             Mapper.CreateMap<HeaderChargeViewModel, HeaderChargeViewModel>();
             Mapper.CreateMap<LineChargeViewModel, LineChargeViewModel>();
 
@@ -1761,6 +1781,10 @@ namespace Jobs.App_Start
 
             Mapper.CreateMap<DirectSaleInvoiceHeaderViewModel, SaleDispatchHeader>();
             Mapper.CreateMap<SaleDispatchHeader, DirectSaleInvoiceHeaderViewModel>();
+            
+            Mapper.CreateMap<CustomHeaderViewModel, CustomHeader>();
+            Mapper.CreateMap<CustomHeader, CustomHeaderViewModel>();
+            
 
             Mapper.CreateMap<DocumentTypeHeaderAttributeViewModel, DocumentTypeHeaderAttribute>();
             Mapper.CreateMap<DocumentTypeHeaderAttribute, DocumentTypeHeaderAttributeViewModel>();

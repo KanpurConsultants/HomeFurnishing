@@ -66,7 +66,7 @@
 
                                     @{
             decimal RequisitionQty = 0;
-            decimal IssueQty = 0;
+            decimal ReceiveQty = 0;
             byte MaxUnitDecPlaces = 0;
                                     }
 
@@ -94,6 +94,7 @@
                                             @Html.HiddenFor(m => Model.StockLineViewModel[i].ProcessId)
                                             @Html.HiddenFor(m => Model.StockLineViewModel[i].RequisitionLineId)
                                             @Html.HiddenFor(m => Model.StockLineViewModel[i].StockHeaderId)
+                                            @Html.HiddenFor(m => Model.StockLineViewModel[i].ProductGroupName, new { @class = "PGN" })
                                             @Html.HiddenFor(m => Model.StockLineViewModel[i].RequisitionHeaderDocNo)
                                             @Html.HiddenFor(m => Model.StockLineViewModel[i].UnitId)
                                             @Html.HiddenFor(m => Model.StockLineViewModel[i].CostCenterId)
@@ -144,9 +145,12 @@
                                                     </div>
 
                                                     <div class='block text-right' style='width:15%'>
-                                                        @Html.TextBoxFor(m => Model.StockLineViewModel[i].QtyRec, new { @class = "form-control ReceiveQty multiple-modal Qty text-right" })
+                                                        @*@Html.TextBoxFor(m => Model.StockLineViewModel[i].QtyRec, new { @class = "form-control ReceiveQty multiple-modal Qty text-right" })*@
+                                                        @Html.TextBoxFor(m => Model.StockLineViewModel[i].QtyRec, "{" + "0:0.".PadRight((Model.StockLineViewModel[i].UnitDecimalPlaces + 4 ?? 0), '0') + "}", new { @class = "form-control number multiple-modal text-right ReceiveQty" })
                                                         @Html.ValidationMessageFor(m => Model.StockLineViewModel[i].QtyRec, "", new { @class = "text-danger" })
                                                     </div>
+
+                                                    @{ReceiveQty += Model.StockLineViewModel[i].RequisitionBalanceQty ?? 0;}
 
                                                 </div>
                                             </div>

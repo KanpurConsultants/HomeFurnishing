@@ -34,6 +34,9 @@ namespace Model.Models
         [MaxLength(10,ErrorMessage="Maximum 10 characters")]
         public string LedgerAccountNature{ get; set; }
 
+        [MaxLength(10, ErrorMessage = "Maximum 10 characters")]
+        public string LedgerAccountGroupNature { get; set; }
+
         [Display(Name = "Created By")]
         public string CreatedBy { get; set; }
 

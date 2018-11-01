@@ -90,6 +90,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DatabaseViews\CustomHeaderViewModel.cs" />
     <Compile Include="DatabaseViews\MaterialPlanViewModel.cs" />
     <Compile Include="DatabaseViews\SaleDeliveryOrderViewModels.cs" />
     <Compile Include="DatabaseViews\SaleEnquiryViewModels.cs" />
@@ -114,6 +115,11 @@
     <Compile Include="Models\Caste.cs" />
     <Compile Include="Models\ChargeGroupPersonCalculation.cs" />
     <Compile Include="Models\CollectionSetting.cs" />
+    <Compile Include="Models\CostingHeader.cs" />
+    <Compile Include="Models\CostingLine.cs" />
+    <Compile Include="Models\CustomHeader.cs" />
+    <Compile Include="Models\CustomHeaderAttributes.cs" />
+    <Compile Include="Models\CustomLine.cs" />
     <Compile Include="Models\DAR.cs" />
     <Compile Include="Models\Dimension1Extended.cs" />
     <Compile Include="Models\DiscountType.cs" />
@@ -127,6 +133,7 @@
     <Compile Include="Models\EmployeeCharge.cs" />
     <Compile Include="Models\JobOrderBomMaterialIssue.cs" />
     <Compile Include="Models\EmployeeLineCharge.cs" />
+    <Compile Include="Models\JobOrderCancelBomMaterialReceive.cs" />
     <Compile Include="Models\LedgerSupplementary.cs" />
     <Compile Include="Models\LedgerHeaderCharge.cs" />
     <Compile Include="Models\LedgerLineCharge.cs" />
@@ -276,6 +283,9 @@
     <Compile Include="ViewModels\CollectionViewModel.cs" />
     <Compile Include="ViewModels\CompanySettingsViewModel.cs" />
     <Compile Include="ViewModels\ControllerActionViewModel.cs" />
+    <Compile Include="ViewModels\CostingHeaderViewModels.cs" />
+    <Compile Include="ViewModels\CostingLineViewModel.cs" />
+    <Compile Include="ViewModels\CustomHeaderViewModel.cs" />
     <Compile Include="ViewModels\DARViewModel.cs" />
     <Compile Include="ViewModels\NarrationViewModel.cs" />
     <Compile Include="ViewModels\Dimension1.cs">

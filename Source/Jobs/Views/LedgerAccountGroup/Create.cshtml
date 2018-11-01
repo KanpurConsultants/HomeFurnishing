@@ -10,6 +10,7 @@
     @Html.AntiForgeryToken()
     @Html.HiddenFor(model => model.LedgerAccountGroupId)
     @Html.HiddenFor(model => model.LedgerAccountNature)
+    @Html.HiddenFor(model => model.LedgerAccountGroupNature)
     @Html.HiddenFor(model => model.LedgerAccountType)
     <div class="panel panel-default">
 
@@ -133,6 +134,7 @@
                 {
                     $("#LedgerAccountNature").val(data.LedgerAccountNature)
                     $("#LedgerAccountType").val(data.LedgerAccountType)
+                    $("#LedgerAccountGroupNature").val(data.LedgerAccountGroupNature)
                 }
             },
             error: function (xhr, ajaxOptions, thrownError) {
@@ -143,6 +145,7 @@
         else {
                 $("#LedgerAccountNature").val('')
                 $("#LedgerAccountType").val('')
+                $("#LedgerAccountGroupNature").val('')
         }
     }
 

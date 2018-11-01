@@ -69,6 +69,7 @@ namespace Service
                         ContraDocTypeCaption = DocumentTypeSettingsTab.ContraDocTypeCaption,
                         DealQtyCaption = DocumentTypeSettingsTab.DealQtyCaption,
                         WeightCaption = DocumentTypeSettingsTab.WeightCaption,
+                        DocIdCaption= DocumentTypeSettingsTab.DocIdCaption,
                         CostCenterCaption = DocumentTypeSettingsTab.CostCenterCaption,
                         SpecificationCaption = DocumentTypeSettingsTab.SpecificationCaption,
                         ReferenceDocTypeCaption = DocumentTypeSettingsTab.ReferenceDocTypeCaption,

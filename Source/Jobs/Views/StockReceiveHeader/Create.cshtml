@@ -262,18 +262,50 @@
       
                 <div class="panel-info" style="height:40px">
                     <div class="btn-group" style="padding:5px 0 3px 0;margin:0px;font-weight:bold">
-                         <span class="glyphicon glyphicon-plus-sign"></span>
+                        <span class="glyphicon glyphicon-plus-sign"></span>
                         @{string Action = "";
-                        if (Model.Status == (int)StatusConstants.Drafted || Model.Status == (int)StatusConstants.Import)
-                        { Action = "CreateLine"; }
-                        else if (Model.Status == (int)StatusConstants.Submitted || Model.Status == (int)StatusConstants.Modified)
-                        { Action = "CreateLineAfter_Submit"; }
+                            if (Model.Status == (int)StatusConstants.Drafted || Model.Status == (int)StatusConstants.Import)
+                            { Action = "CreateLine"; }
+                            else if (Model.Status == (int)StatusConstants.Submitted || Model.Status == (int)StatusConstants.Modified)
+                            { Action = "CreateLineAfter_Submit"; }
                         }
                         @Html.ActionLink("Add New Row", Action, "StockReceiveLine", new { id = @Model.StockHeaderId }, new { data_modal = "", id = "btnCreate", @class = "toolbar", @title = "Add New", @data_toggle = "tooltip", @data_detailDisabled = "true" })
                     </div>
-                    <div class="btn-group right" style="padding-right:15px">
-                        @Html.ActionLink(" ", "_ForStockProcess", "StockReceiveLine", new { id = @Model.StockHeaderId, sid = @Model.PersonId }, new { data_modal = "", id = "btnCreateF", @class = "cbtn btn-circle glyphicon glyphicon-link toolbar right", @title = "For Issue", @data_toggle = "tooltip", @data_detailDeleted = "true" })
+
+                    @*<div class="btn-group right" style="padding-right:15px">
+                @Html.ActionLink(" ", "_ForStockProcess", "StockReceiveLine", new { id = @Model.StockHeaderId, sid = @Model.PersonId }, new { data_modal = "", id = "btnCreateF", @class = "cbtn btn-circle glyphicon glyphicon-link toolbar right", @title = "For Issue", @data_toggle = "tooltip", @data_detailDeleted = "true" })
+
+                <ul class="dropdown-menu pull-right" aria-labelledby="dropdownMenu1">
+                    @if (Model.StockHeaderSettings.isVisibleStockIn)
+                    {
+                        <li><a id="btnCreateFP" data-modal="" href="@Url.Action("_ForProduct", "StockIssueLine", new { id = @Model.StockHeaderId , sid = @Model.PersonId })"><span class="glyphicon glyphicon-user"> </span> For Products</a></li>
+                    }
+                </ul>
+
+            </div>*@
+
+
+                    @if (Model.StockHeaderSettings.isVisibleMaterialRequest || Model.StockHeaderSettings.isVisibleStockIn)
+                    {
+                        <div class="btn-group right" style="padding-right:15px">
+                            <a class="cbtn btn-circle glyphicon glyphicon-link dropdown-toggle" aria-expanded="false" style="padding-top: 6px;padding-bottom: 6px;" href="#" data-toggle="dropdown" id="dropdownMenu1">
+                            </a>
+                            <ul class="dropdown-menu pull-right" aria-labelledby="dropdownMenu1">
+                                @if (Model.StockHeaderSettings.isVisibleMaterialRequest)
+                                {
+                                    <li><a id="btnCreateF" data-modal="" href="@Url.Action("_ForStockProcess", "StockReceiveLine", new { id = @Model.StockHeaderId, sid = @Model.PersonId })"><span class="glyphicon glyphicon-user"> </span> For Issue</a></li>
+                                }
+                                @if (Model.StockHeaderSettings.isVisibleHOCostCenter)
+                                {
+                                    <li><a id="btnCreateF" data-modal="" href="@Url.Action("_ForParentsCostcenter", "StockIssueLine", new { id = @Model.StockHeaderId, sid = @Model.PersonId })"><span class="glyphicon glyphicon-user"> </span> For HO Costcenter</a></li>
+                                }
+                                @if (Model.StockHeaderSettings.isVisibleStockIn)
+                                {
+                                    <li><a id="btnCreateFP" data-modal="" href="@Url.Action("_ForProduct", "StockReceiveLine", new { id = @Model.StockHeaderId , sid = @Model.PersonId })"><span class="glyphicon glyphicon-user"> </span> For Products</a></li>
+                                }
+                            </ul>
                         </div>
+                    }
                     </div>
                 <div style="padding-right:15px">
 

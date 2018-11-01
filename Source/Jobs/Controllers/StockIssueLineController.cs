@@ -119,6 +119,16 @@ namespace Jobs.Controllers
                 ModelState.AddModelError("", "CostCenter is mandatory");
             }
 
+            if (Settings.isMandatoryLotNo == true && vm.StockLineViewModel.Where(m => m.LotNo == null && m.Qty != 0).Any())
+            {
+                ModelState.AddModelError("", "The LotNo field is required");
+            }
+
+            if (Settings.isMandatoryLotNoOrDimension1 == true && vm.StockLineViewModel.Where(m => m.LotNo == null && m.Dimension1Id == null && m.Qty != 0).Any())
+            {
+                ModelState.AddModelError("", "The LotNo field is required");
+            }
+
             decimal Qty = vm.StockLineViewModel.Where(m => m.Rate > 0).Sum(m => m.Qty);
 
             bool BeforeSave = true;

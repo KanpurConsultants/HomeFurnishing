@@ -426,6 +426,8 @@
     <Compile Include="Areas\Rug\Controllers\PackingSettingsController.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Controllers\CustomHeaderController.cs" />
+    <Compile Include="Controllers\DashBoardRugController.cs" />
     <Compile Include="Controllers\Display_StockBalanceController .cs" />
     <Compile Include="Controllers\JobInvoiceHeaderrdl.cs" />
     <Compile Include="Controllers\JobOrderCancelHeaderrdl.cs" />
@@ -437,6 +439,7 @@
     <Compile Include="Controllers\MailboxController.cs" />
     <Compile Include="Controllers\LedgerWizardController.cs" />
     <Compile Include="Controllers\BusinessSessionLineController.cs" />
+    <Compile Include="Controllers\SaleInvoiceCustomController.cs" />
     <Compile Include="Controllers\TaxReturnController.cs" />
     <Compile Include="Controllers\SalaryWizardController.cs" />
     <Compile Include="Controllers\LedgerAccountMergingController.cs" />
@@ -3633,6 +3636,37 @@
     <Content Include="fonts\fontawesome-webfont.woff" />
     <Content Include="fonts\fontawesome-webfont.ttf" />
     <Content Include="fonts\fontawesome-webfont.eot" />
+    <Content Include="Areas\Rug\Views\BarCodeHistory\Delete.cshtml" />
+    <Content Include="Areas\Rug\Views\BarCodeHistory\Details.cshtml" />
+    <Content Include="Areas\Rug\Views\BarCodeHistory\Edit.cshtml" />
+    <Content Include="Areas\Rug\Views\BarCodeHistory\Index.cshtml" />
+    <Content Include="Areas\Rug\Views\ColourMerging\Error.cshtml" />
+    <Content Include="Areas\Rug\Views\ColourMerging\Index.cshtml" />
+    <Content Include="Areas\Rug\Views\ColourMerging\SingleMerging.cshtml" />
+    <Content Include="Areas\Rug\Views\ColourMerging\Sucess.cshtml" />
+    <Content Include="Areas\Rug\Views\CostingHeader\Create - Copy.cshtml" />
+    <Content Include="Areas\Rug\Views\CostingHeader\Create.cshtml" />
+    <Content Include="Areas\Rug\Views\CostingHeader\Delete.cshtml" />
+    <Content Include="Areas\Rug\Views\CostingHeader\Detail.cshtml" />
+    <Content Include="Areas\Rug\Views\CostingHeader\DocumentTypeList.cshtml" />
+    <Content Include="Areas\Rug\Views\CostingHeader\Edit.cshtml" />
+    <Content Include="Areas\Rug\Views\CostingHeader\Index.cshtml" />
+    <Content Include="Areas\Rug\Views\CostingHeader\MultipleDocumentPrint.cshtml" />
+    <Content Include="Areas\Rug\Views\CostingHeader\PendingToApprove.cshtml" />
+    <Content Include="Areas\Rug\Views\CostingHeader\PendingToSubmit.cshtml" />
+    <Content Include="Areas\Rug\Views\CostingHeader\_Reason.cshtml" />
+    <Content Include="Areas\Rug\Views\CostingLine\Create.cshtml" />
+    <Content Include="Areas\Rug\Views\CostingLine\Delete.cshtml" />
+    <Content Include="Areas\Rug\Views\CostingLine\Details.cshtml" />
+    <Content Include="Areas\Rug\Views\CostingLine\Edit.cshtml" />
+    <Content Include="Areas\Rug\Views\CostingLine\Index.cshtml" />
+    <Content Include="Areas\Rug\Views\CostingLine\_Create.cshtml" />
+    <Content Include="Areas\Rug\Views\CostingLine\_Edit.cshtml" />
+    <Content Include="Areas\Rug\Views\CostingLine\_Index.cshtml" />
+    <Content Include="Areas\Rug\Views\ProductMergingRug\Error.cshtml" />
+    <Content Include="Areas\Rug\Views\ProductMergingRug\Index.cshtml" />
+    <Content Include="Areas\Rug\Views\ProductMergingRug\SingleMerging.cshtml" />
+    <Content Include="Areas\Rug\Views\ProductMergingRug\Sucess.cshtml" />
     <None Include="Properties\PublishProfiles\Jobs.kanpurconsultants.com - Web Deploy.pubxml" />
     <None Include="Properties\PublishProfiles\Jobs.pubxml" />
     <None Include="Properties\PublishProfiles\Purchase.pubxml" />

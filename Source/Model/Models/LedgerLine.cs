@@ -46,6 +46,9 @@ namespace Model.Models
         //public int? ReferenceId { get; set; }
         //public virtual Ledger ReferenceNo { get; set; }
 
+        [Display(Name = "Due Date")]
+        public DateTime? DueDate { get; set; }
+
         public decimal BaseValue { get; set; }
         public decimal BaseRate { get; set; }
 

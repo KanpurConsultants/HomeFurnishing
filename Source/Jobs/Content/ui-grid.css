@@ -77,6 +77,19 @@
   clip: rect(0, 0, 0, 0);
   border: 0;
 }
+
+ .Grid-Cell-Red {
+  background-color: red !important;
+}
+
+  .Grid-Cell-Yellow {
+  background-color: palevioletred !important;
+}
+
+  .Grid-Cell-Green {
+  background-color: green !important;
+}
+
 .ui-grid-top-panel-background {
   background: #f3f3f3;
   background: -webkit-gradient(linear, left bottom, left top, color-stop(0, #eeeeee), color-stop(1, #ffffff));

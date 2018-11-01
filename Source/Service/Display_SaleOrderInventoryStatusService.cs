@@ -279,7 +279,7 @@ namespace Service
 
                     SELECT Max(H.SaleOrderLineId) AS SaleOrderLineId,P.ProductId, Max(H.Buyer) Buyer,max(H.DocDate) AS Order_Date, max(H.DocNo) AS OrderNo, max(H.DueDate) AS DueDate,	 DateDiff(Day,max(H.DueDate),GetDate()) AS Days,
                     Max(P.ProductName) ProductName, Max(PQ.ProductQualityName) AS Quality,Max(PG.ProductGroupName) AS Design, Max(VRS.ManufaturingSizeName) AS Size, Max(C.ColourName) AS Colour,
-                    Max(PB.BuyerSpecification) AS BuyerSpecification,Max(PB.BuyerSpecification1) AS BuyerSpecification1,Max(PB.BuyerSpecification2) AS BuyerSpecification2,Max(PB.BuyerSpecification3) AS BuyerSpecification3,Max(PB.BuyerSpecification4) AS BuyerSpecification4,
+                    Max(SELS.BuyerSpecification) AS BuyerSpecification,Max(SELS.BuyerSpecification1) AS BuyerSpecification1,Max(SELS.BuyerSpecification2) AS BuyerSpecification2,Max(SELS.BuyerSpecification3) AS BuyerSpecification3, null AS BuyerSpecification4,
                     isnull(sum(H.OrdQty),0) AS Order_Qty,isnull(sum(H.CancelQty),0) AS Cancel_Qty,isnull(sum(H.OrdQty),0) - isnull(sum(H.CancelQty),0) AS Net_Qty, isnull(sum(H.DispQty),0) AS Ship_Qty,isnull(sum(H.BalQty),0) AS Bal_Qty,
                     isnull(sum(POB.BalanceQty),0) AS To_Be_Issue, isnull(sum(OrderIssue.OrderQty),0) AS Slip_Qty, 
                     isnull(sum(FWob.BalanceQty),0) + isnull(sum(FWobM.BalanceQty),0) AS Loom_Qty, 
@@ -306,7 +306,10 @@ namespace Service
                     LEFT JOIN #FWobM FWobM ON FWobM.ProdOrderHeaderId=PO.ProdOrderHeaderId AND H.ProductId=FWobM.ProductId
                     LEFT JOIN #FDisp Disp WITH (Nolock) ON Disp.SaleOrderLineId=H.SaleOrderLineId
                     LEFT JOIN #FDispO DispO WITH (Nolock) ON DispO.SaleOrderLineId=H.SaleOrderLineId
-                    LEFT JOIN web.ProductBuyers PB ON PB.ProductId = H.ProductId AND PB.BuyerId = H.SaleToBuyerId 
+                    --LEFT JOIN web.ProductBuyers PB ON PB.ProductId = H.ProductId AND PB.BuyerId = H.SaleToBuyerId 
+                    LEFT JOIN web.SaleOrderLines L ON L.SaleOrderLineId = H.SaleOrderLineId
+                    LEFT JOIN web.SaleEnquiryLines SEL ON SEL.SaleEnquiryLineId = L.ReferenceDocLineId 
+					LEFT JOIN web.SaleEnquiryLineExtendeds SELS ON SELS.SaleEnquiryLineId = SEL.SaleEnquiryLineId  
                     WHERE 1=1 " + 
                     (ProductSize != null ? " And VRS.ManufaturingSizeID IN (SELECT Items FROM  Web.[Split] (@ProductSize, ','))" : "") +
                     (BuyerDesign != null ? " And PB.BuyerSpecification IN (SELECT Items FROM [dbo].[Split] (@BuyerDesign, ','))" : "") +

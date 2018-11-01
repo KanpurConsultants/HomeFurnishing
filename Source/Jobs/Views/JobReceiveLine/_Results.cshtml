@@ -35,6 +35,10 @@
                             @Html.HiddenFor(m => m.JobReceiveSettings.isVisibleDimension3)
                             @Html.HiddenFor(m => m.JobReceiveSettings.isVisibleDimension4)
                             @Html.HiddenFor(m => m.JobReceiveSettings.LossPer)
+                            @Html.HiddenFor(m => m.JobReceiveSettings.isVisibleLotNo)
+                            @Html.HiddenFor(m => m.JobReceiveSettings.isMandatoryLotNo)
+                            @Html.HiddenFor(m => m.JobReceiveSettings.isVisibleLoss)        
+                            @Html.HiddenFor(m => m.JobReceiveSettings.IsVisiblePassQty)
                             @Html.ValidationSummary(true)
 
                             <div class="panel panel-default" id="grid">
@@ -86,13 +90,13 @@
 
 
                                             <div class='block row-index' style='width:5%'>
-                                                @Html.HiddenFor(m => Model.JobReceiveLineViewModel[i].ProductId)
+                                                @Html.HiddenFor(m => Model.JobReceiveLineViewModel[i].ProductId, new { @class = "ProdId" })
                                                 @Html.HiddenFor(m => Model.JobReceiveLineViewModel[i].Dimension1Id)
                                                 @Html.HiddenFor(m => Model.JobReceiveLineViewModel[i].Dimension2Id)
                                                 @Html.HiddenFor(m => Model.JobReceiveLineViewModel[i].Dimension3Id)
                                                 @Html.HiddenFor(m => Model.JobReceiveLineViewModel[i].Dimension4Id)
                                                 @Html.HiddenFor(m => Model.JobReceiveLineViewModel[i].DealUnitId)
-                                                @Html.HiddenFor(m => Model.JobReceiveLineViewModel[i].ProductName)
+                                                @Html.HiddenFor(m => Model.JobReceiveLineViewModel[i].ProductName, new { @class = "ProdName" })
                                                 @Html.HiddenFor(m => Model.JobReceiveLineViewModel[i].Specification)
                                                 @Html.HiddenFor(m => Model.JobReceiveLineViewModel[i].Dimension1Name)
                                                 @Html.HiddenFor(m => Model.JobReceiveLineViewModel[i].Dimension2Name)
@@ -112,8 +116,10 @@
 
                                                 <div class='row'>
 
-                                                    <div class='block' style='width:25%'>
+                                                    <div class='block ReplacableProduct' style='width:25%'>
                                                         <strong> @Model.JobReceiveLineViewModel[i].ProductName</strong>
+                                                        <span style="font-size:xx-small;cursor:pointer;padding-left:5px" class="text-info glyphicon glyphicon-pencil EditProduct"></span>
+
                                                         <br />
                                                         <p style="margin-bottom:0px">
                                                             @{
@@ -193,8 +199,26 @@
     </div>
 </div>
 
+<script type="text/javascript">
 
+    $('.EditProduct').click(function () {
+        //alert("1")
+        var $Block = $(this).closest('div.row.crow');
+        var ProdId = parseInt($Block.find('input.ProdId').val());
+        var ProdName = $Block.find('input.ProdName').val();
+        if (ProdId && ProdName) {
+            var ProdElemId = $Block.find('input.ProdId').attr('id');
+            var ProdElemName = $Block.find('input.ProdId').attr('name');
+            $Block.find('input.ProdId').remove();
+            var elem = '<input type="text" class="form-control multiple-modal ProdHelpList ProdId" style="display:inline;margin-bottom:3px" tabindex="-1" id="' + ProdElemId + '" name="' + ProdElemName + '" />'
+            var Container = $Block.find('div.ReplacableProduct:first');
+            Container.html(elem);
+            CustomSelectFunction($('.ProdHelpList', $Block), '/ComboHelpList/GetProducts', '/ComboHelpList/SetSingleProducts', 'Enter Product', false, 0);
+            $('.ProdHelpList', $Block).select2("data", { id: ProdId, text: ProdName });
+        }
 
+    })
+    </script>
 
 <script type="text/javascript">
     var reset = false;
@@ -203,7 +227,7 @@
         var $Block = $(this).closest('div.row');
         var $HBlock = $(this).closest('div.row.crow');
         var DecPlaces = $HBlock.find('input.UDec:first').val();
-        
+
         //if (($Block.find('.OrderBalanceQty').val() - $(this).val()) < 0) {
         //    $('#submit', '.modal-body').attr('disabled', 'disabled');
         //    if ($(this).closest('div.form-horizontal').find('span#cerror').length == 0) {
@@ -219,7 +243,7 @@
 
 
         var qty = parseFloat($(this).val());
-        
+
         if ($Block.find('.LossQty').val() == 0) {
             $Block.find('.ReceiveQty').val(qty.toFixed(DecPlaces));
             $Block.find('.PassQty').val(qty.toFixed(DecPlaces));
@@ -278,7 +302,7 @@
     var allowedLossPer = $('#JobReceiveSettings_LossPer').val();
     function ValidateData(obj)
     {
-        
+
 
         var $Block = $(obj).closest('div.row');
         var $HBlock = $(obj).closest('div.row.crow');
@@ -290,7 +314,7 @@
         if ($Block.find('.ExcessReceiveAllowedAgainstOrderQty').val() == null || $Block.find('.ExcessReceiveAllowedAgainstOrderQty').val() == 0)
         {
 
-        
+
             //Check that Pass Qty can not exceed Job Qty.
             if (parseFloat($Block.find('.JobQuantity').val() - $Block.find('.PassQty').val()) < 0) {
 
@@ -346,7 +370,7 @@
 
     $('#modform').bind('submit', function (event) {
 
-        if (!IsSaved) {            
+        if (!IsSaved) {
             if (!ValidateData()) {
                 return false;
             }

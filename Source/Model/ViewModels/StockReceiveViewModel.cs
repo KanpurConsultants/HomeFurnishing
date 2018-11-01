@@ -87,8 +87,9 @@ namespace Model.ViewModels
         public int? Dimension2Id { get; set; }
         public string Dimension2Name { get; set; }
 
+        public Decimal? ReceiveForQty { get; set; }
 
-
+        public string ProductGroupName { get; set; }
 
 
         [Display(Name = "Dimension3")]

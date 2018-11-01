@@ -68,6 +68,16 @@ namespace Jobs.Controllers
             return PartialView("_Filters", vm);
         }
 
+        public ActionResult _ForProduct(int id, int sid)
+        {
+            ProductsFiltersForIssue vm = new ProductsFiltersForIssue();
+            StockHeader Header = new StockHeaderService(_unitOfWork).Find(id);
+            vm.DocumentTypeSettings = new DocumentTypeSettingsService(_unitOfWork).GetDocumentTypeSettingsForDocument(Header.DocTypeId);
+            vm.StockHeaderId = id;
+            vm.PersonId = sid;
+            return PartialView("_FiltersProducts", vm);
+        }
+
         public ActionResult _ForStockProcess(int id, int sid)
         {
             StockProcessFiltersForReceive vm = new StockProcessFiltersForReceive();
@@ -105,6 +115,56 @@ namespace Jobs.Controllers
             var Header = new StockHeaderService(_unitOfWork).Find(vm.StockHeaderId);
             svm.StockHeaderSettings = Mapper.Map<StockHeaderSettings, StockHeaderSettingsViewModel>(new StockHeaderSettingsService(_unitOfWork).GetStockHeaderSettingsForDocument(Header.DocTypeId, Header.DivisionId, Header.SiteId));
             return PartialView("_Results", svm);
+
+        }
+
+        public JsonResult GetRequisitions(int id, int PersonId, string term)//Receipt Header ID
+        {
+            return Json(_StockLineService.GetPendingRequisitionHelpList(id, PersonId, term), JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult GetProductsForFilter(int id, int PersonId, string term, int Limit)//SupplierID
+        {
+            return Json(_StockLineService.GetProductHelpListForFilters(id, PersonId, term, Limit), JsonRequestBehavior.AllowGet);
+        }
+        public ActionResult _FilterPostProducts(ProductsFiltersForIssue vm)
+        {
+            if (ModelState.IsValid)
+            {
+                List<StockIssueForProductsFilterViewModel> svm = _StockLineService.GetStockReceiveProductsForFilters(vm).ToList();
+
+
+                var DivisionId = (int)System.Web.HttpContext.Current.Session["DivisionId"];
+                var SiteId = (int)System.Web.HttpContext.Current.Session["SiteId"];
+                //var settings = new MaterialPlanSettingsService(_unitOfWork).GetMaterialPlanSettingsForDocument(vm.DocTypeId, DivisionId, SiteId);
+                //svm.MaterialPlanSettings = Mapper.Map<MaterialPlanSettings, MaterialPlanSettingsViewModel>(settings);
+
+                ProductsFilterViewModel ProductsFilterViewModel = new ProductsFilterViewModel();
+                ProductsFilterViewModel.StockIssueForProductsFilterViewModel = svm;
+
+                return PartialView("_ResultsProduction", ProductsFilterViewModel);
+            }
+
+            return PartialView("_FiltersProduction", vm);
+        }
+
+        public ActionResult _ResultsPostProduction(ProductsFilterViewModel vm)
+        {
+            if (ModelState.IsValid)
+            {
+
+                //System.Web.HttpContext.Current.Session["JobOrderCancelBomMaterialReceive"] = vm;
+
+                List<StockReceiveLineViewModel> temp = _StockLineService.GetBOMDetailForProductReceive(vm).ToList();
+
+                StockReceiveMasterDetailModel svm = new StockReceiveMasterDetailModel();
+                svm.StockLineViewModel = temp;
+                var Header = new StockHeaderService(_unitOfWork).Find((int)vm.StockIssueForProductsFilterViewModel[0].StockHeaderId);
+                svm.StockHeaderSettings = Mapper.Map<StockHeaderSettings, StockHeaderSettingsViewModel>(new StockHeaderSettingsService(_unitOfWork).GetStockHeaderSettingsForDocument(Header.DocTypeId, Header.DivisionId, Header.SiteId));
+                return PartialView("_Results", svm);
+
+            }
+            return PartialView("_Results", vm);
 
         }
 
@@ -315,12 +375,50 @@ namespace Jobs.Controllers
                         Cnt = Cnt + 1;
                         if (line.RequisitionLineId.HasValue)
                             LineStatus.Add(line.RequisitionLineId.Value, line.Qty);
+
+
+                        if (System.Web.HttpContext.Current.Session["JobOrderCancelBomMaterialReceive"] != null)
+                        {
+                            foreach (var JobOrderCancelBomMaterialReceiveVm in ((List<JobOrderCancelBomMaterialReceiveViewModel>)System.Web.HttpContext.Current.Session["JobOrderCancelBomMaterialReceive"]))
+                            {
+                                if (JobOrderCancelBomMaterialReceiveVm.CostCenterId == line.CostCenterId
+                                    && JobOrderCancelBomMaterialReceiveVm.ProductId == line.ProductId
+                                    && JobOrderCancelBomMaterialReceiveVm.Dimension1Id == line.Dimension1Id)
+                                {
+                                    JobOrderCancelBomMaterialReceiveVm.StockLineId = line.StockLineId;
+                                    if (item.ReceiveForQty != null && item.ReceiveForQty != 0)
+                                        JobOrderCancelBomMaterialReceiveVm.Qty = (line.Qty / (item.ReceiveForQty ?? 0)) * JobOrderCancelBomMaterialReceiveVm.ReceiveForQty;
+                                }
+                            }
+                        }
+
                     }
 
                 }
 
 
                 new RequisitionLineStatusService(_unitOfWork).UpdateRequisitionQtyReceiveMultiple(LineStatus, Header.DocDate, ref db);
+
+                int i = 0;
+                if (System.Web.HttpContext.Current.Session["JobOrderCancelBomMaterialReceive"] != null)
+                {
+                    foreach (var item in ((List<JobOrderCancelBomMaterialReceiveViewModel>)System.Web.HttpContext.Current.Session["JobOrderCancelBomMaterialReceive"]))
+                    {
+                        JobOrderCancelBomMaterialReceive JobOrderCancelBomMaterialReceive = new JobOrderCancelBomMaterialReceive();
+                        JobOrderCancelBomMaterialReceive.JobOrderCancelBomMaterialReceiveId = i;
+                        JobOrderCancelBomMaterialReceive.JobOrderBomId = item.JobOrderCancelBomId;
+                        JobOrderCancelBomMaterialReceive.StockLineId = item.StockLineId;
+                        JobOrderCancelBomMaterialReceive.ReceiveForQty = item.ReceiveForQty;
+                        JobOrderCancelBomMaterialReceive.Qty = item.Qty;
+                        JobOrderCancelBomMaterialReceive.CreatedDate = DateTime.Now;
+                        JobOrderCancelBomMaterialReceive.ModifiedDate = DateTime.Now;
+                        JobOrderCancelBomMaterialReceive.CreatedBy = User.Identity.Name;
+                        JobOrderCancelBomMaterialReceive.ModifiedBy = User.Identity.Name;
+                        JobOrderCancelBomMaterialReceive.ObjectState = Model.ObjectState.Added;
+                        db.JobOrderCancelBomMaterialReceive.Add(JobOrderCancelBomMaterialReceive);
+                        i = i - 1;
+                    }
+                }
 
                 if (Header.Status != (int)StatusConstants.Drafted && Header.Status != (int)StatusConstants.Import)
                 {
@@ -1182,6 +1280,13 @@ namespace Jobs.Controllers
                     ProductUid.ObjectState = Model.ObjectState.Modified;
                     db.ProductUid.Add(ProductUid);
 
+                }
+
+                var JobOrderBomMaterialReceiveList = (from L in db.JobOrderCancelBomMaterialReceive   where L.StockLineId == vm.StockLineId select L).ToList();
+                foreach (var JobOrderBomMaterialReceiveItem in JobOrderBomMaterialReceiveList)
+                {
+                    JobOrderBomMaterialReceiveItem.ObjectState = Model.ObjectState.Deleted;
+                    db.JobOrderCancelBomMaterialReceive.Remove(JobOrderBomMaterialReceiveItem);
                 }
 
                 StockLine.ObjectState = Model.ObjectState.Deleted;

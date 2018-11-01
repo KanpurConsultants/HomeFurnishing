@@ -48,8 +48,11 @@ namespace Model.Models
         public decimal DealQty { get; set; }
         public decimal? RateDiscountPer { get; set; }
         public decimal? RateDiscountAmt { get; set; }
-        
-        
+
+        public decimal? RetensionRate { get; set; }
+        public decimal? RetensionAmount { get; set; }
+
+
         [Display(Name = "Rate")]
         public Decimal Rate { get; set; }
 

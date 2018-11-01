@@ -328,7 +328,7 @@
 
             if($('#PersonId').val() && $('#PersonId').val() > 0)
             {
-                InitializePopover(this,$("#ProductUidIdName").val(),true,$('#PersonId').val(),TransactionTypeConstantsEnum.Issue);
+                InitializePopover(this,$("#ProductUidIdName").val(),true,$('#GodownId').val(),TransactionTypeConstantsEnum.Receive);
                 $(this).popover('show');
                 setTimeout(function() {$('#ProductUidIdName').popover('destroy')},10000);
             }

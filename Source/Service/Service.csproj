@@ -124,6 +124,7 @@
     <Compile Include="CompanyService.cs" />
     <Compile Include="CompanySettingsService.cs" />
     <Compile Include="DARService.cs" />
+    <Compile Include="DashBoardRugService.cs" />
     <Compile Include="Dimension1ExtendedService.cs" />
     <Compile Include="DiscountTypeService.cs" />
     <Compile Include="Display_JobInvoiceSummaryService.cs" />
@@ -131,6 +132,7 @@
     <Compile Include="Display_StockBalanceService.cs" />
     <Compile Include="EmployeeChargeService.cs" />
     <Compile Include="EmployeeLineChargeService.cs" />
+    <Compile Include="GridCustomReportService.cs" />
     <Compile Include="LedgerHeaderChargeService.cs" />
     <Compile Include="LedgerLineChargeService.cs" />
     <Compile Include="PaymentTermsService.cs" />
@@ -158,6 +160,9 @@
     <Compile Include="SalaryLineService.cs" />
     <Compile Include="SalaryHeaderChargeService.cs" />
     <Compile Include="SalaryLineChargeService.cs" />
+    <Compile Include="CustomHeaderService.cs" />
+    <Compile Include="CostingHeaderService.cs" />
+    <Compile Include="CostingLineService.cs" />
     <Compile Include="UserRolesNewService.cs" />
     <Compile Include="ProjectService.cs" />
     <Compile Include="RedirectService.cs" />

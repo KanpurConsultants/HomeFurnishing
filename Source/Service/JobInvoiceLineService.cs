@@ -147,7 +147,7 @@ namespace Service
                          join Qa in db.JobReceiveQALine on tab1.JobReceiveLineId equals Qa.JobReceiveLineId into JobReceiveQALineTable from JobReceiveQALineTab in JobReceiveQALineTable.DefaultIfEmpty()
                          join t4 in db.JobOrderLine on tab1.JobOrderLineId equals t4.JobOrderLineId into table4
                          from tab4 in table4.DefaultIfEmpty()
-                         join product in db.Product on p.ProductId equals product.ProductId into table2
+                         join product in db.Product on tab1.ProductId equals product.ProductId into table2
                          from tab2 in table2.DefaultIfEmpty()
                          where
                              //(string.IsNullOrEmpty(vm.ProductId) ? 1 == 1 : ProductIdArr.Contains(p.ProductId.ToString()))
@@ -192,6 +192,7 @@ namespace Service
                              //DealQty = p.BalanceQty * tab4.UnitConversionMultiplier,
                              DealQty = JobReceiveQALineTab.JobReceiveQALineId != null ? JobReceiveQALineTab.DealQty :  tab4.UnitConversionMultiplier * p.BalanceQty,
                              Rate = tab4.Rate,
+                             RetensionRate = p.RetensionRate,
                              UnitConversionMultiplier = tab4.UnitConversionMultiplier,
                              UnitDecimalPlaces = tab2.Unit.DecimalPlaces,
                              DealUnitDecimalPlaces = tab4.DealUnit.DecimalPlaces,
@@ -261,6 +262,7 @@ namespace Service
                              JobWorkerName = p.JobWorkerName,
                              DealQty = p.DealQty,
                              Rate = p.Rate,
+                             //RetensionRate=p.RetensionRate,
                              UnitConversionMultiplier = p.UnitConversionMultiplier,
                              UnitDecimalPlaces = p.UnitDecimalPlaces,
                              DealUnitDecimalPlaces = p.DealUnitDecimalPlaces,
@@ -1641,7 +1643,6 @@ namespace Service
             string[] ProductGroups = null;
             if (!string.IsNullOrEmpty(settings.filterProductGroups)) { ProductGroups = settings.filterProductGroups.Split(",".ToCharArray()); }
             else { ProductGroups = new string[] { "NA" }; }
-
 
             return (from p in db.Product
                     join La in db.LedgerAccount on p.ProductId equals La.ProductId into LedgerAccountTable

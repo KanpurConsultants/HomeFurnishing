@@ -1090,6 +1090,30 @@ namespace Jobs.Controllers
             }
             else
             {
+                SaleOrderHeader OrderHeader = new SaleOrderHeaderService(_unitOfWork).Find(EnquiSaleOrderHeaderryHeader.SaleOrderHeaderId);
+
+
+                OrderHeader.DocDate = EnquiryHeader.DocDate;
+                OrderHeader.DocNo = EnquiryHeader.DocNo;
+                OrderHeader.BuyerOrderNo = EnquiryHeader.BuyerEnquiryNo;
+                OrderHeader.CurrencyId = EnquiryHeader.CurrencyId;
+                OrderHeader.Priority = EnquiryHeader.Priority;
+                OrderHeader.UnitConversionForId = EnquiryHeader.UnitConversionForId;
+                OrderHeader.ShipMethodId = EnquiryHeader.ShipMethodId;
+                OrderHeader.ShipAddress = EnquiryHeader.ShipAddress;
+                OrderHeader.DeliveryTermsId = EnquiryHeader.DeliveryTermsId;
+                OrderHeader.Remark = EnquiryHeader.Remark;
+                OrderHeader.DueDate = EnquiryHeader.DueDate;
+                OrderHeader.ActualDueDate = EnquiryHeader.ActualDueDate;
+                OrderHeader.Advance = EnquiryHeader.Advance;
+                OrderHeader.ModifiedDate = DateTime.Now;
+                OrderHeader.ModifiedBy = User.Identity.Name;
+                OrderHeader.Status = (int)StatusConstants.Submitted;
+                OrderHeader.ReviewBy = User.Identity.Name;
+                OrderHeader.ReviewCount = 1;
+                //OrderHeader.LockReason = "Sale order is created for enquiry.Now you can't modify enquiry, changes can be done in sale order.";
+                new SaleOrderHeaderService(_unitOfWork).Update(OrderHeader);
+
                 IEnumerable<SaleEnquiryLine> LineList = new SaleEnquiryLineService(_unitOfWork).GetSaleEnquiryLineListForHeader(SaleEnquiryHeaderId);
                 int i = 0;
                 foreach (SaleEnquiryLine Line in LineList)

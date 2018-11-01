@@ -25,12 +25,14 @@ namespace Model.Models
 
         public decimal Days { get; set; }
         public decimal BasicSalary { get; set; }
+        public decimal? TDS { get; set; }
+        public decimal? TDSBaseValue { get; set; }
         public decimal? OtherAddition { get; set; }
         public decimal? OtherDeduction { get; set; }
         public decimal? LoanEMI { get; set; }
-        public decimal? Advance { get; set; }
+        public decimal? Advance { get; set; }       
         public decimal NetPayable { get; set; }
-
+        public decimal? RetensionAmount { get; set; }
 
         [Display(Name = "Remark")]
         public string Remark { get; set; }

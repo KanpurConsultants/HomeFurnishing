@@ -795,6 +795,12 @@ namespace Jobs.Controllers
 
                     }
 
+                    var JobOrderBomMaterialReceiveList = (from L in context.JobOrderCancelBomMaterialReceive where L.StockLineId == item.StockLineId select L).ToList();
+                    foreach (var JobOrderBomMaterialReceiveItem in JobOrderBomMaterialReceiveList)
+                    {
+                        JobOrderBomMaterialReceiveItem.ObjectState = Model.ObjectState.Deleted;
+                        context.JobOrderCancelBomMaterialReceive.Remove(JobOrderBomMaterialReceiveItem);
+                    }
 
                     item.ObjectState = Model.ObjectState.Deleted;
                     context.StockLine.Remove(item);

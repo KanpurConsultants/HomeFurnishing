@@ -115,6 +115,21 @@ namespace Jobs.Controllers
                             cmd.ExecuteNonQuery();
                         }
                     }
+
+                    using (SqlConnection sqlConnection = new SqlConnection(ConnectionString))
+                    {
+                        sqlConnection.Open();
+
+
+                        using (SqlCommand cmd = new SqlCommand("Web.sp_PostRequisitionForWeavingOrder_ForOverTufted"))
+                        {
+                            cmd.CommandType = CommandType.StoredProcedure;
+                            cmd.Connection = sqlConnection;
+                            cmd.Parameters.AddWithValue("@JobOrderHeaderId", Id);
+                            cmd.CommandTimeout = 1000;
+                            cmd.ExecuteNonQuery();
+                        }
+                    }
                 }
             }
 

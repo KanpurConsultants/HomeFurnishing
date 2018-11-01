@@ -49,6 +49,10 @@ namespace Model.Models
         public virtual Dimension4 Dimension4 { get; set; }
 
 
+        [ForeignKey("Process"), Display(Name = "Process")]
+        public int ? ProcessId { get; set; }
+        public virtual Process Process { get; set; }
+
 
         [Display(Name = "Created By")]
         public string CreatedBy { get; set; }

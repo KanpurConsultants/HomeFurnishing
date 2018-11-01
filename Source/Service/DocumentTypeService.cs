@@ -278,6 +278,7 @@ namespace Service
         {
             return (from p in _unitOfWork.Repository<DocumentTypeHeaderAttribute>().Instance
                     where p.DocumentTypeId == DocumentTypeId
+                    orderby p.Sr
                     select new DocumentTypeHeaderAttributeViewModel
                     {
                         DataType = p.DataType,

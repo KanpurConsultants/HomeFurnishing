@@ -32,6 +32,7 @@ namespace Model.Models
         public bool? isMandatoryHeaderCostCenter { get; set; }
         public bool? isVisibleLineCostCenter { get; set; }
         public bool? isMandatoryLineCostCenter { get; set; }
+        public bool? isVisibleHOCostCenter { get; set; }
         public bool? isVisibleProductUID { get; set; }
         public bool? isVisibleProductCode { get; set; }
         public bool? isVisibleDimension1 { get; set; }
