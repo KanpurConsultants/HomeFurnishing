@@ -1578,6 +1578,20 @@ namespace Jobs.Controllers
                         if (SaleInvoiceHeader.BillToBuyerId != InvoiceRetHeader.BuyerId)
                             POHeaderCharge.PersonID = SaleInvoiceHeader.BillToBuyerId;
 
+                        var SaleInvoiceCharges = (from Hc in db.SaleInvoiceHeaderCharge
+                                    join C in db.Charge on Hc.ChargeId equals C.ChargeId into ChargeTable
+                                    from ChargeTab in ChargeTable.DefaultIfEmpty()
+                                    where Hc.HeaderTableId == svm.SaleInvoiceHeaderId
+                                    && Hc.ChargeId == POHeaderCharge.ChargeId
+                                    select new
+                                    {
+                                        ChargeName = ChargeTab.ChargeName,
+                                        Amount = Hc.Amount
+                                    }).FirstOrDefault();
+
+                        //if (SaleInvoiceCharges.ChargeName == "Discount" || SaleInvoiceCharges.ChargeName == "Other Charges")
+                        POHeaderCharge.Amount = SaleInvoiceCharges.Amount;
+
                         POHeaderCharge.ObjectState = Model.ObjectState.Added;
                         new SaleInvoiceReturnHeaderChargeService(_unitOfWork).Create(POHeaderCharge);
                     }

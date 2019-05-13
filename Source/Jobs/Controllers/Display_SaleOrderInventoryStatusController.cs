@@ -36,7 +36,11 @@ namespace Jobs.Controllers
         }
 
         [HttpGet]
-        public ActionResult Display_SaleOrderInventoryStatus(int MenuId)
+        public ActionResult Display_SaleOrderInventoryStatus(int MenuId, string TextHidden, string NextFormat,
+            string FromDate, string ToDate, string StatusOnDate,
+            string ReportType, string ReportFor, string Site, string Division,
+            string Buyer, string SaleOrderHeaderId, string Product, string ProductCategory,
+            string ProductQuality, string ProductGroup, string ProductSize, string BuyerDesign)
         {
             Menu Menu = new MenuService(_unitOfWork).Find(MenuId);
 
@@ -50,26 +54,78 @@ namespace Jobs.Controllers
             int DivisionId = (int)System.Web.HttpContext.Current.Session["DivisionId"];
 			int DocTypeId = new DocumentTypeService(_unitOfWork).FindByName("General Sale Order").DocumentTypeId;
 
-            List<SelectListItem> ReportType = new List<SelectListItem>();
-            ReportType.Add(new SelectListItem { Text = ReportType_Detail, Value = ReportType_Detail });
-            ReportType.Add(new SelectListItem { Text = ReportType_Summary, Value = ReportType_Summary });
-            ViewBag.ReportType = new SelectList(ReportType, "Value", "Text");
+            List<SelectListItem> ReportTypeList = new List<SelectListItem>();
+            ReportTypeList.Add(new SelectListItem { Text = ReportType_Detail, Value = ReportType_Detail });
+            ReportTypeList.Add(new SelectListItem { Text = ReportType_Summary, Value = ReportType_Summary });
+            ViewBag.ReportType = new SelectList(ReportTypeList, "Value", "Text");
 
-            List<SelectListItem> ReportFor = new List<SelectListItem>();
-            ReportFor.Add(new SelectListItem { Text = ReportFor_All, Value = ReportFor_All });
-            ReportFor.Add(new SelectListItem { Text = ReportFor_Pending, Value = ReportFor_Pending });
-            ViewBag.ReportFor = new SelectList(ReportFor, "Value", "Text");
+            List<SelectListItem> ReportForList = new List<SelectListItem>();
+            ReportForList.Add(new SelectListItem { Text = ReportFor_All, Value = ReportFor_All });
+            ReportForList.Add(new SelectListItem { Text = ReportFor_Pending, Value = ReportFor_Pending });
+            ViewBag.ReportFor = new SelectList(ReportForList, "Value", "Text");
+
+            if (FromDate != "" && FromDate != null)
+                vm.FromDate = FromDate;
+            else
+                vm.FromDate = "01/Apr/" + DateTime.Now.Date.Year.ToString();
+
+            if (ToDate != "" && ToDate != null)
+                vm.ToDate = ToDate;
+            else
+                vm.ToDate = DateTime.Now.Date.ToString("dd/MMM/yyyy");
+
+            if (StatusOnDate != "" && StatusOnDate != null)
+                vm.StatusOnDate = StatusOnDate;
+            else
+                vm.StatusOnDate = DateTime.Now.Date.ToString("dd/MMM/yyyy");
+
+            if (ReportType != "" && ReportType != null)
+                vm.ReportType = ReportType;
+            else
+                vm.ReportType = "Detail";
+
+            if (ReportFor != "" && ReportFor != null)
+                vm.ReportFor = ReportFor;
+            else
+                vm.ReportFor = "Pending";
+
+            if (Site != "" && Site != null)
+                vm.Site = Site;
+            else
+                vm.Site = SiteId.ToString();
+
+            if (Division != "" && Division != null)
+                vm.Division = Division;
+            else
+                vm.Division = DivisionId.ToString();
+
+            vm.DocTypeId = DocTypeId.ToString ();
+
+            if (TextHidden != null)
+                vm.TextHidden = TextHidden.ToString();
+            if (NextFormat != null)
+                vm.NextFormat = NextFormat.ToString();
+
+            if (Buyer != null && Buyer != "")
+                vm.Buyer = Buyer.ToString();
+            if (SaleOrderHeaderId != null && SaleOrderHeaderId != "")
+                vm.SaleOrderHeaderId = SaleOrderHeaderId.ToString();
+            if (Product != null && Product != "")
+                vm.Product = Product.ToString();
+            if (ProductCategory != null && ProductCategory != "")
+                vm.ProductCategory = ProductCategory.ToString();
+            if (ProductQuality != null && ProductQuality != "")
+                vm.ProductQuality = ProductQuality.ToString();
+            if (ProductGroup != null && ProductGroup != "")
+                vm.ProductGroup = ProductGroup.ToString();
+            if (ProductSize != null && ProductSize != "")
+                vm.ProductSize = ProductSize.ToString();
+            if (BuyerDesign != null && BuyerDesign != "")
+                vm.BuyerDesign = BuyerDesign.ToString();
 
 
-            vm.FromDate = "01/Apr/" + DateTime.Now.Date.Year.ToString();
-            vm.ToDate = DateTime.Now.Date.ToString("dd/MMM/yyyy");
-            vm.StatusOnDate = DateTime.Now.Date.ToString("dd/MMM/yyyy");
 
-            vm.ReportType = "Detail";
-			vm.ReportFor = "Pending";
-            vm.Site = SiteId.ToString();
-            vm.Division = DivisionId.ToString();
-			vm.DocTypeId = DocTypeId.ToString ();
+            //vm.Buyer = "23818";
             return View("Display_SaleOrderInventoryStatus", vm);
         }
 

@@ -355,23 +355,23 @@ namespace Jobs.Controllers
         }
 
         [HttpGet]
-        public ActionResult CreateLine(int id, int sid)
+        public ActionResult CreateLine(int id, int sid, string LineNature)
         {
-            return _Create(id, sid);
+            return _Create(id, sid, LineNature);
         }
 
         [HttpGet]
-        public ActionResult CreateLineAfter_Submit(int id, int sid)
+        public ActionResult CreateLineAfter_Submit(int id, int sid, string LineNature)
         {
-            return _Create(id, sid);
+            return _Create(id, sid, LineNature);
         }
 
         [HttpGet]
-        public ActionResult CreateLineAfter_Approve(int id, int sid)
+        public ActionResult CreateLineAfter_Approve(int id, int sid, string LineNature)
         {
-            return _Create(id, sid);
+            return _Create(id, sid, LineNature);
         }
-        public ActionResult _Create(int Id, int sid) //Id ==>Sale Order Header Id
+        public ActionResult _Create(int Id, int sid, string LineNature) //Id ==>Sale Order Header Id
         {
             SaleInvoiceReturnHeader H = new SaleInvoiceReturnHeaderService(_unitOfWork).Find(Id);
             SaleInvoiceReturnLineViewModel s = new SaleInvoiceReturnLineViewModel();
@@ -381,8 +381,21 @@ namespace Jobs.Controllers
             s.SaleInvoiceSettings = Mapper.Map<SaleInvoiceSetting, SaleInvoiceSettingsViewModel>(settings);
 
             s.DocumentTypeSettings = new DocumentTypeSettingsService(_unitOfWork).GetDocumentTypeSettingsForDocument(H.DocTypeId);
-
             s.Nature = H.Nature;
+
+            var HeaderChargeNetAmount = (from Hc in db.SaleInvoiceReturnHeaderCharge
+                                         join C in db.Charge on Hc.ChargeId equals C.ChargeId into ChargeTable
+                                         from ChargeTab in ChargeTable.DefaultIfEmpty()
+                                         where Hc.HeaderTableId == Id && ChargeTab.ChargeName == "Net Amount"
+                                         select new
+                                         {
+                                             GoodsValue = Hc.Amount
+                                         }).FirstOrDefault();
+
+            if (HeaderChargeNetAmount != null)
+            {
+                s.InvoiceGoodsValue = HeaderChargeNetAmount.GoodsValue;
+            }
 
             s.SalesTaxGroupPersonId = H.SalesTaxGroupPersonId;
             s.SaleInvoiceReturnHeaderId = H.SaleInvoiceReturnHeaderId;
@@ -391,6 +404,7 @@ namespace Jobs.Controllers
             s.DocTypeId = H.DocTypeId;
             s.DivisionId = H.DivisionId;
             s.SiteId = H.SiteId;
+            s.LineNature = LineNature;
             ViewBag.LineMode = "Create";
             //PrepareViewBag(null);
             return PartialView("_Create", s);
@@ -414,16 +428,23 @@ namespace Jobs.Controllers
 
             if (svm.SaleInvoiceReturnLineId <= 0)
             {
+                int LedgerAccountProductNatureId = 0;
+                var LedgerAccountProductNature = (from Pt in db.ProductNature where Pt.ProductNatureName == ProductNatureConstants.LedgerAccount select Pt).FirstOrDefault();
+                if (LedgerAccountProductNature != null)
+                    LedgerAccountProductNatureId = LedgerAccountProductNature.ProductNatureId;
 
+                int InvoicedProductNatureId = (from L in db.SaleInvoiceLine
+                                               where L.SaleInvoiceLineId == svm.SaleInvoiceLineId
+                                               select L.Product.ProductGroup.ProductType.ProductNatureId).FirstOrDefault();
 
                 decimal balqty = (from p in db.SaleInvoiceLine
                                   where p.SaleInvoiceLineId == svm.SaleInvoiceLineId
                                   select p.DealQty).FirstOrDefault();
-                if (balqty < svm.Qty)
+                if (balqty < svm.Qty && InvoicedProductNatureId != LedgerAccountProductNatureId)
                 {
                     ModelState.AddModelError("Qty", "Qty Exceeding Invoice Qty");
                 }
-                if (svm.Qty == 0)
+                if (svm.Qty == 0 && InvoicedProductNatureId != LedgerAccountProductNatureId)
                 {
                     ModelState.AddModelError("Qty", "Please Check Qty");
                 }
@@ -438,6 +459,7 @@ namespace Jobs.Controllers
                     SaleInvoiceReturnLine s = Mapper.Map<SaleInvoiceReturnLineViewModel, SaleInvoiceReturnLine>(svm);
                     s.Sr = _SaleInvoiceReturnLineService.GetMaxSr(s.SaleInvoiceReturnHeaderId);
                     s.DiscountPer = svm.DiscountPer;
+                    s.Percentage = svm.Percentage;
                     s.CreatedDate = DateTime.Now;
                     s.ModifiedDate = DateTime.Now;
                     s.CreatedBy = User.Identity.Name;
@@ -653,6 +675,7 @@ namespace Jobs.Controllers
                     line.Weight  = svm.Weight;
                     line.DealQty = svm.DealQty;
                     line.Amount = svm.Amount;
+                    line.Percentage = svm.Percentage;
                     line.ModifiedBy = User.Identity.Name;
                     line.ModifiedDate = DateTime.Now;
 
@@ -860,6 +883,39 @@ namespace Jobs.Controllers
 
             temp.SaleInvoiceSettings = Mapper.Map<SaleInvoiceSetting, SaleInvoiceSettingsViewModel>(settings);
             temp.DocumentTypeSettings = new DocumentTypeSettingsService(_unitOfWork).GetDocumentTypeSettingsForDocument(H.DocTypeId);
+
+
+            var LineNetAmount = (from Lc in db.SaleInvoiceReturnLineCharge
+                                 join C in db.Charge on Lc.ChargeId equals C.ChargeId into ChargeTable
+                                 from ChargeTab in ChargeTable.DefaultIfEmpty()
+                                 where Lc.LineTableId == id &&
+                                 (ChargeTab.ChargeName == "Sales Tax Taxable Amt" || ChargeTab.ChargeName == "IGST" ||
+                                 ChargeTab.ChargeName == "CGST" || ChargeTab.ChargeName == "SGST")
+                                 group new { Lc } by new { Lc.LineTableId } into Result
+                                 select new
+                                 {
+                                     LineNetAmount = Result.Sum(i => i.Lc.Amount)
+                                 }).FirstOrDefault();
+
+            var HeaderChargeNetAmount = (from Hc in db.SaleInvoiceReturnHeaderCharge
+                                         join C in db.Charge on Hc.ChargeId equals C.ChargeId into ChargeTable
+                                         from ChargeTab in ChargeTable.DefaultIfEmpty()
+                                         where Hc.HeaderTableId == H.SaleInvoiceReturnHeaderId && ChargeTab.ChargeName == "Net Amount"
+                                         select new
+                                         {
+                                             GoodsValue = Hc.Amount
+                                         }).FirstOrDefault();
+
+            if (HeaderChargeNetAmount != null && LineNetAmount != null)
+            {
+                temp.InvoiceGoodsValue = HeaderChargeNetAmount.GoodsValue - LineNetAmount.LineNetAmount;
+            }
+
+
+            if (temp.ProductNatureName == ProductNatureConstants.LedgerAccount)
+                temp.LineNature = LineNatureConstants.LedgerAccounts;
+            else
+                temp.LineNature = LineNatureConstants.Direct;
 
             if (temp == null)
             {
@@ -1125,7 +1181,24 @@ namespace Jobs.Controllers
                 JsonRequestBehavior = JsonRequestBehavior.AllowGet
             };
         }
+        public ActionResult GetSaleInvoiceForProductLedgerAccount(string searchTerm, int pageSize, int pageNum, int filter)//SaleInvoiceReturnHeaderId
+        {
+            var Query = _SaleInvoiceReturnLineService.GetSaleInvoiceHelpListForProductLedgerAccount(filter, searchTerm);
+            var temp = Query.Skip(pageSize * (pageNum - 1))
+                .Take(pageSize)
+                .ToList();
 
+            var count = Query.Count();
 
+            ComboBoxPagedResult Data = new ComboBoxPagedResult();
+            Data.Results = temp;
+            Data.Total = count;
+
+            return new JsonpResult
+            {
+                Data = Data,
+                JsonRequestBehavior = JsonRequestBehavior.AllowGet
+            };
+        }
     }
 }

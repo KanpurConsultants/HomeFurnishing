@@ -390,3 +390,4 @@ D:\Kanpur Consultants\HomeFurnishing\Source\Service\obj\Debug\Service.dll
 D:\Kanpur Consultants\HomeFurnishing\Source\Service\obj\Debug\Service.pdb
 D:\Active Projects\Web\HomeFurnishing\Source\Service\bin\Debug\Components.dll
 D:\Active Projects\Web\HomeFurnishing\Source\Service\bin\Debug\Components.pdb
+D:\Kanpur Consultants\HomeFurnishing\Source\Service\bin\Debug\Microsoft.SqlServer.Types.dll

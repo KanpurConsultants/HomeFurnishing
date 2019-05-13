@@ -230,9 +230,14 @@ namespace Service
             var SiteId = (int)System.Web.HttpContext.Current.Session["SiteId"];
 
             int AdditionalChargesProductNatureId = 0;
-            var ProductNature = (from Pt in db.ProductNature where Pt.ProductNatureName == ProductNatureConstants.AdditionalCharges select Pt).FirstOrDefault();
-            if (ProductNature != null)
-                AdditionalChargesProductNatureId = ProductNature.ProductNatureId;
+            var AdditionalChargesProductNature = (from Pt in db.ProductNature where Pt.ProductNatureName == ProductNatureConstants.AdditionalCharges select Pt).FirstOrDefault();
+            if (AdditionalChargesProductNature != null)
+                AdditionalChargesProductNatureId = AdditionalChargesProductNature.ProductNatureId;
+
+            int LedgerAccountProductNatureId = 0;
+            var LedgerAccountProductNature = (from Pt in db.ProductNature where Pt.ProductNatureName == ProductNatureConstants.LedgerAccount select Pt).FirstOrDefault();
+            if (LedgerAccountProductNature != null)
+                LedgerAccountProductNatureId = LedgerAccountProductNature.ProductNatureId;
 
             var TempSaleInvoiceHeaderCharges = from H in db.SaleInvoiceHeader
                                               join Hc in db.SaleInvoiceHeaderCharge on H.SaleInvoiceHeaderId equals Hc.HeaderTableId into SaleInvoiceHeaderChargesTable
@@ -268,7 +273,10 @@ namespace Service
             var TempProductDetail = from H in db.SaleInvoiceHeader
                                     join L in db.SaleInvoiceLine on H.SaleInvoiceHeaderId equals L.SaleInvoiceHeaderId into SaleInvoiceLineTable
                                     from SaleInvoiceLineTab in SaleInvoiceLineTable.DefaultIfEmpty()
-                                    where H.DivisionId == DivisionId && H.SiteId == SiteId && H.DocTypeId == id && SaleInvoiceLineTab.SaleDispatchLine.PackingLine.Product.ProductGroup.ProductType.ProductNatureId != AdditionalChargesProductNatureId && SaleInvoiceLineTab.Qty != 0
+                                    where H.DivisionId == DivisionId && H.SiteId == SiteId && H.DocTypeId == id 
+                                    && SaleInvoiceLineTab.SaleDispatchLine.PackingLine.Product.ProductGroup.ProductType.ProductNatureId != AdditionalChargesProductNatureId
+                                    && SaleInvoiceLineTab.SaleDispatchLine.PackingLine.Product.ProductGroup.ProductType.ProductNatureId != LedgerAccountProductNatureId
+                                    && SaleInvoiceLineTab.Qty != 0
                                     group new { SaleInvoiceLineTab } by new { SaleInvoiceLineTab.SaleInvoiceHeaderId } into Result
                                     select new
                                     {

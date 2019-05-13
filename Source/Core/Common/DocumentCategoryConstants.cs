@@ -634,6 +634,7 @@ namespace Core.Common
         public const string ForOrder = "For Order";
         public const string AdditionalCharges = "Additional Charges";
         public const string ForReceive = "For Receive";
+        public const string LedgerAccounts = "Ledger Accounts";
     }
 
 

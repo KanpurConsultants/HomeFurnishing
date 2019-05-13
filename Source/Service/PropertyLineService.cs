@@ -366,7 +366,7 @@ namespace Services.PropertyTax
             productbuyerextended.WaterTaxPercentage = svm.WaterTaxPercentage;
             productbuyerextended.WaterTaxAmount = svm.WaterTaxAmount;
             productbuyerextended.WEF = svm.WEF;
-            if (svm.WEF != null)
+            if (svm.NewWEF != null)
                 productbuyerextended.WEF = (DateTime)svm.NewWEF;
             productbuyerextended.ObjectState = Model.ObjectState.Modified;
             _ProductBuyerExtendedRepository.Update(productbuyerextended);
@@ -413,11 +413,11 @@ namespace Services.PropertyTax
             }
 
 
-            if (svm.ARV != svm.OldARV)
-            {
-                SqlParameter SqlParameterProductBuyerId = new SqlParameter("@ProductBuyerId", svm.ProductBuyerId);
-                _unitOfWork.SqlQuery<PropertyLineViewModel>("" + ConfigurationManager.AppSettings["DataBaseSchema"] + ".sp_RevisePropertyTaxDue @ProductBuyerId", SqlParameterProductBuyerId).ToList();
-            }
+            //if (svm.ARV != svm.OldARV)
+            //{
+            //    SqlParameter SqlParameterProductBuyerId = new SqlParameter("@ProductBuyerId", svm.ProductBuyerId);
+            //    _unitOfWork.SqlQuery<PropertyLineViewModel>("" + ConfigurationManager.AppSettings["DataBaseSchema"] + ".sp_RevisePropertyTaxDue @ProductBuyerId", SqlParameterProductBuyerId).ToList();
+            //}
 
 
             _logger.LogActivityDetail(LogVm.Map(new ActiivtyLogViewModel

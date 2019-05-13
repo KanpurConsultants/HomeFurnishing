@@ -54,6 +54,9 @@ namespace Model.Models
         [Display(Name = "Rate")]
         public Decimal Rate { get; set; }
 
+        [Display(Name = "Percentage")]
+        public Decimal? Percentage { get; set; }
+
         [Display(Name = "Discount %")]
         public Decimal? DiscountPer { get; set; }
         

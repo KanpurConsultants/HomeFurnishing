@@ -44,7 +44,7 @@ namespace Services.PropertyTax
         int NextPrevId(int DocId, int DocTypeId, string UserName, string PrevNextConstants);
         //byte[] GetReport(string Ids, int DocTypeId, string UserName, string SqlProc);
 
-
+        void CalculateTax(int Id, string UserName);
 
         ComboBoxPagedResult GetPersonWithDocType(string searchTerm, int pageSize, int pageNum, int DocTypeId);
         string FGetNewPersonCode(int SiteId, int GodownId, int? BinLocationId);
@@ -732,7 +732,26 @@ namespace Services.PropertyTax
             pd.ObjectState = Model.ObjectState.Modified;
             _PropertyRepository.Update(pd);
 
+            CalculateTax(Id, UserName);
 
+
+
+            _logger.LogActivityDetail(logVm.Map(new ActiivtyLogViewModel
+            {
+                DocTypeId = pd.DocTypeId,
+                DocId = pd.PersonID,
+                ActivityType = ActivityType,
+                UserRemark = UserRemark,
+                DocNo = pd.Code,
+                DocDate = pd.CreatedDate,
+                DocStatus = pd.Status ?? 0,
+            }));
+
+
+        }
+
+        public void CalculateTax(int Id, string UserName)
+        {
             PropertyHeaderViewModel vmPropertyHeader = GetPropertyHeader(Id);
 
 
@@ -755,20 +774,6 @@ namespace Services.PropertyTax
                 SqlParameter SqlParameterPersonId = new SqlParameter("@PersonId", vmPropertyHeader.PersonID);
                 _unitOfWork.SqlQuery<string>("" + ConfigurationManager.AppSettings["DataBaseSchema"] + ".sp_PropertyTaxDue     @Site, @Division,	@IsFromWEFDate,@UserName,@BusinessSessionId, @PersonId", SqlParameterSite, SqlParameterDivision, SqlParameterIsFromWEFDate, SqlParameterUserName, SqlParameterBusinessSessionId, SqlParameterPersonId).ToList();
             }
-
-
-            _logger.LogActivityDetail(logVm.Map(new ActiivtyLogViewModel
-            {
-                DocTypeId = pd.DocTypeId,
-                DocId = pd.PersonID,
-                ActivityType = ActivityType,
-                UserRemark = UserRemark,
-                DocNo = pd.Code,
-                DocDate = pd.CreatedDate,
-                DocStatus = pd.Status ?? 0,
-            }));
-
-
         }
 
         public void Review(int Id, string UserName, string UserRemark)

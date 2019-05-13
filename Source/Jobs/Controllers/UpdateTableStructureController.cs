@@ -4427,6 +4427,13 @@ CREATE INDEX [IX_DocumentTypeHeaderAttributeId]
                 RecordError(ex);
             }
 
+            AddFields("SaleInvoiceSettings", "IsVisibleLedgerAccounts", "BIT");
+            AddFields("SaleInvoiceLines", "Percentage", "DECIMAL(18,4)");
+
+            AddFields("SaleInvoiceSettings", "isVisibleInvoiceGoodsValue", "BIT");
+            AddFields("SaleInvoiceSettings", "isVisiblePercentage", "BIT");
+
+            AddFields("SaleInvoiceReturnLines", "Percentage", "DECIMAL(18,4)");
 
             ReCreateProcedures();
             DataCorrection();
@@ -4554,7 +4561,7 @@ CREATE INDEX [IX_DocumentTypeHeaderAttributeId]
         public void ExecuteQuery(string Qry)
         {
             string ConnectionString = (string)System.Web.HttpContext.Current.Session["DefaultConnectionString"];
-
+            //string ConnectionString = "Data Source=DESKTOP-IGOMECN\\SQLEXPRESS;Initial Catalog=Bhadohi;Integrated Security=False;User Id=sa; pwd=P@ssw0rd!";
             using (SqlConnection sqlConnection = new SqlConnection(ConnectionString))
             {
                 sqlConnection.Open();
@@ -4568,6 +4575,7 @@ CREATE INDEX [IX_DocumentTypeHeaderAttributeId]
         {
             object val = null;
             string ConnectionString = (string)System.Web.HttpContext.Current.Session["DefaultConnectionString"];
+            //string ConnectionString = "Data Source=DESKTOP-IGOMECN\\SQLEXPRESS;Initial Catalog=Bhadohi;Integrated Security=False;User Id=sa; pwd=P@ssw0rd!";
 
             using (SqlConnection sqlConnection = new SqlConnection(ConnectionString))
             {

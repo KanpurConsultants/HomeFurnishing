@@ -480,24 +480,24 @@ namespace Jobs.Controllers
         }
 
         [HttpGet]
-        public ActionResult CreateLine(int id, bool? IsSaleBased)
+        public ActionResult CreateLine(int id, bool? IsSaleBased, string LineNature)
         {
-            return _Create(id, IsSaleBased);
+            return _Create(id, IsSaleBased, LineNature);
         }
 
         [HttpGet]
-        public ActionResult CreateLineAfter_Submit(int id, bool? IsSaleBased)
+        public ActionResult CreateLineAfter_Submit(int id, bool? IsSaleBased, string LineNature)
         {
-            return _Create(id, IsSaleBased);
+            return _Create(id, IsSaleBased, LineNature);
         }
 
         [HttpGet]
-        public ActionResult CreateLineAfter_Approve(int id, bool? IsSaleBased)
+        public ActionResult CreateLineAfter_Approve(int id, bool? IsSaleBased, string LineNature)
         {
-            return _Create(id, IsSaleBased);
+            return _Create(id, IsSaleBased, LineNature);
         }
 
-        public ActionResult _Create(int Id, bool? IsSaleBased) //Id ==>Sale Order Header Id
+        public ActionResult _Create(int Id, bool? IsSaleBased, string LineNature) //Id ==>Sale Order Header Id
         {
             SaleInvoiceHeader H = new SaleInvoiceHeaderService(_unitOfWork).FindDirectSaleInvoice(Id);
             DirectSaleInvoiceLineViewModel s = new DirectSaleInvoiceLineViewModel();
@@ -517,6 +517,27 @@ namespace Jobs.Controllers
             s.DocDate = H.DocDate;
             s.SalesTaxGroupPersonId = H.SalesTaxGroupPersonId;
 
+            //s.InvoiceGoodsValue = (from L in db.SaleInvoiceLine
+            //                       where L.SaleInvoiceHeaderId == Id
+            //                       group new { L } by new { L.SaleInvoiceHeaderId } into Result
+            //                       select new
+            //                       {
+            //                           GoodsValue = Result.Sum(i => i.L.Amount)
+            //                       }).FirstOrDefault().GoodsValue;
+
+
+            var HeaderChargeNetAmount = (from Hc in db.SaleInvoiceHeaderCharge
+                                   join C in db.Charge on Hc.ChargeId equals C.ChargeId into ChargeTable from ChargeTab in ChargeTable.DefaultIfEmpty()
+                                   where Hc.HeaderTableId == Id && ChargeTab.ChargeName == "Net Amount"
+                                   select new
+                                   {
+                                       GoodsValue = Hc.Amount
+                                   }).FirstOrDefault();
+
+            if (HeaderChargeNetAmount != null)
+            {
+                s.InvoiceGoodsValue = HeaderChargeNetAmount.GoodsValue;
+            }
 
             var LastInvoiceLine = (from L in db.SaleInvoiceLine
                                    join D in db.SaleDispatchLine on L.SaleDispatchLineId equals D.SaleDispatchLineId into SaleDispatchLineTable
@@ -577,8 +598,8 @@ namespace Jobs.Controllers
 
                 }
             }
-            
 
+            s.LineNature = LineNature;
             ViewBag.LineMode = "Create";
             PrepareViewBag();
             if (IsSaleBased == true)
@@ -619,13 +640,19 @@ namespace Jobs.Controllers
                 ModelState.AddModelError("", "Sale Order field is required");
             }
 
-            if (svm.Qty <= 0 && svm.Amount == 0)
+            if (svm.Qty <= 0 && svm.Amount == 0 && svm.LineNature != LineNatureConstants.LedgerAccounts)
                 ModelState.AddModelError("", "The Qty field is required");
 
-            if (svm.GodownId <= 0)
+            if (svm.GodownId <= 0 && svm.LineNature != LineNatureConstants.LedgerAccounts)
                 ModelState.AddModelError("", "The Godown field is required");
 
-            
+            //if (svm.LineNature == LineNatureConstants.LedgerAccounts && svm.Qty == 0)
+            //    svm.Qty = 1;
+
+            //if (svm.LineNature == LineNatureConstants.LedgerAccounts && svm.DealQty == 0)
+            //    svm.DealQty = 1;
+
+
             #region "Tax Calculation Validation"
             //SiteDivisionSettings SiteDivisionSettings = new SiteDivisionSettingsService(_unitOfWork).GetSiteDivisionSettings(Sh.SiteId, Sh.DivisionId, Sh.DocDate);
             //if (SiteDivisionSettings != null)
@@ -1216,6 +1243,32 @@ namespace Jobs.Controllers
                     vm.AdditionalInfo = "Invoice is cancelled.";
             }
 
+            var LineNetAmount = (from Lc in db.SaleInvoiceLineCharge
+                                         join C in db.Charge on Lc.ChargeId equals C.ChargeId into ChargeTable
+                                         from ChargeTab in ChargeTable.DefaultIfEmpty()
+                                         where Lc.LineTableId == id &&
+                                         (ChargeTab.ChargeName == "Sales Tax Taxable Amt" || ChargeTab.ChargeName == "IGST" ||
+                                         ChargeTab.ChargeName == "CGST" || ChargeTab.ChargeName == "SGST")
+                                         group new { Lc } by new { Lc.LineTableId } into Result
+                                         select new
+                                         {
+                                             LineNetAmount = Result.Sum(i => i.Lc.Amount )
+                                         }).FirstOrDefault();
+
+            var HeaderChargeNetAmount = (from Hc in db.SaleInvoiceHeaderCharge
+                                         join C in db.Charge on Hc.ChargeId equals C.ChargeId into ChargeTable
+                                         from ChargeTab in ChargeTable.DefaultIfEmpty()
+                                         where Hc.HeaderTableId == H.SaleInvoiceHeaderId && ChargeTab.ChargeName == "Net Amount"
+                                         select new
+                                         {
+                                             GoodsValue = Hc.Amount
+                                         }).FirstOrDefault();
+
+            if (HeaderChargeNetAmount != null && LineNetAmount != null)
+            {
+                vm.InvoiceGoodsValue = HeaderChargeNetAmount.GoodsValue - LineNetAmount.LineNetAmount;
+            }
+
             if (temp.SaleOrderLineId.HasValue && temp.SaleOrderLineId.Value > 0)
             {
                 vm.IsSaleBased = true;
@@ -1224,6 +1277,13 @@ namespace Jobs.Controllers
             }
             else
             {
+                if (vm.ProductNatureName == ProductNatureConstants.LedgerAccount)
+                    vm.LineNature = LineNatureConstants.LedgerAccounts;
+                else
+                    vm.LineNature = LineNatureConstants.Direct;
+
+
+
                 vm.SaleToBuyerId = H.SaleToBuyerId;
                 vm.DocDate = H.DocDate;
                 vm.IsSaleBased = false;
@@ -1870,5 +1930,6 @@ namespace Jobs.Controllers
 
             return Json(ProductUidJson);
         }
+
     }
 }

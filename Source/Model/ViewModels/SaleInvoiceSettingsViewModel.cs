@@ -29,6 +29,7 @@ namespace Model.ViewModel
         public bool isVisibleRewardPoints { get; set; }
         public bool isVisibleTermsAndConditions { get; set; }
         public bool isVisiblePacking { get; set; }
+        public bool IsVisibleLedgerAccounts { get; set; }
 
         public bool isVisibleLotNo { get; set; }
         public bool CalculateDiscountOnRate { get; set; }
@@ -69,6 +70,9 @@ namespace Model.ViewModel
         public bool isVisiblePromoCode { get; set; }
         public bool isVisibleForSaleOrder { get; set; }
         public bool isVisibleWeight { get; set; }
+
+        public bool isVisibleInvoiceGoodsValue { get; set; }
+        public bool isVisiblePercentage { get; set; }
 
         public bool isVisibleFinancier { get; set; }
         public bool isVisibleSalesExecutive { get; set; }

@@ -39,6 +39,7 @@ namespace Service
 
         IQueryable<ComboBoxResult> GetCustomProducts(int Id, string term);
         IEnumerable<ComboBoxResult> GetSaleInvoiceHelpListForProduct(int Id, string term);
+        IEnumerable<ComboBoxResult> GetSaleInvoiceHelpListForProductLedgerAccount(int Id, string term);
     }
 
     public class SaleInvoiceReturnLineService : ISaleInvoiceReturnLineService
@@ -285,8 +286,10 @@ namespace Service
                         LotNo = t4.LotNo,
                         DiscountPer = p.DiscountPer,
                         DiscountAmount = p.DiscountAmount,
+                        Percentage = p.Percentage,
                         SalesTaxGroupPersonId = p.SaleInvoiceReturnHeader.SalesTaxGroupPersonId,
-                        SalesTaxGroupProductId = p.SalesTaxGroupProductId
+                        SalesTaxGroupProductId = p.SalesTaxGroupProductId,
+                        ProductNatureName = tab.Product.ProductGroup.ProductType.ProductNature.ProductNatureName
                     }).FirstOrDefault();
         }
 
@@ -523,11 +526,68 @@ namespace Service
             int CurrentSiteId = (int)System.Web.HttpContext.Current.Session["SiteId"];
             int CurrentDivisionId = (int)System.Web.HttpContext.Current.Session["DivisionId"];
 
+            int LedgerAccountProductNatureId = 0;
+            var LedgerAccountProductNature = (from Pt in db.ProductNature where Pt.ProductNatureName == ProductNatureConstants.LedgerAccount select Pt).FirstOrDefault();
+            if (LedgerAccountProductNature != null)
+                LedgerAccountProductNatureId = LedgerAccountProductNature.ProductNatureId;
+
 
             return (from VSib in db.ViewSaleInvoiceBalance
                     join L in db.SaleInvoiceLine on VSib.SaleInvoiceLineId equals L.SaleInvoiceLineId into SaleInvoiceLineTable
                     from SaleInvoiceLineTab in SaleInvoiceLineTable.DefaultIfEmpty()
-                    where VSib.BalanceQty > 0 && SaleInvoiceLineTab.SaleInvoiceHeader.SaleToBuyerId == SaleInvoiceReturnHeader.BuyerId
+                    where SaleInvoiceLineTab.Product.ProductGroup.ProductType.ProductNatureId != LedgerAccountProductNatureId
+                    && (VSib.BalanceQty > 0 || SaleInvoiceLineTab.Product.ProductGroup.ProductType.ProductNatureId == LedgerAccountProductNatureId) && SaleInvoiceLineTab.SaleInvoiceHeader.SaleToBuyerId == SaleInvoiceReturnHeader.BuyerId
+                    && (string.IsNullOrEmpty(settings.filterContraSites) ? VSib.SiteId == CurrentSiteId : contraSites.Contains(VSib.SiteId.ToString()))
+                    && (string.IsNullOrEmpty(settings.filterContraDivisions) ? VSib.DivisionId == CurrentDivisionId : contraDivisions.Contains(VSib.DivisionId.ToString()))
+                    && (string.IsNullOrEmpty(term) ? 1 == 1 : SaleInvoiceLineTab.SaleInvoiceHeader.DocNo.ToLower().Contains(term.ToLower())
+                        || string.IsNullOrEmpty(term) ? 1 == 1 : SaleInvoiceLineTab.SaleInvoiceHeader.DocType.DocumentTypeShortName.ToLower().Contains(term.ToLower())
+                        || string.IsNullOrEmpty(term) ? 1 == 1 : SaleInvoiceLineTab.Product.ProductName.ToLower().Contains(term.ToLower())
+                        || string.IsNullOrEmpty(term) ? 1 == 1 : SaleInvoiceLineTab.Dimension1.Dimension1Name.ToLower().Contains(term.ToLower())
+                        || string.IsNullOrEmpty(term) ? 1 == 1 : SaleInvoiceLineTab.Dimension2.Dimension2Name.ToLower().Contains(term.ToLower())
+                        || string.IsNullOrEmpty(term) ? 1 == 1 : SaleInvoiceLineTab.Dimension3.Dimension3Name.ToLower().Contains(term.ToLower())
+                        || string.IsNullOrEmpty(term) ? 1 == 1 : SaleInvoiceLineTab.Dimension4.Dimension4Name.ToLower().Contains(term.ToLower())
+                        )
+                    select new ComboBoxResult
+                    {
+                        id = VSib.SaleInvoiceLineId.ToString(),
+                        text = SaleInvoiceLineTab.SaleInvoiceHeader.DocType.DocumentTypeShortName + "-" + SaleInvoiceLineTab.SaleInvoiceHeader.DocNo,
+                        TextProp1 = "Balance :" + VSib.BalanceQty,
+                        TextProp2 = "Date :" + SaleInvoiceLineTab.SaleInvoiceHeader.DocDate,
+                        AProp1 = SaleInvoiceLineTab.Product.ProductName,
+                        AProp2 = ((SaleInvoiceLineTab.Dimension1.Dimension1Name == null) ? "" : SaleInvoiceLineTab.Dimension1.Dimension1Name) +
+                                    ((SaleInvoiceLineTab.Dimension2.Dimension2Name == null) ? "" : "," + SaleInvoiceLineTab.Dimension2.Dimension2Name) +
+                                    ((SaleInvoiceLineTab.Dimension3.Dimension3Name == null) ? "" : "," + SaleInvoiceLineTab.Dimension3.Dimension3Name) +
+                                    ((SaleInvoiceLineTab.Dimension4.Dimension4Name == null) ? "" : "," + SaleInvoiceLineTab.Dimension4.Dimension4Name)
+                    });
+        }
+        public IEnumerable<ComboBoxResult> GetSaleInvoiceHelpListForProductLedgerAccount(int Id, string term)
+        {
+            var SaleInvoiceReturnHeader = new SaleInvoiceReturnHeaderService(_unitOfWork).Find(Id);
+
+            var settings = new SaleInvoiceSettingService(_unitOfWork).GetSaleInvoiceSettingForDocument(SaleInvoiceReturnHeader.DocTypeId, SaleInvoiceReturnHeader.DivisionId, SaleInvoiceReturnHeader.SiteId);
+
+            string[] contraSites = null;
+            if (!string.IsNullOrEmpty(settings.filterContraSites)) { contraSites = settings.filterContraSites.Split(",".ToCharArray()); }
+            else { contraSites = new string[] { "NA" }; }
+
+            string[] contraDivisions = null;
+            if (!string.IsNullOrEmpty(settings.filterContraDivisions)) { contraDivisions = settings.filterContraDivisions.Split(",".ToCharArray()); }
+            else { contraDivisions = new string[] { "NA" }; }
+
+            int CurrentSiteId = (int)System.Web.HttpContext.Current.Session["SiteId"];
+            int CurrentDivisionId = (int)System.Web.HttpContext.Current.Session["DivisionId"];
+
+            int LedgerAccountProductNatureId = 0;
+            var LedgerAccountProductNature = (from Pt in db.ProductNature where Pt.ProductNatureName == ProductNatureConstants.LedgerAccount select Pt).FirstOrDefault();
+            if (LedgerAccountProductNature != null)
+                LedgerAccountProductNatureId = LedgerAccountProductNature.ProductNatureId;
+
+
+            return (from VSib in db.ViewSaleInvoiceBalance
+                    join L in db.SaleInvoiceLine on VSib.SaleInvoiceLineId equals L.SaleInvoiceLineId into SaleInvoiceLineTable
+                    from SaleInvoiceLineTab in SaleInvoiceLineTable.DefaultIfEmpty()
+                    where SaleInvoiceLineTab.Product.ProductGroup.ProductType.ProductNatureId == LedgerAccountProductNatureId 
+                    && (VSib.BalanceQty > 0 || SaleInvoiceLineTab.Product.ProductGroup.ProductType.ProductNatureId == LedgerAccountProductNatureId) && SaleInvoiceLineTab.SaleInvoiceHeader.SaleToBuyerId == SaleInvoiceReturnHeader.BuyerId
                     && (string.IsNullOrEmpty(settings.filterContraSites) ? VSib.SiteId == CurrentSiteId : contraSites.Contains(VSib.SiteId.ToString()))
                     && (string.IsNullOrEmpty(settings.filterContraDivisions) ? VSib.DivisionId == CurrentDivisionId : contraDivisions.Contains(VSib.DivisionId.ToString()))
                     && (string.IsNullOrEmpty(term) ? 1 == 1 : SaleInvoiceLineTab.SaleInvoiceHeader.DocNo.ToLower().Contains(term.ToLower())

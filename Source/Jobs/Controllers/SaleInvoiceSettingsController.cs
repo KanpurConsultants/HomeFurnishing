@@ -166,6 +166,7 @@ namespace Jobs.Controllers
                     temp.isVisibleDimension2 = pt.isVisibleDimension2;
                     temp.isVisibleDimension3 = pt.isVisibleDimension3;
                     temp.isVisibleDimension4 = pt.isVisibleDimension4;
+                    temp.IsVisibleLedgerAccounts = pt.IsVisibleLedgerAccounts;
                     temp.DocTypeDispatchReturnId = pt.DocTypeDispatchReturnId;
                     temp.isVisibleLotNo = pt.isVisibleLotNo;
                     temp.SqlProcDocumentPrint = pt.SqlProcDocumentPrint;
@@ -199,6 +200,9 @@ namespace Jobs.Controllers
                     temp.isVisibleTermsAndConditions = pt.isVisibleTermsAndConditions;
                     temp.isVisibleShipToPartyAddress = pt.isVisibleShipToPartyAddress;
                     temp.isVisibleGodown = pt.isVisibleGodown;
+
+                    temp.isVisibleInvoiceGoodsValue = pt.isVisibleInvoiceGoodsValue;
+                    temp.isVisiblePercentage = pt.isVisiblePercentage;
 
                     temp.isVisibleProductUid_Index = pt.isVisibleProductUid_Index;
                     temp.isVisibleProduct_Index = pt.isVisibleProduct_Index;
@@ -389,6 +393,10 @@ namespace Jobs.Controllers
                     temp.isVisibleTermsAndConditions = pt.isVisibleTermsAndConditions;
                     temp.isVisibleShipToPartyAddress = pt.isVisibleShipToPartyAddress;
                     temp.isVisibleGodown = pt.isVisibleGodown;
+                    temp.IsVisibleLedgerAccounts = pt.IsVisibleLedgerAccounts;
+
+                    temp.isVisibleInvoiceGoodsValue = pt.isVisibleInvoiceGoodsValue;
+                    temp.isVisiblePercentage = pt.isVisiblePercentage;
 
                     temp.isVisibleProductUid_Index = pt.isVisibleProductUid_Index;
                     temp.isVisibleProduct_Index = pt.isVisibleProduct_Index;

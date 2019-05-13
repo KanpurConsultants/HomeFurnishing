@@ -299,3 +299,4 @@ D:\Kanpur Consultants\HomeFurnishing\Source\Mail\obj\Debug\EmailContents.csprojR
 D:\Kanpur Consultants\HomeFurnishing\Source\Mail\obj\Debug\EMailContents.dll
 D:\Kanpur Consultants\HomeFurnishing\Source\Mail\obj\Debug\EMailContents.pdb
 D:\Active Projects\Web\HomeFurnishing\Source\Mail\bin\Debug\Components.pdb
+D:\Kanpur Consultants\HomeFurnishing\Source\Mail\bin\Debug\Microsoft.SqlServer.Types.dll

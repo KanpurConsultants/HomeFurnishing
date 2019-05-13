@@ -1,0 +1,296 @@
+﻿@model Model.ViewModels.CostingLineViewModel
+@using Core.Common
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Products-(@ViewBag.DocNo)</span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("_CreatePost", "CostingLine", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        {
+            @Html.ValidationLog((string)TempData["CSEXCL"])
+            @Html.AntiForgeryToken()
+
+            @Html.HiddenFor(model => model.CostingHeaderId)
+            @Html.HiddenFor(m => m.CostingLineId)
+
+            <div class="form-horizontal modal-body">
+
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="row">
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ProductId, (Model.DocumentTypeSettings.ProductCaption ?? "Product"), new { @class = "control-label col-md-4 col-sm-2 " })
+                            @Html.HiddenFor(m => m.DocumentTypeSettings.ProductCaption)
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.ProductId, new { @class = "form-control col-xs-7" })
+                                @Html.ValidationMessageFor(model => model.ProductId, "", new { @class = "text-danger" })
+                                <span id="status" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>  
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ProductGroupId, (Model.DocumentTypeSettings.ProductGroupCaption ?? "Product Group"), new { @class = "control-label col-md-4 col-sm-2 " })
+                            @Html.HiddenFor(m => m.DocumentTypeSettings.ProductGroupCaption)
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.ProductGroupId, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.ProductGroupId, "", new { @class = "text-danger" })
+                                <span id="status" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>                    
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ColourId, "Colour", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.ColourId, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.ColourId, "", new { @class = "text-danger" })
+                                <span id="status" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.SizeId, "Size", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.SizeId, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.SizeId, "", new { @class = "text-danger" })
+                                <span id="status" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                  </div>
+
+
+
+
+    
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Qty, "Pcs", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(model => model.Qty, new { @class = "form-control col-xs-7 required" })
+                                        @Html.ValidationMessageFor(model => model.Qty, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.PileWeight, "Pile Weight", new { @class = "control-label col-md-4 col-sm-2" })
+                                <div class="col-md-7 col-sm-10">
+                                    @Html.TextBoxFor(model => model.PileWeight, new { @class = "form-control col-xs-7 required" })
+                                    @Html.ValidationMessageFor(model => model.PileWeight, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.Remark, "Remark", new { @class = "control-label col-md-4 col-sm-2" })
+                                <div class="col-md-7 col-sm-10">
+                                    @Html.TextAreaFor(model => model.Remark, new { @class = "form-control col-xs-7 required" })
+                                    @Html.ValidationMessageFor(model => model.Remark, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                        @if (ViewBag.LineMode == "Edit" || ViewBag.LineMode == "Create")
+                        { <button class="btn custom left" name="Command:Edit" type="submit" id="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-floppy-disk black"></span> </h2></button>
+                        }
+                        @if (ViewBag.LineMode == "Delete")
+                        {
+                            <button class="btn custom" name="Command:Delete" id="delete" type="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-trash black"></span> </h2></button>
+                        }
+
+                    </div>
+
+                </div>
+
+        }
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    
+    $(document).ready(function () {
+        var DocID = $('#CostingHeaderId').val();
+        CustomSelectFunction($("#ProductId"), '/CostingLine/GetCustomProductGroups', '/ComboHelpList/SetSingleProductGroup', ' ', false, 0,DocID);
+        CustomSelectFunction($("#ProductGroupId"), '/ComboHelpList/GetProductGroup', '/ComboHelpList/SetSingleProductGroup', ' ', false, 0);
+        CustomSelectFunction($("#SizeId"), '/ComboHelpList/GetSize', '/ComboHelpList/SetSingleSize', ' ', false, 0);
+        CustomSelectFunction($("#ColourId"), '/ComboHelpList/GetColours', '/ComboHelpList/SetSingleColour', ' ', false, 0);
+
+        $("#ProductId").select2("focus");
+
+        $('.datepicker').datepicker({
+            format: 'dd/MM/yyyy',
+            "setDate": new Date(),
+            "autoclose": true
+
+        })
+
+        var id=@Model.CostingLineId;
+        $('#delete','.modal-content').click(function (e) {
+            if(id>0)
+            {
+                var url = '/CostingLine/DeletePost';
+                $('form#modform').attr('action',url);
+                return;
+            }
+            else
+            {
+                return false;
+            }
+        })
+
+
+
+        var IsSaved=false;
+        var ValidationCount=0;
+
+        $('#modform').bind('submit',function(){
+            if(!IsSaved)
+            {
+                IsSaved=true;
+                $('button:submit').attr('disabled','disabled');
+            }
+            else
+            {
+                return false;
+            }
+        });
+    });
+
+</script>
+
+<script type="text/javascript">
+    $(function () {
+
+        $("#ProductId").change(GetProductDetail);
+    
+        function GetProductDetail() {
+            //alert("#ProductGroupId".val());
+            var ProcessProgress = $("#Product detail loading progress");
+            ProcessProgress.show();
+            if ($("#ProductId").val() != 0 && $("#ProductId").val() != null) {
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.Action("GetProductDetailJson"))",
+                    data: { ProductId: $("#ProductId").val() },
+                    success: function (data) 
+                    {
+                        $("#ProductGroupId").select2('data', { id: data.ProductGroupId, text: data.ProductGroupName});
+                        $("#ColourId").select2('data', { id: data.ColourId, text: data.ColourName});
+                        $("#SizeId").select2('data', { id: data.SizeId, text: data.SizeName});
+                        $("#PileWeight").val(data.PileWeight);
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to retrieve product details.' + thrownError);
+                        ProcessProgress.hide();
+                    }
+                });
+            }
+
+        }
+
+        function CheckForValidation() {
+            if ($("#ProductId").val() != 0 && $("#ProductId").val() != null) {
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.Action("CheckForValidation"))",
+                    data: { ProductId: $("#ProductId").val(), CostingHeaderId: $("#CostingHeaderId").val() },
+                    success: function (data) {
+                        var status = data;
+                        if (data.returnvalue)
+                            $("#status").text("Product already exists");
+                        else
+                            $("#status").text(" ");
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to Check Validation.' + thrownError);
+                    }
+                });
+            }
+
+        }
+
+
+        function CheckForValidationInEdit() {
+            if ($("#ProductId").val() != 0 && $("#ProductId").val() != null) {
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.Action("CheckForValidationinEdit"))",
+                    data: { ProductId: $("#ProductId").val(), CostingHeaderId: $("#CostingHeaderId").val(), CostingLineId: $("#CostingLineId").val() },
+                    success: function (data) {
+                        var status = data;
+                        if (data.returnvalue)
+                            $("#status").text("Product already exists");
+                        else
+                            $("#status").text(" ");
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to Check Validation.' + thrownError);
+                    }
+                });
+            }
+        }
+
+        function GetUnitConversionMultiplier() {
+            if ($("#UnitId").val() == $("#DealUnitId").val()) {
+                $("#UnitConversionMultiplier").val(1);
+                Calculation.call();
+            }
+            else {
+                var ProcessProgress = $("#Unit conversion detail loading progress");
+                ProcessProgress.show();
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.Action("GetUnitConversionDetailJson"))",
+                    data: { ProductId: $("#ProductId").val(), UnitId: $("#UnitId").val(), DeliveryUnitId: $("#DealUnitId").val(),HeaderId: $("#CostingHeaderId").val()},
+
+                    success: function (data) {
+                        $("#UnitConversionMultiplier").val(data[0].Value);
+                        Calculation.call();
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to retrieve Unit conversion details.' + thrownError);
+                        ProcessProgress.hide();
+                    }
+                });
+            }
+        }
+
+
+        function Calculation() {
+            if ($('#UnitConversionMultiplier').val() != 0) {
+                $('#DealQty').val($('#Qty').val() * $('#UnitConversionMultiplier').val())
+            }
+            $('#Amount').val(($('#DealQty').val() * $('#Rate').val()).toFixed(2));
+        }
+
+
+
+    });
+</script>

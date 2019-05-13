@@ -307,6 +307,31 @@ namespace Service
                     ChargeTypeId_SalesTaxTaxableAmount = ChargeType_SalesTaxTaxableAmount.ChargeTypeId;
             }
 
+
+            var temp =  from p in db.CalculationProduct
+                    join t in db.CalculationLineLedgerAccount.Where(m => m.DocTypeId == DocumentTypeId && m.SiteId == SiteId && m.DivisionId == DivisionId) on p.CalculationProductId equals t.CalculationProductId into CalculationLineLedgerAccountTable
+                    from CalculationLineLedgerAccountTab in CalculationLineLedgerAccountTable.DefaultIfEmpty()
+                    join Cgs in ChargeGroupSettings on p.ChargeTypeId equals Cgs.ChargeTypeId into ChargeGroupSettingsTable
+                    from ChargeGroupSettingsTab in ChargeGroupSettingsTable.DefaultIfEmpty()
+                    where p.CalculationId == CalculationID
+                    orderby p.Sr
+                    select new CalculationProductViewModel
+                    {
+                        ChargeId = p.ChargeId,
+                        LedgerAccountCrId = (CalculationLineLedgerAccountTab.LedgerAccountCrId == ChargeLedgerAccountId
+                                ? (p.ChargeTypeId == ChargeTypeId_SalesTaxTaxableAmount
+                                        ? (ProductLedgerAccountId ?? ChargeGroupSettingsTab.ChargeLedgerAccountId)
+                                        : ChargeGroupSettingsTab.ChargeLedgerAccountId)
+                                : CalculationLineLedgerAccountTab.LedgerAccountCrId),
+                        LedgerAccountDrId = (CalculationLineLedgerAccountTab.LedgerAccountDrId == ChargeLedgerAccountId
+                                ? (p.ChargeTypeId == ChargeTypeId_SalesTaxTaxableAmount
+                                        ? (ProductLedgerAccountId ?? ChargeGroupSettingsTab.ChargeLedgerAccountId)
+                                        : ChargeGroupSettingsTab.ChargeLedgerAccountId)
+                                : CalculationLineLedgerAccountTab.LedgerAccountDrId),
+                        Rate = (Decimal?)ChargeGroupSettingsTab.ChargePer ?? 0,
+                        ChargeTypeId = ChargeGroupSettingsTab.ChargeTypeId
+                    };
+
             return (from p in db.CalculationProduct
                     join t in db.CalculationLineLedgerAccount.Where(m => m.DocTypeId == DocumentTypeId && m.SiteId == SiteId && m.DivisionId == DivisionId) on p.CalculationProductId equals t.CalculationProductId into CalculationLineLedgerAccountTable
                     from CalculationLineLedgerAccountTab in CalculationLineLedgerAccountTable.DefaultIfEmpty()

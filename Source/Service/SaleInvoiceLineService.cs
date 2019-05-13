@@ -584,7 +584,9 @@ namespace Service
                         Weight = p.Weight,
                         FreeQty = Pl.FreeQty,
                         RewardPoints = SaleInvoiceLineDetailTab.RewardPoints,
-                        SalesTaxGroupProductId = p.SalesTaxGroupProductId
+                        SalesTaxGroupProductId = p.SalesTaxGroupProductId,
+                        ProductNatureName = p.Product.ProductGroup.ProductType.ProductNature.ProductNatureName,
+                        Percentage = p.Percentage
                     }).FirstOrDefault();
 
         }
@@ -732,6 +734,7 @@ namespace Service
                         SaleInvoiceLineId = p.SaleInvoiceLineId,
                         Qty = b.BalanceQty,
                         Rate = p.Rate,
+                        Percentage = p.Percentage,
                         Remark = p.Remark,
                         UnitConversionMultiplier = p.UnitConversionMultiplier,
                         DealUnitId = p.DealUnitId,

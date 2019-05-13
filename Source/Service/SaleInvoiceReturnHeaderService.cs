@@ -315,7 +315,7 @@ namespace Service
                                                 join L in db.SaleInvoiceReturnLine on H.SaleInvoiceReturnHeaderId equals L.SaleInvoiceReturnHeaderId into SaleInvoiceReturnLineTable
                                                 from SaleInvoiceReturnLineTab in SaleInvoiceReturnLineTable.DefaultIfEmpty()
                                                 join P in db.Persons on H.BuyerId equals P.PersonID into PersonTable from PersonTab in PersonTable.DefaultIfEmpty()
-                                                where H.SaleInvoiceReturnHeaderId == SaleInvoiceReturnHeaderId
+                                                where H.SaleInvoiceReturnHeaderId == SaleInvoiceReturnHeaderId && SaleInvoiceReturnLineTab.Qty > 0
                                                 select new
                                                 {
                                                     DocTypeId = H.DocTypeId,

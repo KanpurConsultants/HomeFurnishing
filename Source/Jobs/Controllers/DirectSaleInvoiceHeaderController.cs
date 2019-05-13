@@ -413,6 +413,11 @@ namespace Jobs.Controllers
                     _SaleDispatchHeaderService.Create(saledispatchheader);
 
 
+
+                    var SaleToPartySalesTax = (from H in db.PersonRegistration where H.PersonId == saleinvoiceheaderdetail.SaleToBuyerId && H.RegistrationType == "Gst No" select H).FirstOrDefault();
+                    if (SaleToPartySalesTax != null)
+                        saleinvoiceheaderdetail.SaleToPartySalesTaxNo = SaleToPartySalesTax.RegistrationNo;
+
                     saleinvoiceheaderdetail.SaleDispatchHeaderId = saledispatchheader.SaleDispatchHeaderId;
                     saleinvoiceheaderdetail.CreatedDate = DateTime.Now;
                     saleinvoiceheaderdetail.ModifiedDate = DateTime.Now;
@@ -507,6 +512,11 @@ namespace Jobs.Controllers
                         saledispatchheader.Status = (int)StatusConstants.Modified;
                         packingHeader.Status = (int)StatusConstants.Modified;
                     }
+
+
+                    var SaleToPartySalesTax = (from H in db.PersonRegistration where H.PersonId == saleinvoiceheaderdetail.SaleToBuyerId && H.RegistrationType == "Gst No" select H).FirstOrDefault();
+                    if (SaleToPartySalesTax != null)
+                        saleinvoiceheaderdetail.SaleToPartySalesTaxNo = SaleToPartySalesTax.RegistrationNo;
 
 
                     saleinvoiceheaderdetail.BillToBuyerId = vm.BillToBuyerId;
@@ -2503,7 +2513,16 @@ EXEC(@Qry);	";
             var DispatchLine = new SaleDispatchLineService(_unitOfWork).GetSaleDispatchLineList(SaleDispatchHeader.SaleDispatchHeaderId);
 
 
-            List<LineChargeRates> LineChargeRates = new List<LineChargeRates>();
+            Decimal InvoiceNetAmount = 0;
+            var InvoiceNetAmountLine = (from Hc in db.SaleInvoiceHeaderCharge
+                                        where Hc.HeaderTableId == svm.SaleInvoiceHeaderId
+                                        && Hc.Charge.ChargeName == "Net Amount"
+                                        select Hc.Amount).FirstOrDefault();
+            if (InvoiceNetAmountLine != null)
+                InvoiceNetAmount = InvoiceNetAmountLine.Value;
+
+
+            List < LineChargeRates > LineChargeRates = new List<LineChargeRates>();
 
             var SaleInvoiceSettings = new SaleInvoiceSettingService(_unitOfWork).GetSaleInvoiceSettingForDocument(SaleInvoiceHeader.DocTypeId, SaleInvoiceHeader.DivisionId, SaleInvoiceHeader.SiteId);
             int InvoiceRetHeaderDocTypeId = 0;
@@ -2522,6 +2541,11 @@ EXEC(@Qry);	";
 
             if (ModelState.IsValid)
             {
+                int LedgerAccountProductNatureId = 0;
+                var LedgerAccountProductNature = (from Pt in db.ProductNature where Pt.ProductNatureName == ProductNatureConstants.LedgerAccount select Pt).FirstOrDefault();
+                if (LedgerAccountProductNature != null)
+                    LedgerAccountProductNatureId = LedgerAccountProductNature.ProductNatureId;
+
                 var SaleInvoiceLineList = (from p in db.ViewSaleInvoiceBalance
                                            join l in db.SaleInvoiceLine on p.SaleInvoiceLineId equals l.SaleInvoiceLineId into linetable
                                            from linetab in linetable.DefaultIfEmpty()
@@ -2530,12 +2554,12 @@ EXEC(@Qry);	";
                                            join t1 in db.SaleDispatchLine on p.SaleDispatchLineId equals t1.SaleDispatchLineId into table1
                                            from tab1 in table1.DefaultIfEmpty()
                                            join packtab in db.PackingLine on tab1.PackingLineId equals packtab.PackingLineId
-                                           join product in db.Product on p.ProductId equals product.ProductId into table2
-                                           from tab2 in table2.DefaultIfEmpty()
+                                           join product in db.Product on p.ProductId equals product.ProductId into ProductTable
+                                           from ProductTab in ProductTable.DefaultIfEmpty()
                                            join B in db.BusinessEntity on tab.SaleToBuyerId equals B.PersonID into BusinessEntityTable
                                            from BusinessEntityTab in BusinessEntityTable.DefaultIfEmpty()
                                            where p.SaleInvoiceHeaderId == SaleInvoiceHeader.SaleInvoiceHeaderId
-                                           && p.BalanceQty > 0
+                                           && (p.BalanceQty > 0 || ProductTab.ProductGroup.ProductType.ProductNatureId == LedgerAccountProductNatureId)
                                            select new SaleInvoiceReturnLineViewModel
                                            {
                                                Dimension1Name = packtab.Dimension1.Dimension1Name,
@@ -2544,23 +2568,25 @@ EXEC(@Qry);	";
                                                InvoiceBalQty = p.BalanceQty,
                                                Qty = p.BalanceQty,
                                                SaleInvoiceHeaderDocNo = tab.DocNo,
-                                               ProductName = tab2.ProductName,
+                                               ProductName = ProductTab.ProductName,
                                                ProductId = p.ProductId,
                                                GodownId = tab1.GodownId,
                                                SaleInvoiceLineId = p.SaleInvoiceLineId,
-                                               UnitId = tab2.UnitId,
+                                               UnitId = ProductTab.UnitId,
                                                UnitConversionMultiplier = linetab.UnitConversionMultiplier ?? 0,
                                                DealUnitId = linetab.DealUnitId,
                                                Rate = linetab.Rate,
                                                RateAfterDiscount = packtab.SaleOrderLine == null ? 0 : (packtab.SaleOrderLine.Amount / packtab.SaleOrderLine.DealQty),
                                                Amount = linetab.Amount,
-                                               unitDecimalPlaces = tab2.Unit.DecimalPlaces,
+                                               unitDecimalPlaces = ProductTab.Unit.DecimalPlaces,
                                                DealunitDecimalPlaces = linetab.DealUnit.DecimalPlaces,
                                                DiscountPer = linetab.DiscountPer,
                                                DiscountAmount = linetab.DiscountAmount,
                                                ProductUidName = packtab.ProductUid.ProductUidName,
                                                SalesTaxGroupPersonId = BusinessEntityTab.SalesTaxGroupPartyId,
-                                               SalesTaxGroupProductId = linetab.SalesTaxGroupProductId
+                                               SalesTaxGroupProductId = linetab.SalesTaxGroupProductId,
+                                               Percentage = linetab.Percentage,
+                                               ProductNatureId = ProductTab.ProductGroup.ProductType.ProductNatureId
                                            }).ToList();
                 
                 if (SaleInvoiceLineList.Sum(i => i.InvoiceBalQty) > 0)
@@ -2609,6 +2635,13 @@ EXEC(@Qry);	";
 
                     int CalculationId = Settings.CalculationId;
 
+                    //Patch
+                    String PubCompName = db.Company.Find(1).CompanyName;
+                    if (PubCompName == "ENAR INDUSTRIAL ENTERPRISES LTD.")
+                        if (SaleInvoiceHeader.DocDate < Convert.ToDateTime("01/Jan/2019"))
+                            CalculationId = 1005;
+
+
                     //IEnumerable<SaleInvoiceLine> SaleInvoiceLineList = new SaleInvoiceLineService(_unitOfWork).GetSaleInvoiceLineList(Sh.SaleInvoiceHeaderId);
 
 
@@ -2625,7 +2658,7 @@ EXEC(@Qry);	";
                                           select p.BalanceQty).FirstOrDefault();
 
 
-                        if (item.Qty > 0 && item.Qty <= balqty)
+                        if ((item.Qty > 0 && item.Qty <= balqty) || item.ProductNatureId == LedgerAccountProductNatureId)
                         {
                             SaleInvoiceReturnLine line = new SaleInvoiceReturnLine();
                             //var receipt = new SaleDispatchLineService(_unitOfWork).Find(item.SaleDispatchLineId );
@@ -2650,6 +2683,13 @@ EXEC(@Qry);	";
                             line.CreatedBy = User.Identity.Name;
                             line.ModifiedBy = User.Identity.Name;
                             line.SaleInvoiceReturnLineId = pk;
+
+                            //if (item.ProductNatureId == LedgerAccountProductNatureId && item.Amount == 0 
+                            //    && (item.Percentage ?? 0) != 0)
+                            //{
+                            //    line.Percentage = item.Percentage;
+                            //    line.Amount = Math.Round(InvoiceNetAmount  * (item.Percentage ?? 0) / 100,2);
+                            //}
 
 
                             SaleDispatchReturnLine GLine = Mapper.Map<SaleInvoiceReturnLine, SaleDispatchReturnLine>(line);

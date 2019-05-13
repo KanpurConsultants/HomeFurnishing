@@ -152,7 +152,8 @@ namespace Model.ViewModels
         public string LockReason { get; set; }
         public string AdditionalInfo { get; set; }
         public string ReturnNature { get; set; }
-
+        public string LineNature { get; set; }
+        public string ProductNatureName { get; set; }
         public int? SalesTaxGroupProductId { get; set; }
         public int? SalesTaxGroupPersonId { get; set; }
 
@@ -183,7 +184,17 @@ namespace Model.ViewModels
         public Decimal? UnitConversionMultiplier { get; set; }
 
         [Display(Name = "Rate")]
-        public Decimal Rate { get; set; }
+        public decimal Rate { get; set; }
+
+        [Display(Name = "Invoice Goods Value")]
+        public decimal? InvoiceGoodsValue { get; set; }
+
+
+        [Display(Name = "Percentage")]
+        public decimal? Percentage { get; set; }
+
+
+
 
         public int? PromoCodeId { get; set; }
         public string PromoCodeName { get; set; }

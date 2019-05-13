@@ -107,6 +107,7 @@ namespace Core.Common
         public const string FinishedMaterial = "Finished Material";
         public const string Machine = "Machine";
         public const string AdditionalCharges = "Addition/Deduction";
+        public const string LedgerAccount = "Ledger Account";
     }
 
     public class UnitConstants

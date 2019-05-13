@@ -75,6 +75,7 @@ namespace Model.ViewModels
 
         public int? SalesTaxGroupProductId { get; set; }
         public string SalesTaxGroupProductName { get; set; }
+        
 
         public string BaleNo { get; set; }
 
@@ -87,6 +88,8 @@ namespace Model.ViewModels
         [Display(Name = "Sale Order Rate")]
         public Decimal SaleOrderRate { get; set; }
 
+
+        public Decimal? Percentage { get; set; }
 
         [Display(Name = "Amount"), Required]
         public Decimal Amount { get; set; }

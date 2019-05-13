@@ -113,9 +113,14 @@ namespace Model.ViewModel
         [Display(Name = "Rate"), Required]
         public Decimal Rate { get; set; }
 
+        public int ProductNatureId { get; set; }
+
         public Decimal RateAfterDiscount { get; set; }
 
         public Decimal? Weight { get; set; }
+
+        public decimal? InvoiceGoodsValue { get; set; }
+        public decimal? Percentage { get; set; }
         public int? GodownId { get; set; }
 
         public bool CalculateDiscountOnRate { get; set; }
@@ -156,9 +161,11 @@ namespace Model.ViewModel
         public int? ProductUidId { get; set; }
         public string ProductUidName { get; set; }
         public string Nature { get; set; }
+        public string LineNature { get; set; }
         public int? CalculationId { get; set; }
         public int? SalesTaxGroupProductId { get; set; }
         public int? SalesTaxGroupPersonId { get; set; }
+        public string ProductNatureName { get; set; }
     }
     public class SaleInvoiceReturnLineIndexViewModel
     {

@@ -28,6 +28,7 @@ namespace Model.ViewModel
         public bool isVisibleProcess { get; set; }
         public bool isMandatoryProcess { get; set; }
         public bool isVisibleGodown { get; set; }
+        public bool isVisibleDueDate { get; set; }
         public bool isMandatoryGodown { get; set; }
         public bool isVisibleProductUid { get; set; }
         public bool isVisibleReferenceDocId { get; set; }

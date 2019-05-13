@@ -1079,3 +1079,4 @@ D:\Kanpur Consultants\HomeFurnishing\Source\Reports\obj\Debug\Reports.csprojReso
 D:\Kanpur Consultants\HomeFurnishing\Source\Reports\obj\Debug\Reports.dll
 D:\Kanpur Consultants\HomeFurnishing\Source\Reports\obj\Debug\Reports.pdb
 D:\Active Projects\Web\HomeFurnishing\Source\Reports\bin\Debug\Components.pdb
+D:\Kanpur Consultants\HomeFurnishing\Source\Reports\bin\Debug\Microsoft.SqlServer.Types.dll

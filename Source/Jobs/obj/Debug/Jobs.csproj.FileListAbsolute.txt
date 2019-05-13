@@ -846,3 +846,4 @@ D:\Kanpur Consultants\HomeFurnishing\Source\Jobs\obj\Debug\Jobs.pdb
 D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Components.dll
 D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\NotificationContents.dll
 D:\Active Projects\Web\HomeFurnishing\Source\Jobs\bin\Components.pdb
+D:\Kanpur Consultants\HomeFurnishing\Source\Jobs\bin\Microsoft.SqlServer.Types.dll
